@@ -285,6 +285,11 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
         <SelfCheckTrainer
           questions={filteredQuestions}
           userProgress={userProgress}
+          userAnswers={inlineAnswers}
+          submittedQuestions={inlineChecked}
+          onAnswerChange={(qid, ans) => setInlineAnswers((prev) => ({ ...prev, [qid]: ans }))}
+          onSubmitQuestion={(qid) => setInlineChecked((prev) => ({ ...prev, [qid]: true }))}
+          onResetQuestion={(qid) => setInlineChecked((prev) => ({ ...prev, [qid]: false }))}
           onMarkLearned={onMarkLearned}
           onMarkRepeat={onMarkRepeat}
         />

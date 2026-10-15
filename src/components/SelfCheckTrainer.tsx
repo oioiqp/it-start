@@ -20,6 +20,11 @@ import { triggerHaptic } from '../lib/telegram';
 interface SelfCheckTrainerProps {
   questions: Question[];
   userProgress: UserProgress;
+  userAnswers?: Record<string, string>;
+  submittedQuestions?: Record<string, boolean>;
+  onAnswerChange?: (questionId: string, answer: string) => void;
+  onSubmitQuestion?: (questionId: string) => void;
+  onResetQuestion?: (questionId: string) => void;
   onMarkLearned: (id: string) => void;
   onMarkRepeat: (id: string) => void;
 }
@@ -27,13 +32,18 @@ interface SelfCheckTrainerProps {
 export const SelfCheckTrainer: React.FC<SelfCheckTrainerProps> = ({
   questions,
   userProgress,
+  userAnswers,
+  submittedQuestions,
+  onAnswerChange,
+  onSubmitQuestion,
+  onResetQuestion,
   onMarkLearned,
   onMarkRepeat,
 }) => {
   const [deck, setDeck] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
-  const [userAnswers, setUserAnswers] = useState<Record<string, string>>({});
-  const [submittedQuestions, setSubmittedQuestions] = useState<Record<string, boolean>>({});
+  const [internalAnswers, setInternalAnswers] = useState<Record<string, string>>({});
+  const [internalSubmitted, setInternalSubmitted] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     setDeck(questions);
@@ -42,8 +52,11 @@ export const SelfCheckTrainer: React.FC<SelfCheckTrainerProps> = ({
 
   const currentCard = deck[currentIndex];
 
-  const currentAnswer = currentCard ? userAnswers[currentCard.id] || '' : '';
-  const isSubmitted = currentCard ? !!submittedQuestions[currentCard.id] : false;
+  const activeAnswers = userAnswers || internalAnswers;
+  const activeSubmitted = submittedQuestions || internalSubmitted;
+
+  const currentAnswer = currentCard ? activeAnswers[currentCard.id] || '' : '';
+  const isSubmitted = currentCard ? !!activeSubmitted[currentCard.id] : false;
 
   const handleNext = () => {
     if (currentIndex < deck.length - 1) {
@@ -68,28 +81,40 @@ export const SelfCheckTrainer: React.FC<SelfCheckTrainerProps> = ({
 
   const handleAnswerChange = (val: string) => {
     if (!currentCard) return;
-    setUserAnswers((prev) => ({
-      ...prev,
-      [currentCard.id]: val,
-    }));
+    if (onAnswerChange) {
+      onAnswerChange(currentCard.id, val);
+    } else {
+      setInternalAnswers((prev) => ({
+        ...prev,
+        [currentCard.id]: val,
+      }));
+    }
   };
 
   const handleSubmit = () => {
     if (!currentCard) return;
     triggerHaptic('medium');
-    setSubmittedQuestions((prev) => ({
-      ...prev,
-      [currentCard.id]: true,
-    }));
+    if (onSubmitQuestion) {
+      onSubmitQuestion(currentCard.id);
+    } else {
+      setInternalSubmitted((prev) => ({
+        ...prev,
+        [currentCard.id]: true,
+      }));
+    }
   };
 
   const handleResetCurrent = () => {
     if (!currentCard) return;
     triggerHaptic('light');
-    setSubmittedQuestions((prev) => ({
-      ...prev,
-      [currentCard.id]: false,
-    }));
+    if (onResetQuestion) {
+      onResetQuestion(currentCard.id);
+    } else {
+      setInternalSubmitted((prev) => ({
+        ...prev,
+        [currentCard.id]: false,
+      }));
+    }
   };
 
   const handleLearned = () => {
@@ -247,7 +272,10 @@ export const SelfCheckTrainer: React.FC<SelfCheckTrainerProps> = ({
               value={currentAnswer}
               onChange={(e) => handleAnswerChange(e.target.value)}
               onKeyDown={(e) => {
-                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSubmit();
+                } else if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
                   e.preventDefault();
                   handleSubmit();
                 }
@@ -259,7 +287,7 @@ export const SelfCheckTrainer: React.FC<SelfCheckTrainerProps> = ({
 
             <div className="flex items-center justify-between gap-3 pt-1">
               <span className="text-[10px] text-slate-500 hidden sm:inline">
-                Подсказка: нажмите <kbd className="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300">Ctrl</kbd> + <kbd className="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300">Enter</kbd> для проверки
+                Подсказка: нажмите <kbd className="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300">Enter</kbd> для проверки (<kbd className="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300">Shift</kbd> + <kbd className="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300">Enter</kbd> новая строка)
               </span>
 
               <button

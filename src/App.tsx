@@ -127,44 +127,54 @@ export function App() {
       const isCompleted = prev.completedTopics.includes(topicId);
       const topic = ROADMAP_TOPICS.find((t) => t.id === topicId);
       const subtopicIds = topic ? topic.subtopics.map((_, idx) => `${topicId}__sub_${idx}`) : [];
-      const currentSubtopics = prev.completedSubtopics || [];
+      const currentSubSet = new Set(prev.completedSubtopics || []);
 
-      let nextSubtopics = [...currentSubtopics];
       if (!isCompleted) {
-        // Mark all subtopics as done
-        subtopicIds.forEach((sid) => {
-          if (!nextSubtopics.includes(sid)) nextSubtopics.push(sid);
-        });
+        // Отметить тему и все её подтемы как изученные
+        subtopicIds.forEach((sid) => currentSubSet.add(sid));
+        return {
+          ...prev,
+          completedTopics: prev.completedTopics.includes(topicId)
+            ? prev.completedTopics
+            : [...prev.completedTopics, topicId],
+          completedSubtopics: Array.from(currentSubSet),
+        };
       } else {
-        // Remove all subtopics of this topic
-        nextSubtopics = nextSubtopics.filter((sid) => !subtopicIds.includes(sid));
+        // Снять отметку с темы и со всех её подтем
+        subtopicIds.forEach((sid) => currentSubSet.delete(sid));
+        return {
+          ...prev,
+          completedTopics: prev.completedTopics.filter((id) => id !== topicId),
+          completedSubtopics: Array.from(currentSubSet),
+        };
       }
-
-      return {
-        ...prev,
-        completedTopics: isCompleted
-          ? prev.completedTopics.filter((id) => id !== topicId)
-          : [...prev.completedTopics, topicId],
-        completedSubtopics: nextSubtopics,
-      };
     });
   };
 
   const handleToggleSubtopic = (topicId: string, subtopicIndex: number) => {
     updateProgress((prev) => {
-      const subtopicId = `${topicId}__sub_${subtopicIndex}`;
-      const currentSubtopics = prev.completedSubtopics || [];
-      const isSubDone = currentSubtopics.includes(subtopicId);
-
-      const nextSubtopics = isSubDone
-        ? currentSubtopics.filter((id) => id !== subtopicId)
-        : [...currentSubtopics, subtopicId];
-
       const topic = ROADMAP_TOPICS.find((t) => t.id === topicId);
       const totalSubtopics = topic?.subtopics.length || 0;
       const allTopicSubIds = topic?.subtopics.map((_, idx) => `${topicId}__sub_${idx}`) || [];
+      const targetSubId = `${topicId}__sub_${subtopicIndex}`;
 
-      const completedCount = allTopicSubIds.filter((sid) => nextSubtopics.includes(sid)).length;
+      const currentSubSet = new Set(prev.completedSubtopics || []);
+      const wasTopicCompleted = prev.completedTopics.includes(topicId);
+
+      // Если тема уже была отмечена как завершенная, считаем все её подтемы исходно выполненными
+      if (wasTopicCompleted) {
+        allTopicSubIds.forEach((sid) => currentSubSet.add(sid));
+      }
+
+      // Переключаем выбранную подтему
+      if (currentSubSet.has(targetSubId)) {
+        currentSubSet.delete(targetSubId);
+      } else {
+        currentSubSet.add(targetSubId);
+      }
+
+      const nextSubtopics = Array.from(currentSubSet);
+      const completedCount = allTopicSubIds.filter((sid) => currentSubSet.has(sid)).length;
       const isAllDone = totalSubtopics > 0 && completedCount === totalSubtopics;
 
       let nextCompletedTopics = [...prev.completedTopics];
@@ -267,8 +277,6 @@ export function App() {
                   <Briefcase className="w-3.5 h-3.5 text-indigo-400" />
                   IT-Стажировки & Подготовка 2026
                 </span>
-                <span className="text-xs text-slate-500 hidden sm:inline">•</span>
-                <span className="text-xs text-slate-500 hidden sm:inline">roadmap.sh style</span>
               </div>
 
               <div className="max-w-3xl space-y-2">

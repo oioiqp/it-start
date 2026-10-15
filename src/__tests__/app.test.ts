@@ -356,4 +356,181 @@ describe('8. Telegram WebApp & Bot Integration Features', () => {
   });
 });
 
+describe('9. Roadmap Subtopics Granular Progress & Two-Way Sync', () => {
+  const feCore1 = ROADMAP_TOPICS.find((t) => t.id === 'fe-core-1')!;
+
+  it('verifies fe-core-1 contains all subtopics requested by user (DNS, TCP 3-way handshake, HTTP/HTTPS, etc.)', () => {
+    expect(feCore1).toBeDefined();
+    expect(feCore1.subtopics.length).toBeGreaterThanOrEqual(5);
+    const subtopicsText = feCore1.subtopics.join(' ');
+    expect(subtopicsText).toContain('клиент-сервер');
+    expect(subtopicsText).toContain('DNS');
+    expect(subtopicsText).toContain('TCP');
+    expect(subtopicsText).toContain('HTTP');
+  });
+
+  it('correctly calculates subtopic checked status and section progress percent', () => {
+    const userProgress = {
+      completedTopics: [] as string[],
+      completedSubtopics: ['fe-core-1__sub_0', 'fe-core-1__sub_1', 'fe-core-1__sub_2'],
+      completedQuestions: [] as string[],
+      repeatQuestions: [] as string[],
+    };
+
+    const isSubtopicChecked = (topicId: string, subIdx: number) => {
+      const subId = `${topicId}__sub_${subIdx}`;
+      return Boolean(
+        userProgress.completedSubtopics?.includes(subId) ||
+        userProgress.completedTopics.includes(topicId)
+      );
+    };
+
+    expect(isSubtopicChecked('fe-core-1', 0)).toBe(true);
+    expect(isSubtopicChecked('fe-core-1', 1)).toBe(true);
+    expect(isSubtopicChecked('fe-core-1', 2)).toBe(true);
+    expect(isSubtopicChecked('fe-core-1', 3)).toBe(false);
+
+    const checkedCount = feCore1.subtopics.filter((_, idx) => isSubtopicChecked('fe-core-1', idx)).length;
+    expect(checkedCount).toBe(3);
+    const percent = Math.round((checkedCount / feCore1.subtopics.length) * 100);
+    expect(percent).toBe(Math.round((3 / feCore1.subtopics.length) * 100));
+  });
+
+  it('simulates two-way sync: marking all subtopics completes the topic (100%)', () => {
+    let progress = {
+      completedTopics: [] as string[],
+      completedSubtopics: [] as string[],
+      completedQuestions: [] as string[],
+      repeatQuestions: [] as string[],
+    };
+
+    const simulateToggleSubtopic = (topicId: string, subIdx: number) => {
+      const topic = ROADMAP_TOPICS.find((t) => t.id === topicId)!;
+      const total = topic.subtopics.length;
+      const allSubIds = topic.subtopics.map((_, i) => `${topicId}__sub_${i}`);
+      const targetSubId = `${topicId}__sub_${subIdx}`;
+
+      const set = new Set(progress.completedSubtopics);
+      if (progress.completedTopics.includes(topicId)) {
+        allSubIds.forEach((sid) => set.add(sid));
+      }
+
+      if (set.has(targetSubId)) {
+        set.delete(targetSubId);
+      } else {
+        set.add(targetSubId);
+      }
+
+      const nextSubtopics = Array.from(set);
+      const doneCount = allSubIds.filter((sid) => set.has(sid)).length;
+      const isAllDone = total > 0 && doneCount === total;
+
+      let nextTopics = [...progress.completedTopics];
+      if (isAllDone && !nextTopics.includes(topicId)) {
+        nextTopics.push(topicId);
+      } else if (!isAllDone && nextTopics.includes(topicId)) {
+        nextTopics = nextTopics.filter((id) => id !== topicId);
+      }
+
+      progress = { ...progress, completedTopics: nextTopics, completedSubtopics: nextSubtopics };
+    };
+
+    // Toggle all subtopics of fe-core-1
+    feCore1.subtopics.forEach((_, idx) => simulateToggleSubtopic('fe-core-1', idx));
+    expect(progress.completedTopics).toContain('fe-core-1');
+    expect(progress.completedSubtopics.length).toBe(feCore1.subtopics.length);
+
+    // Uncheck one subtopic
+    simulateToggleSubtopic('fe-core-1', 0);
+    expect(progress.completedTopics).not.toContain('fe-core-1');
+    expect(progress.completedSubtopics.length).toBe(feCore1.subtopics.length - 1);
+  });
+
+  it('simulates marking topic completed automatically marks all its subtopics', () => {
+    let progress = {
+      completedTopics: [] as string[],
+      completedSubtopics: [] as string[],
+      completedQuestions: [] as string[],
+      repeatQuestions: [] as string[],
+    };
+
+    const simulateToggleTopic = (topicId: string) => {
+      const isCompleted = progress.completedTopics.includes(topicId);
+      const topic = ROADMAP_TOPICS.find((t) => t.id === topicId)!;
+      const allSubIds = topic.subtopics.map((_, i) => `${topicId}__sub_${i}`);
+      const set = new Set(progress.completedSubtopics);
+
+      if (!isCompleted) {
+        allSubIds.forEach((sid) => set.add(sid));
+        progress = {
+          ...progress,
+          completedTopics: [...progress.completedTopics, topicId],
+          completedSubtopics: Array.from(set),
+        };
+      } else {
+        allSubIds.forEach((sid) => set.delete(sid));
+        progress = {
+          ...progress,
+          completedTopics: progress.completedTopics.filter((id) => id !== topicId),
+          completedSubtopics: Array.from(set),
+        };
+      }
+    };
+
+    simulateToggleTopic('fe-core-1');
+    expect(progress.completedTopics).toContain('fe-core-1');
+    expect(progress.completedSubtopics.length).toBe(feCore1.subtopics.length);
+
+    simulateToggleTopic('fe-core-1');
+    expect(progress.completedTopics).not.toContain('fe-core-1');
+    expect(progress.completedSubtopics.length).toBe(0);
+  });
+});
+
+describe('10. Interactive Self-Check Questions Trainer', () => {
+  it('contains Event Loop question with exact order code snippet', () => {
+    const eventLoopQ = QUESTIONS.find((q) => q.id === 'q-fe-1');
+    expect(eventLoopQ).toBeDefined();
+    expect(eventLoopQ!.title).toContain('Event Loop');
+    expect(eventLoopQ!.codeSnippet).toContain('setTimeout');
+    expect(eventLoopQ!.codeSnippet).toContain('Promise.resolve()');
+    expect(eventLoopQ!.answer).toContain('1, 4, 3, 2');
+    expect(eventLoopQ!.keyTakeaways.length).toBeGreaterThan(0);
+  });
+
+  it('supports self-evaluation flow: marking learned vs repeat', () => {
+    let progress = {
+      completedTopics: [],
+      completedSubtopics: [],
+      completedQuestions: [] as string[],
+      repeatQuestions: [] as string[],
+    };
+
+    const markLearned = (qid: string) => {
+      progress = {
+        ...progress,
+        completedQuestions: Array.from(new Set([...progress.completedQuestions, qid])),
+        repeatQuestions: progress.repeatQuestions.filter((id) => id !== qid),
+      };
+    };
+
+    const markRepeat = (qid: string) => {
+      progress = {
+        ...progress,
+        repeatQuestions: Array.from(new Set([...progress.repeatQuestions, qid])),
+        completedQuestions: progress.completedQuestions.filter((id) => id !== qid),
+      };
+    };
+
+    markLearned('q-fe-1');
+    expect(progress.completedQuestions).toContain('q-fe-1');
+    expect(progress.repeatQuestions).not.toContain('q-fe-1');
+
+    markRepeat('q-fe-1');
+    expect(progress.repeatQuestions).toContain('q-fe-1');
+    expect(progress.completedQuestions).not.toContain('q-fe-1');
+  });
+});
+
+
 

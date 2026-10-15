@@ -71,11 +71,23 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
   const readinessPercent = totalItems > 0 ? Math.round((totalCompleted / totalItems) * 100) : 0;
 
   const isSubtopicChecked = (topicId: string, subIdx: number) => {
-    const subtopicKey = `${topicId}:${subIdx}`;
+    const subtopicKey = `${topicId}__sub_${subIdx}`;
     return Boolean(
       userProgress.completedSubtopics?.includes(subtopicKey) ||
       userProgress.completedTopics.includes(topicId)
     );
+  };
+
+  const getTopicProgress = (topic: RoadmapTopic) => {
+    const total = topic.subtopics.length;
+    if (total === 0) {
+      const done = userProgress.completedTopics.includes(topic.id);
+      return { total: 0, checked: done ? 1 : 0, percent: done ? 100 : 0, isDone: done };
+    }
+    const checked = topic.subtopics.filter((_, sIdx) => isSubtopicChecked(topic.id, sIdx)).length;
+    const percent = Math.round((checked / total) * 100);
+    const isDone = checked === total || userProgress.completedTopics.includes(topic.id);
+    return { total, checked, percent, isDone };
   };
 
   const handleToggleTopic = (topicId: string) => {
@@ -211,13 +223,15 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
 
             <div className="space-y-2.5">
               {relevantTopics.map((topic) => {
-                const isCompleted = userProgress.completedTopics.includes(topic.id);
+                const { total, checked, percent, isDone } = getTopicProgress(topic);
                 return (
                   <div
                     key={topic.id}
                     className={`p-3.5 rounded-2xl border transition-all ${
-                      isCompleted
+                      isDone
                         ? 'bg-emerald-950/20 border-emerald-800/40 text-slate-200'
+                        : percent > 0
+                        ? 'bg-slate-900/90 border-indigo-500/40 text-slate-200'
                         : 'bg-slate-950/60 border-slate-800 text-slate-300 hover:border-slate-700'
                     }`}
                   >
@@ -227,8 +241,9 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                           type="button"
                           onClick={() => handleToggleTopic(topic.id)}
                           className="mt-0.5 text-slate-400 hover:text-emerald-400 transition-colors"
+                          title={isDone ? 'Снять отметку' : 'Отметить тему как изученную'}
                         >
-                          {isCompleted ? (
+                          {isDone ? (
                             <CheckCircle2 className="w-5 h-5 text-emerald-400" />
                           ) : (
                             <Circle className="w-5 h-5 text-slate-600 hover:text-indigo-400" />
@@ -262,10 +277,28 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                       </a>
                     </div>
 
+                    {/* Topic Progress Bar with % */}
+                    <div className="bg-slate-900/80 border border-slate-800/80 rounded-xl p-2.5 my-3">
+                      <div className="flex items-center justify-between text-[11px] mb-1">
+                        <span className="text-slate-400 font-medium">Прогресс раздела:</span>
+                        <span className={`font-bold ${isDone ? 'text-emerald-400' : 'text-indigo-300'}`}>
+                          {percent}% ({checked} из {total} подтем)
+                        </span>
+                      </div>
+                      <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all duration-300 ${
+                            isDone ? 'bg-emerald-500' : 'bg-indigo-500'
+                          }`}
+                          style={{ width: `${percent}%` }}
+                        />
+                      </div>
+                    </div>
+
                     {topic.subtopics && topic.subtopics.length > 0 && (
-                      <div className="mt-3 pt-2.5 border-t border-slate-800/80">
-                        <div className="text-[11px] font-medium text-slate-400 mb-1.5">
-                          Ключевые подтемы:
+                      <div className="pt-2 border-t border-slate-800/60">
+                        <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                          Ключевые подтемы (отметьте изученные):
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
                           {topic.subtopics.map((sub, sIdx) => {
@@ -275,18 +308,18 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                                 key={sIdx}
                                 type="button"
                                 onClick={() => handleToggleSubtopic(topic.id, sIdx)}
-                                className={`flex items-center gap-2 p-1.5 rounded-lg text-left text-xs transition-colors ${
+                                className={`flex items-start gap-2 p-2 rounded-xl text-left text-xs transition-colors select-none ${
                                   isSubDone
-                                    ? 'bg-emerald-950/40 text-emerald-300 border border-emerald-800/40'
-                                    : 'bg-slate-900/60 text-slate-300 border border-slate-800 hover:border-slate-700'
+                                    ? 'bg-emerald-950/40 text-emerald-200 border border-emerald-800/50'
+                                    : 'bg-slate-900/70 text-slate-300 border border-slate-800 hover:border-slate-700'
                                 }`}
                               >
                                 {isSubDone ? (
-                                  <CheckSquare className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                                  <CheckSquare className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
                                 ) : (
-                                  <Square className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                                  <Square className="w-3.5 h-3.5 text-slate-500 shrink-0 mt-0.5" />
                                 )}
-                                <span className={isSubDone ? 'line-through text-slate-400' : ''}>
+                                <span className={isSubDone ? 'line-through opacity-80' : ''}>
                                   {sub}
                                 </span>
                               </button>
@@ -295,6 +328,29 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                         </div>
                       </div>
                     )}
+
+                    {/* Quick Section Toggle Button */}
+                    <button
+                      type="button"
+                      onClick={() => handleToggleTopic(topic.id)}
+                      className={`w-full mt-3 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
+                        isDone
+                          ? 'bg-emerald-600/15 border-emerald-500/30 text-emerald-300'
+                          : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white hover:border-slate-700 hover:bg-indigo-600/15 hover:border-indigo-500/30'
+                      }`}
+                    >
+                      {isDone ? (
+                        <>
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                          <span>Раздел полностью изучен (100%)</span>
+                        </>
+                      ) : (
+                        <>
+                          <Circle className="w-3.5 h-3.5" />
+                          <span>Отметить раздел изученным (100%)</span>
+                        </>
+                      )}
+                    </button>
                   </div>
                 );
               })}

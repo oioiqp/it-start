@@ -71,12 +71,10 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
   // Compute subtopic check states
   const getSubtopicChecked = (topic: RoadmapTopic, sIdx: number) => {
     const subId = `${topic.id}__sub_${sIdx}`;
-    const explicitlyChecked = userProgress.completedSubtopics?.includes(subId);
-    if (explicitlyChecked !== undefined) {
-      return explicitlyChecked;
-    }
-    // If completedSubtopics doesn't contain it yet, check if topic is completed
-    return userProgress.completedTopics.includes(topic.id);
+    return Boolean(
+      userProgress.completedSubtopics?.includes(subId) ||
+      userProgress.completedTopics.includes(topic.id)
+    );
   };
 
   const getTopicProgress = (topic: RoadmapTopic) => {
@@ -226,27 +224,30 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
           </div>
 
           {/* Core Nodes Spine */}
-          <div className="relative pl-6 sm:pl-10 space-y-6">
+          <div className="relative pl-8 sm:pl-12 space-y-6">
             {/* Continuous vertical connecting line */}
-            <div className="absolute left-[19px] sm:left-[35px] top-6 bottom-0 w-0.5 bg-slate-800"></div>
+            <div className="absolute left-4 sm:left-6 top-6 bottom-0 w-0.5 bg-slate-800 -translate-x-1/2"></div>
 
             {coreTopics.map((topic, idx) => {
               const { total, checked, percent, isDone } = getTopicProgress(topic);
 
               return (
                 <div key={topic.id} className="relative group">
-                  {/* Tree Node Dot / Anchor on the spine */}
+                  {/* Tree Node Dot / Anchor exactly on the spine */}
                   <div
-                    className={`absolute -left-[19px] sm:-left-[35px] top-6 w-8 h-8 -translate-x-1/2 rounded-full border-2 flex items-center justify-center text-[11px] font-black z-10 transition-colors ${
+                    className={`absolute -left-4 sm:-left-6 top-6 w-8 h-8 -translate-x-1/2 rounded-full border-2 flex items-center justify-center text-[11px] font-black z-20 transition-all ${
                       isDone
-                        ? 'bg-emerald-950 border-emerald-500 text-emerald-300'
+                        ? 'bg-emerald-950 border-emerald-500 text-emerald-300 shadow-sm shadow-emerald-500/30'
                         : percent > 0
-                        ? 'bg-indigo-950 border-indigo-500 text-indigo-300'
+                        ? 'bg-indigo-950 border-indigo-500 text-indigo-300 shadow-sm shadow-indigo-500/30'
                         : 'bg-slate-900 border-slate-700 text-slate-400'
                     }`}
                   >
                     {idx + 1}
                   </div>
+
+                  {/* Horizontal Branch Connector Arm ("веточка" к карточке) */}
+                  <div className="absolute -left-4 sm:-left-6 top-10 w-4 sm:w-6 h-0.5 bg-slate-800 z-10"></div>
 
                   {/* Node Card */}
                   <div
@@ -388,14 +389,17 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
 
         {/* PROMINENT VISUAL JUNCTION: SPECIALIZATION FORK (Развилка специализации) */}
         <div className="relative py-8 my-2">
-          {/* Connector down to fork */}
-          <div className="absolute left-[19px] sm:left-[35px] top-0 h-8 w-0.5 bg-slate-800"></div>
+          {/* Continuous vertical connecting line through the fork */}
+          <div className="absolute left-4 sm:left-6 top-0 bottom-0 w-0.5 bg-slate-800 -translate-x-1/2"></div>
 
-          <div className="relative pl-6 sm:pl-10">
-            {/* Fork icon badge on spine */}
-            <div className="absolute -left-[19px] sm:-left-[35px] top-6 w-9 h-9 -translate-x-1/2 rounded-full bg-slate-900 border-2 border-indigo-500 text-indigo-400 flex items-center justify-center z-10 shadow-md">
+          <div className="relative pl-8 sm:pl-12">
+            {/* Fork icon badge exactly on spine */}
+            <div className="absolute -left-4 sm:-left-6 top-6 w-9 h-9 -translate-x-1/2 rounded-full bg-slate-900 border-2 border-indigo-500 text-indigo-400 flex items-center justify-center z-20 shadow-md">
               <GitFork className="w-4 h-4 rotate-180" />
             </div>
+
+            {/* Horizontal Branch Connector Arm */}
+            <div className="absolute -left-4 sm:-left-6 top-10 w-4 sm:w-6 h-0.5 bg-indigo-500/40 z-10"></div>
 
             {/* Fork Card */}
             <div className="p-5 sm:p-6 rounded-2xl bg-slate-900 border-2 border-indigo-500/40 shadow-xl space-y-4">
@@ -404,14 +408,14 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                   <GitFork className="w-3.5 h-3.5" />
                   Развилка специализации
                 </span>
-                <span className="text-xs text-slate-400">
-                  Общая база завершена • Выберите целевой стек
+                <span className="text-xs text-indigo-300 font-medium">
+                  Общая база (Узлы 1..{coreTopics.length}) завершена • Выберите целевой стек
                 </span>
               </div>
 
               <div>
                 <h3 className="text-base sm:text-lg font-bold text-white mb-1">
-                  Переход к углубленной специализации: {currentDirection.subTracks.find((s) => s.id === validSubTrack)?.name}
+                  Переход к углубленной специализации: <span className="text-indigo-400">{currentDirection.subTracks.find((s) => s.id === validSubTrack)?.name}</span>
                 </h3>
                 <p className="text-xs text-slate-400 leading-relaxed">
                   После освоения фундамента направления выберите профильный стек. Все последующие узлы роадмапа и практические темы автоматически адаптируются под выбранную технологию.
@@ -419,32 +423,46 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
               </div>
 
               {/* Interactive Branch Switcher Buttons */}
-              <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-800">
-                <span className="text-xs font-semibold text-slate-400 mr-1">
-                  Ветки направления:
+              <div className="space-y-2 pt-2 border-t border-slate-800">
+                <span className="text-xs font-semibold text-slate-400 block">
+                  Ветки направления «{currentDirection.title}»:
                 </span>
-                {currentDirection.subTracks.map((st) => {
-                  const isCurrent = st.id === validSubTrack;
-                  return (
-                    <button
-                      key={st.id}
-                      onClick={() => handleSelectSubTrack(st.id)}
-                      className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold border transition-all ${
-                        isCurrent
-                          ? 'bg-indigo-600 text-white border-indigo-400 shadow-sm'
-                          : 'bg-slate-950 text-slate-300 border-slate-800 hover:border-slate-700'
-                      }`}
-                    >
-                      <span>{st.name}</span>
-                      {isCurrent && <Check className="w-3.5 h-3.5" />}
-                    </button>
-                  );
-                })}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                  {currentDirection.subTracks.map((st) => {
+                    const isCurrent = st.id === validSubTrack;
+                    return (
+                      <button
+                        key={st.id}
+                        onClick={() => handleSelectSubTrack(st.id)}
+                        className={`flex items-center justify-between p-3 rounded-xl border text-left transition-all ${
+                          isCurrent
+                            ? 'bg-indigo-600/20 border-indigo-500 text-white shadow-md'
+                            : 'bg-slate-950/80 border-slate-800 text-slate-300 hover:border-slate-700 hover:text-white'
+                        }`}
+                      >
+                        <div>
+                          <div className="text-xs font-bold flex items-center gap-1.5">
+                            <span>{st.name}</span>
+                            {isCurrent && (
+                              <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-indigo-600 text-white">
+                                Выбрано
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-[10px] text-slate-400 mt-0.5 line-clamp-1">
+                            {st.shortDesc}
+                          </div>
+                        </div>
+                        {isCurrent && <Check className="w-4 h-4 text-indigo-400 shrink-0" />}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
               <div className="flex items-center gap-2 text-xs text-indigo-400 pt-1">
-                <ArrowDown className="w-3.5 h-3.5" />
-                <span>Ниже отображаются профильные темы для «{currentDirection.subTracks.find((s) => s.id === validSubTrack)?.name}»</span>
+                <ArrowDown className="w-3.5 h-3.5 animate-bounce" />
+                <span>Ниже отображаются профильные темы для «{currentDirection.subTracks.find((s) => s.id === validSubTrack)?.name}» (Узлы #{coreTopics.length + 1}..#{coreTopics.length + subTrackTopics.length})</span>
               </div>
             </div>
           </div>
@@ -462,9 +480,9 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
           </div>
 
           {/* Sub-track Nodes Spine */}
-          <div className="relative pl-6 sm:pl-10 space-y-6">
+          <div className="relative pl-8 sm:pl-12 space-y-6">
             {/* Continuous vertical connecting line */}
-            <div className="absolute left-[19px] sm:left-[35px] top-0 bottom-6 w-0.5 bg-slate-800"></div>
+            <div className="absolute left-4 sm:left-6 top-0 bottom-6 w-0.5 bg-slate-800 -translate-x-1/2"></div>
 
             {subTrackTopics.map((topic, idx) => {
               const { total, checked, percent, isDone } = getTopicProgress(topic);
@@ -474,16 +492,19 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                 <div key={topic.id} className="relative group">
                   {/* Tree Node Dot / Anchor on the spine */}
                   <div
-                    className={`absolute -left-[19px] sm:-left-[35px] top-6 w-8 h-8 -translate-x-1/2 rounded-full border-2 flex items-center justify-center text-[11px] font-black z-10 transition-colors ${
+                    className={`absolute -left-4 sm:-left-6 top-6 w-8 h-8 -translate-x-1/2 rounded-full border-2 flex items-center justify-center text-[11px] font-black z-20 transition-all ${
                       isDone
-                        ? 'bg-emerald-950 border-emerald-500 text-emerald-300'
+                        ? 'bg-emerald-950 border-emerald-500 text-emerald-300 shadow-sm shadow-emerald-500/30'
                         : percent > 0
-                        ? 'bg-indigo-950 border-indigo-500 text-indigo-300'
+                        ? 'bg-indigo-950 border-indigo-500 text-indigo-300 shadow-sm shadow-indigo-500/30'
                         : 'bg-slate-900 border-slate-700 text-slate-400'
                     }`}
                   >
                     {nodeNumber}
                   </div>
+
+                  {/* Horizontal Branch Connector Arm */}
+                  <div className="absolute -left-4 sm:-left-6 top-10 w-4 sm:w-6 h-0.5 bg-slate-800 z-10"></div>
 
                   {/* Node Card */}
                   <div
@@ -498,8 +519,11 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                     {/* Header: Title, Order & Doc Link */}
                     <div className="flex items-start justify-between gap-3 mb-2">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-xs font-bold text-slate-500 font-mono">
+                        <span className="text-xs font-bold text-indigo-400 font-mono">
                           Узел #{nodeNumber}
+                        </span>
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-950 text-indigo-300 border border-indigo-800/40">
+                          Специализация: {currentDirection.subTracks.find((s) => s.id === validSubTrack)?.name}
                         </span>
                         <h4 className="text-sm sm:text-base font-bold text-white group-hover:text-indigo-300 transition-colors">
                           {topic.title}
