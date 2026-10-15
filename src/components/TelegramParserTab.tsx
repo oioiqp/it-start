@@ -9,7 +9,6 @@ import {
   RefreshCw,
   PlusCircle,
   Terminal,
-  Users,
   ShieldCheck,
   Check,
   Flame,
@@ -17,7 +16,6 @@ import {
 import confetti from 'canvas-confetti';
 import type { DirectionId, Internship, SubTrackId, TelegramSubscription, TelegramUser } from '../types';
 import { DIRECTIONS } from '../data/directions';
-import { TEAM_MEMBERS } from '../data/team';
 import {
   addInternshipToSupabase,
   fetchSubscriptionsFromSupabase,
@@ -819,80 +817,6 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
               </div>
             ))}
           </div>
-        </div>
-      </div>
-
-      {/* BLOCK 4: PROJECT TEAM INFO */}
-      <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 sm:p-7 shadow-xl">
-        <div className="flex items-center gap-3 mb-5">
-          <div className="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-500/30 flex items-center justify-center text-purple-400">
-            <Users className="w-5 h-5" />
-          </div>
-          <div>
-            <h3 className="text-lg font-black text-white">
-              Команда проекта («Проектная деятельность»)
-            </h3>
-            <p className="text-xs text-slate-400">
-              Разработчики сервиса «IT-Старт: агрегатор стажировок и база подготовки»
-            </p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {TEAM_MEMBERS.map((member, idx) => (
-            <div
-              key={idx}
-              className="p-4 rounded-2xl bg-slate-950/70 border border-slate-800 hover:border-slate-700 transition-all flex flex-col justify-between"
-            >
-              <div>
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-12 h-12 rounded-2xl overflow-hidden bg-gradient-to-tr from-indigo-600 to-purple-600 p-0.5 shrink-0">
-                    <img
-                      src={member.avatar}
-                      alt={member.name}
-                      className="w-full h-full object-cover rounded-[14px]"
-                    />
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-bold text-white">{member.name}</h4>
-                    <span className="text-[11px] font-semibold text-indigo-400 block">
-                      {member.role}
-                    </span>
-                  </div>
-                </div>
-
-                <p className="text-xs text-slate-300 mb-3 leading-relaxed">
-                  {member.responsibility}
-                </p>
-              </div>
-
-              <div>
-                <div className="flex flex-wrap gap-1 mb-3">
-                  {member.techStack.map((tech, tIdx) => (
-                    <span
-                      key={tIdx}
-                      className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-slate-900 border border-slate-800 text-slate-400"
-                    >
-                      {tech}
-                    </span>
-                  ))}
-                </div>
-
-                <div className="flex items-center justify-between pt-2 border-t border-slate-800/80 text-xs">
-                  <span className="text-slate-500 text-[11px]">IT-Старт Team</span>
-                  <a
-                    href={member.telegram || TELEGRAM_BOT_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sky-400 hover:text-sky-300 flex items-center gap-1 font-medium"
-                  >
-                    <span>Связаться</span>
-                    <ExternalLink className="w-3 h-3" />
-                  </a>
-                </div>
-              </div>
-            </div>
-          ))}
         </div>
       </div>
     </div>
