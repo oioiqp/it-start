@@ -16,9 +16,22 @@
  *   TELEGRAM_BOT_TOKEN="ВАШ_ТОКЕН" node bot/bot.mjs
  */
 
+import http from 'node:http';
+
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || process.argv[2] || '';
 const GITHUB_PAGES_URL = 'https://oioiqp.github.io/it-start/';
 const BOT_USERNAME = 'IT_start_izh_bot';
+const PORT = process.env.PORT || 3000;
+
+// HTTP Health Check сервер для бесплатного Web Service на Render.com
+const server = http.createServer((req, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+  res.end('IT-Старт Telegram Bot работает 24/7!\n');
+});
+
+server.listen(PORT, () => {
+  console.log(`🌐 HTTP сервер запущен на порту ${PORT} (Render Health Check)`);
+});
 
 const TOP_INTERNSHIPS = [
   {
