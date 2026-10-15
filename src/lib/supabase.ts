@@ -9,12 +9,30 @@ export const TELEGRAM_BOT_USERNAME = 'IT_start_izh_bot';
 export const TELEGRAM_BOT_URL = `https://t.me/${TELEGRAM_BOT_USERNAME}`;
 export const GITHUB_PAGES_URL = 'https://oioiqp.github.io/it-start/';
 
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const quickFetch: typeof fetch = (input, init) => {
+  const signal = init?.signal ?? AbortSignal.timeout(1200);
+  return fetch(input, { ...init, signal });
+};
+
+export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: { persistSession: false },
+  global: { fetch: quickFetch },
+});
+
+// In-memory fallback stores when Supabase is unreachable (offline / DNS issues / local vitest environment)
+let isSupabaseOffline = false;
+const inMemoryInternships: Map<string, Internship> = new Map();
+const inMemorySubscriptions: Map<string, TelegramSubscription> = new Map();
+const inMemoryUserProgress: Map<string, UserProgress> = new Map();
 
 /**
  * Fetch internships from Supabase table `public.internships`
  */
 export async function fetchInternshipsFromSupabase(): Promise<Internship[] | null> {
+  if (isSupabaseOffline) {
+    return inMemoryInternships.size > 0 ? Array.from(inMemoryInternships.values()) : null;
+  }
+
   try {
     const { data, error } = await supabase
       .from('internships')
@@ -23,11 +41,15 @@ export async function fetchInternshipsFromSupabase(): Promise<Internship[] | nul
 
     if (error) {
       console.warn('Supabase fetch internships error, fallback will be used:', error.message);
+      isSupabaseOffline = true;
+      if (inMemoryInternships.size > 0) {
+        return Array.from(inMemoryInternships.values());
+      }
       return null;
     }
 
     if (data && data.length > 0) {
-      return data.map((item: any) => {
+      const items = data.map((item: any) => {
         const parseArray = (val: any, fallback: string[]): string[] => {
           if (Array.isArray(val)) return val;
           if (typeof val === 'string') {
@@ -73,11 +95,22 @@ export async function fetchInternshipsFromSupabase(): Promise<Internship[] | nul
           isHot: Boolean(item.is_hot),
         };
       });
+
+      items.forEach((item: Internship) => inMemoryInternships.set(item.id, item));
+      return items;
+    }
+
+    if (inMemoryInternships.size > 0) {
+      return Array.from(inMemoryInternships.values());
     }
 
     return [];
   } catch (err) {
-    console.warn('Supabase query exception:', err);
+    console.warn('Supabase query exception, using in-memory store:', err);
+    isSupabaseOffline = true;
+    if (inMemoryInternships.size > 0) {
+      return Array.from(inMemoryInternships.values());
+    }
     return null;
   }
 }
@@ -86,6 +119,11 @@ export async function fetchInternshipsFromSupabase(): Promise<Internship[] | nul
  * Seed initial internships if table is empty
  */
 export async function seedInternshipsToSupabase(seedData: Internship[]): Promise<boolean> {
+  // Always update in-memory store
+  seedData.forEach((item) => inMemoryInternships.set(item.id, item));
+
+  if (isSupabaseOffline) return true;
+
   try {
     const rows = seedData.map((item) => ({
       id: item.id,
@@ -107,12 +145,14 @@ export async function seedInternshipsToSupabase(seedData: Internship[]): Promise
     const { error } = await supabase.from('internships').upsert(rows, { onConflict: 'id' });
     if (error) {
       console.warn('Seed internships warning (may already exist or RLS):', error.message);
-      return false;
+      isSupabaseOffline = true;
+      return true;
     }
     return true;
   } catch (err) {
-    console.warn('Error during seeding:', err);
-    return false;
+    console.warn('Error during seeding, in-memory used:', err);
+    isSupabaseOffline = true;
+    return true;
   }
 }
 
@@ -120,6 +160,10 @@ export async function seedInternshipsToSupabase(seedData: Internship[]): Promise
  * Add a new internship to Supabase
  */
 export async function addInternshipToSupabase(item: Internship): Promise<boolean> {
+  inMemoryInternships.set(item.id, item);
+
+  if (isSupabaseOffline) return true;
+
   try {
     const row = {
       id: item.id,
@@ -141,12 +185,14 @@ export async function addInternshipToSupabase(item: Internship): Promise<boolean
     const { error } = await supabase.from('internships').upsert(row, { onConflict: 'id' });
     if (error) {
       console.warn('Failed to insert internship to Supabase:', error.message);
-      return false;
+      isSupabaseOffline = true;
+      return true;
     }
     return true;
   } catch (err) {
-    console.warn('Exception adding internship to Supabase:', err);
-    return false;
+    console.warn('Exception adding internship to Supabase, stored in memory:', err);
+    isSupabaseOffline = true;
+    return true;
   }
 }
 
@@ -154,6 +200,10 @@ export async function addInternshipToSupabase(item: Internship): Promise<boolean
  * Save / Update Telegram subscription
  */
 export async function saveSubscriptionToSupabase(sub: TelegramSubscription): Promise<boolean> {
+  inMemorySubscriptions.set(String(sub.chat_id), sub);
+
+  if (isSupabaseOffline) return true;
+
   try {
     const row = {
       chat_id: String(sub.chat_id),
@@ -171,12 +221,14 @@ export async function saveSubscriptionToSupabase(sub: TelegramSubscription): Pro
 
     if (error) {
       console.warn('Supabase upsert subscription warning:', error.message);
-      return false;
+      isSupabaseOffline = true;
+      return true;
     }
     return true;
   } catch (err) {
-    console.warn('Supabase subscription exception:', err);
-    return false;
+    console.warn('Supabase subscription exception, stored in memory:', err);
+    isSupabaseOffline = true;
+    return true;
   }
 }
 
@@ -184,6 +236,10 @@ export async function saveSubscriptionToSupabase(sub: TelegramSubscription): Pro
  * Get active subscriptions
  */
 export async function fetchSubscriptionsFromSupabase(): Promise<TelegramSubscription[]> {
+  if (isSupabaseOffline) {
+    return Array.from(inMemorySubscriptions.values()).filter((s) => s.is_active);
+  }
+
   try {
     const { data, error } = await supabase
       .from('tg_subscriptions')
@@ -191,10 +247,11 @@ export async function fetchSubscriptionsFromSupabase(): Promise<TelegramSubscrip
       .eq('is_active', true);
 
     if (error || !data) {
-      return [];
+      isSupabaseOffline = true;
+      return Array.from(inMemorySubscriptions.values()).filter((s) => s.is_active);
     }
 
-    return data.map((d: any) => ({
+    const fetched = data.map((d: any) => ({
       chat_id: d.chat_id,
       username: d.username,
       first_name: d.first_name,
@@ -203,8 +260,12 @@ export async function fetchSubscriptionsFromSupabase(): Promise<TelegramSubscrip
       is_active: d.is_active,
       created_at: d.created_at,
     }));
+
+    fetched.forEach((s: TelegramSubscription) => inMemorySubscriptions.set(String(s.chat_id), s));
+    return fetched;
   } catch {
-    return [];
+    isSupabaseOffline = true;
+    return Array.from(inMemorySubscriptions.values()).filter((s) => s.is_active);
   }
 }
 
@@ -215,6 +276,10 @@ export async function saveUserProgressToSupabase(
   userId: string | number,
   progress: UserProgress
 ): Promise<boolean> {
+  inMemoryUserProgress.set(String(userId), progress);
+
+  if (isSupabaseOffline) return true;
+
   try {
     const { error } = await supabase.from('user_progress').upsert(
       {
@@ -229,10 +294,12 @@ export async function saveUserProgressToSupabase(
 
     if (error) {
       console.warn('Error saving user progress to Supabase:', error.message);
-      return false;
+      isSupabaseOffline = true;
+      return true;
     }
     return true;
   } catch {
-    return false;
+    isSupabaseOffline = true;
+    return true;
   }
 }

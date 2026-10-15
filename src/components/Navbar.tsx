@@ -5,7 +5,6 @@ import {
   HelpCircle,
   Send,
   Bell,
-  Sparkles,
   ExternalLink,
   Bot,
   Globe,
@@ -51,19 +50,19 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full backdrop-blur-xl bg-slate-950/85 border-b border-slate-800/80 transition-all">
+    <header className="sticky top-0 z-40 w-full backdrop-blur-md bg-slate-950/90 border-b border-slate-800 transition-all">
       {/* Top micro bar for Telegram Mini App / External Bot link */}
-      <div className="bg-gradient-to-r from-indigo-950/60 via-slate-900/60 to-purple-950/60 border-b border-indigo-900/30 px-3 py-1.5 text-xs text-slate-300">
+      <div className="bg-slate-900/60 border-b border-slate-800/80 px-3 py-1.5 text-xs text-slate-300">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 truncate">
             {isTg ? (
               <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-medium">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                Режим Telegram Mini App: {telegramUser.username ? `@${telegramUser.username}` : telegramUser.first_name} (ID: {telegramUser.id})
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                Telegram Mini App: {telegramUser.username ? `@${telegramUser.username}` : telegramUser.first_name} (ID: {telegramUser.id})
               </span>
             ) : (
               <span className="inline-flex items-center gap-1.5 text-slate-400">
-                <Globe className="w-3.5 h-3.5 text-sky-400" />
+                <Globe className="w-3.5 h-3.5 text-slate-400" />
                 Веб-версия IT-Старт
                 <span className="hidden sm:inline text-slate-500">• Доступен официальный бот</span>
               </span>
@@ -75,11 +74,11 @@ export const Navbar: React.FC<NavbarProps> = ({
               href={TELEGRAM_BOT_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 border border-sky-500/30 transition-colors font-medium text-xs"
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/80 transition-colors font-medium text-xs"
             >
               <Bot className="w-3.5 h-3.5 text-sky-400" />
-              <span>{isTg ? `@${TELEGRAM_BOT_USERNAME}` : `Открыть в Telegram-боте @${TELEGRAM_BOT_USERNAME}`}</span>
-              <ExternalLink className="w-2.5 h-2.5 opacity-70" />
+              <span>{isTg ? `@${TELEGRAM_BOT_USERNAME}` : `Бот @${TELEGRAM_BOT_USERNAME}`}</span>
+              <ExternalLink className="w-2.5 h-2.5 opacity-60" />
             </a>
           </div>
         </div>
@@ -93,17 +92,15 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => handleTabClick('internships')}
             className="flex items-center gap-3 cursor-pointer select-none group shrink-0"
           >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-sky-400 p-0.5 shadow-lg shadow-indigo-500/25 group-hover:shadow-indigo-500/40 transition-shadow">
-              <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-indigo-400 group-hover:rotate-12 transition-transform duration-300" />
-              </div>
+            <div className="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center font-bold text-white text-sm shadow-sm">
+              IT
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="text-lg font-black tracking-tight bg-gradient-to-r from-white via-slate-100 to-indigo-200 bg-clip-text text-transparent">
+                <span className="text-base font-bold tracking-tight text-white">
                   IT-Старт
                 </span>
-                <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.2 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                <span className="text-[10px] uppercase font-semibold tracking-wider px-1.5 py-0.2 rounded bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">
                   WebApp
                 </span>
               </div>

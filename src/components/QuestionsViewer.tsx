@@ -4,18 +4,22 @@ import {
   CheckCircle2,
   Circle,
   RotateCcw,
-  Sparkles,
   ChevronDown,
   ChevronUp,
   LayoutList,
   Layers,
   SlidersHorizontal,
   Code,
+  PenTool,
+  Send,
+  Eye,
+  RefreshCw,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import type { DirectionId, Question, SubTrackId, UserProgress } from '../types';
 import { DIRECTIONS } from '../data/directions';
 import { FlashcardsTrainer } from './FlashcardsTrainer';
+import { SelfCheckTrainer } from './SelfCheckTrainer';
 import { triggerHaptic } from '../lib/telegram';
 
 interface QuestionsViewerProps {
@@ -33,12 +37,14 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
   onMarkRepeat,
   onMarkLearned,
 }) => {
-  const [viewMode, setViewMode] = useState<'accordion' | 'flashcards'>('accordion');
+  const [viewMode, setViewMode] = useState<'accordion' | 'self_check' | 'flashcards'>('self_check');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedDirection, setSelectedDirection] = useState<DirectionId | 'all'>('all');
   const [selectedSubTrack, setSelectedSubTrack] = useState<SubTrackId | 'all'>('all');
   const [statusFilter, setStatusFilter] = useState<'all' | 'repeat' | 'completed'>('all');
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [inlineAnswers, setInlineAnswers] = useState<Record<string, string>>({});
+  const [inlineChecked, setInlineChecked] = useState<Record<string, boolean>>({});
 
   // Filter questions
   const filteredQuestions = questions.filter((q) => {
@@ -95,25 +101,39 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Top Banner & Stats */}
-      <div className="bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col md:flex-row items-center justify-between gap-4">
+      {/* Top Banner & Stats - Minimalist Tech */}
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 flex flex-col md:flex-row items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <h2 className="text-xl font-black text-white tracking-tight flex items-center gap-2">
+          <div className="flex items-center gap-2 mb-1 flex-wrap">
+            <h2 className="text-lg sm:text-xl font-bold text-white tracking-tight flex items-center gap-2">
               Тренажёр вопросов к собеседованию
-              <Sparkles className="w-4 h-4 text-amber-400" />
             </h2>
-            <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+            <span className="px-2 py-0.5 rounded-md text-[11px] font-bold bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">
               {questions.length} вопросов
             </span>
           </div>
           <p className="text-xs text-slate-400">
-            Детально разобранные вопросы с реальных интервью стажёров и джуниоров с примерами кода и ключевыми тезисами.
+            Реальные вопросы с интервью стажёров: пишите ответ, сверяйте с эталоном и тренируйте насмотренность.
           </p>
         </div>
 
-        {/* View Mode Switcher */}
-        <div className="flex items-center bg-slate-950/80 p-1 rounded-xl border border-slate-800 shrink-0">
+        {/* View Mode Switcher: 3 Modes */}
+        <div className="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 shrink-0">
+          <button
+            onClick={() => {
+              triggerHaptic('selection');
+              setViewMode('self_check');
+            }}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+              viewMode === 'self_check'
+                ? 'bg-indigo-600 text-white shadow-sm'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <PenTool className="w-3.5 h-3.5" />
+            <span>Самопроверка</span>
+          </button>
+
           <button
             onClick={() => {
               triggerHaptic('selection');
@@ -121,12 +141,12 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
             }}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
               viewMode === 'accordion'
-                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
+                ? 'bg-indigo-600 text-white shadow-sm'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
             <LayoutList className="w-3.5 h-3.5" />
-            <span>Список (Аккордеон)</span>
+            <span>Список</span>
           </button>
 
           <button
@@ -136,12 +156,12 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
             }}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
               viewMode === 'flashcards'
-                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
+                ? 'bg-indigo-600 text-white shadow-sm'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
-            <span>Флеш-карточки</span>
+            <span>Карточки</span>
           </button>
         </div>
       </div>
@@ -260,8 +280,15 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
         )}
       </div>
 
-      {/* Main Content: Flashcards or Accordion */}
-      {viewMode === 'flashcards' ? (
+      {/* Main Content: Self-Check Trainer, Flashcards, or Accordion */}
+      {viewMode === 'self_check' ? (
+        <SelfCheckTrainer
+          questions={filteredQuestions}
+          userProgress={userProgress}
+          onMarkLearned={onMarkLearned}
+          onMarkRepeat={onMarkRepeat}
+        />
+      ) : viewMode === 'flashcards' ? (
         <FlashcardsTrainer
           questions={filteredQuestions}
           userProgress={userProgress}
@@ -271,7 +298,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
       ) : (
         <div className="space-y-3">
           {filteredQuestions.length === 0 ? (
-            <div className="p-8 text-center bg-slate-900 border border-slate-800 rounded-3xl">
+            <div className="p-8 text-center bg-slate-900 border border-slate-800 rounded-2xl">
               <SlidersHorizontal className="w-10 h-10 text-slate-600 mx-auto mb-2" />
               <h3 className="text-base font-bold text-white mb-1">Ничего не найдено</h3>
               <p className="text-xs text-slate-400">
@@ -283,16 +310,18 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
               const isCompleted = userProgress.completedQuestions.includes(q.id);
               const isRepeat = userProgress.repeatQuestions.includes(q.id);
               const isExpanded = expandedId === q.id;
+              const isChecked = !!inlineChecked[q.id];
+              const userAnswer = inlineAnswers[q.id] || '';
 
               return (
                 <div
                   key={q.id}
                   className={`rounded-2xl border transition-all ${
                     isCompleted
-                      ? 'bg-emerald-950/15 border-emerald-800/40'
+                      ? 'bg-slate-900/90 border-emerald-800/40'
                       : isRepeat
-                      ? 'bg-amber-950/15 border-amber-800/40'
-                      : 'bg-slate-900/80 border-slate-800 hover:border-slate-700'
+                      ? 'bg-slate-900/90 border-amber-800/40'
+                      : 'bg-slate-900/90 border-slate-800 hover:border-slate-700'
                   }`}
                 >
                   <div className="p-4 flex items-start justify-between gap-3">
@@ -315,7 +344,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                         onClick={() => setExpandedId(isExpanded ? null : q.id)}
                       >
                         <div className="flex items-center gap-2 flex-wrap mb-1">
-                          <span className="text-[11px] font-bold text-sky-400 bg-sky-950/50 px-2 py-0.5 rounded-md border border-sky-800/40">
+                          <span className="text-[11px] font-semibold text-sky-300 bg-sky-950/60 px-2 py-0.5 rounded-md border border-sky-800/50">
                             {q.category}
                           </span>
                           <span className="text-[11px] text-slate-400">{q.difficulty}</span>
@@ -330,7 +359,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                           {q.title}
                         </h3>
 
-                        <p className="text-xs text-slate-300 mt-1 line-clamp-2">
+                        <p className="text-xs text-slate-400 mt-1 line-clamp-2">
                           {q.question}
                         </p>
                       </div>
@@ -348,15 +377,9 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                   {isExpanded && (
                     <div className="px-5 pb-5 pt-2 border-t border-slate-800/80 bg-slate-950/40 rounded-b-2xl space-y-4">
                       {/* Full Question text */}
-                      <div className="p-3 bg-slate-900/90 rounded-xl border border-slate-800 text-xs text-slate-300 font-medium">
+                      <div className="p-3 bg-slate-900 rounded-xl border border-slate-800 text-xs text-slate-300 font-medium">
                         <strong className="text-sky-300 block mb-1">Вопрос интервьюера:</strong>
                         {q.question}
-                      </div>
-
-                      {/* Detailed Answer */}
-                      <div className="p-4 bg-slate-900 rounded-xl border border-slate-800 text-xs sm:text-sm text-slate-200 leading-relaxed">
-                        <strong className="text-emerald-400 block mb-1.5 font-bold">Развернутый ответ:</strong>
-                        {q.answer}
                       </div>
 
                       {/* Code Snippet if present */}
@@ -374,17 +397,89 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                         </div>
                       )}
 
-                      {/* Key Takeaways */}
-                      <div className="space-y-1.5">
-                        <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
-                          Что важно запомнить:
-                        </span>
-                        <ul className="text-xs text-slate-300 space-y-1 list-disc list-inside">
-                          {q.keyTakeaways.map((point, idx) => (
-                            <li key={idx}>{point}</li>
-                          ))}
-                        </ul>
-                      </div>
+                      {/* Interactive Self-Check Field */}
+                      {!isChecked ? (
+                        <div className="p-3.5 bg-slate-900/90 rounded-xl border border-slate-800 space-y-2.5">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+                              <PenTool className="w-3.5 h-3.5 text-indigo-400" />
+                              Самопроверка: попробуйте ответить самостоятельно
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setInlineChecked((prev) => ({ ...prev, [q.id]: true }));
+                              }}
+                              className="text-[11px] text-slate-400 hover:text-indigo-300 flex items-center gap-1"
+                            >
+                              <Eye className="w-3 h-3" />
+                              <span>Показать ответ сразу</span>
+                            </button>
+                          </div>
+
+                          <textarea
+                            value={userAnswer}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setInlineAnswers((prev) => ({ ...prev, [q.id]: val }));
+                            }}
+                            rows={2}
+                            placeholder="Введите ваш ответ для сверки..."
+                            className="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-800 focus:border-indigo-500 text-xs text-slate-200 placeholder:text-slate-600 focus:outline-none"
+                          />
+
+                          <div className="flex justify-end">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                triggerHaptic('medium');
+                                setInlineChecked((prev) => ({ ...prev, [q.id]: true }));
+                              }}
+                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-all shadow-sm"
+                            >
+                              <Send className="w-3.5 h-3.5" />
+                              <span>Сверить с эталоном</span>
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {userAnswer.trim() && (
+                            <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 text-xs">
+                              <div className="flex items-center justify-between mb-1">
+                                <strong className="text-slate-400 text-[11px] uppercase">Ваш ответ:</strong>
+                                <button
+                                  type="button"
+                                  onClick={() => setInlineChecked((prev) => ({ ...prev, [q.id]: false }))}
+                                  className="text-[10px] text-slate-500 hover:text-slate-300 flex items-center gap-1"
+                                >
+                                  <RefreshCw className="w-3 h-3" />
+                                  Изменить
+                                </button>
+                              </div>
+                              <p className="text-slate-300 font-mono whitespace-pre-wrap">{userAnswer}</p>
+                            </div>
+                          )}
+
+                          {/* Detailed Answer */}
+                          <div className="p-4 bg-slate-900 rounded-xl border border-emerald-900/40 text-xs sm:text-sm text-slate-200 leading-relaxed">
+                            <strong className="text-emerald-400 block mb-1.5 font-bold">Развернутый ответ:</strong>
+                            {q.answer}
+                          </div>
+
+                          {/* Key Takeaways */}
+                          <div className="space-y-1.5">
+                            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
+                              Что важно запомнить:
+                            </span>
+                            <ul className="text-xs text-slate-300 space-y-1 list-disc list-inside">
+                              {q.keyTakeaways.map((point, idx) => (
+                                <li key={idx}>{point}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                      )}
 
                       {/* Card Action Buttons */}
                       <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-800">

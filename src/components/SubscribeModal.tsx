@@ -7,7 +7,6 @@ import {
   AlertCircle,
   ExternalLink,
   Bot,
-  Sparkles,
   RefreshCw,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
@@ -229,16 +228,15 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
 
         {/* Header */}
         <div className="flex items-center gap-3 mb-5">
-          <div className="w-12 h-12 rounded-2xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
-            <Bell className="w-6 h-6 animate-pulse" />
+          <div className="w-10 h-10 rounded-xl bg-indigo-500/15 border border-indigo-500/25 flex items-center justify-center text-indigo-400">
+            <Bell className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-white flex items-center gap-2">
+            <h2 className="text-lg font-bold text-white">
               Уведомления в Telegram
-              <Sparkles className="w-4 h-4 text-amber-400" />
             </h2>
             <p className="text-xs text-slate-400">
-              Мгновенные пуши о новых стажировках от бота @{TELEGRAM_BOT_USERNAME}
+              Пуши о новых стажировках от бота @{TELEGRAM_BOT_USERNAME}
             </p>
           </div>
         </div>

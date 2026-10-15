@@ -417,24 +417,23 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
 
   return (
     <div className="space-y-8">
-      {/* Tab Header Banner */}
-      <div className="bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-7 shadow-xl">
+      {/* Tab Header Banner - Minimalist Tech */}
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 sm:p-6 space-y-4">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="px-3 py-1 rounded-full text-xs font-bold bg-sky-500/20 text-sky-300 border border-sky-500/30 flex items-center gap-1.5">
-                <Bot className="w-4 h-4 text-sky-400" />
+            <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+              <span className="px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-sky-500/10 text-sky-300 border border-sky-500/20 flex items-center gap-1.5">
+                <Bot className="w-3.5 h-3.5 text-sky-400" />
                 Telegram Bot API & WebApp
               </span>
-              <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-                Киллер-фича
-              </span>
+              <span className="text-xs text-slate-500">•</span>
+              <span className="text-xs text-slate-400">@{TELEGRAM_BOT_USERNAME}</span>
             </div>
-            <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-              Интеграция с Telegram и Симулятор Парсера
+            <h2 className="text-lg sm:text-xl font-bold text-white tracking-tight">
+              Интеграция с Telegram и Сервер бота
             </h2>
-            <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-2xl">
-              Настройка реальных пуш-уведомлений от бота @{TELEGRAM_BOT_USERNAME}, автоматическое определение Chat ID, симуляция парсинга каналов и моментальная рассылка подписчикам.
+            <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-2xl leading-relaxed">
+              Уведомления о новых вакансиях, автоматическое определение Chat ID, симулятор парсера и автономный серверный скрипт для запуска бота 24/7.
             </p>
           </div>
 
@@ -442,12 +441,23 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
             href={TELEGRAM_BOT_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-sky-600/20 hover:bg-sky-600/30 border border-sky-500/40 text-sky-300 text-xs sm:text-sm font-bold transition-all shrink-0"
+            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs sm:text-sm font-medium transition-all shrink-0"
           >
-            <Bot className="w-4 h-4" />
+            <Bot className="w-4 h-4 text-sky-400" />
             <span>Открыть @{TELEGRAM_BOT_USERNAME}</span>
-            <ExternalLink className="w-3.5 h-3.5 opacity-70" />
+            <ExternalLink className="w-3 h-3 text-slate-400" />
           </a>
+        </div>
+
+        {/* Server Architecture Note */}
+        <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800/80 text-xs text-slate-300 space-y-1.5">
+          <div className="flex items-center gap-2 text-indigo-300 font-semibold">
+            <Terminal className="w-4 h-4 text-indigo-400" />
+            <span>Почему бот не может работать прямо на GitHub Pages?</span>
+          </div>
+          <p className="text-slate-400 leading-relaxed">
+            GitHub Pages — это чисто статический хостинг (HTML/CSS/JS). На нём нет серверного процесса Node.js/Python, способного слушать входящие вебхуки Telegram или держать постоянное соединение. Для работы бота мы создали готовый автономный скрипт <code className="text-emerald-400 bg-slate-900 px-1.5 py-0.5 rounded">bot/bot.mjs</code>. Запустите его локально командой <code className="text-indigo-300 bg-slate-900 px-1.5 py-0.5 rounded">npm run bot</code> или разверните бесплатно на Render/Railway.
+          </p>
         </div>
       </div>
 

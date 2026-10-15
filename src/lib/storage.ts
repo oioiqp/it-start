@@ -6,19 +6,20 @@ const INTERNSHIPS_STORAGE_KEY = 'it_start_cached_internships';
 
 export function getLocalProgress(): UserProgress {
   if (typeof window === 'undefined') {
-    return { completedTopics: [], completedQuestions: [], repeatQuestions: [] };
+    return { completedTopics: [], completedSubtopics: [], completedQuestions: [], repeatQuestions: [] };
   }
   try {
     const raw = localStorage.getItem(PROGRESS_STORAGE_KEY);
-    if (!raw) return { completedTopics: [], completedQuestions: [], repeatQuestions: [] };
+    if (!raw) return { completedTopics: [], completedSubtopics: [], completedQuestions: [], repeatQuestions: [] };
     const parsed = JSON.parse(raw);
     return {
       completedTopics: Array.isArray(parsed.completedTopics) ? parsed.completedTopics : [],
+      completedSubtopics: Array.isArray(parsed.completedSubtopics) ? parsed.completedSubtopics : [],
       completedQuestions: Array.isArray(parsed.completedQuestions) ? parsed.completedQuestions : [],
       repeatQuestions: Array.isArray(parsed.repeatQuestions) ? parsed.repeatQuestions : [],
     };
   } catch {
-    return { completedTopics: [], completedQuestions: [], repeatQuestions: [] };
+    return { completedTopics: [], completedSubtopics: [], completedQuestions: [], repeatQuestions: [] };
   }
 }
 

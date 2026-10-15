@@ -120,6 +120,7 @@ export interface TelegramSubscription {
 
 export interface UserProgress {
   completedTopics: string[];
+  completedSubtopics?: string[];
   completedQuestions: string[];
   repeatQuestions: string[];
 }

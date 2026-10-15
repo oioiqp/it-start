@@ -1,7 +1,6 @@
 import React from 'react';
 import {
   X,
-  Sparkles,
   CheckCircle2,
   Circle,
   ExternalLink,
@@ -11,6 +10,10 @@ import {
   Clock,
   Send,
   Trophy,
+  CheckSquare,
+  Square,
+  Map,
+  HelpCircle,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import type { Internship, Question, RoadmapTopic, UserProgress } from '../types';
@@ -23,6 +26,7 @@ interface InternshipModalProps {
   questions: Question[];
   userProgress: UserProgress;
   onToggleTopic: (topicId: string) => void;
+  onToggleSubtopic?: (topicId: string, subtopicIndex: number) => void;
   onToggleQuestion: (questionId: string) => void;
 }
 
@@ -33,6 +37,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
   questions,
   userProgress,
   onToggleTopic,
+  onToggleSubtopic,
   onToggleQuestion,
 }) => {
   const [expandedQuestionId, setExpandedQuestionId] = React.useState<string | null>(null);
@@ -65,11 +70,28 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
 
   const readinessPercent = totalItems > 0 ? Math.round((totalCompleted / totalItems) * 100) : 0;
 
+  const isSubtopicChecked = (topicId: string, subIdx: number) => {
+    const subtopicKey = `${topicId}:${subIdx}`;
+    return Boolean(
+      userProgress.completedSubtopics?.includes(subtopicKey) ||
+      userProgress.completedTopics.includes(topicId)
+    );
+  };
+
   const handleToggleTopic = (topicId: string) => {
     triggerHaptic('selection');
     onToggleTopic(topicId);
     if (!userProgress.completedTopics.includes(topicId) && totalCompleted + 1 === totalItems) {
       confetti({ particleCount: 100, spread: 70 });
+    }
+  };
+
+  const handleToggleSubtopic = (topicId: string, subIdx: number) => {
+    triggerHaptic('selection');
+    if (onToggleSubtopic) {
+      onToggleSubtopic(topicId, subIdx);
+    } else {
+      onToggleTopic(topicId);
     }
   };
 
@@ -182,7 +204,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
           <div>
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-sky-400" />
+                <Map className="w-4 h-4 text-sky-400" />
                 Этапы роадмапа для вакансии ({completedTopicsCount}/{relevantTopics.length})
               </h3>
             </div>
@@ -239,6 +261,40 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                         <ExternalLink className="w-4 h-4" />
                       </a>
                     </div>
+
+                    {topic.subtopics && topic.subtopics.length > 0 && (
+                      <div className="mt-3 pt-2.5 border-t border-slate-800/80">
+                        <div className="text-[11px] font-medium text-slate-400 mb-1.5">
+                          Ключевые подтемы:
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                          {topic.subtopics.map((sub, sIdx) => {
+                            const isSubDone = isSubtopicChecked(topic.id, sIdx);
+                            return (
+                              <button
+                                key={sIdx}
+                                type="button"
+                                onClick={() => handleToggleSubtopic(topic.id, sIdx)}
+                                className={`flex items-center gap-2 p-1.5 rounded-lg text-left text-xs transition-colors ${
+                                  isSubDone
+                                    ? 'bg-emerald-950/40 text-emerald-300 border border-emerald-800/40'
+                                    : 'bg-slate-900/60 text-slate-300 border border-slate-800 hover:border-slate-700'
+                                }`}
+                              >
+                                {isSubDone ? (
+                                  <CheckSquare className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                                ) : (
+                                  <Square className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                                )}
+                                <span className={isSubDone ? 'line-through text-slate-400' : ''}>
+                                  {sub}
+                                </span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 );
               })}
@@ -249,7 +305,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
           <div>
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-amber-400" />
+                <HelpCircle className="w-4 h-4 text-amber-400" />
                 Профильные вопросы собеседования ({completedQuestionsCount}/{relevantQuestions.length})
               </h3>
             </div>

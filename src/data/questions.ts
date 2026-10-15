@@ -215,6 +215,396 @@ const state = reactive({ name: 'Тимур', age: 24 });
       'Деструктуризация reactive теряет реактивность, используйте toRefs()',
     ],
   },
+  {
+    id: 'q-fe-10',
+    directionId: 'frontend',
+    subTrackId: 'core',
+    title: 'Event Loop: async/await, Promise, setTimeout и microtask queue',
+    question: 'В какой точной последовательности выполнится код с async/await, промисами и таймером, и почему?',
+    category: 'JavaScript Runtime',
+    difficulty: 'Junior+',
+    answer: 'Вывод: 1, 3, 5, 4, 2! Разбор: 1) Синхронно выполняется log(1); 2) Вызывается async function foo(), внутри нее синхронно до первого await выполняется log(3); 3) Выражение await Promise.resolve() запускает микрозадачу, выполнение функции foo() приостанавливается; 4) Вызывается setTimeout(..., 0) — колбэк кладется в очередь макрозадач; 5) Синхронно выполняется log(5) в основном потоке; 6) Синхронный стек Call Stack опустел, движок разгребает очередь микрозадач: возобновляется foo() и выводит 4; 7) Микрозадачи завершены, выполняется макрозадача setTimeout, выводя 2.',
+    codeSnippet: `console.log(1);
+async function foo() {
+  console.log(3);
+  await Promise.resolve();
+  console.log(4);
+}
+setTimeout(() => console.log(2), 0);
+foo();
+console.log(5);`,
+    codeLanguage: 'javascript',
+    keyTakeaways: [
+      'Тело async-функции до первого await выполняется строго синхронно',
+      'Ключевое слово await прерывает выполнение функции и планирует микрозадачу',
+      'Очередь микрозадач всегда опустошается перед переходом к следующей макрозадаче',
+    ],
+  },
+  {
+    id: 'q-fe-11',
+    directionId: 'frontend',
+    subTrackId: 'react',
+    title: 'React Fiber и фазы Render / Commit',
+    question: 'Что такое React Fiber и чем отличаются фазы Render и Commit в жизненном цикле компонента?',
+    category: 'React Architecture',
+    difficulty: 'Junior+',
+    answer: 'Fiber — это внутренняя структура данных (связный список узлов) и новый реконсилер, появившийся в React 16. Он разбил монолитный рендеринг на две фазы: 1) Фаза Render (вычисление): React вызывает компоненты, вычисляет изменения (diffing) и строит дерево workInProgress. Эта фаза асинхронна, может прерываться браузером для обработки кликов/анимаций (Concurrent Mode); 2) Фаза Commit (применение): React синхронно вносит изменения в реальный DOM, запускает useLayoutEffect, а затем браузер отрисовывает пиксели и вызывается useEffect. Побочные эффекты (мутации DOM, запросы) допустимы только в фазе Commit.',
+    codeSnippet: `// Фаза Render: чистая функция, вызывается повторно при прерывании
+function UserProfile({ id }: { id: string }) {
+  // НИКАКИХ побочных эффектов прямо в теле функции!
+  
+  // Фаза Commit: безопасное выполнение сайд-эффектов
+  useEffect(() => {
+    fetchUserData(id);
+  }, [id]);
+
+  return <div>Профиль пользователя</div>;
+}`,
+    codeLanguage: 'tsx',
+    keyTakeaways: [
+      'Фаза Render чистая и может прерываться для сохранения плавности интерфейса',
+      'Фаза Commit синхронно модифицирует реальный DOM',
+      'useEffect выполняется асинхронно после завершения Commit и браузерного Layout/Paint',
+    ],
+  },
+  {
+    id: 'q-fe-12',
+    directionId: 'frontend',
+    subTrackId: 'core',
+    title: 'TypeScript: Дженерики, Conditional Types и ключевое слово infer',
+    question: 'Как работают условные типы (Conditional Types) и ключевое слово infer? Напишите реализацию ReturnType<T>.',
+    category: 'TypeScript Advanced',
+    difficulty: 'Junior+',
+    answer: 'Условные типы имеют форму `T extends U ? X : Y`. Ключевое слово infer используется внутри условия extends для вывода (дедукции) типа из другого типа прямо во время компиляции. Встроенная утилита ReturnType<T> проверяет: если тип T является функцией (...args: any[]) => infer R, то компилятор извлекает возвращаемый тип R и возвращает его, иначе возвращает never.',
+    codeSnippet: `type MyReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
+
+function fetchUser() {
+  return { id: 1, name: 'Анна', role: 'developer' };
+}
+
+// UserData получит тип { id: number; name: string; role: string }
+type UserData = MyReturnType<typeof fetchUser>;`,
+    codeLanguage: 'typescript',
+    keyTakeaways: [
+      'infer позволяет «вытащить» тип из структуры (параметры функции, результат промиса, элемент массива)',
+      'Conditional Types лежат в основе большинства утилитных типов TypeScript (Parameters, Awaited, ReturnType)',
+    ],
+  },
+  {
+    id: 'q-fe-13',
+    directionId: 'frontend',
+    subTrackId: 'core',
+    title: 'CSS Stacking Context (контекст наложения) и поведение z-index',
+    question: 'Почему элемент с z-index: 99999 может отображаться ниже элемента с z-index: 1?',
+    category: 'CSS & Layout',
+    difficulty: 'Junior',
+    answer: 'z-index работает только внутри своего локального контекста наложения (Stacking Context). Если родительский контейнер А находится в контексте наложения с z-index: 1, а соседний контейнер B — с z-index: 2, то никакой дочерний элемент внутри А (даже с z-index: 999999) не сможет перекрыть элементы внутри B! Новый Stacking Context создается не только свойством position с z-index, но и: opacity < 1, transform/filter/perspective (отличные от none), will-change, contain: paint, а также свойством isolation: isolate.',
+    codeSnippet: `.parent-low {
+  position: relative;
+  z-index: 1; /* Ограничивает все дочерние элементы уровнем 1 */
+}
+.child-super-high {
+  position: absolute;
+  z-index: 999999; /* НЕ перекроет .parent-high! */
+}
+.parent-high {
+  position: relative;
+  z-index: 2;
+}`,
+    codeLanguage: 'css',
+    keyTakeaways: [
+      'z-index относителен к своему Stacking Context, а не глобален для всей страницы',
+      'Свойства transform, opacity, filter создают новый изолированный контекст наложения',
+      'Свойство isolation: isolate позволяет явно изолировать контекст без хаков с z-index',
+    ],
+  },
+  {
+    id: 'q-fe-14',
+    directionId: 'frontend',
+    subTrackId: 'core',
+    title: 'Безопасность фронтенда: XSS, CSRF, SameSite и CSP',
+    question: 'Чем отличаются Reflected, Stored и DOM-based XSS атаки, и как от них защититься на клиенте и сервере?',
+    category: 'Web Security',
+    difficulty: 'Junior+',
+    answer: 'XSS (Cross-Site Scripting) — внедрение вредоносного JS в браузер жертвы. 1) Stored (хранимая): скрипт сохраняется в БД (например, в комментарии) и отдается всем пользователям; 2) Reflected (отраженная): скрипт передается в параметрах URL (?q=<script>...) и сервер вставляет его в HTML-ответ; 3) DOM-based: уязвимость возникает на клиенте при небезопасной вставке в DOM через innerHTML, eval, document.write без экранирования. Защита: использование Content Security Policy (CSP), экранирование данных (библиотека DOMPurify, React делает это по умолчанию для JSX), флаги cookie HttpOnly (запрет доступа из document.cookie) и SameSite=Lax/Strict (защита от CSRF).',
+    codeSnippet: `// ОПАСНО:
+element.innerHTML = userInput; // Уязвимо к DOM XSS!
+
+// БЕЗОПАСНО:
+element.textContent = userInput;
+// Либо санитайзинг перед вставкой:
+element.innerHTML = DOMPurify.sanitize(userInput);`,
+    codeLanguage: 'javascript',
+    keyTakeaways: [
+      'React автоматически экранирует значения в JSX, предотвращая базовый XSS',
+      'Никогда не используйте dangerouslySetInnerHTML без библиотеки санитайзинга DOMPurify',
+      'Куки авторизации должны иметь флаги HttpOnly, Secure и SameSite=Strict/Lax',
+    ],
+  },
+  {
+    id: 'q-fe-15',
+    directionId: 'frontend',
+    subTrackId: 'core',
+    title: 'Утечки памяти в JavaScript и SPA (Single Page Applications)',
+    question: 'Какие 4 типичные причины приводят к утечкам памяти в SPA и как обнаружить их через Chrome DevTools?',
+    category: 'JavaScript Performance',
+    difficulty: 'Junior+',
+    answer: 'Четыре главные причины утечек памяти: 1) Забытые подписки и таймеры: setInterval, setTimeout или addEventListener на window/document, не очищенные при размонтировании компонента; 2) Замыкания, удерживающие ссылки на тяжелые внешние объекты или DOM-узлы; 3) Detached DOM Nodes (оторванные DOM-узлы): элементы удалены со страницы, но ссылка на них осталась в JS-коллекции или переменной; 4) Неограниченно растущие глобальные кэши или Set/Map (следует использовать WeakMap/WeakSet). Для поиска используют Chrome DevTools -> Memory tab -> Heap snapshot (сравнение двух снимков памяти до и после действия) и Performance monitor.',
+    codeSnippet: `// ПЛОХО (утечка памяти):
+useEffect(() => {
+  const handler = () => console.log('scroll');
+  window.addEventListener('scroll', handler);
+}, []); // Нет функции отписки!
+
+// ХОРОШО:
+useEffect(() => {
+  const handler = () => console.log('scroll');
+  window.addEventListener('scroll', handler);
+  return () => window.removeEventListener('scroll', handler); // Cleanup!
+}, []);`,
+    codeLanguage: 'tsx',
+    keyTakeaways: [
+      'Всегда возвращайте cleanup-функцию из useEffect для таймеров и слушателей',
+      'WeakMap и WeakSet позволяют сборщику мусора удалять объекты, если на них нет иных ссылок',
+      'Heap Snapshot в DevTools позволяет найти оторванные DOM-узлы (Detached HTMLElement)',
+    ],
+  },
+  {
+    id: 'q-fe-16',
+    directionId: 'frontend',
+    subTrackId: 'react',
+    title: 'Stale Closures (устаревшие замыкания) в хуках React',
+    question: 'Что такое Stale Closure в хуках useCallback / useEffect и как его предотвратить?',
+    category: 'React Hooks',
+    difficulty: 'Junior+',
+    answer: 'Stale Closure возникает, когда асинхронный колбэк (например в setInterval или setTimeout) замыкает переменную состояния из старого рендера, потому что массив зависимостей пуст или неполон. Решения: 1) Использовать функциональное обновление состояния setCount(prev => prev + 1) — оно всегда получает самое актуальное значение стейта без добавления переменной в зависимости; 2) Использовать useRef, так как ref.current является мутабельным объектом со стабильной ссылкой; 3) Корректно указывать все зависимости в массиве dependencies.',
+    codeSnippet: `// ОШИБКА: всегда выводит 0, так как count замкнут из начального рендера!
+useEffect(() => {
+  const timer = setInterval(() => {
+    setCount(count + 1); // count всегда равен 0
+  }, 1000);
+  return () => clearInterval(timer);
+}, []);
+
+// РЕШЕНИЕ 1 (функциональный апдейт):
+useEffect(() => {
+  const timer = setInterval(() => {
+    setCount(prev => prev + 1); // Надежно и актуально!
+  }, 1000);
+  return () => clearInterval(timer);
+}, []);`,
+    codeLanguage: 'tsx',
+    keyTakeaways: [
+      'Функциональный setState prev => next решает 90% проблем устаревших замыканий',
+      'useRef хранит актуальные значения без триггера повторного рендера',
+    ],
+  },
+  {
+    id: 'q-fe-17',
+    directionId: 'frontend',
+    subTrackId: 'core',
+    title: 'Core Web Vitals: LCP, INP, CLS и оптимизация скорости загрузки',
+    question: 'Что измеряют ключевые метрики производительности LCP, INP и CLS, и как их улучшить?',
+    category: 'Web Performance',
+    difficulty: 'Junior+',
+    answer: '1) LCP (Largest Contentful Paint): время отрисовки самого крупного контентного элемента (главный баннер, заголовок h1, картинка первого экрана). Цель < 2.5 сек. Оптимизация: fetchpriority="high", preloading, сжатие в WebP/AVIF, CDN; 2) INP (Interaction to Next Paint): отзывчивость интерфейса на действия пользователя (заменил устаревший FID). Измеряет задержку между кликом и отрисовкой следующего кадра. Цель < 200 мс. Оптимизация: разбиение длинных задач (Long Tasks > 50 мс) через scheduler.yield() или setTimeout, дебаунс; 3) CLS (Cumulative Layout Shift): стабильность верстки (сдвиги контента во время загрузки). Цель < 0.1. Оптимизация: явные width/height или aspect-ratio для изображений и видео, резервирование плейсхолдеров (skeleton).',
+    codeSnippet: `<!-- Предзагрузка LCP изображения с высоким приоритетом -->
+<link rel="preload" fetchpriority="high" as="image" href="/hero.webp" type="image/webp" />
+
+<!-- Предотвращение CLS: явные размеры или aspect-ratio -->
+<img src="/card.webp" width="400" height="250" style="aspect-ratio: 16/10;" alt="Курс" />`,
+    codeLanguage: 'html',
+    keyTakeaways: [
+      'LCP измеряет скорость восприятия загрузки (Largest Contentful Paint < 2.5s)',
+      'INP измеряет интерактивность и отсутствие фризов интерфейса (< 200ms)',
+      'CLS предотвращает дергание страницы при подгрузке рекламы и изображений (< 0.1)',
+    ],
+  },
+  {
+    id: 'q-fe-18',
+    directionId: 'frontend',
+    subTrackId: 'core',
+    title: 'События в браузере: Capturing, Bubbling и Event Delegation',
+    question: 'Как работают фазы погружения (Capturing) и всплытия (Bubbling) событий, и в чем преимущество делегирования событий?',
+    category: 'Browser DOM Events',
+    difficulty: 'Junior',
+    answer: 'При возникновении события браузер выполняет 3 фазы: 1) Capturing (погружение): событие идет сверху вниз от window через html/body до целевого элемента (target); 2) Target: событие достигает целевого элемента; 3) Bubbling (всплытие): событие поднимается обратно вверх от целевого элемента до window. Метод addEventListener третьим параметром принимает флаг capture (false по умолчанию — всплытие). Делегирование событий (Event Delegation) — это паттерн, когда один слушатель вешается на родительский контейнер, а целевой кликнутый элемент определяется через e.target.closest("selector"). Это экономит память и работает даже для динамически добавленных элементов.',
+    codeSnippet: `// Паттерн делегирования событий на списке элементов
+const list = document.querySelector('#todo-list');
+list.addEventListener('click', (event) => {
+  const target = (event.target as HTMLElement).closest('.delete-btn');
+  if (target) {
+    const id = target.getAttribute('data-id');
+    deleteTodo(id);
+  }
+});`,
+    codeLanguage: 'typescript',
+    keyTakeaways: [
+      'event.stopPropagation() останавливает дальнейшее всплытие события',
+      'event.preventDefault() отменяет стандартное действие браузера (переход по ссылке, сабмит формы)',
+      'Делегирование событий снижает потребление памяти при сотнях и тысячах элементов списка',
+    ],
+  },
+  {
+    id: 'q-fe-19',
+    directionId: 'frontend',
+    subTrackId: 'core',
+    title: 'HTTP кэширование: Cache-Control, ETag и stale-while-revalidate',
+    question: 'Как браузер принимает решение о кэшировании ответов и в чем разница между no-cache и no-store?',
+    category: 'HTTP & Browser Cache',
+    difficulty: 'Junior+',
+    answer: 'Заголовок Cache-Control управляет кэшем: 1) no-store: запрещает сохранять ответ где-либо (ни на клиенте, ни на прокси), критично для банковских и приватных данных; 2) no-cache: разрешает сохранять кэш, но ОБЯЗЫВАЕТ отправить условный валидационный запрос на сервер перед каждым использованием; 3) max-age=N: указывает время актуальности в секундах; 4) stale-while-revalidate: браузер мгновенно отдает старый кэш, а в фоне делает запрос на сервер за свежей версией. Для валидации сервер возвращает заголовок ETag (хэш контента). Браузер при повторном запросе шлет If-None-Match: "etag_hash", и если файл не менялся, сервер возвращает пустой 304 Not Modified без пересылки тела.',
+    codeSnippet: `// Для статических бандлов с хэшем в имени (index.a8f9b2.js):
+Cache-Control: public, max-age=31536000, immutable
+
+// Для index.html (всегда свежий):
+Cache-Control: no-cache
+
+// Для API со свежими вакансиями:
+Cache-Control: max-age=60, stale-while-revalidate=300`,
+    codeLanguage: 'http',
+    keyTakeaways: [
+      'Статические ассеты с уникальным хэшем кэшируют на 1 год с флагом immutable',
+      'index.html никогда нельзя кэшировать жестко (max-age), иначе клиент не увидит обновления билда',
+      '304 Not Modified экономит трафик, не передавая повторно неизмененный контент',
+    ],
+  },
+  {
+    id: 'q-fe-20',
+    directionId: 'frontend',
+    subTrackId: 'react',
+    title: 'Управление стейтом: Zustand vs Redux Toolkit vs React Context',
+    question: 'Почему React Context не является инструментом управления состоянием и когда выбрать Zustand?',
+    category: 'React State Management',
+    difficulty: 'Junior+',
+    answer: 'React Context — это механизм Dependency Injection (проброса данных через дерево компонентов без prop drilling), а не стейт-менеджер. При изменении значения Provider все компоненты, использующие useContext, безусловно перерендериваются, даже если они используют только одну неизмененную строчку из объекта контекста (отсутствует встроенный механизм селекторов). Zustand — легковесный стейт-менеджер (1 Кб), работающий вне дерева React. Он предоставляет точечную подписку через селекторы (useStore(state => state.activeItem)), мутирование без бойлерплейта и отсутствие лишних рендеров.',
+    codeSnippet: `import { create } from 'zustand';
+
+interface Store {
+  count: number;
+  increment: () => void;
+}
+
+export const useCounterStore = create<Store>((set) => ({
+  count: 0,
+  increment: () => set((state) => ({ count: state.count + 1 })),
+}));
+
+// Компонент перерендерится ТОЛЬКО при изменении count!
+function CounterDisplay() {
+  const count = useCounterStore((state) => state.count);
+  return <div>{count}</div>;
+}`,
+    codeLanguage: 'tsx',
+    keyTakeaways: [
+      'Context провоцирует ререндеры всех потребителей при любом изменении объекта контекста',
+      'Zustand и Redux Toolkit используют селекторы со сравнением shallow equality для предотвращения лишних рендеров',
+    ],
+  },
+  {
+    id: 'q-fe-21',
+    directionId: 'frontend',
+    subTrackId: 'react',
+    title: 'React Server Components (RSC) vs Традиционный SSR',
+    question: 'В чем разница между Server Components (RSC) и SSR в Next.js/React 19?',
+    category: 'Modern React Architecture',
+    difficulty: 'Junior+',
+    answer: 'При традиционном SSR сервер один раз рендерит HTML для быстрой первой отрисовки, но затем ВЕСЬ JavaScript компонентов отправляется в браузер для этапа гидратации (Hydration) — навешивания слушателей событий. В архитектуре RSC (React Server Components): серверные компоненты исполняются ИСКЛЮЧИТЕЛЬНО на сервере. Их код, зависимости (тяжелые парсеры, ORM) НИКОГДА не попадают в JS-бандл браузера! Они сериализуются в специальный текстовый формат Virtual DOM и стримятся клиенту. Клиентскими (Client Components с директивой "use client") объявляются только интерактивные виджеты с состоянием и слушателями.',
+    codeSnippet: `// Server Component по умолчанию (код не попадет в бандл клиента!)
+import db from '@/lib/db';
+
+export default async function VacanciesPage() {
+  const vacancies = await db.internships.findMany(); // Прямой запрос в базу без REST API
+  return (
+    <div>
+      <h1>Стажировки</h1>
+      <VacanciesFilter items={vacancies} />
+    </div>
+  );
+}`,
+    codeLanguage: 'tsx',
+    keyTakeaways: [
+      'RSC уменьшают размер JS бандла практически до нуля для статических и презентационных блоков',
+      'RSC могут напрямую обращаться к базам данных и микросервисам с сервера',
+      'Клиентские компоненты ("use client") нужны для интерактивности, useState и браузерных API',
+    ],
+  },
+  {
+    id: 'q-fe-22',
+    directionId: 'frontend',
+    subTrackId: 'core',
+    title: 'Прототипное наследование в JS: __proto__, prototype и Object.create(null)',
+    question: 'Как устроена цепочка прототипов и зачем создают словари через Object.create(null)?',
+    category: 'JavaScript Core',
+    difficulty: 'Junior',
+    answer: 'В JS наследование основано на прототипах. Каждый объект имеет внутреннюю ссылку [[Prototype]] (доступную через __proto__ или Object.getPrototypeOf()). Если свойство не найдено в объекте, поиск идет вверх по цепочке прототипов вплоть до Object.prototype, а затем null. Обычный объект {} наследует методы toString, hasOwnProperty, constructor из Object.prototype. Создание Object.create(null) порождает «чистый» объект вообще без прототипа ([[Prototype]]: null). Это гарантирует, что в нем нет встроенных ключей, и защищает от атак Prototype Pollution и случайных коллизий ключей (например, если в словарь положат ключ "toString" или "__proto__").',
+    codeSnippet: `const dict = Object.create(null);
+dict['hasOwnProperty'] = 'мое значение';
+
+// Безопасно, не ломает цепочку прототипов!
+console.log(dict.toString); // undefined (нет встроенных методов)
+console.log(Object.getPrototypeOf(dict)); // null`,
+    codeLanguage: 'javascript',
+    keyTakeaways: [
+      'prototype — свойство функции-конструктора, __proto__ — ссылка на прототип у созданного экземпляра',
+      'Object.create(null) создает чистые хэш-мапы без унаследованных методов Object.prototype',
+    ],
+  },
+  {
+    id: 'q-fe-23',
+    directionId: 'frontend',
+    subTrackId: 'core',
+    title: 'Real-time веб: WebSockets vs Server-Sent Events (SSE) vs Polling',
+    question: 'Когда для живого обновления данных лучше выбрать SSE (Server-Sent Events), а когда WebSockets?',
+    category: 'Web Networking & Protocols',
+    difficulty: 'Junior+',
+    answer: '1) Polling (опрос): регулярный HTTP-запрос клиентом каждые N секунд (неэффективно, оверхед заголовков); 2) SSE (Server-Sent Events): однонаправленный канал от сервера к клиенту поверх стандартного протокола HTTP. Идеально подходит для лент обновлений, котировок, чата нейросетей (стриминг токенов) и уведомлений о новых вакансиях. Имеет автоматическое переподключение из коробки (EventSource API), работает через обычные HTTP прокси и HTTP/2; 3) WebSockets: полнодуплексный (двусторонний) бинарный протокол (ws://, wss://). Необходим для высокочастотного обмена (онлайн-игры, совместное редактирование документов, голосовые/видео звонки).',
+    codeSnippet: `// Клиентский код для приема SSE:
+const eventSource = new EventSource('/api/vacancies/stream');
+
+eventSource.onmessage = (event) => {
+  const newVacancy = JSON.parse(event.data);
+  console.log('Новая стажировка:', newVacancy.title);
+};
+
+eventSource.onerror = () => {
+  console.log('Автоматический reconnect будет выполнен браузером');
+};`,
+    codeLanguage: 'typescript',
+    keyTakeaways: [
+      'SSE проще в реализации, использует стандартный HTTP и автоматически восстанавливает соединение',
+      'WebSocket незаменим, когда клиенту требуется передавать поток сообщений обратно на сервер с минимальной задержкой',
+    ],
+  },
+  {
+    id: 'q-fe-24',
+    directionId: 'frontend',
+    subTrackId: 'vue',
+    title: 'Vue 3: Паттерн Composables (пользовательские хуки) и Pinia',
+    question: 'Как проектировать Composables в Vue 3 и почему Pinia вытеснила Vuex 4?',
+    category: 'Vue 3 Ecosystem',
+    difficulty: 'Junior+',
+    answer: 'Composable во Vue 3 — это функция, инкапсулирующая реактивное состояние и логику (аналог custom hooks в React), название которой начинается с "use...". В отличие от React-хуков, код composable выполняется только один раз при инициализации setup(), а не на каждый рендер, поэтому нет проблем с зависимостями и устаревшими замыканиями. Pinia стала официальным стейт-менеджером Vue, потому что: 1) Полная и бесшовная поддержка TypeScript без ручной типизации; 2) Упразднены mutations (мутации) — изменения делаются напрямую или через actions; 3) Модульная архитектура: сторы независимы и поддерживают автоматический tree-shaking.',
+    codeSnippet: `// Использование Pinia Store в синтаксисе Setup:
+import { defineStore } from 'pinia';
+import { ref, computed } from 'vue';
+
+export const useInternshipsStore = defineStore('internships', () => {
+  const list = ref<Internship[]>([]);
+  const hotCount = computed(() => list.value.filter(i => i.isHot).length);
+
+  async function loadData() {
+    list.value = await fetchFromApi();
+  }
+
+  return { list, hotCount, loadData };
+});`,
+    codeLanguage: 'typescript',
+    keyTakeaways: [
+      'Composables во Vue возвращают реактивные ref/computed и запускаются единожды при создании компонента',
+      'Pinia убрала избыточный бойлерплейт мутаций из Vuex и обеспечила нативную типизацию TypeScript',
+    ],
+  },
 
   // ==========================================
   // BACKEND (PYTHON, GO, JAVA, NODEJS, SQL)

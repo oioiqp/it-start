@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import {
   Search,
-  Sparkles,
   Briefcase,
   ExternalLink,
   Bot,
@@ -125,12 +124,60 @@ export function App() {
 
   const handleToggleTopic = (topicId: string) => {
     updateProgress((prev) => {
-      const exists = prev.completedTopics.includes(topicId);
+      const isCompleted = prev.completedTopics.includes(topicId);
+      const topic = ROADMAP_TOPICS.find((t) => t.id === topicId);
+      const subtopicIds = topic ? topic.subtopics.map((_, idx) => `${topicId}__sub_${idx}`) : [];
+      const currentSubtopics = prev.completedSubtopics || [];
+
+      let nextSubtopics = [...currentSubtopics];
+      if (!isCompleted) {
+        // Mark all subtopics as done
+        subtopicIds.forEach((sid) => {
+          if (!nextSubtopics.includes(sid)) nextSubtopics.push(sid);
+        });
+      } else {
+        // Remove all subtopics of this topic
+        nextSubtopics = nextSubtopics.filter((sid) => !subtopicIds.includes(sid));
+      }
+
       return {
         ...prev,
-        completedTopics: exists
+        completedTopics: isCompleted
           ? prev.completedTopics.filter((id) => id !== topicId)
           : [...prev.completedTopics, topicId],
+        completedSubtopics: nextSubtopics,
+      };
+    });
+  };
+
+  const handleToggleSubtopic = (topicId: string, subtopicIndex: number) => {
+    updateProgress((prev) => {
+      const subtopicId = `${topicId}__sub_${subtopicIndex}`;
+      const currentSubtopics = prev.completedSubtopics || [];
+      const isSubDone = currentSubtopics.includes(subtopicId);
+
+      const nextSubtopics = isSubDone
+        ? currentSubtopics.filter((id) => id !== subtopicId)
+        : [...currentSubtopics, subtopicId];
+
+      const topic = ROADMAP_TOPICS.find((t) => t.id === topicId);
+      const totalSubtopics = topic?.subtopics.length || 0;
+      const allTopicSubIds = topic?.subtopics.map((_, idx) => `${topicId}__sub_${idx}`) || [];
+
+      const completedCount = allTopicSubIds.filter((sid) => nextSubtopics.includes(sid)).length;
+      const isAllDone = totalSubtopics > 0 && completedCount === totalSubtopics;
+
+      let nextCompletedTopics = [...prev.completedTopics];
+      if (isAllDone && !nextCompletedTopics.includes(topicId)) {
+        nextCompletedTopics.push(topicId);
+      } else if (!isAllDone && nextCompletedTopics.includes(topicId)) {
+        nextCompletedTopics = nextCompletedTopics.filter((id) => id !== topicId);
+      }
+
+      return {
+        ...prev,
+        completedTopics: nextCompletedTopics,
+        completedSubtopics: nextSubtopics,
       };
     });
   };
@@ -213,62 +260,61 @@ export function App() {
         {/* TAB 1: INTERNSHIPS FEED */}
         {activeTab === 'internships' && (
           <div className="space-y-6">
-            {/* Hero Banner */}
-            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-950 via-slate-900 to-purple-950 border border-slate-800 p-6 sm:p-8 shadow-2xl">
-              <div className="relative z-10 max-w-3xl space-y-3">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 text-xs font-bold">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Агрегатор стажировок & Junior-вакансий 2026</span>
-                </div>
-
-                <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight leading-tight">
-                  Старт карьеры в IT с интерактивным планом подготовки и Telegram-ботом
-                </h1>
-
-                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-2xl">
-                  Актуальные стажировки из проверенных Telegram-каналов и порталов (Т-Банк, Яндекс, Сбер, Ozon, VK, Авито, Контур). Выберите вакансию, чтобы мгновенно увидеть процент готовности вашего стека и вопросы для собеседования!
-                </p>
-
-                <div className="flex flex-wrap items-center gap-3 pt-2">
-                  <button
-                    onClick={() => {
-                      triggerHaptic('medium');
-                      setIsSubscribeModalOpen(true);
-                    }}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-sky-600 hover:from-indigo-500 hover:to-sky-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-indigo-600/30 active:scale-95 transition-all"
-                  >
-                    <Bell className="w-4 h-4 animate-bounce" />
-                    <span>Подписаться на уведомления в Telegram</span>
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      triggerHaptic('selection');
-                      setActiveTab('roadmaps');
-                    }}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-700 text-slate-200 font-semibold text-xs sm:text-sm transition-colors"
-                  >
-                    <span>Смотреть Роадмапы</span>
-                    <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
-                  </button>
-
-                  {!telegramUser && (
-                    <a
-                      href={TELEGRAM_BOT_URL}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-sky-600/20 hover:bg-sky-600/30 border border-sky-500/40 text-sky-300 font-bold text-xs sm:text-sm transition-all"
-                    >
-                      <Bot className="w-4 h-4 text-sky-400" />
-                      <span>Открыть в Telegram-боте @{TELEGRAM_BOT_USERNAME}</span>
-                      <ExternalLink className="w-3.5 h-3.5 opacity-70" />
-                    </a>
-                  )}
-                </div>
+            {/* Hero Header - Clean Minimalist Tech */}
+            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-7 space-y-4">
+              <div className="flex items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-semibold">
+                  <Briefcase className="w-3.5 h-3.5 text-indigo-400" />
+                  IT-Стажировки & Подготовка 2026
+                </span>
+                <span className="text-xs text-slate-500 hidden sm:inline">•</span>
+                <span className="text-xs text-slate-500 hidden sm:inline">roadmap.sh style</span>
               </div>
 
-              {/* Decorative background glow */}
-              <div className="absolute right-0 top-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+              <div className="max-w-3xl space-y-2">
+                <h1 className="text-xl sm:text-3xl font-bold text-white tracking-tight leading-snug">
+                  Старт карьеры в IT: агрегатор стажировок, роадмапы и тренажёр
+                </h1>
+                <p className="text-xs sm:text-sm text-slate-400 leading-relaxed max-w-2xl">
+                  Актуальные вакансии для стажёров и Junior-специалистов (Т-Банк, Яндекс, Сбер, Ozon, VK, Авито, Контур). Выбирайте позицию для расчёта соответствия вашему стеку и тренируйте вопросы к интервью.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2.5 pt-1">
+                <button
+                  onClick={() => {
+                    triggerHaptic('medium');
+                    setIsSubscribeModalOpen(true);
+                  }}
+                  className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs sm:text-sm shadow-sm transition-all active:scale-95"
+                >
+                  <Bell className="w-3.5 h-3.5" />
+                  <span>Уведомления в Telegram</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    triggerHaptic('selection');
+                    setActiveTab('roadmaps');
+                  }}
+                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700/70 text-slate-200 text-xs sm:text-sm font-medium transition-colors"
+                >
+                  <span>Роадмапы</span>
+                  <ExternalLink className="w-3 h-3 text-slate-400" />
+                </button>
+
+                {!telegramUser && (
+                  <a
+                    href={TELEGRAM_BOT_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 text-xs sm:text-sm font-medium transition-colors"
+                  >
+                    <Bot className="w-3.5 h-3.5 text-sky-400" />
+                    <span>Бот @{TELEGRAM_BOT_USERNAME}</span>
+                  </a>
+                )}
+              </div>
             </div>
 
             {/* Filter and Search Panel */}
@@ -472,6 +518,7 @@ export function App() {
             topics={ROADMAP_TOPICS}
             userProgress={userProgress}
             onToggleTopic={handleToggleTopic}
+            onToggleSubtopic={handleToggleSubtopic}
           />
         )}
 
@@ -505,6 +552,7 @@ export function App() {
         questions={QUESTIONS}
         userProgress={userProgress}
         onToggleTopic={handleToggleTopic}
+        onToggleSubtopic={handleToggleSubtopic}
         onToggleQuestion={handleToggleQuestion}
       />
 
