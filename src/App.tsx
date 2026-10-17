@@ -243,12 +243,23 @@ export function App() {
     });
   };
 
+  // Helper for matching companies with synonyms (Directum/Директум, Т1, Контур, Т-Банк)
+  const matchesCompanyFilter = (companyName: string, targetCompany: string): boolean => {
+    if (targetCompany === 'all') return true;
+    const c = companyName.toLowerCase();
+    const t = targetCompany.toLowerCase();
+    if (c.includes(t) || t.includes(c)) return true;
+    if (t.includes('directum') || t.includes('директ')) return c.includes('directum') || c.includes('директ');
+    if (t.includes('т1') || t.includes('t1')) return c.includes('т1') || c.includes('t1');
+    if (t.includes('контур') || t.includes('kontur')) return c.includes('контур') || c.includes('kontur');
+    if (t.includes('т-банк') || t.includes('тбанк') || t.includes('тиньк')) return c.includes('т-банк') || c.includes('тинькофф') || c.includes('тбанк');
+    return false;
+  };
+
   // Filtered internships for feed
   const filteredInternships = internships.filter((item) => {
-    if (selectedCompany !== 'all') {
-      const compLower = item.company.toLowerCase();
-      const selLower = selectedCompany.toLowerCase();
-      if (!compLower.includes(selLower) && !selLower.includes(compLower)) return false;
+    if (selectedCompany !== 'all' && !matchesCompanyFilter(item.company, selectedCompany)) {
+      return false;
     }
     if (selectedDirection !== 'all' && item.directionId !== selectedDirection) return false;
     if (selectedSubTrack !== 'all' && item.subTrackId !== selectedSubTrack) return false;
@@ -257,9 +268,31 @@ export function App() {
     if (selectedSource === 'portal' && item.sourceType !== 'portal') return false;
 
     if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
+      const q = searchQuery.toLowerCase().trim();
+      const isDirectum = q.includes('директ') || q.includes('direct');
+      const isT1 = q.includes('т1') || q.includes('t1');
+      const isTBank = q.includes('тбанк') || q.includes('т-банк') || q.includes('tbank') || q.includes('тиньк');
+      const isKontur = q.includes('контур') || q.includes('kontur');
+      const isOzon = q.includes('озон') || q.includes('ozon');
+      const isSber = q.includes('сбер') || q.includes('sber');
+      const isAvito = q.includes('авито') || q.includes('avito');
+      const isYandex = q.includes('яндекс') || q.includes('yandex');
+      const isVk = q.includes('вк') || q.includes('vk') || q.includes('вконтакт');
+
+      const compLower = item.company.toLowerCase();
+      const matchCompany =
+        compLower.includes(q) ||
+        (isDirectum && compLower.includes('directum')) ||
+        (isT1 && (compLower.includes('т1') || compLower.includes('t1'))) ||
+        (isTBank && (compLower.includes('т-банк') || compLower.includes('тинькофф') || compLower.includes('tbank'))) ||
+        (isKontur && (compLower.includes('контур') || compLower.includes('kontur'))) ||
+        (isOzon && compLower.includes('ozon')) ||
+        (isSber && compLower.includes('сбер')) ||
+        (isAvito && compLower.includes('avito')) ||
+        (isYandex && compLower.includes('яндекс')) ||
+        (isVk && compLower.includes('vk'));
+
       const matchTitle = item.title.toLowerCase().includes(q);
-      const matchCompany = item.company.toLowerCase().includes(q);
       const matchTags = item.tags.some((t) => t.toLowerCase().includes(q));
       const matchDesc = item.description.toLowerCase().includes(q);
       return matchTitle || matchCompany || matchTags || matchDesc;
@@ -405,11 +438,7 @@ export function App() {
                   </button>
                   {TARGET_COMPANIES.map((company) => {
                     const isSelected = selectedCompany === company;
-                    const count = internships.filter((item) => {
-                      const c = item.company.toLowerCase();
-                      const t = company.toLowerCase();
-                      return c.includes(t) || t.includes(c);
-                    }).length;
+                    const count = internships.filter((item) => matchesCompanyFilter(item.company, company)).length;
                     return (
                       <button
                         key={company}

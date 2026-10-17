@@ -620,7 +620,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
     salary: 'от 55 000 до 75 000 ₽',
     directionId: 'frontend',
     subTrackId: 'react',
-    tags: ['React', 'TypeScript', 'Directum RX', 'Web Client', 'Ижевск'],
+    tags: ['React', 'TypeScript', 'Directum RX', 'Web Client', 'Ижевск', 'Директум'],
     description: 'Разработка веб-клиента флагманской платформы управления цифровыми процессами и документами Directum RX в Ижевске.',
     requirements: [
       'Знание современного JavaScript/TypeScript и React',
@@ -649,7 +649,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
     salary: 'от 55 000 до 80 000 ₽',
     directionId: 'backend',
     subTrackId: 'java',
-    tags: ['C#', '.NET', 'Directum RX', 'PostgreSQL', 'Web API', 'Ижевск'],
+    tags: ['C#', '.NET', 'Directum RX', 'PostgreSQL', 'Web API', 'Ижевск', 'Директум'],
     description: 'Разработка масштабируемого бэкенда интеллектуальной системы управления документами Directum RX. Микросервисы, асинхронная обработка и AI-модули.',
     requirements: [
       'Знание базовых принципов ООП, SOLID и языка C# или Java',
@@ -677,7 +677,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
     salary: 'от 50 000 до 65 000 ₽',
     directionId: 'qa',
     subTrackId: 'manual_qa',
-    tags: ['Manual QA', 'Тест-дизайн', 'Directum RX', 'Postman', 'Ижевск'],
+    tags: ['Manual QA', 'Тест-дизайн', 'Directum RX', 'Postman', 'Ижевск', 'Директум'],
     description: 'Тестирование веб- и десктоп-клиентов Directum RX, поиск дефектов в бизнес-процессах электронного документооборота.',
     requirements: [
       'Понимание жизненного цикла ПО и видов тестирования',

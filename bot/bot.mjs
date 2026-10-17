@@ -16,7 +16,13 @@
  */
 
 import http from 'node:http';
+import dns from 'node:dns';
 import { createClient } from '@supabase/supabase-js';
+
+// Prefer IPv4 to avoid IPv6 connect timeouts on public Telegram web gateways
+if (dns.setDefaultResultOrder) {
+  dns.setDefaultResultOrder('ipv4first');
+}
 
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || process.argv[2] || '';
 const GITHUB_PAGES_URL = 'https://oioiqp.github.io/it-start/';
@@ -33,7 +39,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: { persistSession: false },
 });
 
-// Database of target companies
+// Database of target companies with search aliases and public channels
 export const COMPANIES_DATA = [
   {
     id: 't1',
@@ -41,6 +47,7 @@ export const COMPANIES_DATA = [
     shortName: 'Т1',
     channel: '@t1_holding',
     channelUrl: 'https://t.me/t1_holding',
+    aliases: ['т1', 't1', 'холдинг т1', 'открытая школа', 'открытая школа т1', 't1 holding', 't1-holding'],
     description: 'Один из лидеров российского IT-рынка. Программа «Открытая школа Т1» — оплачиваемое обучение и стажировка по Java, DevOps, QA и Cloud с переходом в штат.',
     stack: 'Java, Spring Boot, DevOps, CI/CD, QA Auto, Cloud',
   },
@@ -50,6 +57,7 @@ export const COMPANIES_DATA = [
     shortName: 'Контур',
     channel: '@kontur_career',
     channelUrl: 'https://t.me/kontur_career',
+    aliases: ['контур', 'kontur', 'скб контур', 'контур.старт', 'контур старт', 'kontur_career'],
     description: 'Разработчик экосистемы сервисов для бизнеса (Диадок, Экстерн, Фокус). Программа «Контур.Старт» для студентов и начинающих разработчиков с персональным наставником.',
     stack: 'React, TypeScript, C#, Python, Go, Manual & Auto QA',
   },
@@ -59,6 +67,7 @@ export const COMPANIES_DATA = [
     shortName: 'Т-Банк',
     channel: '@tbank_start',
     channelUrl: 'https://t.me/tbank_start',
+    aliases: ['тбанк', 'т-банк', 'tbank', 'тинькофф', 'tinkoff', 't-bank', 'т банк', 'tbank_start'],
     description: 'Ведущий финансово-технологический гигант. Финтех-стажировки по разработке интерфейсов, высоконагруженного бэкенда, SRE-инфраструктуры и машинного обучения.',
     stack: 'React, TypeScript, Python, Golang, Kubernetes, SRE, ML',
   },
@@ -68,6 +77,7 @@ export const COMPANIES_DATA = [
     shortName: 'Directum',
     channel: '@directum_careers',
     channelUrl: 'https://t.me/directum_careers',
+    aliases: ['директум', 'директрум', 'directum', 'directum rx', 'директум рх', 'directum_careers', 'ижевск'],
     description: 'Ведущий российский вендор интеллектуальных систем управления цифровыми процессами и документами (Directum RX), штаб-квартира в Ижевске. Сильная инженерная школа.',
     stack: 'C#, .NET, TypeScript, React, QA, Web API, AI, Ижевск',
   },
@@ -77,6 +87,7 @@ export const COMPANIES_DATA = [
     shortName: 'Яндекс',
     channel: '@yandex_intern',
     channelUrl: 'https://t.me/yandex_intern',
+    aliases: ['яндекс', 'yandex', 'яша', 'young con', 'yandex_intern'],
     description: 'Технологическая компания (Поиск, Go, Маркет, AI). Программы стажировок Young Con круглый год с релокацией или удаленкой.',
     stack: 'Python, Go, C++, React, iOS/Android, Machine Learning',
   },
@@ -86,6 +97,7 @@ export const COMPANIES_DATA = [
     shortName: 'Ozon Tech',
     channel: '@ozon_tech_career',
     channelUrl: 'https://t.me/ozon_tech_career',
+    aliases: ['ozon', 'озон', 'ozon tech', 'озон тех', 'ozon camp', 'ozon_tech_career'],
     description: 'Электронная коммерция и логистика. Стажировки Ozon Camp с глубоким погружением в микросервисы на Go и масштабируемые системы.',
     stack: 'Golang, gRPC, PostgreSQL, Kafka, Android, QA',
   },
@@ -95,6 +107,7 @@ export const COMPANIES_DATA = [
     shortName: 'Сбер',
     channel: '@sber_careers',
     channelUrl: 'https://t.me/sber_careers',
+    aliases: ['сбер', 'sber', 'сбербанк', 'sberseasons', 'sber ai', 'sber_careers'],
     description: 'Крупнейшая банковская и AI-экосистема России. Программа SberSeasons: исследования LLM, Data Science, разработка мобильных и серверных систем.',
     stack: 'Python, PyTorch, Data Science, Java, Mobile, DevOps',
   },
@@ -104,6 +117,7 @@ export const COMPANIES_DATA = [
     shortName: 'Авито',
     channel: '@avito_tech',
     channelUrl: 'https://t.me/avito_tech',
+    aliases: ['авито', 'avito', 'avito tech', 'авито тех', 'avito_tech'],
     description: 'Суперапп объявлений с десятками миллионов пользователей. Стажировки в Platform Engineering, Mobile и высоконагруженном Backend.',
     stack: 'Android (Kotlin), iOS (Swift), Golang, Kubernetes, DevOps',
   },
@@ -113,16 +127,47 @@ export const COMPANIES_DATA = [
     shortName: 'VK',
     channel: '@vk_team',
     channelUrl: 'https://t.me/vk_team',
+    aliases: ['vk', 'вк', 'вконтакте', 'vk team', 'vk_team'],
     description: 'Социальные сервисы, музыка, видео и игры. Оплачиваемые стажировки для студентов с менторством экспертов.',
     stack: 'Node.js, Python, QA Automation, React, C++',
   },
 ];
 
-// Curated tracking database covering target employers
+/**
+ * Fuzzy / synonym matcher for company detection
+ */
+export function findCompanyByQuery(query) {
+  if (!query) return null;
+  const q = String(query).trim().toLowerCase();
+  if (!q) return null;
+
+  // 1. Exact matches by id, shortName, channel, name
+  for (const c of COMPANIES_DATA) {
+    if (c.id === q) return c;
+    if (c.shortName.toLowerCase() === q) return c;
+    if (c.name.toLowerCase() === q) return c;
+    if (c.channel.toLowerCase().replace('@', '') === q.replace('@', '')) return c;
+    if (Array.isArray(c.aliases) && c.aliases.includes(q)) return c;
+  }
+
+  // 2. Tokenized word boundary or inclusion match
+  for (const c of COMPANIES_DATA) {
+    if (q.includes(c.shortName.toLowerCase()) || c.name.toLowerCase().includes(q)) return c;
+    if (Array.isArray(c.aliases)) {
+      for (const alias of c.aliases) {
+        if (q.includes(alias) || alias.includes(q)) return c;
+      }
+    }
+  }
+
+  return null;
+}
+
+// Curated tracking database covering target employers (using standard unified IDs)
 export const ALL_INTERNSHIPS = [
   // --- Холдинг Т1 ---
   {
-    id: 'bot-t1-1',
+    id: 'int-19',
     companyId: 't1',
     company: 'Холдинг Т1',
     title: 'Стажёр Java-разработчик (Открытая школа Т1)',
@@ -134,10 +179,10 @@ export const ALL_INTERNSHIPS = [
     subTrackId: 'java',
     url: 'https://t.me/t1_holding',
     description: 'Обучение и стажировка в Открытой школе Т1 с переходом в штат. Разработка надежных Enterprise-сервисов.',
-    tags: ['Java 21', 'Spring Boot', 'Открытая школа Т1', 'PostgreSQL'],
+    tags: ['Java 21', 'Spring Boot', 'Открытая школа Т1', 'PostgreSQL', 'Т1'],
   },
   {
-    id: 'bot-t1-2',
+    id: 'int-20',
     companyId: 't1',
     company: 'Холдинг Т1',
     title: 'Junior DevOps-инженер (Инфраструктура Т1)',
@@ -152,7 +197,7 @@ export const ALL_INTERNSHIPS = [
     tags: ['Linux', 'Docker', 'CI/CD', 'Ansible', 'Т1'],
   },
   {
-    id: 'bot-t1-3',
+    id: 'int-21',
     companyId: 't1',
     company: 'Холдинг Т1',
     title: 'Стажёр QA Automation (Python / Java)',
@@ -169,7 +214,7 @@ export const ALL_INTERNSHIPS = [
 
   // --- Контур ---
   {
-    id: 'bot-kontur-1',
+    id: 'int-25',
     companyId: 'kontur',
     company: 'СКБ Контур',
     title: 'Стажёр Frontend-разработчик (Контур.Старт)',
@@ -181,10 +226,10 @@ export const ALL_INTERNSHIPS = [
     subTrackId: 'react',
     url: 'https://t.me/kontur_career',
     description: 'Оплачиваемая стажировка Контур.Старт 2026 с индивидуальным наставником. Разработка UI сервисов.',
-    tags: ['React', 'TypeScript', 'Контур.Старт', 'Jest'],
+    tags: ['React', 'TypeScript', 'Контур.Старт', 'Jest', 'Контур'],
   },
   {
-    id: 'bot-kontur-2',
+    id: 'int-26',
     companyId: 'kontur',
     company: 'СКБ Контур',
     title: 'Стажёр Backend C# / Python (Контур.Старт)',
@@ -196,12 +241,12 @@ export const ALL_INTERNSHIPS = [
     subTrackId: 'python',
     url: 'https://t.me/kontur_career',
     description: 'Программа стажировки Контур.Старт для начинающих бэкендеров. Решение бизнес-задач под менторством.',
-    tags: ['Python', 'C#', 'Контур.Старт', 'PostgreSQL'],
+    tags: ['Python', 'C#', 'Контур.Старт', 'PostgreSQL', 'Контур'],
   },
 
   // --- Т-Банк ---
   {
-    id: 'bot-tbank-1',
+    id: 'int-1',
     companyId: 'tbank',
     company: 'Т-Банк',
     title: 'Стажёр Frontend (React / TypeScript)',
@@ -213,10 +258,10 @@ export const ALL_INTERNSHIPS = [
     subTrackId: 'react',
     url: 'https://t.me/tbank_start',
     description: 'Разработка новых витрин и финансовых сервисов для мобильного и веб-банкинга.',
-    tags: ['React', 'TypeScript', 'Redux', 'Т-Банк'],
+    tags: ['React', 'TypeScript', 'Redux', 'Т-Банк', 'Финтех'],
   },
   {
-    id: 'bot-tbank-2',
+    id: 'int-27',
     companyId: 'tbank',
     company: 'Т-Банк',
     title: 'Стажёр Python Backend (Финтех)',
@@ -228,10 +273,10 @@ export const ALL_INTERNSHIPS = [
     subTrackId: 'python',
     url: 'https://t.me/tbank_start',
     description: 'Разработка сервисов процессинга и кредитных конвейеров банка. Высокая нагрузка.',
-    tags: ['Python 3.12', 'FastAPI', 'PostgreSQL', 'Kafka'],
+    tags: ['Python 3.12', 'FastAPI', 'PostgreSQL', 'Kafka', 'Т-Банк'],
   },
   {
-    id: 'bot-tbank-3',
+    id: 'int-28',
     companyId: 'tbank',
     company: 'Т-Банк',
     title: 'Стажёр Site Reliability Engineer / SRE',
@@ -243,12 +288,12 @@ export const ALL_INTERNSHIPS = [
     subTrackId: 'k8s_iac',
     url: 'https://t.me/tbank_start',
     description: 'Обеспечение бесперебойной работы критических сервисов Т-Банка на Kubernetes.',
-    tags: ['Kubernetes', 'Linux', 'Terraform', 'Prometheus'],
+    tags: ['Kubernetes', 'Linux', 'Terraform', 'Prometheus', 'Т-Банк'],
   },
 
   // --- Directum (Ижевск) ---
   {
-    id: 'bot-directum-1',
+    id: 'int-22',
     companyId: 'directum',
     company: 'Directum',
     title: 'Стажёр Web-разработчик (TypeScript / React)',
@@ -260,10 +305,10 @@ export const ALL_INTERNSHIPS = [
     subTrackId: 'react',
     url: 'https://t.me/directum_careers',
     description: 'Разработка веб-клиента флагманской платформы Directum RX в Ижевске.',
-    tags: ['React', 'TypeScript', 'Directum RX', 'Ижевск'],
+    tags: ['React', 'TypeScript', 'Directum RX', 'Ижевск', 'Директум'],
   },
   {
-    id: 'bot-directum-2',
+    id: 'int-23',
     companyId: 'directum',
     company: 'Directum',
     title: 'Стажёр Backend C# / .NET Developer',
@@ -275,10 +320,10 @@ export const ALL_INTERNSHIPS = [
     subTrackId: 'java',
     url: 'https://t.me/directum_careers',
     description: 'Разработка бэкенда интеллектуальной системы управления документами Directum RX.',
-    tags: ['C#', '.NET', 'Directum RX', 'PostgreSQL', 'Ижевск'],
+    tags: ['C#', '.NET', 'Directum RX', 'PostgreSQL', 'Ижевск', 'Директум'],
   },
   {
-    id: 'bot-directum-3',
+    id: 'int-24',
     companyId: 'directum',
     company: 'Directum',
     title: 'Стажёр Инженер по тестированию ПО (QA)',
@@ -290,12 +335,12 @@ export const ALL_INTERNSHIPS = [
     subTrackId: 'manual_qa',
     url: 'https://t.me/directum_careers',
     description: 'Тестирование веб- и десктоп-клиентов Directum RX, поиск дефектов в бизнес-процессах.',
-    tags: ['Manual QA', 'Тест-дизайн', 'Directum RX', 'Ижевск'],
+    tags: ['Manual QA', 'Тест-дизайн', 'Directum RX', 'Ижевск', 'Директум'],
   },
 
   // --- Яндекс ---
   {
-    id: 'bot-yandex-1',
+    id: 'int-2',
     companyId: 'yandex',
     company: 'Яндекс',
     title: 'Стажёр Python Backend Developer',
@@ -307,12 +352,12 @@ export const ALL_INTERNSHIPS = [
     subTrackId: 'python',
     url: 'https://yandex.ru/yabackend/',
     description: 'Масштабирование микросервисов Яндекс Маркета и Поиска с менторской поддержкой.',
-    tags: ['Python 3.12', 'FastAPI', 'PostgreSQL', 'asyncio'],
+    tags: ['Python 3.12', 'FastAPI', 'PostgreSQL', 'asyncio', 'Яндекс'],
   },
 
   // --- Ozon Tech ---
   {
-    id: 'bot-ozon-1',
+    id: 'int-3',
     companyId: 'ozon',
     company: 'Ozon Tech',
     title: 'Junior Golang Developer (Логистика)',
@@ -324,12 +369,12 @@ export const ALL_INTERNSHIPS = [
     subTrackId: 'golang',
     url: 'https://job.ozon.ru/it/',
     description: 'Микросервисы логистики и маршрутизации на Go с обменом через gRPC и Kafka.',
-    tags: ['Go', 'gRPC', 'PostgreSQL', 'Kafka'],
+    tags: ['Go', 'gRPC', 'PostgreSQL', 'Kafka', 'Ozon'],
   },
 
   // --- Сбер AI ---
   {
-    id: 'bot-sber-1',
+    id: 'int-4',
     companyId: 'sber',
     company: 'Сбер AI',
     title: 'Стажёр Data Scientist / Machine Learning',
@@ -341,12 +386,12 @@ export const ALL_INTERNSHIPS = [
     subTrackId: 'ml',
     url: 'https://sbergraduate.ru/',
     description: 'Обучение моделей ранжирования, NLP и классических табличных бустингов.',
-    tags: ['Python', 'PyTorch', 'CatBoost', 'SQL'],
+    tags: ['Python', 'PyTorch', 'CatBoost', 'SQL', 'Сбер'],
   },
 
   // --- Авито ---
   {
-    id: 'bot-avito-1',
+    id: 'int-6',
     companyId: 'avito',
     company: 'Авито',
     title: 'Junior Android / DevOps Engineer',
@@ -363,7 +408,7 @@ export const ALL_INTERNSHIPS = [
 
   // --- VK ---
   {
-    id: 'bot-vk-1',
+    id: 'int-5',
     companyId: 'vk',
     company: 'VK',
     title: 'Стажёр QA Automation (Python)',
@@ -379,8 +424,8 @@ export const ALL_INTERNSHIPS = [
   },
 ];
 
-// Target public channels for automated HTTP checking
-const MONITORED_TG_CHANNELS = [
+// Target public channels for automated HTTP checking and parsing
+export const MONITORED_TG_CHANNELS = [
   't1_holding',
   'kontur_career',
   'tbank_start',
@@ -389,6 +434,9 @@ const MONITORED_TG_CHANNELS = [
   'ozon_tech_career',
   'sber_careers',
   'avito_tech',
+  'vk_team',
+  'tproger_jobs',
+  'normrabota',
 ];
 
 // Cache of already notified users to avoid duplicate notifications
@@ -396,6 +444,17 @@ const notifiedKeys = new Set();
 
 // HTTP Health Check server for Render.com Web Service
 const server = http.createServer(async (req, res) => {
+  // CORS headers for WebApp integration
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204);
+    res.end();
+    return;
+  }
+
   if (req.url === '/health') {
     res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
     res.end(JSON.stringify({ status: 'ok', uptime: process.uptime(), bot: BOT_USERNAME }));
@@ -425,19 +484,17 @@ if (process.env.NODE_ENV !== 'test') {
     console.log('='.repeat(70));
     console.log('⚠️  Внимание: TELEGRAM_BOT_TOKEN не указан!');
     console.log('');
-    console.log('Чтобы запустить бота, передайте токен одним из способов:');
-    console.log('  1) node bot/bot.mjs <ТОКЕН_БОТА>');
-    console.log('  2) TELEGRAM_BOT_TOKEN=<ТОКЕН_БОТА> npm run bot');
-    console.log('');
-    console.log('Токен можно получить у @BotFather в Telegram для @IT_start_izh_bot.');
+    console.log('HTTP Health Check сервер продолжает работать на порту ' + PORT + ' (Render Web Service).');
+    console.log('Чтобы бот отвечал в Telegram, укажите токен в переменных окружения Render:');
+    console.log('  TELEGRAM_BOT_TOKEN=<ТОКЕН_БОТА>');
     console.log('='.repeat(70));
-    process.exit(0);
   }
 }
 
 const API_BASE = `https://api.telegram.org/bot${BOT_TOKEN}`;
 
 async function callTelegram(method, payload = {}) {
+  if (!BOT_TOKEN) return { ok: false, description: 'BOT_TOKEN is missing' };
   const res = await fetch(`${API_BASE}/${method}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -447,31 +504,248 @@ async function callTelegram(method, payload = {}) {
 }
 
 /**
+ * Parse public Telegram channel web preview (https://t.me/s/<channel>)
+ * Extracts posts, filters IT vacancies, maps to Internship format
+ */
+export async function parseChannelPosts(channelHandle, companyInfo) {
+  try {
+    const cleanHandle = channelHandle.replace(/^@/, '');
+    const url = `https://t.me/s/${cleanHandle}`;
+    const res = await fetch(url, {
+      headers: {
+        'User-Agent':
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+        Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Language': 'ru,en;q=0.9',
+      },
+      signal: AbortSignal.timeout(3500),
+    });
+
+    if (!res.ok) return [];
+
+    const html = await res.text();
+    const posts = [];
+
+    // Match messages in t.me/s/ preview
+    const msgRegex = /data-post="([^"]+)"[\s\S]*?<div class="tgme_widget_message_text[^"]*"[^>]*>([\s\S]*?)<\/div>/g;
+    let match;
+
+    while ((match = msgRegex.exec(html)) !== null) {
+      const postSlug = match[1]; // e.g. "tbank_start/456"
+      const rawText = match[2];
+      const text = rawText
+        .replace(/<br\s*\/?>/gi, '\n')
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/&quot;/g, '"')
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .trim();
+
+      const textLower = text.toLowerCase();
+      // Filter for junior/intern/it vacancy keywords
+      const isVacancy =
+        textLower.includes('стаж') ||
+        textLower.includes('junior') ||
+        textLower.includes('джуниор') ||
+        textLower.includes('интенсив') ||
+        textLower.includes('школ') ||
+        textLower.includes('ваканси') ||
+        textLower.includes('ищем') ||
+        textLower.includes('разработчик') ||
+        textLower.includes('инженер') ||
+        textLower.includes('qa') ||
+        textLower.includes('тестиров') ||
+        textLower.includes('devops') ||
+        textLower.includes('camp') ||
+        textLower.includes('start');
+
+      if (!isVacancy) continue;
+
+      // Extract first meaningful line as title candidate
+      const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
+      const firstLine = lines[0] || 'IT-Стажировка';
+      const title = firstLine.length > 70 ? firstLine.slice(0, 67) + '...' : firstLine;
+
+      // Direction detection
+      let directionId = 'backend';
+      let subTrackId = 'python';
+
+      if (
+        textLower.includes('react') ||
+        textLower.includes('frontend') ||
+        textLower.includes('фронтенд') ||
+        textLower.includes('typescript')
+      ) {
+        directionId = 'frontend';
+        subTrackId = 'react';
+      } else if (textLower.includes('qa') || textLower.includes('тестир') || textLower.includes('test')) {
+        directionId = 'qa';
+        subTrackId = textLower.includes('auto') || textLower.includes('автомат') ? 'auto_qa' : 'manual_qa';
+      } else if (
+        textLower.includes('devops') ||
+        textLower.includes('sre') ||
+        textLower.includes('kubernetes') ||
+        textLower.includes('docker') ||
+        textLower.includes('облак')
+      ) {
+        directionId = 'devops';
+        subTrackId = textLower.includes('k8s') || textLower.includes('kubernetes') ? 'k8s_iac' : 'cicd_docker';
+      } else if (textLower.includes('java') || textLower.includes('spring')) {
+        directionId = 'backend';
+        subTrackId = 'java';
+      } else if (textLower.includes('go') || textLower.includes('golang')) {
+        directionId = 'backend';
+        subTrackId = 'golang';
+      } else if (textLower.includes('android') || textLower.includes('ios') || textLower.includes('mobile')) {
+        directionId = 'mobile';
+        subTrackId = textLower.includes('ios') ? 'ios' : 'android';
+      } else if (textLower.includes('data science') || textLower.includes('ml') || textLower.includes('машинн')) {
+        directionId = 'data_science';
+        subTrackId = 'ml';
+      }
+
+      // Format detection
+      let format = 'Удаленно';
+      if (textLower.includes('гибрид')) format = 'Гибрид';
+      else if (textLower.includes('офис')) format = 'Офис';
+
+      // Location detection
+      let location = 'Москва / Удаленно';
+      if (textLower.includes('ижевск')) location = 'Ижевск / Удаленно';
+      else if (textLower.includes('екатеринбург')) location = 'Екатеринбург / Удаленно';
+      else if (textLower.includes('санкт-петербург') || textLower.includes('питер')) location = 'Санкт-Петербург / Удаленно';
+
+      // Salary detection
+      let salary = 'от 65 000 до 90 000 ₽';
+      const salaryMatch = text.match(/от\s*(\d+[\s\d]*)\s*(?:до\s*(\d+[\s\d]*))?\s*(?:₽|руб)/i);
+      if (salaryMatch) {
+        salary = salaryMatch[0];
+      }
+
+      const postId = postSlug.replace('/', '-');
+      posts.push({
+        id: `tg-${postId}`,
+        companyId: companyInfo.id,
+        company: companyInfo.name,
+        title,
+        salary,
+        format,
+        location,
+        channel: '@' + cleanHandle,
+        directionId,
+        subTrackId,
+        url: `https://t.me/${postSlug}`,
+        description: text.slice(0, 300) + (text.length > 300 ? '...' : ''),
+        tags: [companyInfo.shortName, subTrackId.toUpperCase(), 'Telegram', 'Стажировка'],
+      });
+    }
+
+    return posts;
+  } catch (err) {
+    console.warn(`[Parser] Ошибка парсинга @${channelHandle}:`, err.message);
+    return [];
+  }
+}
+
+/**
+ * Fetch active internships combining Supabase data with fallback to curated database
+ */
+export async function getActiveInternships() {
+  try {
+    const { data, error } = await supabase
+      .from('internships')
+      .select('*')
+      .order('published_at', { ascending: false });
+
+    if (!error && Array.isArray(data) && data.length > 0) {
+      const parseArray = (val, fallback) => {
+        if (Array.isArray(val)) return val;
+        if (typeof val === 'string') {
+          try {
+            if (val.startsWith('[')) return JSON.parse(val);
+            return val.split(',').map((s) => s.trim()).filter(Boolean);
+          } catch {
+            return [val];
+          }
+        }
+        return fallback;
+      };
+
+      const mapped = data.map((item) => {
+        const comp = findCompanyByQuery(item.company) || {};
+        return {
+          id: String(item.id),
+          companyId: comp.id || item.company_id || 'other',
+          company: item.company,
+          title: item.title,
+          salary: item.salary || 'По договоренности',
+          format: item.format || 'Удаленно',
+          location: item.city || item.location || 'Москва / Удаленно',
+          channel: item.source_name || '@IT_start_izh_bot',
+          directionId: item.direction || item.direction_id || 'backend',
+          subTrackId: item.sub_track || item.sub_track_id || 'python',
+          url: item.source_url || item.url || GITHUB_PAGES_URL,
+          description: item.description || '',
+          tags: parseArray(item.tags, [item.company, 'Стажировка']),
+        };
+      });
+
+      const idSet = new Set(mapped.map((m) => m.id));
+      const remaining = ALL_INTERNSHIPS.filter((i) => !idSet.has(i.id));
+      return [...mapped, ...remaining];
+    }
+  } catch (err) {
+    console.warn('[Parser] Ошибка чтения из Supabase, используем ALL_INTERNSHIPS:', err.message);
+  }
+  return ALL_INTERNSHIPS;
+}
+
+/**
  * Automated tracking & channel parsing module
  * Checks Telegram channel web previews, saves to Supabase, and notifies subscribers.
  */
-async function scanChannelsAndSyncSupabase(notifySubscribers = true) {
-  console.log(`[Parser] ⚡ Запуск сканирования каналов: ${MONITORED_TG_CHANNELS.map((c) => '@' + c).join(', ')}...`);
+export async function scanChannelsAndSyncSupabase(notifySubscribers = true) {
+  console.log(`[Parser] ⚡ Запуск параллельного сканирования ${COMPANIES_DATA.length} каналов...`);
 
-  // 1. Check HTTP availability of channels
-  for (const ch of MONITORED_TG_CHANNELS) {
+  // 1. Parallel channel parsing with timeout protection
+  const parsePromises = COMPANIES_DATA.map(async (c) => {
     try {
-      const res = await fetch(`https://t.me/s/${ch}`, {
-        headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' },
-        signal: AbortSignal.timeout(4000),
-      });
-      if (res.ok) {
-        console.log(`[Parser] @${ch} — HTTP 200 OK, канал доступен`);
-      }
+      const posts = await parseChannelPosts(c.channel, c);
+      console.log(`[Parser] @${c.channel.replace('@', '')} — HTTP 200 OK (вакансий: ${posts.length})`);
+      return posts;
     } catch (e) {
-      console.warn(`[Parser] @${ch} — сетевое предупреждение: ${e.message}`);
+      console.warn(`[Parser] @${c.channel.replace('@', '')} — ошибка: ${e.message}`);
+      return [];
+    }
+  });
+
+  const settled = await Promise.allSettled(parsePromises);
+  const newlyParsed = [];
+  for (const item of settled) {
+    if (item.status === 'fulfilled' && Array.isArray(item.value)) {
+      newlyParsed.push(...item.value);
     }
   }
 
-  // 2. Save vacancies to Supabase table `public.internships`
+  // 2. Combine newly parsed with curated database, deduplicating by ID and title
+  const seenIds = new Set();
+  const seenTitles = new Set();
+  const allToSync = [];
+
+  for (const item of [...newlyParsed, ...ALL_INTERNSHIPS]) {
+    const titleKey = `${item.company}_${item.title}`.toLowerCase();
+    if (!seenIds.has(item.id) && !seenTitles.has(titleKey)) {
+      seenIds.add(item.id);
+      seenTitles.add(titleKey);
+      allToSync.push(item);
+    }
+  }
+
+  // 3. Save vacancies to Supabase table `public.internships`
   let savedCount = 0;
   try {
-    const rows = ALL_INTERNSHIPS.map((item) => ({
+    const rows = allToSync.map((item) => ({
       id: item.id,
       title: item.title,
       company: item.company,
@@ -499,7 +773,7 @@ async function scanChannelsAndSyncSupabase(notifySubscribers = true) {
     console.warn('[Parser] Исключение при синхронизации Supabase:', err.message);
   }
 
-  // 3. Match subscribers from `public.tg_subscriptions` and send notifications
+  // 4. Match subscribers from `public.tg_subscriptions` and send notifications
   let sentPushes = 0;
   if (notifySubscribers && BOT_TOKEN) {
     try {
@@ -515,7 +789,7 @@ async function scanChannelsAndSyncSupabase(notifySubscribers = true) {
           const subDirs = Array.isArray(sub.directions) ? sub.directions : [];
           const subTracks = Array.isArray(sub.sub_tracks) ? sub.sub_tracks : [];
 
-          const matching = ALL_INTERNSHIPS.filter(
+          const matching = allToSync.filter(
             (v) => subDirs.includes(v.directionId) || subTracks.includes(v.subTrackId)
           );
 
@@ -561,7 +835,7 @@ async function scanChannelsAndSyncSupabase(notifySubscribers = true) {
     }
   }
 
-  return { savedCount, sentPushes, channelsChecked: MONITORED_TG_CHANNELS.length };
+  return { savedCount, sentPushes, channelsChecked: COMPANIES_DATA.length, parsedCount: newlyParsed.length };
 }
 
 /**
@@ -583,7 +857,7 @@ async function handleMessage(msg) {
       `Добро пожаловать в <b>IT-Старт</b> — платформу для подготовки к IT-стажировкам и Junior-вакансиям!\n\n` +
       `🎯 <b>Что доступно прямо сейчас:</b>\n` +
       `• <b>Интерактивный WebApp</b> — роадмапы в стиле roadmap.sh, тренажёр собеседований и база стажировок\n` +
-      `• <b>Отслеживание компаний</b> — Т1, Контур, Т-Банк, Directum, Яндекс, Ozon, Сбер, Авито\n` +
+      `• <b>Отслеживание компаний</b> — Т1, Контур, Т-Банк, Directum, Яндекс, Ozon, Сбер, Авито, VK\n` +
       `• <b>Мониторинг Telegram-каналов</b> — автоматический парсинг вакансий и персональные пуш-уведомления\n` +
       `• <b>Тренажёр интервью</b> — 70+ вопросов с эталонными ответами и самопроверкой\n\n` +
       `Нажмите кнопку ниже, чтобы запустить приложение!`;
@@ -618,8 +892,17 @@ async function handleMessage(msg) {
     return;
   }
 
-  // /vacancies or /internships
+  // /vacancies or /internships with optional company argument
   if (text.startsWith('/vacancies') || text.startsWith('/internships')) {
+    const parts = text.trim().split(/\s+/);
+    if (parts.length > 1) {
+      const queryCompany = parts.slice(1).join(' ');
+      const matched = findCompanyByQuery(queryCompany);
+      if (matched) {
+        await sendCompanyVacancies(chatId, matched.id);
+        return;
+      }
+    }
     await sendVacancies(chatId, 'all');
     return;
   }
@@ -656,11 +939,8 @@ async function handleMessage(msg) {
     return;
   }
 
-  // Check if text matches company name
-  const matchedCompany = COMPANIES_DATA.find((c) =>
-    text.toLowerCase().includes(c.shortName.toLowerCase()) ||
-    text.toLowerCase().includes(c.name.toLowerCase())
-  );
+  // Check if text directly matches company name/alias (e.g. "директум", "директрум", "t1", "контур", "тбанк")
+  const matchedCompany = findCompanyByQuery(text);
   if (matchedCompany) {
     await sendCompanyVacancies(chatId, matchedCompany.id);
     return;
@@ -691,11 +971,14 @@ async function handleMessage(msg) {
  * Send vacancies list with company filter buttons
  */
 async function sendVacancies(chatId, filterCompanyId = 'all') {
-  let list = ALL_INTERNSHIPS;
+  const allList = await getActiveInternships();
+  let list = allList;
   let titleHeader = '🔥 <b>Актуальные IT-стажировки 2026:</b>\n\n';
 
   if (filterCompanyId !== 'all') {
-    list = ALL_INTERNSHIPS.filter((i) => i.companyId === filterCompanyId);
+    list = allList.filter(
+      (i) => i.companyId === filterCompanyId || findCompanyByQuery(i.company)?.id === filterCompanyId
+    );
     const company = COMPANIES_DATA.find((c) => c.id === filterCompanyId);
     if (company) {
       titleHeader = `🏢 <b>Вакансии компании ${company.name} (${company.channel}):</b>\n\n`;
@@ -703,13 +986,23 @@ async function sendVacancies(chatId, filterCompanyId = 'all') {
   }
 
   let text = titleHeader;
-  list.slice(0, 7).forEach((item, idx) => {
-    text += `${idx + 1}. <b>${item.company}</b> — ${item.title}\n`;
-    text += `   💰 <i>${item.salary}</i> | 📍 ${item.format}\n`;
-    text += `   📢 Источник: <code>${item.channel}</code> | <a href="${item.url}">Подать заявку</a>\n\n`;
-  });
+  if (list.length === 0) {
+    text += `На данный момент новых вакансий в этой категории не найдено.\n\nПроверьте полный каталог в WebApp или выберите другую компанию ниже:`;
+  } else {
+    list.slice(0, 6).forEach((item, idx) => {
+      text += `${idx + 1}. <b>${item.company}</b> — ${item.title}\n`;
+      text += `   💰 <i>${item.salary}</i> | 📍 ${item.format} (${item.location || 'РФ'})\n`;
+      text += `   📢 Источник: <code>${item.channel}</code> | <a href="${item.url}">Подать заявку</a>\n\n`;
+    });
+    if (list.length > 6) {
+      text += `<i>... и ещё ${list.length - 6} вакансий доступно в WebApp!</i>\n\n`;
+    }
+    text += `⚡ Полный интерактивный каталог, фильтры по стеку и роадмапы доступны в WebApp!`;
+  }
 
-  text += `⚡ Полный интерактивный каталог, фильтры по стеку и роадмапы доступны в WebApp!`;
+  if (text.length > 3900) {
+    text = text.slice(0, 3850) + '\n\n<i>(Список сокращен, откройте WebApp для полного просмотра)</i>';
+  }
 
   await callTelegram('sendMessage', {
     chat_id: chatId,
@@ -732,6 +1025,10 @@ async function sendVacancies(chatId, filterCompanyId = 'all') {
           { text: 'Ozon', callback_data: 'vacancies:ozon' },
           { text: 'Сбер', callback_data: 'vacancies:sber' },
           { text: 'Авито', callback_data: 'vacancies:avito' },
+        ],
+        [
+          { text: 'VK', callback_data: 'vacancies:vk' },
+          { text: '⚡ Сканировать каналы', callback_data: 'scan' },
         ],
         [
           {
@@ -782,6 +1079,10 @@ async function sendCompanies(chatId) {
           { text: 'Avito Tech', callback_data: 'company:avito' },
         ],
         [
+          { text: 'VK (ВКонтакте)', callback_data: 'company:vk' },
+          { text: '💼 Все вакансии', callback_data: 'vacancies:all' },
+        ],
+        [
           {
             text: '🚀 Смотреть в WebApp с фильтрами',
             web_app: { url: GITHUB_PAGES_URL },
@@ -802,7 +1103,10 @@ async function sendCompanyVacancies(chatId, companyId) {
     return;
   }
 
-  const list = ALL_INTERNSHIPS.filter((i) => i.companyId === companyId);
+  const allList = await getActiveInternships();
+  const list = allList.filter(
+    (i) => i.companyId === companyId || findCompanyByQuery(i.company)?.id === companyId
+  );
 
   let text = `🏢 <b>Компания: ${company.name}</b>\n`;
   text += `📢 Telegram-канал: <code>${company.channel}</code>\n`;
@@ -812,9 +1116,9 @@ async function sendCompanyVacancies(chatId, companyId) {
   if (list.length === 0) {
     text += `На данный момент новых вакансий в канале не обнаружено. Проверьте WebApp!\n`;
   } else {
-    list.forEach((item, idx) => {
+    list.slice(0, 7).forEach((item, idx) => {
       text += `${idx + 1}. <b>${item.title}</b>\n`;
-      text += `   💰 <i>${item.salary}</i> | 📍 ${item.format} (${item.location})\n`;
+      text += `   💰 <i>${item.salary}</i> | 📍 ${item.format} (${item.location || 'РФ'})\n`;
       text += `   🔗 <a href="${item.url}">Подать заявку / Перейти к посту</a>\n\n`;
     });
   }
@@ -845,7 +1149,7 @@ async function sendCompanyVacancies(chatId, companyId) {
 async function runManualScan(chatId) {
   await callTelegram('sendMessage', {
     chat_id: chatId,
-    text: `⚡ <b>Запуск сканирования 8 Telegram-каналов...</b>\n\nПроверяем @t1_holding, @kontur_career, @tbank_start, @directum_careers, @yandex_intern, @ozon_tech_career, @sber_careers, @avito_tech...`,
+    text: `⚡ <b>Запуск сканирования ${COMPANIES_DATA.length} Telegram-каналов...</b>\n\nОпрашиваем @t1_holding, @kontur_career, @tbank_start, @directum_careers, @yandex_intern, @ozon_tech_career, @sber_careers, @avito_tech, @vk_team...`,
     parse_mode: 'HTML',
   });
 
@@ -854,7 +1158,8 @@ async function runManualScan(chatId) {
   const reportText =
     `✅ <b>Сканирование каналов успешно завершено!</b>\n\n` +
     `• Проверено каналов: <b>${res.channelsChecked}</b>\n` +
-    `• Вакансий в базе Supabase: <b>${ALL_INTERNSHIPS.length}</b>\n` +
+    `• Спарсено новых постов: <b>${res.parsedCount}</b>\n` +
+    `• Синхронизировано с Supabase: <b>${res.savedCount}</b>\n` +
     `• Отправлено пуш-уведомлений: <b>${res.sentPushes}</b>\n\n` +
     `Все свежие стажировки доступны по команде /vacancies и в WebApp!`;
 
@@ -911,7 +1216,7 @@ async function sendHelp(chatId) {
   const text =
     `ℹ️ <b>Команды бота @${BOT_USERNAME}:</b>\n\n` +
     `/start — Главное меню и запуск WebApp\n` +
-    `/vacancies — Каталог стажировок с фильтром по компаниям\n` +
+    `/vacancies — Каталог стажировок с фильтром по компаниям (например: <code>/vacancies t1</code> или <code>/vacancies directum</code>)\n` +
     `/companies — Список целевых IT-компаний и каналов\n` +
     `/scan — Запустить сканирование Telegram-каналов и синхронизацию\n` +
     `/roadmaps — Роадмапы по 6 направлениям разработки\n` +
@@ -924,7 +1229,9 @@ async function sendHelp(chatId) {
     `/company_yandex — Яндекс\n` +
     `/company_ozon — Ozon Tech\n` +
     `/company_sber — Сбер AI\n` +
-    `/company_avito — Avito Tech\n\n` +
+    `/company_avito — Avito Tech\n` +
+    `/company_vk — VK\n\n` +
+    `💡 <i>Вы также можете просто отправить боту название компании (например: «директум», «t1», «тбанк», «контур»), и бот сразу покажет её стажировки!</i>\n\n` +
     `🌐 <b>Сайт платформы:</b> ${GITHUB_PAGES_URL}`;
 
   await callTelegram('sendMessage', {

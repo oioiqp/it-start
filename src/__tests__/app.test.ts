@@ -654,5 +654,58 @@ describe('11. Target Companies & Telegram Channels Tracking', () => {
 
     expect(botModule.ALL_INTERNSHIPS).toBeDefined();
     expect(botModule.ALL_INTERNSHIPS.length).toBeGreaterThanOrEqual(14);
+
+    // Verify all ALL_INTERNSHIPS IDs match SEED_INTERNSHIPS to avoid database duplication
+    const seedIds = new Set(SEED_INTERNSHIPS.map((i) => i.id));
+    botModule.ALL_INTERNSHIPS.forEach((item: any) => {
+      expect(seedIds.has(item.id)).toBe(true);
+    });
+
+    // Test findCompanyByQuery matching russian and english synonyms
+    expect(botModule.findCompanyByQuery).toBeDefined();
+    expect(botModule.findCompanyByQuery('директум')?.id).toBe('directum');
+    expect(botModule.findCompanyByQuery('директрум')?.id).toBe('directum');
+    expect(botModule.findCompanyByQuery('directum')?.id).toBe('directum');
+    expect(botModule.findCompanyByQuery('t1')?.id).toBe('t1');
+    expect(botModule.findCompanyByQuery('т1')?.id).toBe('t1');
+    expect(botModule.findCompanyByQuery('контур')?.id).toBe('kontur');
+    expect(botModule.findCompanyByQuery('kontur')?.id).toBe('kontur');
+    expect(botModule.findCompanyByQuery('тбанк')?.id).toBe('tbank');
+    expect(botModule.findCompanyByQuery('тинькофф')?.id).toBe('tbank');
+    expect(botModule.findCompanyByQuery('сбер')?.id).toBe('sber');
+    expect(botModule.findCompanyByQuery('ozon')?.id).toBe('ozon');
+    expect(botModule.findCompanyByQuery('авито')?.id).toBe('avito');
+    expect(botModule.findCompanyByQuery('vk')?.id).toBe('vk');
+  });
+
+  it('verifies search query matching handles transliterated company names for Directum, T1, Kontur, T-Bank', () => {
+    const searchFilter = (query: string) => {
+      const q = query.toLowerCase().trim();
+      const isDirectum = q.includes('директ') || q.includes('direct');
+      const isT1 = q.includes('т1') || q.includes('t1');
+      const isTBank = q.includes('тбанк') || q.includes('т-банк') || q.includes('tbank') || q.includes('тиньк');
+      const isKontur = q.includes('контур') || q.includes('kontur');
+
+      return SEED_INTERNSHIPS.filter((item) => {
+        const compLower = item.company.toLowerCase();
+        const matchCompany =
+          compLower.includes(q) ||
+          (isDirectum && compLower.includes('directum')) ||
+          (isT1 && (compLower.includes('т1') || compLower.includes('t1'))) ||
+          (isTBank && (compLower.includes('т-банк') || compLower.includes('тинькофф') || compLower.includes('tbank'))) ||
+          (isKontur && (compLower.includes('контур') || compLower.includes('kontur')));
+
+        const matchTitle = item.title.toLowerCase().includes(q);
+        const matchTags = item.tags.some((t) => t.toLowerCase().includes(q));
+        const matchDesc = item.description.toLowerCase().includes(q);
+        return matchCompany || matchTitle || matchTags || matchDesc;
+      });
+    };
+
+    expect(searchFilter('директум').length).toBeGreaterThanOrEqual(3);
+    expect(searchFilter('директрум').length).toBeGreaterThanOrEqual(3);
+    expect(searchFilter('t1').length).toBeGreaterThanOrEqual(3);
+    expect(searchFilter('тбанк').length).toBeGreaterThanOrEqual(3);
+    expect(searchFilter('контур').length).toBeGreaterThanOrEqual(3);
   });
 });

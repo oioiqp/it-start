@@ -390,6 +390,21 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
       );
     }
 
+    // Trigger background scan on Render bot server if available
+    try {
+      fetch('https://it-start-bot.onrender.com/scan', { signal: AbortSignal.timeout(3000) })
+        .then((res) => {
+          if (res.ok) {
+            addLog('success', 'Серверный бот на Render.com подтвердил синхронизацию каналов с базой Supabase!');
+          }
+        })
+        .catch(() => {
+          // Server may be spinning up, continue with local visual feedback
+        });
+    } catch {
+      // Ignore
+    }
+
     setParsedPosts(INITIAL_PARSED_POSTS);
     setIsScanningChannels(false);
     triggerHaptic('success');
@@ -407,7 +422,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
     addLog('info', `Публикация вакансии "${post.title}" (${post.company})...`);
 
     const newVacancy: Internship = {
-      id: 'parsed-' + Date.now() + '-' + post.id,
+      id: 'parsed-' + post.id,
       title: post.title,
       company: post.company,
       location: post.location,
@@ -603,7 +618,16 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
 
   const filteredChannels = monitoredChannels.filter((c) => {
     if (channelFilter === 'all') return true;
-    return c.company.toLowerCase().includes(channelFilter.toLowerCase());
+    if (channelFilter === 'channels') {
+      return c.category.toLowerCase().includes('канал') || c.company.toLowerCase().includes('channel');
+    }
+    const cf = channelFilter.toLowerCase();
+    return (
+      c.company.toLowerCase().includes(cf) ||
+      c.name.toLowerCase().includes(cf) ||
+      c.handle.toLowerCase().includes(cf) ||
+      c.id.toLowerCase().includes(cf)
+    );
   });
 
   return (
@@ -722,6 +746,8 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
             { id: 'яндекс', label: 'Яндекс' },
             { id: 'ozon', label: 'Ozon' },
             { id: 'сбер', label: 'Сбер' },
+            { id: 'avito', label: 'Авито' },
+            { id: 'channels', label: 'IT-Каналы' },
           ].map((f) => (
             <button
               key={f.id}
