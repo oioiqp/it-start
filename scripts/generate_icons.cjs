@@ -67,15 +67,26 @@ function encodePNG(width, height, rgbaBuffer) {
   return Buffer.concat([signature, ihdrChunk, idatChunk, iendChunk]);
 }
 
+function distToRoundedBox(px, py, bx, by, bw, bh, r) {
+  const cx = bx + bw / 2;
+  const cy = by + bh / 2;
+  const qx = Math.abs(px - cx) - (bw / 2 - r);
+  const qy = Math.abs(py - cy) - (bh / 2 - r);
+  const mx = Math.max(qx, 0);
+  const my = Math.max(qy, 0);
+  const distOutside = Math.hypot(mx, my);
+  const distInside = Math.min(Math.max(qx, qy), 0);
+  return distOutside + distInside - r;
+}
+
 // Drawing helper
 function drawIcon(size) {
   const buf = Buffer.alloc(size * size * 4);
   const cx = size / 2;
   const cy = size / 2;
   const r = size * 0.44; // squircle radius
-
-  // Squircle curvature
   const n = 4.0; // superellipse power
+  const scale = 512 / size;
 
   for (let y = 0; y < size; y++) {
     for (let x = 0; x < size; x++) {
@@ -88,84 +99,79 @@ function drawIcon(size) {
 
       if (dist <= 1.0) {
         // Inside squircle
-        // Gradient background from top-left to bottom-right: #0f172a to #030712
         const t = (x + y) / (2 * size);
-        let bgR = Math.round(15 * (1 - t) + 3 * t);
-        let bgG = Math.round(23 * (1 - t) + 7 * t);
-        let bgB = Math.round(42 * (1 - t) + 18 * t);
+        let bgR = Math.round(15 * (1 - t) + 2 * t);
+        let bgG = Math.round(23 * (1 - t) + 6 * t);
+        let bgB = Math.round(42 * (1 - t) + 23 * t);
 
-        // Center ambient glow
+        // Center ambient backlight
         const dCenter = Math.hypot(x - cx, y - cy) / (size * 0.5);
         if (dCenter < 1.0) {
-          const glow = Math.pow(1 - dCenter, 2) * 0.28;
+          const glow = Math.pow(1 - dCenter, 2) * 0.25;
           bgR += Math.round(99 * glow);
           bgG += Math.round(102 * glow);
           bgB += Math.round(241 * glow);
         }
 
-        // Border glow (near dist = 1.0)
+        // Border stroke (near dist = 0.94..1.0)
         if (dist > 0.94) {
           const edgeT = (dist - 0.94) / 0.06;
-          // Gradient border: Indigo to Cyan
-          const bR = Math.round(129 * (1 - t) + 56 * t);
-          const bG = Math.round(140 * (1 - t) + 189 * t);
-          const bB = Math.round(248 * (1 - t) + 248 * t);
+          const bR = Math.round(56 * (1 - t) + 30 * t);
+          const bG = Math.round(189 * (1 - t) + 41 * t);
+          const bB = Math.round(248 * (1 - t) + 59 * t);
           bgR = Math.round(bgR * (1 - edgeT) + bR * edgeT);
           bgG = Math.round(bgG * (1 - edgeT) + bG * edgeT);
           bgB = Math.round(bgB * (1 - edgeT) + bB * edgeT);
         }
 
-        // Anti-aliasing at the very outer edge
+        // Anti-aliasing at the squircle outer edge
         let alpha = 255;
         if (dist > 0.98) {
           alpha = Math.round(255 * (1 - (dist - 0.98) / 0.02));
         }
 
-        // Render "IT" + Launch Arrow symbol
-        // Coordinate system scaled to 0..1
-        const nx = x / size;
-        const ny = y / size;
+        // Render pure minimalist "IT" typography
+        const px = x * scale;
+        const py = y * scale;
 
-        // Symbol 1: Bold "I" Bar
-        const inIBar = nx >= 0.26 && nx <= 0.35 && ny >= 0.32 && ny <= 0.70;
-        // Dot above I
-        const inIDot = Math.hypot(nx - 0.305, ny - 0.23) <= 0.045;
+        // Letter "I"
+        const dI = distToRoundedBox(px, py, 119, 144, 58, 224, 16);
 
-        // Symbol 2: "T" Top Bar
-        const inTTop = nx >= 0.42 && nx <= 0.74 && ny >= 0.32 && ny <= 0.41;
+        // Letter "T" (crossbar + stem union)
+        const dTCross = distToRoundedBox(px, py, 217, 144, 176, 54, 16);
+        const dTStem = distToRoundedBox(px, py, 276, 144, 58, 224, 16);
+        const dT = Math.min(dTCross, dTStem);
 
-        // Symbol 3: Dynamic Launch Arrow (Rocket Chevron)
-        // Vector pointing up-right from (0.47, 0.68) to (0.74, 0.41)
-        // Stem of T
-        const inTStem = nx >= 0.535 && nx <= 0.625 && ny >= 0.41 && ny <= 0.70;
+        const dText = Math.min(dI, dT);
 
-        // Upward diagonal rocket thrust / arrow head
-        const arrowX = nx - 0.58;
-        const arrowY = ny - 0.45;
-        const dDiag = arrowX - arrowY;
-        const inArrowHead = nx >= 0.50 && nx <= 0.78 && ny >= 0.22 && ny <= 0.50 && Math.abs(dDiag) <= 0.09;
+        // Subpixel anti-aliasing for letters
+        const letterAlpha = Math.max(0, Math.min(1, 0.5 - dText / scale));
 
-        // Star / Spark at (0.80, 0.20)
-        const sparkDx = Math.abs(nx - 0.78);
-        const sparkDy = Math.abs(ny - 0.22);
-        const inSpark = Math.hypot(sparkDx, sparkDy) < 0.05 && (sparkDx < 0.015 || sparkDy < 0.015);
+        // Subtle drop shadow behind letters
+        const dShadowI = distToRoundedBox(px, py - 6, 119, 144, 58, 224, 16);
+        const dShadowT = Math.min(
+          distToRoundedBox(px, py - 6, 217, 144, 176, 54, 16),
+          distToRoundedBox(px, py - 6, 276, 144, 58, 224, 16)
+        );
+        const dShadow = Math.min(dShadowI, dShadowT);
+        const shadowAlpha = Math.max(0, Math.min(0.4, (0.5 - dShadow / (scale * 2.5)) * 0.4));
 
-        if (inIBar || inTTop) {
-          // Crisp clean white for base letters
-          bgR = 255;
-          bgG = 255;
-          bgB = 255;
-        } else if (inIDot || inSpark) {
-          // Vibrant Cyan / Emerald
-          bgR = 56;
-          bgG = 189;
-          bgB = 248;
-        } else if (inTStem || inArrowHead) {
-          // Electric Indigo to Cyan gradient
-          const gradT = (nx - 0.4) / 0.4;
-          bgR = Math.round(99 * (1 - gradT) + 56 * gradT);
-          bgG = Math.round(102 * (1 - gradT) + 189 * gradT);
-          bgB = Math.round(241 * (1 - gradT) + 248 * gradT);
+        // Apply shadow
+        if (shadowAlpha > 0 && letterAlpha < 1) {
+          bgR = Math.round(bgR * (1 - shadowAlpha));
+          bgG = Math.round(bgG * (1 - shadowAlpha));
+          bgB = Math.round(bgB * (1 - shadowAlpha));
+        }
+
+        // Apply letter color (crisp bright white)
+        if (letterAlpha > 0) {
+          const textR = 255;
+          const textG = 255;
+          const textB = 255;
+
+          bgR = Math.round(bgR * (1 - letterAlpha) + textR * letterAlpha);
+          bgG = Math.round(bgG * (1 - letterAlpha) + textG * letterAlpha);
+          bgB = Math.round(bgB * (1 - letterAlpha) + textB * letterAlpha);
         }
 
         buf[idx] = Math.min(255, bgR);
