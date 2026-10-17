@@ -8,12 +8,12 @@ import {
   ChevronUp,
   MapPin,
   Clock,
-  Send,
   Trophy,
   CheckSquare,
   Square,
   Map,
   HelpCircle,
+  Bot,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import type { Internship, Question, RoadmapTopic, UserProgress } from '../types';
@@ -451,22 +451,39 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
         </div>
 
         {/* Modal Footer */}
-        <div className="shrink-0 pt-4 border-t border-slate-800 flex items-center justify-between gap-3">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs sm:text-sm font-medium transition-colors"
-          >
-            Закрыть
-          </button>
+        <div className="shrink-0 pt-4 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={onClose}
+              className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs sm:text-sm font-medium transition-colors"
+            >
+              Закрыть
+            </button>
+
+            {internship.sourceChannel.startsWith('@') && (
+              <a
+                href={`https://t.me/${internship.sourceChannel.replace(/^@/, '')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-sky-950/40 hover:bg-sky-900/50 border border-sky-800/50 text-sky-300 text-xs font-medium transition-colors"
+                title={`Открыть Telegram-канал ${internship.sourceChannel}`}
+              >
+                <Bot className="w-4 h-4 text-sky-400" />
+                <span>Канал {internship.sourceChannel}</span>
+                <ExternalLink className="w-3 h-3" />
+              </a>
+            )}
+          </div>
 
           <a
             href={internship.applyUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-emerald-600/20 active:scale-95 transition-all"
+            title={`Подать заявку на официальном сайте компании ${internship.company}`}
           >
-            <span>Откликнуться на стажировку</span>
-            <Send className="w-4 h-4" />
+            <span>Подать заявку на сайте {internship.company}</span>
+            <ExternalLink className="w-4 h-4" />
           </a>
         </div>
       </div>

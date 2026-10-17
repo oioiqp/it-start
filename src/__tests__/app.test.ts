@@ -547,10 +547,10 @@ describe('11. Target Companies & Telegram Channels Tracking', () => {
 
     // Channels
     const channels = SEED_INTERNSHIPS.map((i) => i.sourceChannel);
-    expect(channels).toContain('@t1_holding');
-    expect(channels).toContain('@directum_careers');
-    expect(channels).toContain('@kontur_career');
-    expect(channels).toContain('@tbank_start');
+    expect(channels).toContain('@t1career');
+    expect(channels).toContain('@Life_in_Directum');
+    expect(channels).toContain('@KonturTech');
+    expect(channels).toContain('@tbank_team');
   });
 
   it('verifies Directum vacancies have Izhevsk location and valid fields', () => {
@@ -561,7 +561,7 @@ describe('11. Target Companies & Telegram Channels Tracking', () => {
 
     directumItems.forEach((item) => {
       expect(item.location).toContain('Ижевск');
-      expect(item.sourceChannel).toBe('@directum_careers');
+      expect(item.sourceChannel).toBe('@Life_in_Directum');
       expect(item.salary).toBeTruthy();
       expect(item.requirements.length).toBeGreaterThan(0);
       expect(item.responsibilities.length).toBeGreaterThan(0);
@@ -588,10 +588,10 @@ describe('11. Target Companies & Telegram Channels Tracking', () => {
 
     expect(MONITORED_CHANNELS_LIST.length).toBeGreaterThanOrEqual(8);
     const handles = MONITORED_CHANNELS_LIST.map((c) => c.handle);
-    expect(handles).toContain('@t1_holding');
-    expect(handles).toContain('@kontur_career');
-    expect(handles).toContain('@tbank_start');
-    expect(handles).toContain('@directum_careers');
+    expect(handles).toContain('@t1career');
+    expect(handles).toContain('@KonturTech');
+    expect(handles).toContain('@tbank_team');
+    expect(handles).toContain('@Life_in_Directum');
     expect(handles).toContain('@yandex_intern');
     expect(handles).toContain('@ozon_tech_career');
     expect(handles).toContain('@sber_careers');

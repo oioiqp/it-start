@@ -92,7 +92,7 @@ const PRESET_VACANCIES = [
     salary: 'от 75 000 ₽',
     directionId: 'frontend' as DirectionId,
     subTrackId: 'react' as SubTrackId,
-    sourceChannel: '@tbank_start',
+    sourceChannel: '@tbank_team',
     description: 'Разработка новых витрин и финансовых сервисов для мобильного и веб-банкинга.',
     tags: ['React', 'TypeScript', 'Redux', 'Tailwind'],
   },
@@ -235,7 +235,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
       id: 'log-01',
       timestamp: new Date().toLocaleTimeString(),
       type: 'success',
-      text: 'Подключено 10 источников Telegram: @t1_holding, @kontur_career, @tbank_start, @directum_careers и др.',
+      text: 'Подключено 10 источников Telegram: @t1career, @KonturTech, @tbank_team, @Life_in_Directum и др.',
     },
   ]);
   const [isPublishing, setIsPublishing] = useState<boolean>(false);

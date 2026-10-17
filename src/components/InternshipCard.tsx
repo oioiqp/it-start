@@ -142,10 +142,23 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
 
         {/* Source and Actions */}
         <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-1 text-[11px] text-slate-400 font-medium truncate">
-            <Bot className="w-3.5 h-3.5 shrink-0 text-slate-500" />
-            <span className="truncate">{internship.sourceChannel}</span>
-          </div>
+          {internship.sourceChannel.startsWith('@') ? (
+            <a
+              href={`https://t.me/${internship.sourceChannel.replace(/^@/, '')}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-sky-400 transition-colors font-medium truncate group"
+              title={`Открыть Telegram-канал ${internship.sourceChannel}`}
+            >
+              <Bot className="w-3.5 h-3.5 shrink-0 text-sky-400/80 group-hover:text-sky-300" />
+              <span className="truncate underline decoration-slate-700 group-hover:decoration-sky-400">{internship.sourceChannel}</span>
+            </a>
+          ) : (
+            <div className="flex items-center gap-1 text-[11px] text-slate-400 font-medium truncate">
+              <Bot className="w-3.5 h-3.5 shrink-0 text-slate-500" />
+              <span className="truncate">{internship.sourceChannel}</span>
+            </div>
+          )}
 
           <div className="flex items-center gap-1.5 shrink-0">
             <button
@@ -160,10 +173,11 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
               href={internship.applyUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors"
-              title="Открыть источник"
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/30 text-emerald-300 text-xs font-semibold transition-all active:scale-95"
+              title={`Подать заявку на официальном сайте ${internship.company}`}
             >
-              <ExternalLink className="w-3.5 h-3.5" />
+              <span>Отклик</span>
+              <ExternalLink className="w-3 h-3" />
             </a>
           </div>
         </div>
