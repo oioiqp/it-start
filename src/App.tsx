@@ -6,6 +6,7 @@ import {
   Bot,
   RefreshCw,
   Bell,
+  Building2,
 } from 'lucide-react';
 import type {
   DirectionId,
@@ -66,10 +67,23 @@ export function App() {
 
   // Internships Filters
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [selectedCompany, setSelectedCompany] = useState<string>('all');
   const [selectedDirection, setSelectedDirection] = useState<DirectionId | 'all'>('all');
   const [selectedSubTrack, setSelectedSubTrack] = useState<SubTrackId | 'all'>('all');
   const [selectedFormat, setSelectedFormat] = useState<WorkFormat | 'all'>('all');
   const [selectedSource, setSelectedSource] = useState<'all' | 'telegram' | 'portal'>('all');
+
+  const TARGET_COMPANIES = [
+    'Т-Банк',
+    'Холдинг Т1',
+    'Контур',
+    'Directum',
+    'Яндекс',
+    'Ozon Tech',
+    'Сбер',
+    'Avito Tech',
+    'VK',
+  ];
 
   // Initialize Telegram WebApp & Supabase
   useEffect(() => {
@@ -231,6 +245,11 @@ export function App() {
 
   // Filtered internships for feed
   const filteredInternships = internships.filter((item) => {
+    if (selectedCompany !== 'all') {
+      const compLower = item.company.toLowerCase();
+      const selLower = selectedCompany.toLowerCase();
+      if (!compLower.includes(selLower) && !selLower.includes(compLower)) return false;
+    }
     if (selectedDirection !== 'all' && item.directionId !== selectedDirection) return false;
     if (selectedSubTrack !== 'all' && item.subTrackId !== selectedSubTrack) return false;
     if (selectedFormat !== 'all' && item.format !== selectedFormat) return false;
@@ -344,6 +363,7 @@ export function App() {
                   <button
                     onClick={() => {
                       setSearchQuery('');
+                      setSelectedCompany('all');
                       setSelectedDirection('all');
                       setSelectedSubTrack('all');
                       setSelectedFormat('all');
@@ -356,8 +376,66 @@ export function App() {
                 </div>
               </div>
 
-              {/* Row 2: Direction tabs */}
-              <div className="space-y-1.5">
+              {/* Row 2: Company Filter */}
+              <div className="space-y-1.5 pt-1 border-t border-slate-800/60">
+                <div className="flex items-center justify-between text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                  <span className="flex items-center gap-1.5">
+                    <Building2 className="w-3.5 h-3.5 text-indigo-400" />
+                    Компания / Работодатель:
+                  </span>
+                  {selectedCompany !== 'all' && (
+                    <button
+                      onClick={() => setSelectedCompany('all')}
+                      className="text-xs text-indigo-400 hover:text-indigo-300 normal-case font-normal"
+                    >
+                      Сбросить компанию
+                    </button>
+                  )}
+                </div>
+                <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
+                  <button
+                    onClick={() => setSelectedCompany('all')}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                      selectedCompany === 'all'
+                        ? 'bg-indigo-600 text-white shadow-sm'
+                        : 'bg-slate-950/70 border border-slate-800 text-slate-400 hover:text-slate-200'
+                    }`}
+                  >
+                    Все компании ({internships.length})
+                  </button>
+                  {TARGET_COMPANIES.map((company) => {
+                    const isSelected = selectedCompany === company;
+                    const count = internships.filter((item) => {
+                      const c = item.company.toLowerCase();
+                      const t = company.toLowerCase();
+                      return c.includes(t) || t.includes(c);
+                    }).length;
+                    return (
+                      <button
+                        key={company}
+                        onClick={() => setSelectedCompany(isSelected ? 'all' : company)}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 ${
+                          isSelected
+                            ? 'bg-indigo-600 text-white shadow-sm ring-1 ring-indigo-400'
+                            : 'bg-slate-950/70 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700'
+                        }`}
+                      >
+                        <span>{company}</span>
+                        <span
+                          className={`text-[10px] px-1.5 py-0.2 rounded-full ${
+                            isSelected ? 'bg-white/20 text-white font-mono' : 'bg-slate-800 text-slate-400 font-mono'
+                          }`}
+                        >
+                          {count}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Row 3: Direction tabs */}
+              <div className="space-y-1.5 pt-1 border-t border-slate-800/60">
                 <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
                   Направление разработки:
                 </div>
@@ -492,6 +570,7 @@ export function App() {
                   <button
                     onClick={() => {
                       setSearchQuery('');
+                      setSelectedCompany('all');
                       setSelectedDirection('all');
                       setSelectedSubTrack('all');
                       setSelectedFormat('all');

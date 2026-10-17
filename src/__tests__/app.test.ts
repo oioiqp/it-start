@@ -532,5 +532,127 @@ describe('10. Interactive Self-Check Questions Trainer', () => {
   });
 });
 
+describe('11. Target Companies & Telegram Channels Tracking', () => {
+  it('covers key employer vacancies: Холдинг Т1, Directum, СКБ Контур, Т-Банк', () => {
+    const companies = SEED_INTERNSHIPS.map((i) => i.company.toLowerCase());
 
+    // Т1
+    expect(companies.some((c) => c.includes('т1') || c.includes('t1'))).toBe(true);
+    // Directum
+    expect(companies.some((c) => c.includes('directum') || c.includes('директум'))).toBe(true);
+    // Контур
+    expect(companies.some((c) => c.includes('контур'))).toBe(true);
+    // Т-Банк
+    expect(companies.some((c) => c.includes('т-банк'))).toBe(true);
 
+    // Channels
+    const channels = SEED_INTERNSHIPS.map((i) => i.sourceChannel);
+    expect(channels).toContain('@t1_holding');
+    expect(channels).toContain('@directum_careers');
+    expect(channels).toContain('@kontur_career');
+    expect(channels).toContain('@tbank_start');
+  });
+
+  it('verifies Directum vacancies have Izhevsk location and valid fields', () => {
+    const directumItems = SEED_INTERNSHIPS.filter(
+      (i) => i.company.toLowerCase().includes('directum') || i.company.toLowerCase().includes('директум')
+    );
+    expect(directumItems.length).toBeGreaterThanOrEqual(3);
+
+    directumItems.forEach((item) => {
+      expect(item.location).toContain('Ижевск');
+      expect(item.sourceChannel).toBe('@directum_careers');
+      expect(item.salary).toBeTruthy();
+      expect(item.requirements.length).toBeGreaterThan(0);
+      expect(item.responsibilities.length).toBeGreaterThan(0);
+    });
+  });
+
+  it('verifies Холдинг Т1 vacancies cover Open School (Открытая школа), DevOps and QA', () => {
+    const t1Items = SEED_INTERNSHIPS.filter((i) => i.company.toLowerCase().includes('т1'));
+    expect(t1Items.length).toBeGreaterThanOrEqual(3);
+
+    const hasJava = t1Items.some((i) => i.subTrackId === 'java');
+    const hasDevOps = t1Items.some((i) => i.directionId === 'devops');
+    const hasQA = t1Items.some((i) => i.directionId === 'qa');
+
+    expect(hasJava).toBe(true);
+    expect(hasDevOps).toBe(true);
+    expect(hasQA).toBe(true);
+  });
+
+  it('exports valid MONITORED_CHANNELS_LIST and INITIAL_PARSED_POSTS from TelegramParserTab', async () => {
+    const { MONITORED_CHANNELS_LIST, INITIAL_PARSED_POSTS } = await import(
+      '../data/channels'
+    );
+
+    expect(MONITORED_CHANNELS_LIST.length).toBeGreaterThanOrEqual(8);
+    const handles = MONITORED_CHANNELS_LIST.map((c) => c.handle);
+    expect(handles).toContain('@t1_holding');
+    expect(handles).toContain('@kontur_career');
+    expect(handles).toContain('@tbank_start');
+    expect(handles).toContain('@directum_careers');
+    expect(handles).toContain('@yandex_intern');
+    expect(handles).toContain('@ozon_tech_career');
+    expect(handles).toContain('@sber_careers');
+    expect(handles).toContain('@avito_tech');
+
+    expect(INITIAL_PARSED_POSTS.length).toBeGreaterThanOrEqual(5);
+    const parsedCompanies = INITIAL_PARSED_POSTS.map((p) => p.company.toLowerCase());
+    expect(parsedCompanies.some((c) => c.includes('т1'))).toBe(true);
+    expect(parsedCompanies.some((c) => c.includes('контур'))).toBe(true);
+    expect(parsedCompanies.some((c) => c.includes('directum'))).toBe(true);
+    expect(parsedCompanies.some((c) => c.includes('т-банк'))).toBe(true);
+  });
+
+  it('tests company filtering logic matching internships correctly', () => {
+    const filterByCompany = (items: typeof SEED_INTERNSHIPS, selectedComp: string) => {
+      if (selectedComp === 'all') return items;
+      return items.filter((item) => {
+        const compLower = item.company.toLowerCase();
+        const selLower = selectedComp.toLowerCase();
+        return compLower.includes(selLower) || selLower.includes(compLower);
+      });
+    };
+
+    const t1Results = filterByCompany(SEED_INTERNSHIPS, 'Холдинг Т1');
+    expect(t1Results.length).toBeGreaterThanOrEqual(3);
+    t1Results.forEach((i) => expect(i.company).toContain('Т1'));
+
+    const directumResults = filterByCompany(SEED_INTERNSHIPS, 'Directum');
+    expect(directumResults.length).toBeGreaterThanOrEqual(3);
+    directumResults.forEach((i) => expect(i.company).toContain('Directum'));
+
+    const konturResults = filterByCompany(SEED_INTERNSHIPS, 'Контур');
+    expect(konturResults.length).toBeGreaterThanOrEqual(3);
+    konturResults.forEach((i) => expect(i.company.toLowerCase()).toContain('контур'));
+
+    const allResults = filterByCompany(SEED_INTERNSHIPS, 'all');
+    expect(allResults.length).toBe(SEED_INTERNSHIPS.length);
+  });
+
+  it('validates bot server companies database and internships data', async () => {
+    // Set NODE_ENV to test before import
+    const nodeProcess = (globalThis as unknown as { process: { env: Record<string, string> } }).process;
+    if (nodeProcess?.env) {
+      nodeProcess.env.NODE_ENV = 'test';
+    }
+    // @ts-ignore
+    const botModule: any = await import('../../bot/bot.mjs');
+    expect(botModule.COMPANIES_DATA).toBeDefined();
+    expect(botModule.COMPANIES_DATA.length).toBeGreaterThanOrEqual(8);
+
+    const botCompanyIds = botModule.COMPANIES_DATA.map((c: any) => c.id);
+    expect(botCompanyIds).toContain('t1');
+    expect(botCompanyIds).toContain('kontur');
+    expect(botCompanyIds).toContain('tbank');
+    expect(botCompanyIds).toContain('directum');
+    expect(botCompanyIds).toContain('yandex');
+    expect(botCompanyIds).toContain('ozon');
+    expect(botCompanyIds).toContain('sber');
+    expect(botCompanyIds).toContain('avito');
+
+    expect(botModule.ALL_INTERNSHIPS).toBeDefined();
+    expect(botModule.ALL_INTERNSHIPS.length).toBeGreaterThanOrEqual(14);
+  });
+});

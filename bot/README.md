@@ -9,8 +9,27 @@
 
 **Архитектура IT-Старт:**
 1. **Фронтенд & Telegram Mini App (WebApp):** Размещен на GitHub Pages (`https://oioiqp.github.io/it-start/`).
-2. **База данных и прогресс:** Supabase.
-3. **Telegram-бот:** Серверный скрипт `bot/bot.mjs`, который обрабатывает команды `/start`, `/vacancies`, `/roadmaps` и открывает WebApp.
+2. **База данных и прогресс:** Supabase (`public.internships`, `public.tg_subscriptions`, `public.user_progress`).
+3. **Telegram-бот:** Серверный скрипт `bot/bot.mjs`, работающий на Render.com (`https://it-start-bot.onrender.com`), который:
+   - Непрерывно отслеживает целевые Telegram-каналы: `@t1_holding`, `@kontur_career`, `@tbank_start`, `@directum_careers`, `@yandex_intern`, `@ozon_tech_career`, `@sber_careers`, `@avito_tech`.
+   - Автоматически записывает найденные вакансии в Supabase.
+   - Рассылает персональные пуш-уведомления подписчикам по совпадению направлений и компаний.
+   - Поддерживает команды `/vacancies`, `/companies`, `/scan`, быстрые команды `/company_<id>` и интерактивные кнопки.
+
+---
+
+## Команды бота
+
+- `/start` — Приветствие, главное меню и кнопка запуска WebApp
+- `/vacancies` — Каталог свежих стажировок с кнопками фильтрации по компаниям (Т1, Контур, Т-Банк, Directum, Яндекс, Ozon, Сбер, Авито)
+- `/companies` — Полный обзор отслеживаемых IT-компаний и их Telegram-источников
+- `/scan` — Ручной запуск сканирования всех целевых каналов и синхронизации с базой
+- `/company_t1` — Вакансии Холдинга Т1 (Открытая школа Т1)
+- `/company_kontur` — Вакансии СКБ Контур (Контур.Старт 2026)
+- `/company_tbank` — Вакансии Т-Банка (Финтех)
+- `/company_directum` — Вакансии Directum (Ижевск / РФ)
+- `/roadmaps` — Список интерактивных роадмапов
+- `/help` — Справка по командам
 
 ---
 
