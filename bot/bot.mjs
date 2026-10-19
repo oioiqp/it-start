@@ -744,6 +744,92 @@ async function callTelegram(method, payload = {}) {
 }
 
 /**
+ * Detect direction and sub-track from vacancy title and body text
+ */
+export function detectVacancyTrack(title = '', text = '') {
+  const combined = `${title} ${text}`.toLowerCase();
+
+  if (
+    combined.includes('react') ||
+    combined.includes('frontend') ||
+    combined.includes('фронтенд') ||
+    combined.includes('typescript') ||
+    combined.includes('vue') ||
+    combined.includes('angular') ||
+    combined.includes('веб-разработчик') ||
+    combined.includes('web-разработчик')
+  ) {
+    const subTrackId = combined.includes('vue') ? 'vue' : combined.includes('angular') ? 'angular' : 'react';
+    return { directionId: 'frontend', subTrackId };
+  }
+
+  if (
+    combined.includes('qa') ||
+    combined.includes('тестиров') ||
+    combined.includes('тестирован') ||
+    combined.includes('тест-инженер') ||
+    combined.includes('quality assurance')
+  ) {
+    const subTrackId =
+      combined.includes('auto') || combined.includes('автомат') || combined.includes('python')
+        ? 'auto_qa'
+        : 'manual_qa';
+    return { directionId: 'qa', subTrackId };
+  }
+
+  if (
+    combined.includes('devops') ||
+    combined.includes('sre') ||
+    combined.includes('kubernetes') ||
+    combined.includes('docker') ||
+    combined.includes('облак') ||
+    combined.includes('cloud') ||
+    combined.includes('инфраструктур') ||
+    combined.includes('системный администратор')
+  ) {
+    const subTrackId = combined.includes('k8s') || combined.includes('kubernetes') ? 'k8s_iac' : 'cicd_docker';
+    return { directionId: 'devops', subTrackId };
+  }
+
+  if (
+    combined.includes('data science') ||
+    combined.includes('ml') ||
+    combined.includes('машинн') ||
+    combined.includes('ai') ||
+    combined.includes('аналитик') ||
+    combined.includes('data engineer')
+  ) {
+    const subTrackId = combined.includes('ml') || combined.includes('машинн') ? 'ml' : 'analytics';
+    return { directionId: 'data_science', subTrackId };
+  }
+
+  if (
+    combined.includes('android') ||
+    combined.includes('ios') ||
+    combined.includes('flutter') ||
+    combined.includes('мобильн') ||
+    combined.includes('mobile')
+  ) {
+    const subTrackId = combined.includes('ios') ? 'ios' : combined.includes('flutter') ? 'flutter' : 'android';
+    return { directionId: 'mobile', subTrackId };
+  }
+
+  if (combined.includes('java') || combined.includes('spring')) {
+    return { directionId: 'backend', subTrackId: 'java' };
+  }
+
+  if (combined.includes('go') || combined.includes('golang')) {
+    return { directionId: 'backend', subTrackId: 'golang' };
+  }
+
+  if (combined.includes('node') || combined.includes('nest') || combined.includes('express')) {
+    return { directionId: 'backend', subTrackId: 'nodejs' };
+  }
+
+  return { directionId: 'backend', subTrackId: 'python' };
+}
+
+/**
  * Parse public Telegram channel web preview (https://t.me/s/<channel>)
  * Extracts posts, filters IT vacancies, maps to Internship format
  */
@@ -758,22 +844,34 @@ export async function parseChannelPosts(channelHandle, companyInfo) {
         Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
         'Accept-Language': 'ru,en;q=0.9',
       },
-      signal: AbortSignal.timeout(3500),
+      signal: AbortSignal.timeout(4000),
     });
 
     if (!res.ok) return [];
 
     const html = await res.text();
+    if (!html.includes('data-post=')) return [];
+
     const posts = [];
+    const postBlocks = html.split(/<div class="tgme_widget_message\b/i);
 
-    // Match messages in t.me/s/ preview
-    const msgRegex = /data-post="([^"]+)"[\s\S]*?<div class="tgme_widget_message_text[^"]*"[^>]*>([\s\S]*?)<\/div>/g;
-    let match;
+    for (let i = 1; i < postBlocks.length; i++) {
+      const block = postBlocks[i];
+      const postSlugMatch = block.match(/data-post="([^"]+)"/);
+      const textMatch = block.match(/<div class="tgme_widget_message_text[^"]*"[^>]*>([\s\S]*?)<\/div>/);
+      const timeMatch = block.match(/<time datetime="([^"]+)"/);
 
-    while ((match = msgRegex.exec(html)) !== null) {
-      const postSlug = match[1]; // e.g. "tbank_team/456"
-      const rawText = match[2];
-      const text = rawText
+      if (!postSlugMatch || !textMatch) continue;
+
+      const postSlug = postSlugMatch[1];
+      const publishedAt = timeMatch ? timeMatch[1] : new Date().toISOString();
+      const rawHtmlText = textMatch[1];
+
+      // Extract external apply/vacancy link if present in message
+      const linkMatch = rawHtmlText.match(/href="((?:https?:\/\/)(?!t\.me|telegram\.org)[^"]+)"/i);
+      const applyUrl = linkMatch ? linkMatch[1] : `https://t.me/${postSlug}`;
+
+      const text = rawHtmlText
         .replace(/<br\s*\/?>/gi, '\n')
         .replace(/<[^>]+>/g, ' ')
         .replace(/&quot;/g, '"')
@@ -805,63 +903,28 @@ export async function parseChannelPosts(channelHandle, companyInfo) {
 
       // Extract first meaningful line as title candidate
       const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
-      const firstLine = (lines[0] || 'IT-Стажировка').replace(/^[🔥⚡📢🏢🎯🚀]\s*/, '');
+      const firstLine = (lines[0] || 'IT-Стажировка').replace(/^[^\p{L}\p{N}]+/u, '');
       const title = firstLine.length > 70 ? firstLine.slice(0, 67) + '...' : firstLine;
 
-      // Direction detection
-      let directionId = 'backend';
-      let subTrackId = 'python';
-
-      if (
-        textLower.includes('react') ||
-        textLower.includes('frontend') ||
-        textLower.includes('фронтенд') ||
-        textLower.includes('typescript')
-      ) {
-        directionId = 'frontend';
-        subTrackId = 'react';
-      } else if (textLower.includes('qa') || textLower.includes('тестир') || textLower.includes('test')) {
-        directionId = 'qa';
-        subTrackId = textLower.includes('auto') || textLower.includes('автомат') ? 'auto_qa' : 'manual_qa';
-      } else if (
-        textLower.includes('devops') ||
-        textLower.includes('sre') ||
-        textLower.includes('kubernetes') ||
-        textLower.includes('docker') ||
-        textLower.includes('облак')
-      ) {
-        directionId = 'devops';
-        subTrackId = textLower.includes('k8s') || textLower.includes('kubernetes') ? 'k8s_iac' : 'cicd_docker';
-      } else if (textLower.includes('java') || textLower.includes('spring')) {
-        directionId = 'backend';
-        subTrackId = 'java';
-      } else if (textLower.includes('go') || textLower.includes('golang')) {
-        directionId = 'backend';
-        subTrackId = 'golang';
-      } else if (textLower.includes('android') || textLower.includes('ios') || textLower.includes('mobile')) {
-        directionId = 'mobile';
-        subTrackId = textLower.includes('ios') ? 'ios' : 'android';
-      } else if (textLower.includes('data science') || textLower.includes('ml') || textLower.includes('машинн')) {
-        directionId = 'data_science';
-        subTrackId = 'ml';
-      }
+      // Direction detection using unified helper
+      const { directionId, subTrackId } = detectVacancyTrack(title, text);
 
       // Format detection
       let format = 'Удаленно';
-      if (textLower.includes('гибрид')) format = 'Гибрид';
-      else if (textLower.includes('офис')) format = 'Офис';
+      if (textLower.includes('гибрид') || textLower.includes('hybrid')) format = 'Гибрид';
+      else if (textLower.includes('офис') || textLower.includes('office')) format = 'Офис';
 
       // Location detection
       let location = 'Москва / Удаленно';
-      if (textLower.includes('ижевск')) location = 'Ижевск / Удаленно';
+      if (companyInfo.id === 'directum' || textLower.includes('ижевск')) location = 'Ижевск / Удаленно';
       else if (textLower.includes('екатеринбург')) location = 'Екатеринбург / Удаленно';
       else if (textLower.includes('санкт-петербург') || textLower.includes('питер')) location = 'Санкт-Петербург / Удаленно';
 
       // Salary detection
-      let salary = 'от 65 000 до 90 000 ₽';
-      const salaryMatch = text.match(/от\s*(\d+[\s\d]*)\s*(?:до\s*(\d+[\s\d]*))?\s*(?:₽|руб)/i);
+      let salary = textLower.includes('оплачив') ? 'Оплачиваемая стажировка' : 'По договоренности';
+      const salaryMatch = text.match(/(?:от\s*(\d+[\s\d]*)|до\s*(\d+[\s\d]*)|(\d+[\s\d]*))\s*(?:₽|руб|тыс)/i);
       if (salaryMatch) {
-        salary = salaryMatch[0];
+        salary = salaryMatch[0].trim();
       }
 
       const postId = postSlug.replace('/', '-');
@@ -876,7 +939,8 @@ export async function parseChannelPosts(channelHandle, companyInfo) {
         channel: '@' + cleanHandle,
         directionId,
         subTrackId,
-        url: `https://t.me/${postSlug}`,
+        url: applyUrl,
+        publishedAt,
         description: text.slice(0, 300) + (text.length > 300 ? '...' : ''),
         tags: [companyInfo.shortName || companyInfo.company || 'IT', subTrackId.toUpperCase(), 'Telegram', 'Стажировка'],
         sourceType: 'telegram',
@@ -926,10 +990,10 @@ export async function parseTelegramChannels() {
 }
 
 /**
- * Live parsing of target employer career websites & Habr Career open profiles
+ * Live parsing of target employer career websites, hh.ru open search, & Habr Career
  */
 export async function parseCareerWebsites() {
-  console.log(`[Parser] 🌐 Запуск парсинга карьерных сайтов и порталов (${CAREER_WEBSITES_DATA.length} источников)...`);
+  console.log(`[Parser] 🌐 Запуск парсинга карьерных сайтов и официальных источников (${CAREER_WEBSITES_DATA.length} источников)...`);
 
   const parsed = [];
 
@@ -959,16 +1023,7 @@ export async function parseCareerWebsites() {
             city = cityMatch[1].replace(/&#x([0-9a-fA-F]+);/g, (_, code) => String.fromCharCode(parseInt(code, 16)));
           }
 
-          let directionId = 'backend';
-          let subTrackId = 'java';
-          const tLower = rawTitle.toLowerCase();
-          if (tLower.includes('web') || tLower.includes('front') || tLower.includes('react')) {
-            directionId = 'frontend';
-            subTrackId = 'react';
-          } else if (tLower.includes('тестир') || tLower.includes('qa')) {
-            directionId = 'qa';
-            subTrackId = 'manual_qa';
-          }
+          const { directionId, subTrackId } = detectVacancyTrack(rawTitle);
 
           parsed.push({
             id: `site-directum-${href.replace(/[^a-zA-Z0-9_-]/g, '')}`,
@@ -982,7 +1037,7 @@ export async function parseCareerWebsites() {
             directionId,
             subTrackId,
             url: href.startsWith('http') ? href : `https://career.directum.ru${href}`,
-            description: `Вакансия с официального карьерного портала Directum в Ижевске: участие в развитии экосистемы Directum RX, современные технологии и наставничество.`,
+            description: `Официальная вакансия Directum в Ижевске: развитие платформы Directum RX, современные технологии и наставничество.`,
             tags: ['Directum RX', 'Ижевск', 'Сайт компании', subTrackId.toUpperCase()],
             sourceType: 'portal',
           });
@@ -994,7 +1049,136 @@ export async function parseCareerWebsites() {
     console.warn('[Parser] Ошибка парсинга career.directum.ru:', err.message);
   }
 
-  // 2. High-fidelity career portals data for key employers
+  // 2. Open Search / REST API for key employers on hh.ru without authorization
+  const hhEmployers = [
+    { id: '8620', companyId: 'directum', company: 'Directum', defaultCity: 'Ижевск' },
+    { id: '41862', companyId: 'kontur', company: 'СКБ Контур', defaultCity: 'Екатеринбург' },
+    { id: '78638', companyId: 'tbank', company: 'Т-Банк', defaultCity: 'Москва' },
+    { id: '870233', companyId: 't1', company: 'Холдинг Т1', defaultCity: 'Москва' },
+    { id: '1740', companyId: 'yandex', company: 'Яндекс', defaultCity: 'Москва' },
+    { id: '2180', companyId: 'ozon', company: 'Ozon Tech', defaultCity: 'Москва' },
+    { id: '3529', companyId: 'sber', company: 'Сбер', defaultCity: 'Москва' },
+  ];
+
+  await Promise.allSettled(
+    hhEmployers.map(async (emp) => {
+      try {
+        const url = `https://hh.ru/search/vacancy?employer_id=${emp.id}&text=стажер+OR+junior`;
+        const res = await fetch(url, {
+          headers: {
+            'User-Agent':
+              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+            Accept: 'text/html,application/xhtml+xml',
+          },
+          signal: AbortSignal.timeout(4000),
+        });
+
+        if (res.ok) {
+          const html = await res.text();
+          const vacancyRegex = /<a[^>]+data-qa="serp-item__title"[^>]+href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/g;
+          let m;
+          let count = 0;
+          while ((m = vacancyRegex.exec(html)) !== null && count < 5) {
+            count++;
+            const rawTitle = m[2].replace(/<[^>]+>/g, '').trim();
+            const cleanUrl = m[1].split('?')[0];
+            const numId = cleanUrl.match(/\/(\d+)/)?.[1] || Math.random().toString(36).slice(2, 7);
+            const { directionId, subTrackId } = detectVacancyTrack(rawTitle);
+
+            parsed.push({
+              id: `hh-${emp.id}-${numId}`,
+              companyId: emp.companyId,
+              company: emp.company,
+              title: rawTitle,
+              salary: 'По договоренности',
+              format: 'Удаленно',
+              location: emp.defaultCity ? `${emp.defaultCity} / Удаленно` : 'Москва / Удаленно',
+              channel: `hh.ru/${emp.id}`,
+              directionId,
+              subTrackId,
+              url: cleanUrl,
+              description: `Актуальная позиция для начинающих специалистов от ${emp.company} (официальный профиль работодателя на hh.ru).`,
+              tags: [emp.company, subTrackId.toUpperCase(), 'hh.ru', 'Junior / Стажёр'],
+              sourceType: 'portal',
+            });
+          }
+          if (count > 0) {
+            console.log(`[Parser] hh.ru работодатель ${emp.company} (id ${emp.id}) — спарсено ${count} вакансий`);
+          }
+        }
+      } catch (err) {
+        console.warn(`[Parser] Ошибка парсинга hh.ru employer ${emp.id}:`, err.message);
+      }
+    })
+  );
+
+  // 3. Habr Career open profiles for target companies
+  const habrCompanies = [
+    { alias: 'directum', companyId: 'directum', company: 'Directum' },
+    { alias: 'kontur', companyId: 'kontur', company: 'СКБ Контур' },
+    { alias: 'tinkoff', companyId: 'tbank', company: 'Т-Банк' },
+    { alias: 't1-group', companyId: 't1', company: 'Холдинг Т1' },
+    { alias: 'yandex', companyId: 'yandex', company: 'Яндекс' },
+    { alias: 'ozon', companyId: 'ozon', company: 'Ozon Tech' },
+    { alias: 'sber', companyId: 'sber', company: 'Сбер' },
+  ];
+
+  await Promise.allSettled(
+    habrCompanies.map(async (comp) => {
+      try {
+        const url = `https://career.habr.com/companies/${comp.alias}/vacancies`;
+        const res = await fetch(url, {
+          headers: {
+            'User-Agent':
+              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+          },
+          signal: AbortSignal.timeout(4000),
+        });
+
+        if (res.ok) {
+          const html = await res.text();
+          const vacancyRegex = /<a[^>]+href="(\/vacancies\/\d+)"[^>]*>([\s\S]*?)<\/a>/g;
+          let m;
+          let count = 0;
+          const seen = new Set();
+          while ((m = vacancyRegex.exec(html)) !== null && count < 5) {
+            const href = m[1];
+            const rawTitle = m[2].replace(/<[^>]+>/g, '').trim();
+            if (rawTitle && !seen.has(href)) {
+              seen.add(href);
+              count++;
+              const numId = href.replace(/[^0-9]/g, '');
+              const { directionId, subTrackId } = detectVacancyTrack(rawTitle);
+
+              parsed.push({
+                id: `habr-${comp.alias}-${numId}`,
+                companyId: comp.companyId,
+                company: comp.company,
+                title: rawTitle,
+                salary: 'По договоренности',
+                format: 'Гибрид',
+                location: comp.companyId === 'directum' ? 'Ижевск / Удаленно' : 'Москва / Удаленно',
+                channel: `career.habr.com/${comp.alias}`,
+                directionId,
+                subTrackId,
+                url: `https://career.habr.com${href}`,
+                description: `Официальная вакансия компании ${comp.company} на Хабр Карьере: современный технологический стек, сильная инженерная культура.`,
+                tags: [comp.company, 'Хабр Карьера', subTrackId.toUpperCase()],
+                sourceType: 'portal',
+              });
+            }
+          }
+          if (count > 0) {
+            console.log(`[Parser] Хабр Карьера ${comp.company} — спарсено ${count} вакансий`);
+          }
+        }
+      } catch (err) {
+        console.warn(`[Parser] Ошибка парсинга Хабр Карьеры ${comp.alias}:`, err.message);
+      }
+    })
+  );
+
+  // 4. High-fidelity career portals data for key employers (guaranteed presence)
   const portalVacancies = [
     {
       id: 'site-kontur-start-fe',
@@ -1343,6 +1527,8 @@ export async function scanChannelsAndSyncSupabase(notifySubscribers = true) {
     websitesChecked: CAREER_WEBSITES_DATA.length,
     parsedCount: newlyParsed.length,
     totalActive: allToSync.length,
+    newlyParsed,
+    vacancies: allToSync,
   };
 }
 

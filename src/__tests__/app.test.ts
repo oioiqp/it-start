@@ -708,4 +708,45 @@ describe('11. Target Companies & Telegram Channels Tracking', () => {
     expect(searchFilter('тбанк').length).toBeGreaterThanOrEqual(3);
     expect(searchFilter('контур').length).toBeGreaterThanOrEqual(3);
   });
+
+  it('validates Telegram channels and career websites parser modules in bot.mjs', async () => {
+    // @ts-ignore
+    const botModule: any = await import('../../bot/bot.mjs');
+
+    expect(typeof botModule.detectVacancyTrack).toBe('function');
+    expect(botModule.detectVacancyTrack('Стажёр Frontend React').directionId).toBe('frontend');
+    expect(botModule.detectVacancyTrack('Стажёр Frontend React').subTrackId).toBe('react');
+    expect(botModule.detectVacancyTrack('Инженер по тестированию (Auto QA)').directionId).toBe('qa');
+    expect(botModule.detectVacancyTrack('Junior DevOps / SRE').directionId).toBe('devops');
+    expect(botModule.detectVacancyTrack('Стажёр ML Engineer').directionId).toBe('data_science');
+    expect(botModule.detectVacancyTrack('Junior Android Developer').directionId).toBe('mobile');
+    expect(botModule.detectVacancyTrack('Java Software Engineer').directionId).toBe('backend');
+
+    expect(Array.isArray(botModule.ALL_TARGET_TG_CHANNELS)).toBe(true);
+    expect(botModule.ALL_TARGET_TG_CHANNELS.length).toBeGreaterThanOrEqual(15);
+    const tgHandles = botModule.ALL_TARGET_TG_CHANNELS.map((c: any) => c.handle);
+    expect(tgHandles).toContain('@tbank_team');
+    expect(tgHandles).toContain('@KonturTech');
+    expect(tgHandles).toContain('@Life_in_Directum');
+    expect(tgHandles).toContain('@t1career');
+    expect(tgHandles).toContain('@yandex_intern');
+    expect(tgHandles).toContain('@ozon_tech_career');
+    expect(tgHandles).toContain('@forjunior');
+    expect(tgHandles).toContain('@it_internships');
+    expect(tgHandles).toContain('@normrabota');
+
+    expect(Array.isArray(botModule.CAREER_WEBSITES_DATA)).toBe(true);
+    expect(botModule.CAREER_WEBSITES_DATA.length).toBeGreaterThanOrEqual(10);
+    const siteUrls = botModule.CAREER_WEBSITES_DATA.map((s: any) => s.url);
+    expect(siteUrls.some((u: string) => u.includes('career.directum.ru'))).toBe(true);
+    expect(siteUrls.some((u: string) => u.includes('kontur.ru'))).toBe(true);
+    expect(siteUrls.some((u: string) => u.includes('fintech.tbank.ru'))).toBe(true);
+    expect(siteUrls.some((u: string) => u.includes('t1.ru'))).toBe(true);
+
+    expect(typeof botModule.parseTelegramChannels).toBe('function');
+    expect(typeof botModule.parseCareerWebsites).toBe('function');
+    expect(typeof botModule.fetchCompanyVacancies).toBe('function');
+    expect(typeof botModule.scanChannelsAndSyncSupabase).toBe('function');
+  });
 });
+

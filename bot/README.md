@@ -11,10 +11,10 @@
 1. **Фронтенд & Telegram Mini App (WebApp):** Размещен на GitHub Pages (`https://oioiqp.github.io/it-start/`).
 2. **База данных и прогресс:** Supabase (`public.internships`, `public.tg_subscriptions`, `public.user_progress`).
 3. **Telegram-бот:** Серверный скрипт `bot/bot.mjs`, работающий на Render.com (`https://it-start-bot.onrender.com`), который:
-   - Непрерывно отслеживает целевые Telegram-каналы: `@t1_holding`, `@kontur_career`, `@tbank_start`, `@directum_careers`, `@yandex_intern`, `@ozon_tech_career`, `@sber_careers`, `@avito_tech`.
-   - Автоматически записывает найденные вакансии в Supabase.
+   - Непрерывно отслеживает целевые Telegram-каналы: `@tbank_team`, `@KonturTech`, `@Life_in_Directum`, `@t1career`, `@yandex_intern`, `@ozon_tech_career`, `@forjunior`, `@normrabota` и карьерные сайты/API компаний (Directum, hh.ru, Habr Career).
+   - Автоматически записывает найденные вакансии в Supabase (`public.internships`).
    - Рассылает персональные пуш-уведомления подписчикам по совпадению направлений и компаний.
-   - Поддерживает команды `/vacancies`, `/companies`, `/scan`, быстрые команды `/company_<id>` и интерактивные кнопки.
+   - Поддерживает команды `/vacancies`, `/companies`, `/parse`, `/sync`, `/status`, `/scan`, быстрые команды `/company_<id>` и интерактивные кнопки.
 
 ---
 
