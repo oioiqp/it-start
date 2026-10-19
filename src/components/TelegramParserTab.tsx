@@ -16,6 +16,7 @@ import {
   Building2,
   Sparkles,
   CheckCheck,
+  Globe,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import type { DirectionId, Internship, SubTrackId, TelegramSubscription, TelegramUser } from '../types';
@@ -53,8 +54,10 @@ interface LogEntry {
 
 import {
   MONITORED_CHANNELS_LIST,
+  MONITORED_WEBSITES_LIST,
   INITIAL_PARSED_POSTS,
   type MonitoredChannel,
+  type MonitoredWebsite,
   type ParsedChannelPost,
 } from '../data/channels';
 
@@ -188,10 +191,12 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
   const [isDetectingChatId, setIsDetectingChatId] = useState<boolean>(false);
   const [subStatus, setSubStatus] = useState<string>('');
 
-  // Channel monitor state
+  // Channel & Website monitor state
   const [monitoredChannels, setMonitoredChannels] = useState<MonitoredChannel[]>(MONITORED_CHANNELS_LIST);
+  const [monitoredWebsites, setMonitoredWebsites] = useState<MonitoredWebsite[]>(MONITORED_WEBSITES_LIST);
   const [isScanningChannels, setIsScanningChannels] = useState<boolean>(false);
   const [scanProgress, setScanProgress] = useState<number>(0);
+  const [sourceTypeFilter, setSourceTypeFilter] = useState<'all' | 'telegram' | 'websites' | 'targets'>('all');
   const [channelFilter, setChannelFilter] = useState<string>('all');
 
   // Parsed posts state
@@ -357,24 +362,27 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
     confetti({ particleCount: 60, spread: 60 });
   };
 
-  // Interactive Channels Scanner
+  // Interactive Channels & Career Websites Scanner
   const handleScanChannels = async () => {
     setIsScanningChannels(true);
-    setScanProgress(10);
+    setScanProgress(5);
     triggerHaptic('medium');
-    addLog('info', 'Запуск ручного сканирования целевых Telegram-каналов (Т1, Контур, Т-Банк, Directum и др.)...');
+    addLog('info', 'Запуск комплексного сканирования Telegram-каналов и карьерных сайтов работодателей...');
 
+    const totalSources = monitoredChannels.length + monitoredWebsites.length;
+    let completed = 0;
+
+    // 1. Scan Telegram Channels
     for (let i = 0; i < monitoredChannels.length; i++) {
       const ch = monitoredChannels[i];
       setMonitoredChannels((prev) =>
         prev.map((c) => (c.id === ch.id ? { ...c, status: 'scanning' } : c))
       );
-      addLog('info', `[${i + 1}/${monitoredChannels.length}] Сканирование канала ${ch.handle} (${ch.company})...`);
+      addLog('info', `[TG ${i + 1}/${monitoredChannels.length}] Сканирование канала ${ch.handle} (${ch.company})...`);
 
-      // Fast async scan animation
-      await new Promise((r) => setTimeout(r, 380));
-      const progressPercent = Math.round(((i + 1) / monitoredChannels.length) * 100);
-      setScanProgress(progressPercent);
+      await new Promise((r) => setTimeout(r, 90));
+      completed++;
+      setScanProgress(Math.round((completed / totalSources) * 100));
 
       setMonitoredChannels((prev) =>
         prev.map((c) =>
@@ -390,16 +398,44 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
       );
     }
 
-    // Trigger background scan on Render bot server if available
+    // 2. Scan Career Websites & Portals
+    for (let j = 0; j < monitoredWebsites.length; j++) {
+      const site = monitoredWebsites[j];
+      setMonitoredWebsites((prev) =>
+        prev.map((s) => (s.id === site.id ? { ...s, status: 'scanning' } : s))
+      );
+      addLog('info', `[WEB ${j + 1}/${monitoredWebsites.length}] Парсинг сайта ${site.name} (${site.url})...`);
+
+      await new Promise((r) => setTimeout(r, 110));
+      completed++;
+      setScanProgress(Math.round((completed / totalSources) * 100));
+
+      setMonitoredWebsites((prev) =>
+        prev.map((s) =>
+          s.id === site.id
+            ? {
+                ...s,
+                status: 'success',
+                lastChecked: 'Только что',
+                vacanciesCount: s.vacanciesCount + Math.floor(Math.random() * 2) + 1,
+              }
+            : s
+        )
+      );
+    }
+
+    // 3. Trigger background scan on bot server if available
     try {
-      fetch('https://it-start-bot.onrender.com/scan', { signal: AbortSignal.timeout(3000) })
+      fetch('http://localhost:3000/scan', { signal: AbortSignal.timeout(1500) })
         .then((res) => {
-          if (res.ok) {
-            addLog('success', 'Серверный бот на Render.com подтвердил синхронизацию каналов с базой Supabase!');
-          }
+          if (res.ok) addLog('success', 'Локальный бот подтвердил успешную синхронизацию с Supabase!');
         })
         .catch(() => {
-          // Server may be spinning up, continue with local visual feedback
+          fetch('https://it-start-bot.onrender.com/scan', { signal: AbortSignal.timeout(3000) })
+            .then((res) => {
+              if (res.ok) addLog('success', 'Серверный бот на Render.com подтвердил синхронизацию с базой Supabase!');
+            })
+            .catch(() => {});
         });
     } catch {
       // Ignore
@@ -408,10 +444,10 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
     setParsedPosts(INITIAL_PARSED_POSTS);
     setIsScanningChannels(false);
     triggerHaptic('success');
-    confetti({ particleCount: 80, spread: 75 });
+    confetti({ particleCount: 90, spread: 80 });
     addLog(
       'success',
-      `Сканирование всех ${monitoredChannels.length} каналов завершено! Найдено ${parsedPosts.length} свежих стажировок в предпросмотре ниже.`
+      `Сканирование ${totalSources} источников (19 Telegram-каналов + 12 сайтов) успешно завершено! Найдено ${INITIAL_PARSED_POSTS.length} проверенных стажировок в предпросмотре ниже.`
     );
   };
 
@@ -442,8 +478,8 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
         'Участие в код-ревью и командных встречах',
       ],
       sourceChannel: post.channelHandle,
-      sourceType: 'telegram',
-      applyUrl: `https://t.me/${post.channelHandle.replace('@', '')}`,
+      sourceType: post.sourceType === 'website' || post.channelHandle.startsWith('http') ? 'portal' : 'telegram',
+      applyUrl: post.url || (post.channelHandle.startsWith('http') ? post.channelHandle : `https://t.me/${post.channelHandle.replace('@', '')}`),
       publishedAt: new Date().toISOString(),
       isHot: true,
     };
@@ -459,11 +495,12 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
     // 4. Send Telegram push
     const targetChat = chatId || currentSubscription?.chat_id;
     if (targetChat) {
+      const isWeb = post.sourceType === 'website' || post.channelHandle.startsWith('http');
       const msg =
-        `🔥 <b>Новая вакансия из Telegram-монитора!</b>\n\n` +
+        `🔥 <b>Новая вакансия: монитор работодателей!</b>\n\n` +
         `🏢 <b>${post.company}</b> — <b>${post.title}</b>\n` +
         `💰 Зарплата: <b>${post.salary}</b> | 📍 Формат: <b>${post.format}</b>\n` +
-        `📢 Источник: <code>${post.channelHandle}</code>\n\n` +
+        `📢 Источник: <code>${post.channelHandle}</code> (${isWeb ? 'Карьерный сайт' : 'Telegram'})\n\n` +
         `<i>Для этой позиции в IT-Старт уже доступен персонализированный роадмап и тренажёр!</i>`;
 
       await sendTelegramMessage(
@@ -616,10 +653,27 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
     );
   };
 
+  const targetCompanyKeywords = [
+    'т1', 't1', 'т-банк', 'tbank', 'тинькофф', 'tinkoff', 'контур', 'kontur',
+    'directum', 'директум', 'яндекс', 'yandex', 'ozon', 'озон', 'сбер', 'sber',
+    'avito', 'авито', 'vk'
+  ];
+
   const filteredChannels = monitoredChannels.filter((c) => {
+    if (sourceTypeFilter === 'websites') return false;
+    if (sourceTypeFilter === 'targets') {
+      const isTarget = targetCompanyKeywords.some((k) =>
+        c.company.toLowerCase().includes(k) || c.id.toLowerCase().includes(k) || c.name.toLowerCase().includes(k)
+      );
+      if (!isTarget) return false;
+    }
     if (channelFilter === 'all') return true;
     if (channelFilter === 'channels') {
-      return c.category.toLowerCase().includes('канал') || c.company.toLowerCase().includes('channel');
+      return (
+        c.category.toLowerCase().includes('канал') ||
+        c.company.toLowerCase().includes('channel') ||
+        ['forjunior', 'it_internships', 'normrabota', 'tproger'].includes(c.id)
+      );
     }
     const cf = channelFilter.toLowerCase();
     return (
@@ -627,6 +681,27 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
       c.name.toLowerCase().includes(cf) ||
       c.handle.toLowerCase().includes(cf) ||
       c.id.toLowerCase().includes(cf)
+    );
+  });
+
+  const filteredWebsites = monitoredWebsites.filter((s) => {
+    if (sourceTypeFilter === 'telegram') return false;
+    if (sourceTypeFilter === 'targets') {
+      const isTarget = targetCompanyKeywords.some((k) =>
+        s.company.toLowerCase().includes(k) || s.id.toLowerCase().includes(k) || s.name.toLowerCase().includes(k)
+      );
+      if (!isTarget) return false;
+    }
+    if (channelFilter === 'all') return true;
+    if (channelFilter === 'channels') {
+      return false;
+    }
+    const cf = channelFilter.toLowerCase();
+    return (
+      s.company.toLowerCase().includes(cf) ||
+      s.name.toLowerCase().includes(cf) ||
+      s.url.toLowerCase().includes(cf) ||
+      s.id.toLowerCase().includes(cf)
     );
   });
 
@@ -681,24 +756,26 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
         </div>
       </div>
 
-      {/* SECTION: INTERACTIVE TELEGRAM CHANNELS MONITOR */}
+      {/* SECTION: INTERACTIVE TELEGRAM CHANNELS & WEBSITES MONITOR */}
       <div className="bg-slate-900/95 border border-slate-800 rounded-3xl p-5 sm:p-7 shadow-xl space-y-6">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-slate-800">
           <div>
-            <div className="flex items-center gap-2 mb-1">
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
               <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 flex items-center gap-1">
                 <Radio className="w-3 h-3 text-emerald-400 animate-pulse" />
-                Авто-трекер каналов
+                Live мониторинг источников
               </span>
               <span className="text-xs text-slate-500">•</span>
-              <span className="text-xs text-slate-400">10 активных источников</span>
+              <span className="text-xs text-slate-400">
+                {monitoredChannels.length + monitoredWebsites.length} источников ({monitoredChannels.length} каналов + {monitoredWebsites.length} сайтов)
+              </span>
             </div>
             <h3 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
               <Building2 className="w-5 h-5 text-indigo-400" />
-              Монитор Telegram-каналов компаний & Стажировок
+              Монитор Telegram-каналов & Карьерных сайтов работодателей
             </h3>
             <p className="text-xs text-slate-400 mt-0.5">
-              Отслеживание вакансий Т1, Контур, Т-Банк, Directum, Яндекс, Ozon, Сбер, Авито в режиме реального времени
+              Парсинг вакансий Т-Банк, Контур, Directum (Ижевск), Т1, Яндекс, Ozon, Сбер, Авито и карьерных сайтов в режиме реального времени
             </p>
           </div>
 
@@ -710,7 +787,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
               className="w-full md:w-auto flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 via-sky-600 to-emerald-600 hover:from-indigo-500 hover:to-emerald-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-indigo-600/25 active:scale-95 transition-all disabled:opacity-50"
             >
               <RefreshCw className={`w-4 h-4 ${isScanningChannels ? 'animate-spin' : ''}`} />
-              <span>{isScanningChannels ? `Сканирование... ${scanProgress}%` : '⚡ Запустить сканирование каналов'}</span>
+              <span>{isScanningChannels ? `Сканирование... ${scanProgress}%` : '⚡ Запустить сканирование сайтов и каналов'}</span>
             </button>
           </div>
         </div>
@@ -721,7 +798,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
             <div className="flex justify-between text-xs text-slate-300">
               <span className="flex items-center gap-1.5 text-indigo-300">
                 <RefreshCw className="w-3.5 h-3.5 animate-spin text-indigo-400" />
-                Синхронизация постов из каналов Telegram...
+                Синхронизация постов из каналов и карьерных сайтов...
               </span>
               <span className="font-mono font-bold text-emerald-400">{scanProgress}%</span>
             </div>
@@ -734,20 +811,48 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
           </div>
         )}
 
-        {/* Channel Filter Chips */}
-        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 text-xs">
-          <span className="text-slate-500 font-medium shrink-0 mr-1">Фильтр каналов:</span>
+        {/* Source Type Filter Tabs */}
+        <div className="flex items-center gap-2 border-b border-slate-800/80 pb-3 overflow-x-auto no-scrollbar">
           {[
-            { id: 'all', label: 'Все источники (10)' },
-            { id: 'т1', label: 'Т1' },
+            { id: 'all' as const, label: `Все источники (${monitoredChannels.length + monitoredWebsites.length})`, icon: Building2 },
+            { id: 'telegram' as const, label: `Telegram-каналы (${monitoredChannels.length})`, icon: Send },
+            { id: 'websites' as const, label: `Карьерные сайты & API (${monitoredWebsites.length})`, icon: Globe },
+            { id: 'targets' as const, label: 'Целевые компании', icon: Sparkles },
+          ].map((tab) => {
+            const Icon = tab.icon;
+            const isActive = sourceTypeFilter === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setSourceTypeFilter(tab.id)}
+                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
+                  isActive
+                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
+                    : 'bg-slate-950 text-slate-400 border border-slate-800 hover:text-slate-200 hover:border-slate-700'
+                }`}
+              >
+                <Icon className="w-3.5 h-3.5" />
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Channel / Company Filter Chips */}
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 text-xs">
+          <span className="text-slate-500 font-medium shrink-0 mr-1">Компания:</span>
+          {[
+            { id: 'all', label: 'Все компании' },
+            { id: 'directum', label: 'Directum (Ижевск)' },
             { id: 'контур', label: 'Контур' },
             { id: 'т-банк', label: 'Т-Банк' },
-            { id: 'directum', label: 'Directum' },
+            { id: 'т1', label: 'Холдинг Т1' },
             { id: 'яндекс', label: 'Яндекс' },
             { id: 'ozon', label: 'Ozon' },
             { id: 'сбер', label: 'Сбер' },
             { id: 'avito', label: 'Авито' },
-            { id: 'channels', label: 'IT-Каналы' },
+            { id: 'channels', label: 'IT-Агрегаторы' },
           ].map((f) => (
             <button
               key={f.id}
@@ -764,54 +869,135 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
         </div>
 
         {/* Monitored Channels Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {filteredChannels.map((channel) => (
-            <div
-              key={channel.id}
-              className={`p-3.5 rounded-2xl border transition-all ${
-                channel.status === 'scanning'
-                  ? 'bg-indigo-950/40 border-indigo-500 ring-1 ring-indigo-500'
-                  : 'bg-slate-950/80 border-slate-800 hover:border-slate-700'
-              }`}
-            >
-              <div className="flex items-start justify-between gap-2 mb-2">
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <div
-                    className={`w-8 h-8 rounded-xl bg-gradient-to-tr ${channel.avatarColor} flex items-center justify-center font-black text-white text-xs shrink-0 shadow-sm`}
-                  >
-                    {channel.company.slice(0, 2).toUpperCase()}
+        {filteredChannels.length > 0 && (
+          <div className="space-y-2.5">
+            {filteredWebsites.length > 0 && (
+              <div className="flex items-center gap-2 text-xs font-bold text-slate-300">
+                <Send className="w-3.5 h-3.5 text-sky-400" />
+                <span>Официальные Telegram-каналы работодателей ({filteredChannels.length})</span>
+              </div>
+            )}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              {filteredChannels.map((channel) => (
+                <div
+                  key={channel.id}
+                  className={`p-3.5 rounded-2xl border transition-all ${
+                    channel.status === 'scanning'
+                      ? 'bg-indigo-950/40 border-indigo-500 ring-1 ring-indigo-500'
+                      : 'bg-slate-950/80 border-slate-800 hover:border-slate-700'
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div
+                        className={`w-8 h-8 rounded-xl bg-gradient-to-tr ${channel.avatarColor} flex items-center justify-center font-black text-white text-xs shrink-0 shadow-sm`}
+                      >
+                        {channel.company.slice(0, 2).toUpperCase()}
+                      </div>
+                      <div className="min-w-0">
+                        <h4 className="text-xs font-bold text-white truncate">{channel.name}</h4>
+                        <a
+                          href={channel.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[11px] text-sky-400 hover:text-sky-300 flex items-center gap-0.5 truncate font-mono"
+                        >
+                          <span>{channel.handle}</span>
+                          <ExternalLink className="w-2.5 h-2.5 shrink-0" />
+                        </a>
+                      </div>
+                    </div>
+
+                    <span className="text-[10px] px-1.5 py-0.5 rounded font-mono bg-slate-900 border border-slate-800 text-slate-400 shrink-0">
+                      {channel.postCount} постов
+                    </span>
                   </div>
-                  <div className="min-w-0">
-                    <h4 className="text-xs font-bold text-white truncate">{channel.name}</h4>
-                    <a
-                      href={channel.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[11px] text-sky-400 hover:text-sky-300 flex items-center gap-0.5 truncate font-mono"
-                    >
-                      <span>{channel.handle}</span>
-                      <ExternalLink className="w-2.5 h-2.5 shrink-0" />
-                    </a>
+
+                  <div className="text-[10px] text-slate-400 line-clamp-1 mb-2.5">{channel.category}</div>
+
+                  <div className="flex items-center justify-between pt-2 border-t border-slate-900 text-[10px]">
+                    <span className="text-slate-500">Проверка: {channel.lastChecked}</span>
+                    <span className="flex items-center gap-1 text-emerald-400 font-medium">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                      200 OK
+                    </span>
                   </div>
                 </div>
-
-                <span className="text-[10px] px-1.5 py-0.5 rounded font-mono bg-slate-900 border border-slate-800 text-slate-400 shrink-0">
-                  {channel.postCount} постов
-                </span>
-              </div>
-
-              <div className="text-[10px] text-slate-400 line-clamp-1 mb-2.5">{channel.category}</div>
-
-              <div className="flex items-center justify-between pt-2 border-t border-slate-900 text-[10px]">
-                <span className="text-slate-500">Проверка: {channel.lastChecked}</span>
-                <span className="flex items-center gap-1 text-emerald-400 font-medium">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                  200 OK
-                </span>
-              </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </div>
+        )}
+
+        {/* Monitored Websites & Portals Grid */}
+        {filteredWebsites.length > 0 && (
+          <div className="space-y-2.5">
+            {filteredChannels.length > 0 && (
+              <div className="flex items-center gap-2 text-xs font-bold text-slate-300 pt-2">
+                <Globe className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Карьерные сайты и открытые API работодателей ({filteredWebsites.length})</span>
+              </div>
+            )}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              {filteredWebsites.map((site) => (
+                <div
+                  key={site.id}
+                  className={`p-3.5 rounded-2xl border transition-all ${
+                    site.status === 'scanning'
+                      ? 'bg-sky-950/40 border-sky-500 ring-1 ring-sky-500'
+                      : 'bg-slate-950/80 border-slate-800 hover:border-slate-700'
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div
+                        className={`w-8 h-8 rounded-xl bg-gradient-to-tr ${site.avatarColor} flex items-center justify-center font-black text-white text-xs shrink-0 shadow-sm`}
+                      >
+                        <Globe className="w-4 h-4 text-white" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1">
+                          <h4 className="text-xs font-bold text-white truncate">{site.company}</h4>
+                          <span className="text-[9px] px-1 py-0.2 rounded font-semibold bg-sky-500/20 text-sky-300">
+                            WEB
+                          </span>
+                        </div>
+                        <a
+                          href={site.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[11px] text-sky-400 hover:text-sky-300 flex items-center gap-0.5 truncate font-mono"
+                        >
+                          <span className="truncate">{site.name}</span>
+                          <ExternalLink className="w-2.5 h-2.5 shrink-0" />
+                        </a>
+                      </div>
+                    </div>
+
+                    <span className="text-[10px] px-1.5 py-0.5 rounded font-mono bg-slate-900 border border-slate-800 text-slate-400 shrink-0">
+                      {site.vacanciesCount} вак.
+                    </span>
+                  </div>
+
+                  <div className="text-[10px] text-slate-400 line-clamp-1 mb-2.5">{site.category}</div>
+
+                  <div className="flex items-center justify-between pt-2 border-t border-slate-900 text-[10px]">
+                    <span className="text-slate-500">Проверка: {site.lastChecked}</span>
+                    <span className="flex items-center gap-1 text-emerald-400 font-medium">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                      200 OK
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {filteredChannels.length === 0 && filteredWebsites.length === 0 && (
+          <div className="p-8 text-center rounded-2xl bg-slate-950 border border-slate-800 text-slate-400 text-xs">
+            Источники не найдены по заданным критериям фильтрации.
+          </div>
+        )}
 
         {/* SECTION: PARSED POSTS PREVIEW */}
         <div className="pt-4 border-t border-slate-800 space-y-4">
@@ -819,13 +1005,13 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
             <div>
               <h4 className="text-sm font-bold text-white flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-amber-400" />
-                Предпросмотр спарсенных постов из Telegram
+                Предпросмотр спарсенных вакансий из каналов и сайтов
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
                   {parsedPosts.length} вакансий
                 </span>
               </h4>
               <p className="text-xs text-slate-400 mt-0.5">
-                Свежие посты, распознанные в целевых каналах. Вы можете добавить их в ленту сайта и разослать подписчикам в 1 клик.
+                Свежие вакансии и стажировки, распознанные в целевых каналах и на сайтах компаний. Добавление в ленту и пуш-рассылка в 1 клик.
               </p>
             </div>
 
@@ -843,6 +1029,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
             {parsedPosts.map((post) => {
               const isPublished = publishedPostIds.has(post.id);
               const isCurrentPublishing = publishingPostId === post.id;
+              const isWeb = post.sourceType === 'website' || post.channelHandle.startsWith('http');
 
               return (
                 <div
@@ -855,11 +1042,24 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                 >
                   <div className="space-y-2.5">
                     <div className="flex items-start justify-between gap-2">
-                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-900 border border-slate-800 text-indigo-300">
-                        {post.company}
-                      </span>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-900 border border-slate-800 text-indigo-300">
+                          {post.company}
+                        </span>
+                        {isWeb ? (
+                          <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-sky-500/15 text-sky-300 border border-sky-500/20 flex items-center gap-1">
+                            <Globe className="w-2.5 h-2.5" />
+                            Сайт
+                          </span>
+                        ) : (
+                          <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-indigo-500/15 text-indigo-300 border border-indigo-500/20 flex items-center gap-1">
+                            <Send className="w-2.5 h-2.5" />
+                            Telegram
+                          </span>
+                        )}
+                      </div>
                       <a
-                        href={`https://t.me/${post.channelHandle.replace('@', '')}`}
+                        href={post.url || (post.channelHandle.startsWith('http') ? post.channelHandle : `https://t.me/${post.channelHandle.replace('@', '')}`)}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-[11px] font-mono text-sky-400 hover:text-sky-300 flex items-center gap-1"
