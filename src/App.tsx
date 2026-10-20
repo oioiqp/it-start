@@ -720,6 +720,10 @@ export function App() {
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
               Supabase Connected
             </span>
+            <span>•</span>
+            <span className="text-indigo-400/90 font-mono text-[10px] bg-indigo-950/60 px-2 py-0.5 rounded border border-indigo-800/50">
+              v1.2.0 (20.10.2026)
+            </span>
           </div>
         </div>
       </footer>
