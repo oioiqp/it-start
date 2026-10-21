@@ -44,6 +44,7 @@ import {
   saveLocalProgress,
 } from './lib/storage';
 import { initTelegramWebApp, triggerHaptic } from './lib/telegram';
+import { initVkBridge } from './lib/vkBridge';
 
 export function App() {
   // Navigation
@@ -87,11 +88,12 @@ export function App() {
 
   // Initialize Telegram WebApp & Supabase
   useEffect(() => {
-    // 1. Detect Telegram WebApp
+    // 1. Detect Telegram WebApp or VK Mini App
     const user = initTelegramWebApp();
     if (user) {
       setTelegramUser(user);
     }
+    initVkBridge().catch(() => {});
 
     // 2. Load cached subscription
     const localSub = getLocalSubscription();

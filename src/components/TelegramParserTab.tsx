@@ -17,6 +17,8 @@ import {
   Sparkles,
   CheckCheck,
   Globe,
+  MessageSquare,
+  Smartphone,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import type { DirectionId, Internship, SubTrackId, TelegramSubscription, TelegramUser } from '../types';
@@ -37,6 +39,18 @@ import {
   sendTelegramMessage,
   triggerHaptic,
 } from '../lib/telegram';
+import { isVkMiniApp, getVkLaunchParams, triggerVkHaptic } from '../lib/vkBridge';
+import {
+  getSavedVkToken,
+  saveVkToken,
+  getSavedVkPeerId,
+  saveVkPeerId,
+  sendVkMessage,
+  getVkBotCommands,
+  VK_COMMUNITY_URL,
+  VK_BOT_DIALOG_URL,
+  VK_BOT_NAME,
+} from '../lib/vk';
 import { saveLocalSubscription } from '../lib/storage';
 
 interface TelegramParserTabProps {
@@ -172,6 +186,22 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
   const [tokenInput, setTokenInput] = useState<string>(getSavedBotToken());
   const [tokenSavedStatus, setTokenSavedStatus] = useState<string>('');
 
+  // VK Bot & Mini App state
+  const [vkTokenInput, setVkTokenInput] = useState<string>(getSavedVkToken());
+  const [vkTokenSavedStatus, setVkTokenSavedStatus] = useState<string>('');
+  const [vkPeerId, setVkPeerId] = useState<string>(() => {
+    const saved = getSavedVkPeerId();
+    if (saved) return saved;
+    const launch = getVkLaunchParams();
+    return launch.vk_user_id ? String(launch.vk_user_id) : '';
+  });
+  const [vkSendStatus, setVkSendStatus] = useState<string>('');
+  const [isSendingVkTest, setIsSendingVkTest] = useState<boolean>(false);
+  const [activeVkCommand, setActiveVkCommand] = useState<string | null>(null);
+  const isVkApp = isVkMiniApp();
+  const vkLaunchParams = getVkLaunchParams();
+  const vkBotCommands = getVkBotCommands();
+
   // Subscription state
   const [chatId, setChatId] = useState<string>(
     telegramUser
@@ -266,6 +296,46 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
     setTokenSavedStatus('Токен сохранен локально в вашем браузере!');
     addLog('success', 'Bot Token обновлен в локальном хранилище');
     setTimeout(() => setTokenSavedStatus(''), 3000);
+  };
+
+  // VK Token save
+  const handleSaveVkToken = (e: React.FormEvent) => {
+    e.preventDefault();
+    triggerVkHaptic('impact');
+    saveVkToken(vkTokenInput.trim());
+    setVkTokenSavedStatus('VK Bot Token сохранен локально в вашем браузере!');
+    addLog('success', 'VK Bot Token сохранен в localStorage');
+    setTimeout(() => setVkTokenSavedStatus(''), 3000);
+  };
+
+  // VK Send Test Message
+  const handleSendVkTest = async () => {
+    if (!vkPeerId) {
+      setVkSendStatus('Сначала укажите VK Peer ID');
+      return;
+    }
+    setIsSendingVkTest(true);
+    setVkSendStatus('Отправка сообщения в VK...');
+    saveVkPeerId(vkPeerId);
+    triggerVkHaptic('impact');
+    addLog('info', `Отправка тестового сообщения в VK (Peer ID: ${vkPeerId})...`);
+
+    const text =
+      `🚀 Тестовое уведомление IT-Старт (VK)!\n\n` +
+      `Бот ${VK_BOT_NAME} подключен к вашей сессии. Мониторинг вакансий Т1, Контур, Т-Банк, Directum, Яндекс, Ozon, Сбер, Авито и VK активен!`;
+
+    const res = await sendVkMessage(vkPeerId, text, vkTokenInput.trim() || undefined);
+    setIsSendingVkTest(false);
+
+    if (res.success) {
+      setVkSendStatus('Тестовое сообщение успешно отправлено в VK!');
+      addLog('success', `Сообщение в VK успешно доставлено на Peer ID ${vkPeerId}`);
+      triggerVkHaptic('notification');
+      confetti({ particleCount: 50, spread: 60 });
+    } else {
+      setVkSendStatus(`Ошибка: ${res.error}`);
+      addLog('error', `Не удалось отправить сообщение в VK: ${res.error}`);
+    }
   };
 
   // Auto-detect Chat ID
@@ -808,8 +878,10 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                 <Bot className="w-3.5 h-3.5 text-sky-400" />
                 Telegram Bot API & WebApp
               </span>
-              <span className="text-xs text-slate-500">•</span>
-              <span className="text-xs text-slate-400">@{TELEGRAM_BOT_USERNAME}</span>
+              <span className="px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-blue-500/10 text-blue-300 border border-blue-500/20 flex items-center gap-1.5">
+                <MessageSquare className="w-3.5 h-3.5 text-blue-400" />
+                ВКонтакте Bot & VK Mini App
+              </span>
               <span className="text-xs text-slate-500">•</span>
               <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
                 <Radio className="w-3 h-3 animate-pulse" />
@@ -817,33 +889,45 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
               </span>
             </div>
             <h2 className="text-lg sm:text-2xl font-bold text-white tracking-tight">
-              Интеграция с Telegram, Трекер каналов и Сервер бота
+              Интеграция с Telegram & ВКонтакте, Трекер каналов и Сервер ботов
             </h2>
             <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-3xl leading-relaxed">
-              Автоматический мониторинг вакансий Т1, Контур, Т-Банк, Directum, Яндекс, Ozon, Сбер и профильных каналов. Мгновенная рассылка пуш-уведомлений по совпадению стека.
+              Автоматический мониторинг вакансий Т1, Контур, Т-Банк, Directum, Яндекс, Ozon, Сбер, Авито, VK и карьерных сайтов. Мгновенная рассылка пуш-уведомлений подписчикам в Telegram и VK.
             </p>
           </div>
 
-          <a
-            href={TELEGRAM_BOT_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs sm:text-sm font-medium transition-all shrink-0"
-          >
-            <Bot className="w-4 h-4 text-sky-400" />
-            <span>Открыть @{TELEGRAM_BOT_USERNAME}</span>
-            <ExternalLink className="w-3 h-3 text-slate-400" />
-          </a>
+          <div className="flex items-center gap-2 flex-wrap">
+            <a
+              href={TELEGRAM_BOT_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs sm:text-sm font-medium transition-all shrink-0"
+            >
+              <Bot className="w-4 h-4 text-sky-400" />
+              <span>@{TELEGRAM_BOT_USERNAME}</span>
+              <ExternalLink className="w-3 h-3 text-slate-400" />
+            </a>
+            <a
+              href={VK_BOT_DIALOG_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-3 py-2 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 text-blue-300 text-xs sm:text-sm font-medium transition-all shrink-0"
+            >
+              <MessageSquare className="w-4 h-4 text-blue-400" />
+              <span>VK Бот IT-Старт</span>
+              <ExternalLink className="w-3 h-3 text-blue-400" />
+            </a>
+          </div>
         </div>
 
         {/* Server Architecture Note */}
         <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800/80 text-xs text-slate-300 space-y-1.5">
           <div className="flex items-center gap-2 text-indigo-300 font-semibold">
             <Terminal className="w-4 h-4 text-indigo-400" />
-            <span>Архитектура 24/7 бота и фонового парсинга:</span>
+            <span>Архитектура 24/7 ботов и фонового парсинга:</span>
           </div>
           <p className="text-slate-400 leading-relaxed">
-            Автономный серверный бот на Node.js развернут в файле <code className="text-emerald-400 bg-slate-900 px-1.5 py-0.5 rounded">bot/bot.mjs</code> и работает на Render.com (health check на порту 3000). Он непрерывно сканирует Telegram-каналы t.me/s/..., записывает свежие вакансии в Supabase и рассылает персонализированные пуши подписчикам. Запуск бота локально: <code className="text-indigo-300 bg-slate-900 px-1.5 py-0.5 rounded">npm run bot</code>.
+            Автономные серверные боты на Node.js развернуты в файлах <code className="text-emerald-400 bg-slate-900 px-1.5 py-0.5 rounded">bot/bot.mjs</code> (Telegram) и <code className="text-blue-400 bg-slate-900 px-1.5 py-0.5 rounded">bot/vk_bot.mjs</code> (ВКонтакте) и работают на Render.com. Они непрерывно сканируют каналы и сайты, записывают свежие вакансии в Supabase и рассылают персонализированные пуши. Запуск: <code className="text-indigo-300 bg-slate-900 px-1.5 py-0.5 rounded">npm run bot:all</code>.
           </p>
         </div>
       </div>
@@ -1428,6 +1512,258 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
               </button>
             </div>
           </form>
+        </div>
+      </div>
+
+      {/* SECTION: VKONTAKTE (VK) BOT & VK MINI APP */}
+      <div className="bg-slate-900/95 border border-blue-900/40 rounded-3xl p-5 sm:p-7 shadow-xl space-y-6">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+          <div>
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
+              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30 flex items-center gap-1.5">
+                <MessageSquare className="w-3.5 h-3.5 text-blue-400" />
+                ВКонтакте Bot API & VK Mini App
+              </span>
+              <span className="text-xs text-slate-500">•</span>
+              <span className="text-xs text-blue-400 font-medium">IT-Старт VK Бот</span>
+              <span className="text-xs text-slate-500">•</span>
+              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                <Radio className="w-3 h-3 animate-pulse" />
+                Bots Long Poll 24/7
+              </span>
+            </div>
+            <h3 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
+              <MessageSquare className="w-5 h-5 text-blue-400" />
+              ВКонтакте Бот & VK Mini App интеграция
+            </h3>
+            <p className="text-xs text-slate-400 mt-0.5">
+              Официальный бот для сообщества ВКонтакте на Bots Long Poll API. Единый каталог вакансий, мгновенные ответы и пуш-уведомления подписчикам.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 w-full md:w-auto flex-wrap sm:flex-nowrap">
+            <a
+              href={VK_BOT_DIALOG_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs transition-all shadow-md shadow-blue-600/25 shrink-0"
+            >
+              <MessageSquare className="w-4 h-4" />
+              <span>Написать боту VK</span>
+              <ExternalLink className="w-3 h-3 text-blue-200" />
+            </a>
+            <a
+              href={VK_COMMUNITY_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-semibold text-xs transition-all shrink-0"
+            >
+              <Globe className="w-4 h-4 text-slate-400" />
+              <span>Сообщество</span>
+            </a>
+          </div>
+        </div>
+
+        {/* VK Mini App Status Banner */}
+        <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-3">
+            <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${isVkApp ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-slate-800 text-slate-400 border border-slate-700'}`}>
+              <Smartphone className="w-4 h-4" />
+            </div>
+            <div>
+              <div className="font-semibold text-white flex items-center gap-2">
+                <span>{isVkApp ? 'Активен режим VK Mini App' : 'Режим запуска: WebApp / Browser'}</span>
+                {isVkApp && (
+                  <span className="px-1.5 py-0.5 rounded text-[10px] bg-emerald-500/20 text-emerald-300 font-mono">
+                    VK Bridge OK
+                  </span>
+                )}
+              </div>
+              <p className="text-slate-400 text-[11px] mt-0.5">
+                {isVkApp
+                  ? `Платформа: ${vkLaunchParams.vk_platform || 'mobile_web'} | User ID: ${vkLaunchParams.vk_user_id || 'определен'}`
+                  : 'Поддерживается как открытие в обычном браузере, так и прямо внутри мобильного клиента ВКонтакте'}
+              </p>
+            </div>
+          </div>
+          <div className="text-[11px] text-slate-400 flex items-center gap-1.5 font-mono">
+            <span>Сервер:</span>
+            <code className="text-indigo-300 bg-slate-900 px-1.5 py-0.5 rounded">bot/vk_bot.mjs</code>
+          </div>
+        </div>
+
+        {/* TWO COLUMNS: VK BOT TOKEN & VK TEST NOTIFICATION */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Card 1: VK Group Token */}
+          <div className="bg-slate-950/70 border border-slate-800/80 rounded-2xl p-4 sm:p-5 flex flex-col justify-between space-y-4">
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <Key className="w-4 h-4 text-blue-400" />
+                <h4 className="text-sm font-bold text-white">Ключ доступа сообщества VK (VK_BOT_TOKEN)</h4>
+              </div>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Ключ создается в: <b>Управление сообществом → Работа с API → Создать ключ доступа</b> (с правами «Сообщения сообщества»). Сохраняется локально в localStorage для безопасности.
+              </p>
+            </div>
+
+            <form onSubmit={handleSaveVkToken} className="space-y-3">
+              <div>
+                <label className="block text-[11px] font-medium text-slate-300 mb-1">
+                  VK Group Access Token:
+                </label>
+                <input
+                  type="password"
+                  value={vkTokenInput}
+                  onChange={(e) => setVkTokenInput(e.target.value)}
+                  placeholder="vk1.a.ABCdefGhIjklmNoPQRstuv..."
+                  className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-xs font-mono text-slate-200 placeholder:text-slate-600"
+                />
+              </div>
+
+              {vkTokenSavedStatus && (
+                <div className="p-2 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-emerald-300 text-xs flex items-center gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                  <span>{vkTokenSavedStatus}</span>
+                </div>
+              )}
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="submit"
+                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-colors"
+                >
+                  <Check className="w-3.5 h-3.5" />
+                  <span>Сохранить ключ VK</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setVkTokenInput('');
+                    saveVkToken('');
+                    addLog('info', 'VK Bot Token удален из хранилища');
+                  }}
+                  className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white text-xs font-medium transition-colors"
+                >
+                  Очистить
+                </button>
+              </div>
+            </form>
+          </div>
+
+          {/* Card 2: Test Message to VK */}
+          <div className="bg-slate-950/70 border border-slate-800/80 rounded-2xl p-4 sm:p-5 flex flex-col justify-between space-y-4">
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <Bell className="w-4 h-4 text-emerald-400" />
+                <h4 className="text-sm font-bold text-white">Тестовое уведомление подписчику в VK</h4>
+              </div>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Укажите ваш Peer ID (числовой ID пользователя или беседы в VK). Бот пришлет тестовый пуш с подтверждением синхронизации.
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <label className="block text-[11px] font-medium text-slate-300 mb-1">
+                  VK Peer ID (User ID):
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={vkPeerId}
+                    onChange={(e) => setVkPeerId(e.target.value)}
+                    placeholder="например 12345678"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-200 font-mono"
+                  />
+                  {vkLaunchParams.vk_user_id && (
+                    <button
+                      type="button"
+                      onClick={() => setVkPeerId(String(vkLaunchParams.vk_user_id))}
+                      className="px-2.5 py-2 rounded-xl bg-slate-800 text-slate-300 text-[11px] hover:text-white shrink-0"
+                    >
+                      Мой ID
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {vkSendStatus && (
+                <div className={`p-2 rounded-xl text-xs flex items-center gap-2 ${
+                  vkSendStatus.includes('успешно')
+                    ? 'bg-emerald-950/40 border border-emerald-500/30 text-emerald-300'
+                    : 'bg-indigo-950/40 border border-indigo-500/30 text-indigo-300'
+                }`}>
+                  <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                  <span>{vkSendStatus}</span>
+                </div>
+              )}
+
+              <button
+                type="button"
+                onClick={handleSendVkTest}
+                disabled={isSendingVkTest}
+                className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs shadow-md shadow-blue-600/20 transition-all disabled:opacity-50"
+              >
+                <Send className={`w-3.5 h-3.5 ${isSendingVkTest ? 'animate-spin' : ''}`} />
+                <span>{isSendingVkTest ? 'Отправка...' : 'Отправить тестовое уведомление в VK'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* VK BOT COMMANDS CHEAT SHEET */}
+        <div className="pt-2 space-y-3">
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+              <Terminal className="w-3.5 h-3.5 text-blue-400" />
+              Команды VK-бота (нажмите для просмотра ответа):
+            </h4>
+            <span className="text-[11px] text-slate-500 font-mono">
+              npm run bot:vk
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {vkBotCommands.map((c) => {
+              const isSelected = activeVkCommand === c.command;
+              return (
+                <button
+                  key={c.command}
+                  type="button"
+                  onClick={() => setActiveVkCommand(isSelected ? null : c.command)}
+                  className={`p-2.5 rounded-xl border text-left text-xs transition-all ${
+                    isSelected
+                      ? 'bg-blue-600/20 border-blue-500 text-white shadow-md'
+                      : 'bg-slate-950 border-slate-800 text-slate-300 hover:border-slate-700 hover:text-white'
+                  }`}
+                >
+                  <span className="font-bold block text-blue-300 font-mono text-[11px]">{c.command}</span>
+                  <span className="text-[10px] text-slate-400 line-clamp-1 mt-0.5">{c.description}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {activeVkCommand && (
+            <div className="p-3.5 rounded-xl bg-slate-950 border border-blue-500/30 text-xs space-y-1.5">
+              {(() => {
+                const cmdInfo = vkBotCommands.find((c) => c.command === activeVkCommand);
+                if (!cmdInfo) return null;
+                return (
+                  <div>
+                    <div className="font-semibold text-white flex items-center gap-2">
+                      <span className="text-blue-400 font-mono">{cmdInfo.command}</span>
+                      <span className="text-slate-500">•</span>
+                      <span className="text-slate-300">{cmdInfo.description}</span>
+                    </div>
+                    <div className="text-[11px] text-slate-400 mt-1 font-mono">
+                      Пример использования: <code className="text-emerald-400 bg-slate-900 px-1 py-0.5 rounded">{cmdInfo.example}</code>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+          )}
         </div>
       </div>
 

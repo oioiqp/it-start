@@ -157,7 +157,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               }`}
             >
               <Send className="w-4 h-4 text-sky-400" />
-              <span>Telegram & Парсер</span>
+              <span>Боты & Парсер</span>
             </button>
           </nav>
 
@@ -237,7 +237,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             }`}
           >
             <Send className="w-3.5 h-3.5 text-sky-400" />
-            <span>TG & Парсер</span>
+            <span>Боты & Парсер</span>
           </button>
         </div>
       </div>

@@ -708,26 +708,52 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  if (urlPath === '/vk/status') {
+    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+    try {
+      const { getVkBotStatus } = await import('./vk_bot.mjs');
+      res.end(JSON.stringify(getVkBotStatus()));
+    } catch {
+      res.end(JSON.stringify({ status: 'standby', bot: 'IT-Старт VK Бот' }));
+    }
+    return;
+  }
+
   res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
-  res.end('IT-Старт Telegram Bot & Parser работает 24/7! (Render Health Check OK)\n');
+  res.end('IT-Старт Telegram & VK Bot & Parser работает 24/7! (Render Health Check OK)\n');
 });
 
 if (process.env.NODE_ENV !== 'test') {
-  server.listen(PORT, () => {
-    console.log(`🌐 HTTP сервер запущен на порту ${PORT} (Render Health Check & Parser API)`);
-  });
+  const isDirectRun =
+    process.argv[1] &&
+    !process.argv[1].includes('vk_bot') &&
+    (process.argv[1].endsWith('bot.mjs') || process.argv[1].endsWith('bot.js'));
 
-  // Check if bot token is provided
-  if (!BOT_TOKEN) {
-    console.log('='.repeat(70));
-    console.log('⚡ IT-Старт Telegram Bot Runner');
-    console.log('='.repeat(70));
-    console.log('⚠️  Внимание: TELEGRAM_BOT_TOKEN не указан!');
-    console.log('');
-    console.log('HTTP Health Check сервер продолжает работать на порту ' + PORT + ' (Render Web Service).');
-    console.log('Чтобы бот отвечал в Telegram, укажите токен в переменных окружения Render:');
-    console.log('  TELEGRAM_BOT_TOKEN=<ТОКЕН_БОТА>');
-    console.log('='.repeat(70));
+  if (isDirectRun) {
+    server.listen(PORT, () => {
+      console.log(`🌐 HTTP сервер запущен на порту ${PORT} (Render Health Check & Parser API)`);
+    }).on('error', (err) => {
+      if (err.code === 'EADDRINUSE') {
+        console.warn(`[HTTP] Порт ${PORT} уже занят, процесс продолжает работу.`);
+      } else {
+        console.error('[HTTP Server Error]', err);
+      }
+    });
+
+    // Check if bot tokens are provided
+    if (!BOT_TOKEN) {
+      console.log('='.repeat(70));
+      console.log('⚡ IT-Старт Telegram & VK Bot Runner');
+      console.log('='.repeat(70));
+      console.log('⚠️  Внимание: TELEGRAM_BOT_TOKEN не указан!');
+      console.log('');
+      console.log('HTTP Health Check сервер продолжает работать на порту ' + PORT + ' (Render Web Service).');
+      console.log('Чтобы бот отвечал в Telegram, укажите токен в переменных окружения Render:');
+      console.log('  TELEGRAM_BOT_TOKEN=<ТОКЕН_БОТА>');
+      console.log('Для VK-бота укажите:');
+      console.log('  VK_BOT_TOKEN=<ТОКЕН_СООБЩЕСТВА_VK>');
+      console.log('='.repeat(70));
+    }
   }
 }
 
@@ -1507,7 +1533,21 @@ export async function scanChannelsAndSyncSupabase(notifySubscribers = true) {
         }
       }
     } catch (err) {
-      console.warn('[Parser] Ошибка рассылки уведомлений:', err.message);
+      console.warn('[Parser] Ошибка рассылки уведомлений Telegram:', err.message);
+    }
+  }
+
+  // 5. Match and notify subscribers in VK
+  if (notifySubscribers) {
+    try {
+      const { notifyVkSubscribers } = await import('./vk_bot.mjs');
+      const vkPushes = await notifyVkSubscribers(newlyParsed.length > 0 ? newlyParsed : allToSync.slice(0, 2));
+      if (vkPushes > 0) {
+        console.log(`[Parser] Отправлено ${vkPushes} уведомлений подписчикам в VK.`);
+        sentPushes += vkPushes;
+      }
+    } catch {
+      // Graceful fallback if VK bot module is absent
     }
   }
 
@@ -2102,6 +2142,24 @@ process.on('SIGTERM', () => {
   process.exit(0);
 });
 
-if (BOT_TOKEN && process.env.NODE_ENV !== 'test') {
+const isDirectRun =
+  process.argv[1] &&
+  !process.argv[1].includes('vk_bot') &&
+  (process.argv[1].endsWith('bot.mjs') || process.argv[1].endsWith('bot.js'));
+
+if (isDirectRun && BOT_TOKEN && process.env.NODE_ENV !== 'test') {
   pollUpdates();
+}
+
+// Start VK bot concurrently when --all is passed or VK token is provided in bot.mjs
+if (
+  isDirectRun &&
+  process.env.NODE_ENV !== 'test' &&
+  (process.env.VK_BOT_TOKEN || process.env.VK_GROUP_TOKEN || process.argv.includes('--all') || process.argv.includes('--vk'))
+) {
+  import('./vk_bot.mjs')
+    .then(({ startVkBot }) => {
+      startVkBot().catch((err) => console.warn('[VK Bot Startup]', err.message));
+    })
+    .catch((err) => console.warn('[VK Bot Import]', err.message));
 }
