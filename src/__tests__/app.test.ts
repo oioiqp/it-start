@@ -12,7 +12,7 @@ import { ROADMAP_TOPICS } from '../data/roadmaps';
 import { SEED_INTERNSHIPS } from '../data/internships';
 import { QUESTIONS } from '../data/questions';
 import { TEAM_MEMBERS } from '../data/team';
-import { getLocalProgress, saveLocalProgress } from '../lib/storage';
+import { getLocalProgress, saveLocalProgress, getLocalTheme, saveLocalTheme } from '../lib/storage';
 
 describe('1. Configuration & Embedded Constants', () => {
   it('has exact Supabase URL matching requirements', () => {
@@ -654,6 +654,9 @@ describe('11. Target Companies & Telegram Channels Tracking', () => {
 
     expect(botModule.ALL_INTERNSHIPS).toBeDefined();
     expect(botModule.ALL_INTERNSHIPS.length).toBeGreaterThanOrEqual(14);
+    expect(botModule.SEED_INTERNSHIPS).toBeDefined();
+    expect(botModule.PORTAL_FALLBACK_VACANCIES).toBeDefined();
+    expect(botModule.PORTAL_FALLBACK_VACANCIES.length).toBeGreaterThanOrEqual(8);
 
     // Verify all ALL_INTERNSHIPS IDs match SEED_INTERNSHIPS to avoid database duplication
     const seedIds = new Set(SEED_INTERNSHIPS.map((i) => i.id));
@@ -1110,6 +1113,126 @@ describe('12. VKontakte (VK) Bot & VK Mini App Integration', () => {
     expect(vkStatus.bot).toBe('IT-Старт VK Бот');
     expect(vkStatus.commandsCount).toBe(8);
     expect(vkStatus.version).toBe('5.199');
+  });
+});
+
+describe('13. Real Employer Positions & Cyberpunk Dark/Light Theme System', () => {
+  it('covers 100% of required real programs for all 9 target employers', () => {
+    // 1. Т-Банк: Frontend, Backend Python, Backend Go, Backend Java, QA, Analytics
+    const tbankItems = SEED_INTERNSHIPS.filter((i) => i.company.toLowerCase().includes('т-банк'));
+    expect(tbankItems.length).toBeGreaterThanOrEqual(6);
+    expect(tbankItems.some((i) => i.directionId === 'frontend')).toBe(true);
+    expect(tbankItems.some((i) => i.directionId === 'backend' && i.subTrackId === 'python')).toBe(true);
+    expect(tbankItems.some((i) => i.directionId === 'backend' && i.subTrackId === 'golang')).toBe(true);
+    expect(tbankItems.some((i) => i.directionId === 'backend' && i.subTrackId === 'java')).toBe(true);
+    expect(tbankItems.some((i) => i.directionId === 'qa')).toBe(true);
+    expect(tbankItems.some((i) => i.subTrackId === 'analytics')).toBe(true);
+    tbankItems.forEach((i) => {
+      expect(i.sourceChannel).toBe('@tbank_team');
+      expect(i.applyUrl).toContain('fintech.tbank.ru');
+    });
+
+    // 2. СКБ Контур: Frontend React/TS, Backend C#/Python, QA
+    const konturItems = SEED_INTERNSHIPS.filter((i) => i.company.toLowerCase().includes('контур'));
+    expect(konturItems.length).toBeGreaterThanOrEqual(4);
+    expect(konturItems.some((i) => i.directionId === 'frontend')).toBe(true);
+    expect(konturItems.some((i) => i.directionId === 'backend')).toBe(true);
+    expect(konturItems.some((i) => i.directionId === 'qa')).toBe(true);
+    konturItems.forEach((i) => {
+      expect(i.sourceChannel).toBe('@KonturTech');
+      expect(i.applyUrl).toContain('kontur.ru');
+    });
+
+    // 3. Directum: Directum RX, C#, Web, QA
+    const directumItems = SEED_INTERNSHIPS.filter((i) => i.company.toLowerCase().includes('directum'));
+    expect(directumItems.length).toBeGreaterThanOrEqual(4);
+    expect(directumItems.some((i) => i.directionId === 'frontend')).toBe(true);
+    expect(directumItems.some((i) => i.directionId === 'backend')).toBe(true);
+    expect(directumItems.some((i) => i.directionId === 'qa')).toBe(true);
+    directumItems.forEach((i) => {
+      expect(i.location).toContain('Ижевск');
+      expect(i.sourceChannel).toBe('@Life_in_Directum');
+      expect(i.applyUrl).toContain('directum.ru');
+    });
+
+    // 4. Холдинг Т1: Java, DevOps/Linux, QA Auto
+    const t1Items = SEED_INTERNSHIPS.filter((i) => i.company.toLowerCase().includes('т1'));
+    expect(t1Items.length).toBeGreaterThanOrEqual(3);
+    expect(t1Items.some((i) => i.directionId === 'backend' && i.subTrackId === 'java')).toBe(true);
+    expect(t1Items.some((i) => i.directionId === 'devops')).toBe(true);
+    expect(t1Items.some((i) => i.directionId === 'qa')).toBe(true);
+    t1Items.forEach((i) => {
+      expect(i.sourceChannel).toBe('@t1career');
+      expect(i.applyUrl).toContain('t1.ru');
+    });
+
+    // 5. Яндекс: Frontend, Backend, ML
+    const yandexItems = SEED_INTERNSHIPS.filter((i) => i.company.toLowerCase().includes('яндекс'));
+    expect(yandexItems.length).toBeGreaterThanOrEqual(4);
+    expect(yandexItems.some((i) => i.directionId === 'frontend')).toBe(true);
+    expect(yandexItems.some((i) => i.directionId === 'backend' && i.subTrackId === 'python')).toBe(true);
+    expect(yandexItems.some((i) => i.directionId === 'data_science')).toBe(true);
+    yandexItems.forEach((i) => {
+      expect(i.sourceChannel).toBe('@yandex_intern');
+      expect(i.applyUrl).toContain('yandex.ru');
+    });
+
+    // 6. Ozon Tech: Go, C#, Frontend, QA
+    const ozonItems = SEED_INTERNSHIPS.filter((i) => i.company.toLowerCase().includes('ozon'));
+    expect(ozonItems.length).toBeGreaterThanOrEqual(4);
+    expect(ozonItems.some((i) => i.subTrackId === 'golang')).toBe(true);
+    expect(ozonItems.some((i) => i.title.includes('C#'))).toBe(true);
+    expect(ozonItems.some((i) => i.directionId === 'frontend')).toBe(true);
+    expect(ozonItems.some((i) => i.directionId === 'qa')).toBe(true);
+    ozonItems.forEach((i) => {
+      expect(i.sourceChannel).toBe('@ozon_tech_career');
+      expect(i.applyUrl).toContain('job.ozon.ru');
+    });
+
+    // 7. Сбер: Java, Data Science, DevOps
+    const sberItems = SEED_INTERNSHIPS.filter((i) => i.company.toLowerCase().includes('сбер'));
+    expect(sberItems.length).toBeGreaterThanOrEqual(4);
+    expect(sberItems.some((i) => i.directionId === 'backend' && i.subTrackId === 'java')).toBe(true);
+    expect(sberItems.some((i) => i.directionId === 'data_science')).toBe(true);
+    expect(sberItems.some((i) => i.directionId === 'devops')).toBe(true);
+    sberItems.forEach((i) => {
+      expect(i.sourceChannel).toBe('@sber_careers');
+      expect(i.applyUrl).toContain('sbergraduate.ru');
+    });
+
+    // 8. Авито: Frontend, Backend, Analytics
+    const avitoItems = SEED_INTERNSHIPS.filter((i) => i.company.toLowerCase().includes('avito') || i.company.toLowerCase().includes('авито'));
+    expect(avitoItems.length).toBeGreaterThanOrEqual(5);
+    expect(avitoItems.some((i) => i.directionId === 'frontend')).toBe(true);
+    expect(avitoItems.some((i) => i.directionId === 'backend')).toBe(true);
+    expect(avitoItems.some((i) => i.subTrackId === 'analytics')).toBe(true);
+    avitoItems.forEach((i) => {
+      expect(i.sourceChannel).toBe('@avito_tech');
+      expect(i.applyUrl).toContain('avito.com');
+    });
+
+    // 9. VK: Web, Mobile, Data
+    const vkItems = SEED_INTERNSHIPS.filter((i) => i.company.toLowerCase().includes('vk'));
+    expect(vkItems.length).toBeGreaterThanOrEqual(5);
+    expect(vkItems.some((i) => i.directionId === 'frontend')).toBe(true);
+    expect(vkItems.some((i) => i.directionId === 'mobile')).toBe(true);
+    expect(vkItems.some((i) => i.directionId === 'data_science')).toBe(true);
+    vkItems.forEach((i) => {
+      expect(i.sourceChannel).toBe('@vk_team');
+      expect(i.applyUrl).toContain('vk.company');
+    });
+  });
+
+  it('validates theme persistence with getLocalTheme and saveLocalTheme', () => {
+    localStorage.removeItem('it_start_theme');
+    // Default fallback is dark
+    expect(getLocalTheme()).toBe('dark');
+
+    saveLocalTheme('light');
+    expect(getLocalTheme()).toBe('light');
+
+    saveLocalTheme('dark');
+    expect(getLocalTheme()).toBe('dark');
   });
 });
 

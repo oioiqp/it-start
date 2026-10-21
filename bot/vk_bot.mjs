@@ -21,13 +21,15 @@ import {
   COMPANIES_DATA,
   findCompanyByQuery,
   ALL_INTERNSHIPS,
+  SEED_INTERNSHIPS,
+  PORTAL_FALLBACK_VACANCIES,
   getActiveInternships,
   LAST_SCAN_STATUS,
   ALL_TARGET_TG_CHANNELS,
   CAREER_WEBSITES_DATA,
 } from './bot.mjs';
 
-export { ALL_INTERNSHIPS };
+export { ALL_INTERNSHIPS, SEED_INTERNSHIPS, PORTAL_FALLBACK_VACANCIES };
 
 // Configuration
 export const VK_BOT_TOKEN =

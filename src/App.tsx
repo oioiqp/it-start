@@ -334,7 +334,7 @@ export function App() {
   return (
     <div className={`min-h-screen flex flex-col transition-colors duration-200 ${
       theme === 'dark'
-        ? 'dark bg-[#06080f] text-slate-100 cyber-grid-dark selection:bg-cyan-500 selection:text-black'
+        ? 'dark bg-[#080b12] text-slate-100 cyber-grid-dark selection:bg-cyan-500 selection:text-black'
         : 'light bg-[#f8fafc] text-slate-900 cyber-grid-light selection:bg-sky-500 selection:text-white'
     }`}>
       {/* Navbar */}

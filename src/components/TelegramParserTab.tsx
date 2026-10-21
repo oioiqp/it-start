@@ -87,6 +87,7 @@ const PRESET_VACANCIES = [
     directionId: 'backend' as DirectionId,
     subTrackId: 'java' as SubTrackId,
     sourceChannel: '@t1career',
+    applyUrl: 'https://t1.ru/school/',
     description: 'Обучение и стажировка в Открытой школе Т1 с переходом в штат. Разработка надежных Enterprise-сервисов.',
     tags: ['Java 21', 'Spring Boot', 'Открытая школа Т1', 'PostgreSQL'],
   },
@@ -99,6 +100,7 @@ const PRESET_VACANCIES = [
     directionId: 'frontend' as DirectionId,
     subTrackId: 'react' as SubTrackId,
     sourceChannel: '@KonturTech',
+    applyUrl: 'https://kontur.ru/career',
     description: 'Оплачиваемая программа Контур.Старт 2026: разработка веб-сервисов на React/TypeScript с наставником.',
     tags: ['React', 'TypeScript', 'Контур.Старт', 'Jest'],
   },
@@ -111,6 +113,7 @@ const PRESET_VACANCIES = [
     directionId: 'frontend' as DirectionId,
     subTrackId: 'react' as SubTrackId,
     sourceChannel: '@tbank_team',
+    applyUrl: 'https://fintech.tbank.ru/start/',
     description: 'Разработка новых витрин и финансовых сервисов для мобильного и веб-банкинга.',
     tags: ['React', 'TypeScript', 'Redux', 'Tailwind'],
   },
@@ -123,6 +126,7 @@ const PRESET_VACANCIES = [
     directionId: 'frontend' as DirectionId,
     subTrackId: 'react' as SubTrackId,
     sourceChannel: '@Life_in_Directum',
+    applyUrl: 'https://career.directum.ru/',
     description: 'Разработка веб-клиента флагманской платформы Directum RX в Ижевске на современном TypeScript и React.',
     tags: ['React', 'TypeScript', 'Directum RX', 'Ижевск'],
   },
@@ -135,6 +139,7 @@ const PRESET_VACANCIES = [
     directionId: 'backend' as DirectionId,
     subTrackId: 'python' as SubTrackId,
     sourceChannel: '@yandex_intern',
+    applyUrl: 'https://yandex.ru/yabackend/',
     description: 'Разработка высоконагруженных бэкенд-сервисов на FastAPI и асинхронном Python.',
     tags: ['Python 3.12', 'FastAPI', 'PostgreSQL', 'asyncio'],
   },
@@ -147,6 +152,7 @@ const PRESET_VACANCIES = [
     directionId: 'backend' as DirectionId,
     subTrackId: 'golang' as SubTrackId,
     sourceChannel: '@ozon_tech_career',
+    applyUrl: 'https://job.ozon.ru/it/',
     description: 'Микросервисы логистики и маршрутизации на Go с обменом через gRPC и Kafka.',
     tags: ['Go', 'gRPC', 'PostgreSQL', 'Docker'],
   },
@@ -159,6 +165,7 @@ const PRESET_VACANCIES = [
     directionId: 'data_science' as DirectionId,
     subTrackId: 'ml' as SubTrackId,
     sourceChannel: '@sber_careers',
+    applyUrl: 'https://sbergraduate.ru/',
     description: 'Обучение моделей ранжирования, NLP и классических табличных бустингов.',
     tags: ['Python', 'PyTorch', 'CatBoost', 'SQL'],
   },
@@ -171,6 +178,7 @@ const PRESET_VACANCIES = [
     directionId: 'mobile' as DirectionId,
     subTrackId: 'android' as SubTrackId,
     sourceChannel: '@avito_tech',
+    applyUrl: 'https://career.avito.com/internship/',
     description: 'Фичи для супераппа объявлений Авито на Kotlin и Jetpack Compose.',
     tags: ['Kotlin', 'Jetpack Compose', 'Coroutines'],
   },
@@ -183,6 +191,7 @@ const PRESET_VACANCIES = [
     directionId: 'qa' as DirectionId,
     subTrackId: 'auto_qa' as SubTrackId,
     sourceChannel: '@vk_team',
+    applyUrl: 'https://internship.vk.company/',
     description: 'Автоматизация тестирования сервисов сообществ и видео в VK на Python, Pytest и Playwright.',
     tags: ['Python', 'Pytest', 'Playwright', 'VK Team'],
   },
@@ -270,6 +279,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
   const [customSubTrack, setCustomSubTrack] = useState<SubTrackId>(PRESET_VACANCIES[0].subTrackId);
   const [customDescription, setCustomDescription] = useState<string>(PRESET_VACANCIES[0].description);
   const [customFormat, setCustomFormat] = useState<'Удаленно' | 'Гибрид' | 'Офис'>(PRESET_VACANCIES[0].format);
+  const [customApplyUrl, setCustomApplyUrl] = useState<string>(PRESET_VACANCIES[0].applyUrl || '');
 
   // Activity logs
   const [logs, setLogs] = useState<LogEntry[]>(() => [
@@ -732,6 +742,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
     setCustomSubTrack(p.subTrackId);
     setCustomDescription(p.description);
     setCustomFormat(p.format);
+    setCustomApplyUrl(p.applyUrl || '');
   };
 
   // Publish Vacancy & Send Real Notifications (Manual form)
@@ -740,6 +751,14 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
     triggerHaptic('medium');
 
     addLog('info', `1/3: Симуляция парсинга нового поста из Telegram-канала ${customChannel}...`);
+
+    const p = PRESET_VACANCIES[presetIndex];
+    const resolvedApplyUrl =
+      customApplyUrl ||
+      p?.applyUrl ||
+      (customChannel.startsWith('http')
+        ? customChannel
+        : `https://t.me/${customChannel.replace('@', '')}`);
 
     const newVacancy: Internship = {
       id: 'int-new-' + Date.now(),
@@ -762,8 +781,8 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
         'Участие в код-ревью и написание тестов',
       ],
       sourceChannel: customChannel,
-      sourceType: 'telegram',
-      applyUrl: TELEGRAM_BOT_URL,
+      sourceType: customChannel.startsWith('http') || customApplyUrl.startsWith('http') ? 'portal' : 'telegram',
+      applyUrl: resolvedApplyUrl,
       publishedAt: new Date().toISOString(),
       isHot: true,
     };
