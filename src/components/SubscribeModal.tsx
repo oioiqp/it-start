@@ -217,25 +217,33 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-md overflow-y-auto">
-      <div className="relative w-full max-w-xl bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-5 sm:p-6 my-8 text-slate-100 animate-in fade-in zoom-in-95 duration-200">
+      <div className="relative w-full max-w-xl rounded-2xl shadow-2xl p-5 sm:p-6 my-8 animate-in fade-in zoom-in-95 duration-200 cyber-corner transition-colors
+        dark:bg-[#0c101c] dark:border dark:border-cyan-500/30 dark:shadow-[0_0_32px_rgba(0,240,255,0.15)] dark:text-slate-100
+        light:bg-white light:border light:border-slate-300 light:text-slate-900 light:shadow-2xl"
+      >
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+          className="absolute top-4 right-4 p-2 rounded-xl transition-colors
+            dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800
+            light:text-slate-400 light:hover:text-slate-900 light:hover:bg-slate-100"
         >
           <X className="w-5 h-5" />
         </button>
 
         {/* Header */}
         <div className="flex items-center gap-3 mb-5">
-          <div className="w-10 h-10 rounded-xl bg-indigo-500/15 border border-indigo-500/25 flex items-center justify-center text-indigo-400">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center border font-mono
+            dark:bg-cyan-500/15 dark:border-cyan-500/30 dark:text-cyan-400
+            light:bg-sky-50 light:border-sky-200 light:text-sky-800"
+          >
             <Bell className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-white">
+            <h2 className="text-lg font-bold font-sans dark:text-white light:text-slate-900">
               Уведомления в Telegram
             </h2>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs font-mono dark:text-slate-400 light:text-slate-500">
               Пуши о новых стажировках от бота @{TELEGRAM_BOT_USERNAME}
             </p>
           </div>
@@ -243,24 +251,32 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
 
         {/* Telegram WebApp Auto-Detected Notice */}
         {telegramUser ? (
-          <div className="mb-4 p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-emerald-300 text-xs flex items-center gap-2.5">
+          <div className="mb-4 p-3 rounded-xl border text-xs flex items-center gap-2.5 font-mono
+            dark:bg-emerald-950/40 dark:border-emerald-500/30 dark:text-emerald-300
+            light:bg-emerald-50 light:border-emerald-200 light:text-emerald-900"
+          >
             <div className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></div>
             <div>
               <span className="font-semibold">Mini App обнаружен:</span> Вы открыли приложение прямо в Telegram. Chat ID (<span className="font-mono font-bold">{telegramUser.id}</span>) подставлен автоматически!
             </div>
           </div>
         ) : (
-          <div className="mb-4 p-3.5 rounded-xl bg-slate-800/80 border border-slate-700/80 text-xs space-y-2">
-            <div className="font-semibold text-sky-400 flex items-center gap-1.5">
+          <div className="mb-4 p-3.5 rounded-xl border text-xs space-y-2
+            dark:bg-[#06080f]/90 dark:border-slate-800
+            light:bg-slate-50 light:border-slate-200"
+          >
+            <div className="font-semibold flex items-center gap-1.5 font-mono dark:text-cyan-400 light:text-sky-700">
               <Bot className="w-4 h-4" />
               Как получать уведомления в обычном браузере:
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 font-mono">
               <a
                 href={`${TELEGRAM_BOT_URL}?start=subscribe`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-sky-600/30 hover:bg-sky-600/40 border border-sky-500/40 text-sky-200 font-medium transition-colors"
+                className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border font-medium transition-colors
+                  dark:bg-cyan-500/15 dark:hover:bg-cyan-500/25 dark:border-cyan-500/30 dark:text-cyan-200
+                  light:bg-sky-50 light:hover:bg-sky-100 light:border-sky-200 light:text-sky-800"
               >
                 <span>1. Написать /start боту</span>
                 <ExternalLink className="w-3.5 h-3.5" />
@@ -270,7 +286,9 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
                 type="button"
                 onClick={handleAutoDetect}
                 disabled={isDetecting}
-                className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-indigo-600/30 hover:bg-indigo-600/40 border border-indigo-500/40 text-indigo-200 font-medium transition-colors disabled:opacity-50"
+                className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border font-medium transition-colors disabled:opacity-50
+                  dark:bg-indigo-600/30 dark:hover:bg-indigo-600/40 dark:border-indigo-500/40 dark:text-indigo-200
+                  light:bg-slate-100 light:hover:bg-slate-200 light:border-slate-300 light:text-slate-800"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${isDetecting ? 'animate-spin' : ''}`} />
                 <span>2. Определить мой Chat ID</span>
@@ -283,7 +301,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
           {/* Chat ID & User Info */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
+              <label className="block text-xs font-medium mb-1 font-mono dark:text-slate-300 light:text-slate-700">
                 Ваш Telegram Chat ID <span className="text-red-400">*</span>
               </label>
               <input
@@ -292,12 +310,14 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
                 onChange={(e) => setChatId(e.target.value)}
                 placeholder="например 123456789"
                 required
-                className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-sm text-slate-100 placeholder:text-slate-600"
+                className="w-full px-3 py-2 rounded-xl text-sm font-mono transition-colors focus:outline-none
+                  dark:bg-[#06080f] dark:border dark:border-slate-800 dark:focus:border-cyan-400 dark:text-slate-100 dark:placeholder:text-slate-600
+                  light:bg-slate-50 light:border light:border-slate-300 light:focus:border-sky-500 light:text-slate-900 light:placeholder:text-slate-400"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
+              <label className="block text-xs font-medium mb-1 font-mono dark:text-slate-300 light:text-slate-700">
                 Username в Telegram
               </label>
               <input
@@ -305,14 +325,16 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="@username (необязательно)"
-                className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-sm text-slate-100 placeholder:text-slate-600"
+                className="w-full px-3 py-2 rounded-xl text-sm font-mono transition-colors focus:outline-none
+                  dark:bg-[#06080f] dark:border dark:border-slate-800 dark:focus:border-cyan-400 dark:text-slate-100 dark:placeholder:text-slate-600
+                  light:bg-slate-50 light:border light:border-slate-300 light:focus:border-sky-500 light:text-slate-900 light:placeholder:text-slate-400"
               />
             </div>
           </div>
 
           {/* Directions selector */}
           <div>
-            <label className="block text-xs font-semibold text-slate-200 mb-2">
+            <label className="block text-xs font-semibold mb-2 font-mono dark:text-slate-200 light:text-slate-800">
               Интересующие направления ({selectedDirections.length}):
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -325,12 +347,12 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
                     onClick={() => toggleDirection(dir.id)}
                     className={`flex items-center justify-between p-2 rounded-xl border text-left text-xs font-medium transition-all ${
                       isSelected
-                        ? 'bg-indigo-600/20 border-indigo-500 text-white shadow-sm'
-                        : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700'
+                        ? 'dark:bg-cyan-500/20 dark:border-cyan-400 dark:text-cyan-300 dark:shadow-[0_0_12px_rgba(0,240,255,0.2)] light:bg-slate-900 light:border-slate-900 light:text-white shadow-sm'
+                        : 'dark:bg-[#06080f] dark:border-slate-800 dark:text-slate-400 dark:hover:text-slate-200 light:bg-slate-50 light:border-slate-200 light:text-slate-700 light:hover:border-slate-300'
                     }`}
                   >
                     <span className="truncate">{dir.title.split('-')[0]}</span>
-                    {isSelected && <Check className="w-3.5 h-3.5 text-indigo-400 shrink-0 ml-1" />}
+                    {isSelected && <Check className="w-3.5 h-3.5 shrink-0 ml-1 dark:text-cyan-400 light:text-white" />}
                   </button>
                 );
               })}
@@ -339,10 +361,13 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
 
           {/* Sub-tracks selector */}
           <div>
-            <label className="block text-xs font-semibold text-slate-200 mb-2">
+            <label className="block text-xs font-semibold mb-2 font-mono dark:text-slate-200 light:text-slate-800">
               Конкретные специализации и ветки ({selectedSubTracks.length}):
             </label>
-            <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-2 rounded-xl bg-slate-950/50 border border-slate-800">
+            <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-2 rounded-xl border transition-colors
+              dark:bg-[#06080f] dark:border-slate-800
+              light:bg-slate-50 light:border-slate-200"
+            >
               {DIRECTIONS.filter((d) => selectedDirections.includes(d.id)).flatMap((d) =>
                 d.subTracks.map((st) => {
                   const isSelected = selectedSubTracks.includes(st.id);
@@ -351,10 +376,10 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
                       key={st.id}
                       type="button"
                       onClick={() => toggleSubTrack(st.id)}
-                      className={`px-2.5 py-1 rounded-lg text-xs font-medium border transition-all ${
+                      className={`px-2.5 py-1 rounded-lg text-xs font-medium border transition-all font-mono ${
                         isSelected
-                          ? 'bg-sky-500/20 border-sky-400 text-sky-200'
-                          : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200'
+                          ? 'dark:bg-cyan-500/20 dark:border-cyan-400 dark:text-cyan-200 light:bg-slate-900 light:text-white light:border-slate-900'
+                          : 'dark:bg-[#0c101c] dark:border-slate-800 dark:text-slate-400 dark:hover:text-slate-200 light:bg-white light:border-slate-200 light:text-slate-700'
                       }`}
                     >
                       {st.name}
@@ -366,15 +391,18 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
           </div>
 
           {/* Bot Token Configuration Block */}
-          <div className="p-3 rounded-xl bg-slate-950/70 border border-slate-800 text-xs space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="font-semibold text-slate-300">
+          <div className="p-3 rounded-xl border text-xs space-y-2 transition-colors
+            dark:bg-[#06080f]/80 dark:border-slate-800
+            light:bg-slate-50 light:border-slate-200"
+          >
+            <div className="flex items-center justify-between font-mono">
+              <span className="font-semibold dark:text-slate-300 light:text-slate-700">
                 Bot Token для отправки пушей (@BotFather):
               </span>
               <button
                 type="button"
                 onClick={() => setShowTokenInput((v) => !v)}
-                className="text-[11px] text-sky-400 hover:text-sky-300"
+                className="text-[11px] dark:text-cyan-400 dark:hover:text-cyan-300 light:text-sky-600 light:hover:text-sky-700"
               >
                 {showTokenInput ? 'Скрыть поле' : 'Настроить токен'}
               </button>
@@ -389,9 +417,11 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
                     saveBotToken(e.target.value.trim());
                   }}
                   placeholder="Токен от @BotFather (сохраняется в браузере)"
-                  className="w-full px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 focus:border-indigo-500 font-mono text-[11px] text-slate-200"
+                  className="w-full px-3 py-1.5 rounded-lg border font-mono text-[11px] transition-colors focus:outline-none
+                    dark:bg-[#0c101c] dark:border-slate-800 dark:focus:border-cyan-400 dark:text-slate-200
+                    light:bg-white light:border-slate-300 light:focus:border-sky-500 light:text-slate-900"
                 />
-                <p className="text-[10px] text-slate-500">
+                <p className="text-[10px] dark:text-slate-500 light:text-slate-500 font-mono">
                   Токен хранится только в вашем браузере и используется для реальных вызовов Bot API.
                 </p>
               </div>
@@ -401,12 +431,12 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
           {/* Status Message */}
           {statusMessage && (
             <div
-              className={`p-3 rounded-xl text-xs flex items-start gap-2 ${
+              className={`p-3 rounded-xl text-xs flex items-start gap-2 font-mono ${
                 statusMessage.type === 'success'
-                  ? 'bg-emerald-950/40 border border-emerald-500/40 text-emerald-300'
+                  ? 'dark:bg-emerald-950/40 dark:border dark:border-emerald-500/40 dark:text-emerald-300 light:bg-emerald-50 light:border light:border-emerald-200 light:text-emerald-900'
                   : statusMessage.type === 'error'
-                  ? 'bg-rose-950/40 border border-rose-500/40 text-rose-300'
-                  : 'bg-sky-950/40 border border-sky-500/40 text-sky-300'
+                  ? 'dark:bg-rose-950/40 dark:border dark:border-rose-500/40 dark:text-rose-300 light:bg-rose-50 light:border light:border-rose-200 light:text-rose-900'
+                  : 'dark:bg-sky-950/40 dark:border dark:border-sky-500/40 dark:text-sky-300 light:bg-sky-50 light:border light:border-sky-200 light:text-sky-900'
               }`}
             >
               {statusMessage.type === 'success' ? (
@@ -419,21 +449,25 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
           )}
 
           {/* Action buttons */}
-          <div className="flex flex-col sm:flex-row items-center gap-2 pt-2">
+          <div className="flex flex-col sm:flex-row items-center gap-2 pt-2 font-mono">
             <button
               type="button"
               onClick={handleTestNotification}
               disabled={isLoading || !chatId}
-              className="w-full sm:w-1/2 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs sm:text-sm font-medium transition-colors disabled:opacity-50"
+              className="w-full sm:w-1/2 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border text-xs sm:text-sm font-medium transition-colors disabled:opacity-50
+                dark:bg-[#06080f] dark:hover:bg-slate-800 dark:border-slate-800 dark:text-slate-200
+                light:bg-slate-100 light:hover:bg-slate-200 light:border-slate-200 light:text-slate-800"
             >
-              <Send className="w-3.5 h-3.5 text-sky-400" />
+              <Send className="w-3.5 h-3.5 dark:text-cyan-400 light:text-sky-600" />
               <span>Проверить уведомление</span>
             </button>
 
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full sm:w-1/2 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-sky-600 hover:from-indigo-500 hover:to-sky-500 text-white text-xs sm:text-sm font-bold shadow-lg shadow-indigo-600/30 transition-all active:scale-95 disabled:opacity-50"
+              className="w-full sm:w-1/2 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-white text-xs sm:text-sm font-bold shadow-lg transition-all active:scale-95 disabled:opacity-50
+                dark:bg-gradient-to-r dark:from-cyan-500 dark:to-indigo-600 dark:shadow-[0_0_16px_rgba(0,240,255,0.25)]
+                light:bg-slate-900 light:hover:bg-slate-800"
             >
               <Check className="w-4 h-4" />
               <span>{isLoading ? 'Сохранение...' : 'Сохранить подписку'}</span>
@@ -441,7 +475,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
           </div>
 
           {!botToken && (
-            <p className="text-[11px] text-slate-500 text-center">
+            <p className="text-[11px] font-mono text-center dark:text-slate-500 light:text-slate-500">
               * Для реальной отправки сообщений укажите Bot Token во вкладке «Telegram & Парсер»
             </p>
           )}

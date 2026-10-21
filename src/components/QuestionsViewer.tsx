@@ -102,32 +102,41 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
   return (
     <div className="space-y-6">
       {/* Top Banner & Stats - Minimalist Tech */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="rounded-2xl p-4 sm:p-5 flex flex-col md:flex-row items-center justify-between gap-4 transition-colors cyber-corner
+        dark:bg-[#0c101c]/90 dark:border dark:border-cyan-500/20
+        light:bg-white light:border light:border-slate-200 light:shadow-sm"
+      >
         <div>
           <div className="flex items-center gap-2 mb-1 flex-wrap">
-            <h2 className="text-lg sm:text-xl font-bold text-white tracking-tight flex items-center gap-2">
+            <h2 className="text-lg sm:text-xl font-bold tracking-tight flex items-center gap-2 font-sans dark:text-white light:text-slate-900">
               Тренажёр вопросов к собеседованию
             </h2>
-            <span className="px-2 py-0.5 rounded-md text-[11px] font-bold bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">
+            <span className="px-2 py-0.5 rounded-md text-[11px] font-bold font-mono
+              dark:bg-cyan-500/15 dark:text-cyan-300 dark:border dark:border-cyan-500/30
+              light:bg-sky-50 light:text-sky-800 light:border light:border-sky-200"
+            >
               {questions.length} вопросов
             </span>
           </div>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs leading-relaxed dark:text-slate-300 light:text-slate-600">
             Реальные вопросы с интервью стажёров: пишите ответ, сверяйте с эталоном и тренируйте насмотренность.
           </p>
         </div>
 
         {/* View Mode Switcher: 3 Modes */}
-        <div className="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 shrink-0">
+        <div className="flex items-center p-1 rounded-xl shrink-0 font-mono text-xs transition-colors
+          dark:bg-[#06080f] dark:border dark:border-slate-800
+          light:bg-slate-100 light:border light:border-slate-200"
+        >
           <button
             onClick={() => {
               triggerHaptic('selection');
               setViewMode('self_check');
             }}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold transition-all ${
               viewMode === 'self_check'
-                ? 'bg-indigo-600 text-white shadow-sm'
-                : 'text-slate-400 hover:text-white'
+                ? 'dark:bg-cyan-500/25 dark:text-cyan-300 dark:border dark:border-cyan-500/40 dark:shadow-[0_0_12px_rgba(0,240,255,0.2)] light:bg-slate-900 light:text-white shadow-sm'
+                : 'dark:text-slate-400 dark:hover:text-slate-200 light:text-slate-600 light:hover:text-slate-900'
             }`}
           >
             <PenTool className="w-3.5 h-3.5" />
@@ -139,10 +148,10 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
               triggerHaptic('selection');
               setViewMode('accordion');
             }}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold transition-all ${
               viewMode === 'accordion'
-                ? 'bg-indigo-600 text-white shadow-sm'
-                : 'text-slate-400 hover:text-white'
+                ? 'dark:bg-cyan-500/25 dark:text-cyan-300 dark:border dark:border-cyan-500/40 dark:shadow-[0_0_12px_rgba(0,240,255,0.2)] light:bg-slate-900 light:text-white shadow-sm'
+                : 'dark:text-slate-400 dark:hover:text-slate-200 light:text-slate-600 light:hover:text-slate-900'
             }`}
           >
             <LayoutList className="w-3.5 h-3.5" />
@@ -154,10 +163,10 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
               triggerHaptic('selection');
               setViewMode('flashcards');
             }}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold transition-all ${
               viewMode === 'flashcards'
-                ? 'bg-indigo-600 text-white shadow-sm'
-                : 'text-slate-400 hover:text-white'
+                ? 'dark:bg-cyan-500/25 dark:text-cyan-300 dark:border dark:border-cyan-500/40 dark:shadow-[0_0_12px_rgba(0,240,255,0.2)] light:bg-slate-900 light:text-white shadow-sm'
+                : 'dark:text-slate-400 dark:hover:text-slate-200 light:text-slate-600 light:hover:text-slate-900'
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
@@ -167,27 +176,32 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
       </div>
 
       {/* Filters Bar */}
-      <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 space-y-3">
+      <div className="rounded-2xl p-4 space-y-3 transition-colors cyber-corner
+        dark:bg-[#0c101c]/90 dark:border dark:border-cyan-500/20
+        light:bg-white light:border light:border-slate-200 light:shadow-sm"
+      >
         {/* Row 1: Search + Status tabs */}
         <div className="flex flex-col sm:flex-row items-center gap-3">
           <div className="relative w-full sm:flex-1">
-            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
+            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 dark:text-slate-500 light:text-slate-400" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Поиск по вопросу, ключевому слову или коду..."
-              className="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-950/90 border border-slate-800 focus:border-indigo-500 text-xs sm:text-sm text-slate-200 placeholder:text-slate-600"
+              className="w-full pl-9 pr-4 py-2 rounded-xl text-xs sm:text-sm font-mono transition-colors focus:outline-none
+                dark:bg-[#06080f] dark:border dark:border-slate-800 dark:focus:border-cyan-400 dark:text-slate-100 dark:placeholder:text-slate-600
+                light:bg-slate-50 light:border light:border-slate-200 light:focus:border-sky-500 light:text-slate-900 light:placeholder:text-slate-400"
             />
           </div>
 
-          <div className="flex items-center gap-1.5 w-full sm:w-auto overflow-x-auto no-scrollbar shrink-0">
+          <div className="flex items-center gap-1.5 w-full sm:w-auto overflow-x-auto no-scrollbar shrink-0 font-mono">
             <button
               onClick={() => setStatusFilter('all')}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap border transition-all ${
                 statusFilter === 'all'
-                  ? 'bg-indigo-600 text-white border-indigo-400'
-                  : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-200'
+                  ? 'dark:bg-cyan-500/20 dark:text-cyan-300 dark:border-cyan-400 light:bg-slate-900 light:text-white light:border-slate-900 shadow-sm'
+                  : 'dark:bg-[#06080f] dark:border-slate-800 dark:text-slate-400 dark:hover:text-slate-200 light:bg-slate-50 light:border-slate-200 light:text-slate-600 light:hover:text-slate-900'
               }`}
             >
               Все ({questions.length})
@@ -196,8 +210,8 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
               onClick={() => setStatusFilter('repeat')}
               className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap border transition-all ${
                 statusFilter === 'repeat'
-                  ? 'bg-amber-600 text-white border-amber-400'
-                  : 'bg-slate-950 border-slate-800 text-amber-400/80 hover:text-amber-300'
+                  ? 'dark:bg-amber-500/20 dark:text-amber-300 dark:border-amber-400 light:bg-amber-600 light:text-white light:border-amber-600 shadow-sm'
+                  : 'dark:bg-[#06080f] dark:border-slate-800 dark:text-amber-400/80 dark:hover:text-amber-300 light:bg-slate-50 light:border-slate-200 light:text-amber-700 light:hover:text-amber-800'
               }`}
             >
               <RotateCcw className="w-3 h-3" />
@@ -207,8 +221,8 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
               onClick={() => setStatusFilter('completed')}
               className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap border transition-all ${
                 statusFilter === 'completed'
-                  ? 'bg-emerald-600 text-white border-emerald-400'
-                  : 'bg-slate-950 border-slate-800 text-emerald-400/80 hover:text-emerald-300'
+                  ? 'dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-400 light:bg-emerald-600 light:text-white light:border-emerald-600 shadow-sm'
+                  : 'dark:bg-[#06080f] dark:border-slate-800 dark:text-emerald-400/80 dark:hover:text-emerald-300 light:bg-slate-50 light:border-slate-200 light:text-emerald-700 light:hover:text-emerald-800'
               }`}
             >
               <CheckCircle2 className="w-3 h-3" />
@@ -218,7 +232,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
         </div>
 
         {/* Row 2: Directions pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1">
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1 font-mono">
           <button
             onClick={() => {
               setSelectedDirection('all');
@@ -226,8 +240,8 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
             }}
             className={`px-3 py-1 rounded-lg text-xs font-bold whitespace-nowrap transition-colors ${
               selectedDirection === 'all'
-                ? 'bg-indigo-600 text-white'
-                : 'bg-slate-950/60 text-slate-400 hover:text-slate-200'
+                ? 'dark:bg-gradient-to-r dark:from-cyan-500 dark:to-indigo-600 dark:text-white light:bg-slate-900 light:text-white'
+                : 'dark:bg-[#06080f]/70 dark:text-slate-400 dark:hover:text-slate-200 light:bg-slate-100 light:text-slate-600 light:hover:text-slate-900'
             }`}
           >
             Все направления
@@ -241,8 +255,8 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
               }}
               className={`px-3 py-1 rounded-lg text-xs font-bold whitespace-nowrap transition-colors ${
                 selectedDirection === dir.id
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-slate-950/60 text-slate-400 hover:text-slate-200'
+                  ? 'dark:bg-gradient-to-r dark:from-cyan-500 dark:to-indigo-600 dark:text-white light:bg-slate-900 light:text-white'
+                  : 'dark:bg-[#06080f]/70 dark:text-slate-400 dark:hover:text-slate-200 light:bg-slate-100 light:text-slate-600 light:hover:text-slate-900'
               }`}
             >
               {dir.title.split('-')[0]}
@@ -252,13 +266,13 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
 
         {/* Row 3: Sub-tracks pills if direction chosen */}
         {selectedDirection !== 'all' && (
-          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1 border-t border-slate-800/60">
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1 border-t dark:border-slate-800/60 light:border-slate-200 font-mono">
             <button
               onClick={() => setSelectedSubTrack('all')}
-              className={`px-2.5 py-0.5 rounded-md text-[11px] font-semibold whitespace-nowrap ${
+              className={`px-2.5 py-0.5 rounded-md text-[11px] font-semibold whitespace-nowrap transition-colors ${
                 selectedSubTrack === 'all'
-                  ? 'bg-sky-500/20 text-sky-300 border border-sky-400/40'
-                  : 'text-slate-500 hover:text-slate-300'
+                  ? 'dark:bg-cyan-500/20 dark:text-cyan-300 dark:border dark:border-cyan-400/40 light:bg-slate-900 light:text-white'
+                  : 'dark:text-slate-400 dark:hover:text-slate-200 light:text-slate-500 light:hover:text-slate-800'
               }`}
             >
               Все ветки
@@ -267,10 +281,10 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
               <button
                 key={st.id}
                 onClick={() => setSelectedSubTrack(st.id)}
-                className={`px-2.5 py-0.5 rounded-md text-[11px] font-semibold whitespace-nowrap ${
+                className={`px-2.5 py-0.5 rounded-md text-[11px] font-semibold whitespace-nowrap transition-colors ${
                   selectedSubTrack === st.id
-                    ? 'bg-sky-500/20 text-sky-300 border border-sky-400/40'
-                    : 'text-slate-500 hover:text-slate-300'
+                    ? 'dark:bg-cyan-500/20 dark:text-cyan-300 dark:border dark:border-cyan-400/40 light:bg-slate-900 light:text-white'
+                    : 'dark:text-slate-400 dark:hover:text-slate-200 light:text-slate-500 light:hover:text-slate-800'
                 }`}
               >
                 {st.name}
@@ -303,10 +317,13 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
       ) : (
         <div className="space-y-3">
           {filteredQuestions.length === 0 ? (
-            <div className="p-8 text-center bg-slate-900 border border-slate-800 rounded-2xl">
-              <SlidersHorizontal className="w-10 h-10 text-slate-600 mx-auto mb-2" />
-              <h3 className="text-base font-bold text-white mb-1">Ничего не найдено</h3>
-              <p className="text-xs text-slate-400">
+            <div className="p-8 text-center rounded-2xl cyber-corner transition-colors
+              dark:bg-[#0c101c] dark:border dark:border-slate-800
+              light:bg-white light:border light:border-slate-200 light:shadow-sm"
+            >
+              <SlidersHorizontal className="w-10 h-10 mx-auto mb-2 dark:text-slate-600 light:text-slate-400" />
+              <h3 className="text-base font-bold mb-1 font-sans dark:text-white light:text-slate-900">Ничего не найдено</h3>
+              <p className="text-xs dark:text-slate-400 light:text-slate-500">
                 Попробуйте изменить поисковый запрос или сбросить фильтры.
               </p>
             </div>
@@ -321,12 +338,12 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
               return (
                 <div
                   key={q.id}
-                  className={`rounded-2xl border transition-all ${
+                  className={`rounded-2xl border transition-all cyber-corner ${
                     isCompleted
-                      ? 'bg-slate-900/90 border-emerald-800/40'
+                      ? 'dark:bg-[#08131d]/90 dark:border-emerald-500/40 dark:shadow-[0_0_16px_rgba(0,255,157,0.1)] light:bg-white light:border-emerald-300 light:shadow-sm'
                       : isRepeat
-                      ? 'bg-slate-900/90 border-amber-800/40'
-                      : 'bg-slate-900/90 border-slate-800 hover:border-slate-700'
+                      ? 'dark:bg-[#1a1208]/90 dark:border-amber-500/40 dark:shadow-[0_0_16px_rgba(245,158,11,0.1)] light:bg-white light:border-amber-300 light:shadow-sm'
+                      : 'dark:bg-[#0c101c]/90 dark:border-slate-800/90 dark:hover:border-cyan-500/30 light:bg-white light:border-slate-200 light:hover:border-slate-300 light:shadow-sm'
                   }`}
                 >
                   <div className="p-4 flex items-start justify-between gap-3">
@@ -340,7 +357,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                         {isCompleted ? (
                           <CheckCircle2 className="w-5 h-5 text-emerald-400" />
                         ) : (
-                          <Circle className="w-5 h-5 text-slate-600 hover:text-indigo-400" />
+                          <Circle className="w-5 h-5 dark:text-slate-600 dark:hover:text-cyan-400 light:text-slate-400 light:hover:text-slate-700" />
                         )}
                       </button>
 
@@ -348,23 +365,32 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                         className="cursor-pointer flex-1"
                         onClick={() => setExpandedId(isExpanded ? null : q.id)}
                       >
-                        <div className="flex items-center gap-2 flex-wrap mb-1">
-                          <span className="text-[11px] font-semibold text-sky-300 bg-sky-950/60 px-2 py-0.5 rounded-md border border-sky-800/50">
+                        <div className="flex items-center gap-2 flex-wrap mb-1 font-mono">
+                          <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md border
+                            dark:text-cyan-300 dark:bg-cyan-950/60 dark:border-cyan-800/50
+                            light:text-sky-800 light:bg-sky-50 light:border-sky-200"
+                          >
                             {q.category}
                           </span>
-                          <span className="text-[11px] text-slate-400">{q.difficulty}</span>
+                          <span className="text-[11px] dark:text-slate-400 light:text-slate-500">{q.difficulty}</span>
                           {isRepeat && (
-                            <span className="text-[11px] font-bold text-amber-400 bg-amber-950/60 px-2 py-0.5 rounded-md border border-amber-800/50">
+                            <span className="text-[11px] font-bold px-2 py-0.5 rounded-md border
+                              dark:text-amber-300 dark:bg-amber-950/60 dark:border-amber-800/50
+                              light:text-amber-800 light:bg-amber-50 light:border-amber-200"
+                            >
                               В повторении
                             </span>
                           )}
                         </div>
 
-                        <h3 className="text-sm sm:text-base font-bold text-white hover:text-indigo-300 transition-colors">
+                        <h3 className="text-sm sm:text-base font-bold transition-colors font-sans
+                          dark:text-white dark:hover:text-cyan-300
+                          light:text-slate-900 light:hover:text-sky-700"
+                        >
                           {q.title}
                         </h3>
 
-                        <p className="text-xs text-slate-400 mt-1 line-clamp-2">
+                        <p className="text-xs mt-1 line-clamp-2 dark:text-slate-300 light:text-slate-600">
                           {q.question}
                         </p>
                       </div>
@@ -373,26 +399,37 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                     <button
                       type="button"
                       onClick={() => setExpandedId(isExpanded ? null : q.id)}
-                      className="p-1.5 rounded-xl bg-slate-950 hover:bg-slate-800 text-slate-400 hover:text-white transition-colors shrink-0"
+                      className="p-1.5 rounded-xl transition-colors shrink-0
+                        dark:bg-[#06080f] dark:hover:bg-slate-800 dark:text-slate-400 dark:hover:text-white
+                        light:bg-slate-100 light:hover:bg-slate-200 light:text-slate-600 light:hover:text-slate-900"
                     >
                       {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                     </button>
                   </div>
 
                   {isExpanded && (
-                    <div className="px-5 pb-5 pt-2 border-t border-slate-800/80 bg-slate-950/40 rounded-b-2xl space-y-4">
+                    <div className="px-5 pb-5 pt-2 border-t rounded-b-2xl space-y-4 transition-colors
+                      dark:border-slate-800/80 dark:bg-[#06080f]/60
+                      light:border-slate-200 light:bg-slate-50/70"
+                    >
                       {/* Full Question text */}
-                      <div className="p-3 bg-slate-900 rounded-xl border border-slate-800 text-xs text-slate-300 font-medium">
-                        <strong className="text-sky-300 block mb-1">Вопрос интервьюера:</strong>
+                      <div className="p-3 rounded-xl border text-xs font-medium transition-colors
+                        dark:bg-[#0c101c] dark:border-slate-800 dark:text-slate-200
+                        light:bg-white light:border-slate-200 light:text-slate-800"
+                      >
+                        <strong className="block mb-1 font-mono dark:text-cyan-400 light:text-sky-700">Вопрос интервьюера:</strong>
                         {q.question}
                       </div>
 
                       {/* Code Snippet if present */}
                       {q.codeSnippet && (
-                        <div className="rounded-xl overflow-hidden border border-slate-800 bg-slate-950">
-                          <div className="bg-slate-900 px-3 py-1.5 text-xs font-mono text-slate-400 border-b border-slate-800 flex items-center justify-between">
+                        <div className="rounded-xl overflow-hidden border dark:border-slate-800 dark:bg-[#06080f] light:border-slate-200 light:bg-slate-900">
+                          <div className="px-3 py-1.5 text-xs font-mono border-b flex items-center justify-between
+                            dark:bg-[#0c101c] dark:text-slate-400 dark:border-slate-800
+                            light:bg-slate-800 light:text-slate-300 light:border-slate-700"
+                          >
                             <span className="flex items-center gap-1.5">
-                              <Code className="w-3.5 h-3.5 text-indigo-400" />
+                              <Code className="w-3.5 h-3.5 dark:text-cyan-400 light:text-cyan-300" />
                               {q.codeLanguage || 'code'}
                             </span>
                           </div>
@@ -404,10 +441,13 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
 
                       {/* Interactive Self-Check Field */}
                       {!isChecked ? (
-                        <div className="p-3.5 bg-slate-900/90 rounded-xl border border-slate-800 space-y-2.5">
+                        <div className="p-3.5 rounded-xl border space-y-2.5 transition-colors
+                          dark:bg-[#0c101c]/90 dark:border-slate-800
+                          light:bg-white light:border-slate-200"
+                        >
                           <div className="flex items-center justify-between">
-                            <span className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-                              <PenTool className="w-3.5 h-3.5 text-indigo-400" />
+                            <span className="text-xs font-semibold flex items-center gap-1.5 dark:text-slate-300 light:text-slate-700">
+                              <PenTool className="w-3.5 h-3.5 dark:text-cyan-400 light:text-sky-600" />
                               Самопроверка: попробуйте ответить самостоятельно
                             </span>
                             <button
@@ -415,7 +455,9 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                               onClick={() => {
                                 setInlineChecked((prev) => ({ ...prev, [q.id]: true }));
                               }}
-                              className="text-[11px] text-slate-400 hover:text-indigo-300 flex items-center gap-1"
+                              className="text-[11px] flex items-center gap-1 font-mono
+                                dark:text-slate-400 dark:hover:text-cyan-300
+                                light:text-slate-500 light:hover:text-slate-900"
                             >
                               <Eye className="w-3 h-3" />
                               <span>Показать ответ сразу</span>
@@ -430,7 +472,9 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                             }}
                             rows={2}
                             placeholder="Введите ваш ответ для сверки..."
-                            className="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-800 focus:border-indigo-500 text-xs text-slate-200 placeholder:text-slate-600 focus:outline-none"
+                            className="w-full px-3 py-2 rounded-lg text-xs font-mono transition-colors focus:outline-none
+                              dark:bg-[#06080f] dark:border dark:border-slate-800 dark:focus:border-cyan-400 dark:text-slate-200 dark:placeholder:text-slate-600
+                              light:bg-slate-50 light:border light:border-slate-200 light:focus:border-sky-500 light:text-slate-900 light:placeholder:text-slate-400"
                           />
 
                           <div className="flex justify-end">
@@ -440,7 +484,9 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                                 triggerHaptic('medium');
                                 setInlineChecked((prev) => ({ ...prev, [q.id]: true }));
                               }}
-                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-all shadow-sm"
+                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm font-mono
+                                dark:bg-gradient-to-r dark:from-cyan-500 dark:to-indigo-600 dark:text-white dark:shadow-[0_0_12px_rgba(0,240,255,0.25)]
+                                light:bg-slate-900 light:text-white"
                             >
                               <Send className="w-3.5 h-3.5" />
                               <span>Сверить с эталоном</span>
@@ -450,34 +496,42 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                       ) : (
                         <div className="space-y-3">
                           {userAnswer.trim() && (
-                            <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 text-xs">
+                            <div className="p-3 rounded-xl border text-xs transition-colors
+                              dark:bg-[#06080f] dark:border-slate-800
+                              light:bg-white light:border-slate-200"
+                            >
                               <div className="flex items-center justify-between mb-1">
-                                <strong className="text-slate-400 text-[11px] uppercase">Ваш ответ:</strong>
+                                <strong className="text-[11px] uppercase font-mono dark:text-slate-400 light:text-slate-500">Ваш ответ:</strong>
                                 <button
                                   type="button"
                                   onClick={() => setInlineChecked((prev) => ({ ...prev, [q.id]: false }))}
-                                  className="text-[10px] text-slate-500 hover:text-slate-300 flex items-center gap-1"
+                                  className="text-[10px] flex items-center gap-1 font-mono
+                                    dark:text-slate-500 dark:hover:text-cyan-300
+                                    light:text-slate-500 light:hover:text-slate-900"
                                 >
                                   <RefreshCw className="w-3 h-3" />
                                   Изменить
                                 </button>
                               </div>
-                              <p className="text-slate-300 font-mono whitespace-pre-wrap">{userAnswer}</p>
+                              <p className="font-mono whitespace-pre-wrap dark:text-slate-300 light:text-slate-800">{userAnswer}</p>
                             </div>
                           )}
 
                           {/* Detailed Answer */}
-                          <div className="p-4 bg-slate-900 rounded-xl border border-emerald-900/40 text-xs sm:text-sm text-slate-200 leading-relaxed">
-                            <strong className="text-emerald-400 block mb-1.5 font-bold">Развернутый ответ:</strong>
+                          <div className="p-4 rounded-xl border text-xs sm:text-sm leading-relaxed transition-colors
+                            dark:bg-[#08131d] dark:border-emerald-900/50 dark:text-slate-200
+                            light:bg-emerald-50/60 light:border-emerald-200 light:text-slate-800"
+                          >
+                            <strong className="block mb-1.5 font-bold font-mono dark:text-emerald-400 light:text-emerald-700">Развернутый ответ:</strong>
                             {q.answer}
                           </div>
 
                           {/* Key Takeaways */}
                           <div className="space-y-1.5">
-                            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
+                            <span className="text-xs font-bold uppercase tracking-wider block font-mono dark:text-slate-400 light:text-slate-500">
                               Что важно запомнить:
                             </span>
-                            <ul className="text-xs text-slate-300 space-y-1 list-disc list-inside">
+                            <ul className="text-xs space-y-1 list-disc list-inside dark:text-slate-300 light:text-slate-600">
                               {q.keyTakeaways.map((point, idx) => (
                                 <li key={idx}>{point}</li>
                               ))}
@@ -487,7 +541,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                       )}
 
                       {/* Card Action Buttons */}
-                      <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-800">
+                      <div className="flex items-center justify-end gap-2 pt-2 border-t dark:border-slate-800 light:border-slate-200 font-mono">
                         <button
                           type="button"
                           onClick={() => {
@@ -496,8 +550,8 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                           }}
                           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
                             isRepeat
-                              ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
-                              : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-amber-300'
+                              ? 'dark:bg-amber-500/20 dark:text-amber-300 dark:border-amber-500/40 light:bg-amber-100 light:text-amber-800 light:border-amber-300'
+                              : 'dark:bg-[#06080f] dark:text-slate-400 dark:border-slate-800 dark:hover:text-amber-300 light:bg-slate-100 light:border-slate-200 light:text-slate-700 light:hover:bg-slate-200'
                           }`}
                         >
                           <RotateCcw className="w-3.5 h-3.5" />
@@ -509,8 +563,8 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                           onClick={() => handleToggle(q.id)}
                           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
                             isCompleted
-                              ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
-                              : 'bg-indigo-600 text-white border-indigo-500 hover:bg-indigo-500'
+                              ? 'dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-500/40 light:bg-emerald-600 light:text-white light:border-emerald-600'
+                              : 'dark:bg-cyan-500/20 dark:text-cyan-300 dark:border-cyan-400 light:bg-slate-900 light:text-white light:border-slate-900'
                           }`}
                         >
                           <CheckCircle2 className="w-3.5 h-3.5" />

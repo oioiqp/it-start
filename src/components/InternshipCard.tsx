@@ -52,32 +52,46 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
   };
 
   return (
-    <div className="group relative bg-slate-900 hover:bg-slate-900/95 border border-slate-800 hover:border-slate-700 rounded-2xl p-4 sm:p-5 transition-all flex flex-col justify-between">
+    <div className="group relative rounded-2xl p-4 sm:p-5 transition-all duration-200 flex flex-col justify-between cyber-corner
+      dark:bg-[#0b0f1a]/95 dark:border dark:border-cyan-500/20 dark:hover:border-cyan-400/80 dark:hover:shadow-[0_0_24px_rgba(0,240,255,0.22)] dark:text-cyan-400
+      light:bg-white light:border light:border-slate-200 light:hover:border-sky-400 light:hover:shadow-xl light:shadow-sm light:text-sky-600"
+    >
       {/* Top row */}
       <div>
         <div className="flex items-start justify-between gap-3 mb-3">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center font-bold text-slate-200 text-sm shrink-0 overflow-hidden">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center font-mono font-bold text-sm shrink-0 overflow-hidden transition-colors
+              dark:bg-[#12192c] dark:border dark:border-cyan-500/30 dark:text-cyan-300
+              light:bg-slate-100 light:border light:border-slate-200 light:text-slate-800"
+            >
               {internship.company.charAt(0)}
             </div>
             <div>
               <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="font-semibold text-sm text-slate-200">{internship.company}</span>
+                <span className="font-semibold text-sm dark:text-slate-100 light:text-slate-900 font-sans">
+                  {internship.company}
+                </span>
                 {internship.isHot && (
-                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20">
-                    <Flame className="w-3 h-3 text-rose-400" />
+                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono font-bold uppercase
+                    dark:bg-rose-500/15 dark:text-rose-400 dark:border dark:border-rose-500/30
+                    light:bg-rose-50 light:text-rose-600 light:border light:border-rose-200"
+                  >
+                    <Flame className="w-3 h-3 text-rose-500 animate-pulse" />
                     HOT
                   </span>
                 )}
+                <span className="font-mono text-[9px] px-1 py-0.2 rounded uppercase dark:bg-slate-800/80 dark:text-slate-400 light:bg-slate-100 light:text-slate-500">
+                  REAL
+                </span>
               </div>
-              <div className="flex items-center gap-2 text-xs text-slate-400 mt-0.5 flex-wrap">
+              <div className="flex items-center gap-2 text-xs dark:text-slate-400 light:text-slate-500 mt-0.5 flex-wrap font-mono text-[11px]">
                 <span className="flex items-center gap-1">
-                  <MapPin className="w-3 h-3 text-slate-500" />
+                  <MapPin className="w-3 h-3 opacity-70" />
                   {internship.location}
                 </span>
                 <span>•</span>
                 <span className="flex items-center gap-1">
-                  <Clock className="w-3 h-3 text-slate-500" />
+                  <Clock className="w-3 h-3 opacity-70" />
                   {internship.format}
                 </span>
               </div>
@@ -86,20 +100,28 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
 
           {/* Salary */}
           <div className="text-right shrink-0">
-            <span className="text-xs sm:text-sm font-bold text-emerald-400 block">
+            <span className="text-xs sm:text-sm font-mono font-bold block
+              dark:text-emerald-400 dark:drop-shadow-[0_0_8px_rgba(0,255,157,0.3)]
+              light:text-emerald-700"
+            >
               {internship.salary}
             </span>
-            <span className="text-[10px] text-slate-500">оплата</span>
+            <span className="text-[10px] font-mono uppercase dark:text-slate-500 light:text-slate-400">
+              оплата
+            </span>
           </div>
         </div>
 
         {/* Position Title */}
-        <h3 className="text-sm sm:text-base font-bold text-white group-hover:text-indigo-300 transition-colors tracking-tight line-clamp-2 mb-2">
+        <h3 className="text-sm sm:text-base font-bold transition-colors tracking-tight line-clamp-2 mb-2
+          dark:text-white dark:group-hover:text-cyan-300
+          light:text-slate-900 light:group-hover:text-sky-600 font-sans"
+        >
           {internship.title}
         </h3>
 
         {/* Description snippet */}
-        <p className="text-xs text-slate-400 line-clamp-2 mb-3 leading-relaxed">
+        <p className="text-xs line-clamp-2 mb-3 leading-relaxed dark:text-slate-300 light:text-slate-600">
           {internship.description}
         </p>
 
@@ -108,13 +130,15 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
           {internship.tags.slice(0, 4).map((tag, idx) => (
             <span
               key={idx}
-              className="px-2 py-0.5 rounded-md text-[11px] font-medium bg-slate-950 border border-slate-800 text-slate-300"
+              className="px-2 py-0.5 rounded-md text-[11px] font-mono transition-colors
+                dark:bg-[#06080f] dark:border dark:border-slate-800 dark:text-slate-300 dark:group-hover:border-cyan-500/30
+                light:bg-slate-50 light:border light:border-slate-200 light:text-slate-700"
             >
               {tag}
             </span>
           ))}
           {internship.tags.length > 4 && (
-            <span className="px-1.5 py-0.5 rounded-md text-[10px] text-slate-500 bg-slate-950">
+            <span className="px-1.5 py-0.5 rounded-md text-[10px] font-mono dark:text-slate-500 dark:bg-[#06080f] light:text-slate-400 light:bg-slate-100">
               +{internship.tags.length - 4}
             </span>
           )}
@@ -122,19 +146,27 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
       </div>
 
       {/* Bottom section: Readiness bar & Buttons */}
-      <div className="pt-3 border-t border-slate-800/80 space-y-3">
+      <div className="pt-3 border-t transition-colors space-y-3
+        dark:border-slate-800/80
+        light:border-slate-100"
+      >
         {/* Readiness Bar */}
-        <div className="bg-slate-950 rounded-xl p-2.5 border border-slate-800/60">
-          <div className="flex items-center justify-between text-[11px] mb-1">
-            <span className="text-slate-400 flex items-center gap-1">
-              <Sparkles className="w-3 h-3 text-indigo-400" />
+        <div className="rounded-xl p-2.5 transition-colors
+          dark:bg-[#06080f] dark:border dark:border-slate-800/80
+          light:bg-slate-50 light:border light:border-slate-200"
+        >
+          <div className="flex items-center justify-between text-[11px] mb-1 font-mono">
+            <span className="flex items-center gap-1 dark:text-slate-300 light:text-slate-600">
+              <Sparkles className="w-3 h-3 dark:text-cyan-400 light:text-sky-600" />
               Готовность к стеку:
             </span>
-            <span className="font-bold text-indigo-300">{readinessPercent}%</span>
+            <span className="font-bold dark:text-cyan-300 light:text-sky-600">{readinessPercent}%</span>
           </div>
-          <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+          <div className="w-full h-1.5 rounded-full overflow-hidden dark:bg-slate-800 light:bg-slate-200">
             <div
-              className="h-full bg-indigo-500 rounded-full transition-all duration-300"
+              className="h-full rounded-full transition-all duration-500
+                dark:bg-gradient-to-r dark:from-cyan-400 dark:to-emerald-400 dark:shadow-[0_0_8px_rgba(0,240,255,0.4)]
+                light:bg-gradient-to-r light:from-sky-500 light:to-emerald-500"
               style={{ width: `${readinessPercent}%` }}
             />
           </div>
@@ -147,15 +179,19 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
               href={`https://t.me/${internship.sourceChannel.replace(/^@/, '')}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-sky-400 transition-colors font-medium truncate group"
+              className="flex items-center gap-1 text-[11px] font-mono transition-colors font-medium truncate group/ch
+                dark:text-slate-400 dark:hover:text-cyan-300
+                light:text-slate-500 light:hover:text-sky-600"
               title={`Открыть Telegram-канал ${internship.sourceChannel}`}
             >
-              <Bot className="w-3.5 h-3.5 shrink-0 text-sky-400/80 group-hover:text-sky-300" />
-              <span className="truncate underline decoration-slate-700 group-hover:decoration-sky-400">{internship.sourceChannel}</span>
+              <Bot className="w-3.5 h-3.5 shrink-0 dark:text-cyan-400 light:text-sky-600" />
+              <span className="truncate underline dark:decoration-slate-700 dark:group-hover/ch:decoration-cyan-400 light:decoration-slate-300 light:group-hover/ch:decoration-sky-500">
+                {internship.sourceChannel}
+              </span>
             </a>
           ) : (
-            <div className="flex items-center gap-1 text-[11px] text-slate-400 font-medium truncate">
-              <Bot className="w-3.5 h-3.5 shrink-0 text-slate-500" />
+            <div className="flex items-center gap-1 text-[11px] font-mono dark:text-slate-400 light:text-slate-500 font-medium truncate">
+              <Bot className="w-3.5 h-3.5 shrink-0 opacity-70" />
               <span className="truncate">{internship.sourceChannel}</span>
             </div>
           )}
@@ -163,17 +199,21 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
           <div className="flex items-center gap-1.5 shrink-0">
             <button
               onClick={handleOpenPlan}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700/80 text-slate-200 text-xs font-medium transition-all active:scale-95"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all active:scale-95
+                dark:bg-[#131b2e] dark:hover:bg-[#1a253e] dark:border dark:border-cyan-500/30 dark:hover:border-cyan-400 dark:text-cyan-200 dark:hover:shadow-[0_0_10px_rgba(0,240,255,0.25)]
+                light:bg-slate-100 light:hover:bg-slate-200 light:border light:border-slate-300 light:text-slate-800"
             >
-              <GraduationCap className="w-3.5 h-3.5 text-indigo-400" />
-              <span>План подготовки</span>
+              <GraduationCap className="w-3.5 h-3.5 dark:text-cyan-400 light:text-sky-600" />
+              <span>План</span>
             </button>
 
             <a
               href={internship.applyUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/30 text-emerald-300 text-xs font-semibold transition-all active:scale-95"
+              className="flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold transition-all active:scale-95
+                dark:bg-gradient-to-r dark:from-cyan-500 dark:to-emerald-400 dark:hover:from-cyan-400 dark:hover:to-emerald-300 dark:text-black dark:shadow-[0_0_14px_rgba(0,240,255,0.35)]
+                light:bg-slate-900 light:hover:bg-slate-800 light:text-white light:shadow-sm"
               title={`Подать заявку на официальном сайте ${internship.company}`}
             >
               <span>Отклик</span>

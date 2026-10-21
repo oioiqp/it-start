@@ -119,18 +119,18 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
     if (readinessPercent >= 80) {
       return {
         label: 'Готов к собеседованию! 🔥',
-        color: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40',
+        color: 'dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-500/40 light:bg-emerald-50 light:text-emerald-700 light:border-emerald-300',
       };
     }
     if (readinessPercent >= 40) {
       return {
         label: 'В активной подготовке 🚀',
-        color: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40',
+        color: 'dark:bg-cyan-500/20 dark:text-cyan-300 dark:border-cyan-500/40 light:bg-sky-50 light:text-sky-700 light:border-sky-300',
       };
     }
     return {
       label: 'Начальный уровень 📚',
-      color: 'bg-amber-500/20 text-amber-300 border-amber-500/40',
+      color: 'dark:bg-amber-500/20 dark:text-amber-300 dark:border-amber-500/40 light:bg-amber-50 light:text-amber-700 light:border-amber-300',
     };
   };
 
@@ -138,40 +138,54 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
-      <div className="relative w-full max-w-3xl bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl p-5 sm:p-7 my-8 text-slate-100 max-h-[90vh] flex flex-col">
+      <div className="relative w-full max-w-3xl rounded-3xl p-5 sm:p-7 my-8 max-h-[90vh] flex flex-col cyber-corner transition-colors
+        dark:bg-[#0c101c] dark:border dark:border-cyan-500/30 dark:shadow-[0_0_35px_rgba(0,240,255,0.18)] dark:text-slate-100
+        light:bg-white light:border light:border-slate-200 light:shadow-2xl light:text-slate-900"
+      >
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors z-10"
+          className="absolute top-5 right-5 p-2 rounded-xl transition-colors z-10
+            dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800
+            light:text-slate-400 light:hover:text-slate-900 light:hover:bg-slate-100"
         >
           <X className="w-5 h-5" />
         </button>
 
         {/* Modal Header */}
-        <div className="shrink-0 pb-4 border-b border-slate-800 pr-10">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+        <div className="shrink-0 pb-4 border-b pr-10 dark:border-slate-800 light:border-slate-200">
+          <div className="flex items-center gap-2 mb-2 flex-wrap">
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold
+              dark:bg-cyan-500/20 dark:text-cyan-300 dark:border dark:border-cyan-500/40
+              light:bg-sky-50 light:text-sky-700 light:border light:border-sky-200"
+            >
               {internship.company}
             </span>
-            <span className="text-xs text-slate-400 flex items-center gap-1">
+            <span className="text-xs dark:text-slate-400 light:text-slate-500 flex items-center gap-1 font-mono">
               <MapPin className="w-3.5 h-3.5" />
               {internship.location}
             </span>
-            <span className="text-xs text-slate-400 flex items-center gap-1">
+            <span className="text-xs dark:text-slate-400 light:text-slate-500 flex items-center gap-1 font-mono">
               <Clock className="w-3.5 h-3.5" />
               {internship.format}
             </span>
           </div>
 
-          <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+          <h2 className="text-xl sm:text-2xl font-black tracking-tight dark:text-white light:text-slate-900 font-sans">
             План подготовки: {internship.title}
           </h2>
 
           <div className="flex flex-wrap items-center gap-2 mt-2">
-            <span className="text-xs font-bold text-emerald-400 bg-emerald-950/60 px-2.5 py-1 rounded-lg border border-emerald-800/60">
+            <span className="text-xs font-mono font-bold px-2.5 py-1 rounded-lg
+              dark:text-emerald-400 dark:bg-emerald-950/60 dark:border dark:border-emerald-800/60
+              light:text-emerald-700 light:bg-emerald-50 light:border light:border-emerald-200"
+            >
               {internship.salary}
             </span>
-            <span className="text-xs text-sky-400 bg-sky-950/60 px-2.5 py-1 rounded-lg border border-sky-800/60">
+            <span className="text-xs font-mono px-2.5 py-1 rounded-lg
+              dark:text-cyan-400 dark:bg-cyan-950/60 dark:border dark:border-cyan-800/60
+              light:text-sky-700 light:bg-sky-50 light:border light:border-sky-200"
+            >
               Источник: {internship.sourceChannel}
             </span>
           </div>
@@ -180,43 +194,48 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
         {/* Scrollable Content */}
         <div className="overflow-y-auto py-4 space-y-6 flex-1 pr-1 custom-scroll">
           {/* Readiness Progress Bar Card */}
-          <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-indigo-950/50 via-slate-900 to-slate-950 border border-indigo-800/40 shadow-inner">
-            <div className="flex items-center justify-between gap-3 mb-2">
+          <div className="p-4 sm:p-5 rounded-2xl border shadow-inner transition-colors
+            dark:bg-gradient-to-br dark:from-[#090e1a] dark:to-[#06080f] dark:border-cyan-500/30
+            light:bg-slate-50 light:border-slate-200"
+          >
+            <div className="flex items-center justify-between gap-3 mb-2 flex-wrap">
               <div className="flex items-center gap-2">
                 <Trophy className="w-5 h-5 text-amber-400" />
-                <span className="text-sm font-bold text-white">
+                <span className="text-sm font-bold dark:text-white light:text-slate-900 font-sans">
                   Ваша готовность к этой стажировке:
                 </span>
               </div>
-              <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border ${statusBadge.color}`}>
+              <span className={`px-2.5 py-0.5 rounded-full text-xs font-mono font-bold border ${statusBadge.color}`}>
                 {statusBadge.label}
               </span>
             </div>
 
-            <div className="flex items-baseline justify-between mb-1.5">
-              <span className="text-xs text-slate-400">
+            <div className="flex items-baseline justify-between mb-1.5 font-mono">
+              <span className="text-xs dark:text-slate-400 light:text-slate-600">
                 Изучено {totalCompleted} из {totalItems} тем и профильных вопросов
               </span>
-              <span className="text-2xl font-black text-indigo-300">{readinessPercent}%</span>
+              <span className="text-2xl font-black dark:text-cyan-300 light:text-sky-600">{readinessPercent}%</span>
             </div>
 
-            <div className="w-full h-3 bg-slate-800/90 rounded-full overflow-hidden p-0.5 border border-slate-700/60">
+            <div className="w-full h-3 rounded-full overflow-hidden p-0.5 border dark:bg-slate-900 dark:border-slate-700 light:bg-slate-200 light:border-slate-300">
               <div
-                className="h-full bg-gradient-to-r from-indigo-500 via-sky-400 to-emerald-400 rounded-full transition-all duration-500 shadow-sm shadow-indigo-500"
+                className="h-full rounded-full transition-all duration-500
+                  dark:bg-gradient-to-r dark:from-cyan-400 dark:via-indigo-400 dark:to-emerald-400 dark:shadow-[0_0_10px_rgba(0,240,255,0.4)]
+                  light:bg-gradient-to-r light:from-sky-500 light:to-emerald-500"
                 style={{ width: `${readinessPercent}%` }}
               />
             </div>
 
-            <p className="text-xs text-slate-400 mt-2">
-              💡 Отмечайте галочками изученные разделы и вопросы прямо в этом окне — ваш прогресс сохраняется синхронно в базе данных!
+            <p className="text-xs mt-2 dark:text-slate-400 light:text-slate-500">
+              💡 Отмечайте изученные разделы и вопросы прямо в этом окне — ваш прогресс сохраняется синхронно в базе данных!
             </p>
           </div>
 
           {/* Section 1: Required Roadmap Steps */}
           <div>
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                <Map className="w-4 h-4 text-sky-400" />
+              <h3 className="text-sm font-bold uppercase tracking-wider flex items-center gap-2 font-mono dark:text-white light:text-slate-900">
+                <Map className="w-4 h-4 dark:text-cyan-400 light:text-sky-600" />
                 Этапы роадмапа для вакансии ({completedTopicsCount}/{relevantTopics.length})
               </h3>
             </div>
@@ -229,10 +248,10 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                     key={topic.id}
                     className={`p-3.5 rounded-2xl border transition-all ${
                       isDone
-                        ? 'bg-emerald-950/20 border-emerald-800/40 text-slate-200'
+                        ? 'dark:bg-emerald-950/20 dark:border-emerald-800/40 light:bg-emerald-50/50 light:border-emerald-200'
                         : percent > 0
-                        ? 'bg-slate-900/90 border-indigo-500/40 text-slate-200'
-                        : 'bg-slate-950/60 border-slate-800 text-slate-300 hover:border-slate-700'
+                        ? 'dark:bg-[#0e1424] dark:border-cyan-500/40 light:bg-sky-50/30 light:border-sky-200'
+                        : 'dark:bg-[#06080f]/80 dark:border-slate-800 light:bg-white light:border-slate-200'
                     }`}
                   >
                     <div className="flex items-start justify-between gap-3">
@@ -246,21 +265,21 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                           {isDone ? (
                             <CheckCircle2 className="w-5 h-5 text-emerald-400" />
                           ) : (
-                            <Circle className="w-5 h-5 text-slate-600 hover:text-indigo-400" />
+                            <Circle className="w-5 h-5 text-slate-500 hover:text-cyan-400" />
                           )}
                         </button>
                         <div>
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-sm font-bold text-white">{topic.title}</span>
-                            <span className="text-[10px] uppercase font-bold px-1.5 py-0.2 rounded bg-slate-800 text-slate-400">
-                              {topic.category === 'core' ? 'База' : 'Стек вакансии'}
+                          <div className="flex items-center gap-2 flex-wrap font-mono">
+                            <span className="text-sm font-bold dark:text-white light:text-slate-900 font-sans">{topic.title}</span>
+                            <span className="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded dark:bg-slate-800 dark:text-slate-400 light:bg-slate-100 light:text-slate-600">
+                              {topic.category === 'core' ? 'База' : 'Стек'}
                             </span>
-                            <span className="text-[10px] px-1.5 py-0.2 rounded bg-indigo-950 text-indigo-300">
+                            <span className="text-[10px] px-1.5 py-0.5 rounded dark:bg-cyan-950 dark:text-cyan-300 light:bg-sky-100 light:text-sky-800">
                               {topic.difficulty}
                             </span>
                           </div>
-                          <p className="text-xs text-slate-400 mt-1">{topic.description}</p>
-                          <div className="mt-2 text-[11px] text-amber-300/90 bg-amber-950/30 border border-amber-900/40 p-2 rounded-xl">
+                          <p className="text-xs dark:text-slate-300 light:text-slate-600 mt-1">{topic.description}</p>
+                          <div className="mt-2 text-[11px] p-2 rounded-xl dark:text-amber-300/90 dark:bg-amber-950/30 dark:border dark:border-amber-900/40 light:text-amber-900 light:bg-amber-50 light:border light:border-amber-200">
                             <strong>Совет для интервью:</strong> {topic.interviewTip}
                           </div>
                         </div>
@@ -270,25 +289,30 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                         href={topic.externalDocUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-sky-300 transition-colors shrink-0"
+                        className="p-1.5 rounded-lg transition-colors shrink-0
+                          dark:bg-slate-900 dark:hover:bg-slate-800 dark:text-slate-400 dark:hover:text-cyan-300
+                          light:bg-slate-100 light:hover:bg-slate-200 light:text-slate-600 light:hover:text-sky-600"
                         title="Открыть документацию"
                       >
                         <ExternalLink className="w-4 h-4" />
                       </a>
                     </div>
 
-                    {/* Topic Progress Bar with % */}
-                    <div className="bg-slate-900/80 border border-slate-800/80 rounded-xl p-2.5 my-3">
+                    {/* Topic Progress Bar */}
+                    <div className="rounded-xl p-2.5 my-3 border font-mono
+                      dark:bg-[#06080f] dark:border-slate-800
+                      light:bg-slate-50 light:border-slate-200"
+                    >
                       <div className="flex items-center justify-between text-[11px] mb-1">
-                        <span className="text-slate-400 font-medium">Прогресс раздела:</span>
-                        <span className={`font-bold ${isDone ? 'text-emerald-400' : 'text-indigo-300'}`}>
+                        <span className="dark:text-slate-400 light:text-slate-600">Прогресс раздела:</span>
+                        <span className={`font-bold ${isDone ? 'dark:text-emerald-400 light:text-emerald-600' : 'dark:text-cyan-300 light:text-sky-600'}`}>
                           {percent}% ({checked} из {total} подтем)
                         </span>
                       </div>
-                      <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                      <div className="w-full h-1.5 rounded-full overflow-hidden dark:bg-slate-800 light:bg-slate-200">
                         <div
                           className={`h-full rounded-full transition-all duration-300 ${
-                            isDone ? 'bg-emerald-500' : 'bg-indigo-500'
+                            isDone ? 'bg-emerald-500' : 'dark:bg-cyan-500 light:bg-sky-600'
                           }`}
                           style={{ width: `${percent}%` }}
                         />
@@ -296,8 +320,8 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                     </div>
 
                     {topic.subtopics && topic.subtopics.length > 0 && (
-                      <div className="pt-2 border-t border-slate-800/60">
-                        <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                      <div className="pt-2 border-t dark:border-slate-800/60 light:border-slate-100">
+                        <div className="text-[11px] font-mono font-semibold uppercase tracking-wider mb-2 dark:text-slate-400 light:text-slate-500">
                           Ключевые подтемы (отметьте изученные):
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
@@ -310,14 +334,14 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                                 onClick={() => handleToggleSubtopic(topic.id, sIdx)}
                                 className={`flex items-start gap-2 p-2 rounded-xl text-left text-xs transition-colors select-none ${
                                   isSubDone
-                                    ? 'bg-emerald-950/40 text-emerald-200 border border-emerald-800/50'
-                                    : 'bg-slate-900/70 text-slate-300 border border-slate-800 hover:border-slate-700'
+                                    ? 'dark:bg-emerald-950/40 dark:text-emerald-200 dark:border dark:border-emerald-800/50 light:bg-emerald-50 light:text-emerald-800 light:border light:border-emerald-300'
+                                    : 'dark:bg-slate-900/70 dark:text-slate-300 dark:border dark:border-slate-800 dark:hover:border-slate-700 light:bg-slate-50 light:text-slate-700 light:border light:border-slate-200'
                                 }`}
                               >
                                 {isSubDone ? (
-                                  <CheckSquare className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
+                                  <CheckSquare className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
                                 ) : (
-                                  <Square className="w-3.5 h-3.5 text-slate-500 shrink-0 mt-0.5" />
+                                  <Square className="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5" />
                                 )}
                                 <span className={isSubDone ? 'line-through opacity-80' : ''}>
                                   {sub}
@@ -328,29 +352,6 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                         </div>
                       </div>
                     )}
-
-                    {/* Quick Section Toggle Button */}
-                    <button
-                      type="button"
-                      onClick={() => handleToggleTopic(topic.id)}
-                      className={`w-full mt-3 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
-                        isDone
-                          ? 'bg-emerald-600/15 border-emerald-500/30 text-emerald-300'
-                          : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white hover:border-slate-700 hover:bg-indigo-600/15 hover:border-indigo-500/30'
-                      }`}
-                    >
-                      {isDone ? (
-                        <>
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                          <span>Раздел полностью изучен (100%)</span>
-                        </>
-                      ) : (
-                        <>
-                          <Circle className="w-3.5 h-3.5" />
-                          <span>Отметить раздел изученным (100%)</span>
-                        </>
-                      )}
-                    </button>
                   </div>
                 );
               })}
@@ -360,8 +361,8 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
           {/* Section 2: Profile Interview Questions */}
           <div>
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                <HelpCircle className="w-4 h-4 text-amber-400" />
+              <h3 className="text-sm font-bold uppercase tracking-wider flex items-center gap-2 font-mono dark:text-white light:text-slate-900">
+                <HelpCircle className="w-4 h-4 dark:text-cyan-400 light:text-sky-600" />
                 Профильные вопросы собеседования ({completedQuestionsCount}/{relevantQuestions.length})
               </h3>
             </div>
@@ -376,8 +377,8 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                     key={q.id}
                     className={`rounded-2xl border transition-all ${
                       isCompleted
-                        ? 'bg-emerald-950/15 border-emerald-800/40'
-                        : 'bg-slate-950/60 border-slate-800'
+                        ? 'dark:bg-emerald-950/15 dark:border-emerald-800/40 light:bg-emerald-50/50 light:border-emerald-200'
+                        : 'dark:bg-[#06080f]/80 dark:border-slate-800 light:bg-white light:border-slate-200'
                     }`}
                   >
                     <div className="p-3.5 flex items-start justify-between gap-3">
@@ -390,52 +391,54 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                           {isCompleted ? (
                             <CheckCircle2 className="w-5 h-5 text-emerald-400" />
                           ) : (
-                            <Circle className="w-5 h-5 text-slate-600 hover:text-indigo-400" />
+                            <Circle className="w-5 h-5 text-slate-500 hover:text-cyan-400" />
                           )}
                         </button>
 
                         <div className="cursor-pointer flex-1" onClick={() => setExpandedQuestionId(isExpanded ? null : q.id)}>
-                          <div className="flex items-center gap-2 flex-wrap mb-1">
-                            <span className="text-xs font-semibold text-sky-400 bg-sky-950/50 px-2 py-0.5 rounded-md">
+                          <div className="flex items-center gap-2 flex-wrap mb-1 font-mono text-[11px]">
+                            <span className="font-semibold px-2 py-0.5 rounded-md dark:text-cyan-300 dark:bg-cyan-950/50 light:text-sky-700 light:bg-sky-50">
                               {q.category}
                             </span>
-                            <span className="text-xs text-slate-400">{q.difficulty}</span>
+                            <span className="dark:text-slate-400 light:text-slate-500">{q.difficulty}</span>
                           </div>
-                          <h4 className="text-sm font-bold text-slate-100">{q.title}</h4>
-                          <p className="text-xs text-slate-300 mt-1">{q.question}</p>
+                          <h4 className="text-sm font-bold dark:text-slate-100 light:text-slate-900 font-sans">{q.title}</h4>
+                          <p className="text-xs dark:text-slate-300 light:text-slate-600 mt-1">{q.question}</p>
                         </div>
                       </div>
 
                       <button
                         type="button"
                         onClick={() => setExpandedQuestionId(isExpanded ? null : q.id)}
-                        className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition-colors"
+                        className="p-1.5 rounded-lg transition-colors
+                          dark:bg-slate-900 dark:hover:bg-slate-800 dark:text-slate-400 dark:hover:text-slate-200
+                          light:bg-slate-100 light:hover:bg-slate-200 light:text-slate-600 light:hover:text-slate-900"
                       >
                         {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                       </button>
                     </div>
 
                     {isExpanded && (
-                      <div className="px-4 pb-4 pt-1 border-t border-slate-800/80 bg-slate-900/50 rounded-b-2xl space-y-3">
-                        <div className="text-xs text-slate-200 leading-relaxed bg-slate-950/60 p-3 rounded-xl border border-slate-800">
-                          <span className="font-semibold text-emerald-400 block mb-1">Ответ:</span>
+                      <div className="px-4 pb-4 pt-1 border-t space-y-3 dark:border-slate-800/80 dark:bg-slate-900/50 light:border-slate-100 light:bg-slate-50/70 rounded-b-2xl">
+                        <div className="text-xs leading-relaxed p-3 rounded-xl border dark:bg-[#06080f] dark:border-slate-800 dark:text-slate-200 light:bg-white light:border-slate-200 light:text-slate-800">
+                          <span className="font-bold text-emerald-500 block mb-1">Ответ:</span>
                           {q.answer}
                         </div>
 
                         {q.codeSnippet && (
-                          <div className="rounded-xl overflow-hidden border border-slate-800 bg-slate-950">
-                            <div className="bg-slate-900 px-3 py-1 text-[11px] font-mono text-slate-400 border-b border-slate-800">
+                          <div className="rounded-xl overflow-hidden border dark:border-slate-800 dark:bg-[#030712] light:border-slate-200 light:bg-slate-900">
+                            <div className="px-3 py-1 text-[11px] font-mono text-slate-400 border-b dark:bg-slate-900 dark:border-slate-800 light:bg-slate-800 light:border-slate-700">
                               {q.codeLanguage || 'code'}
                             </div>
-                            <pre className="p-3 text-xs font-mono text-emerald-300 overflow-x-auto">
+                            <pre className="p-3 text-xs font-mono text-cyan-300 overflow-x-auto">
                               <code>{q.codeSnippet}</code>
                             </pre>
                           </div>
                         )}
 
                         <div className="space-y-1">
-                          <span className="text-[11px] font-semibold text-slate-400 block">Главные тезисы:</span>
-                          <ul className="list-disc list-inside text-xs text-slate-300 space-y-1">
+                          <span className="text-[11px] font-mono font-semibold dark:text-slate-400 light:text-slate-500 block">Главные тезисы:</span>
+                          <ul className="list-disc list-inside text-xs space-y-1 dark:text-slate-300 light:text-slate-600">
                             {q.keyTakeaways.map((point, idx) => (
                               <li key={idx}>{point}</li>
                             ))}
@@ -451,11 +454,13 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
         </div>
 
         {/* Modal Footer */}
-        <div className="shrink-0 pt-4 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3">
+        <div className="shrink-0 pt-4 border-t flex flex-wrap items-center justify-between gap-3 dark:border-slate-800 light:border-slate-200">
           <div className="flex items-center gap-2">
             <button
               onClick={onClose}
-              className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs sm:text-sm font-medium transition-colors"
+              className="px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-colors
+                dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300
+                light:bg-slate-100 light:hover:bg-slate-200 light:text-slate-700"
             >
               Закрыть
             </button>
@@ -465,7 +470,9 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                 href={`https://t.me/${internship.sourceChannel.replace(/^@/, '')}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-sky-950/40 hover:bg-sky-900/50 border border-sky-800/50 text-sky-300 text-xs font-medium transition-colors"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-mono transition-colors
+                  dark:bg-cyan-950/40 dark:hover:bg-cyan-900/50 dark:border dark:border-cyan-800/50 dark:text-cyan-300
+                  light:bg-sky-50 light:hover:bg-sky-100 light:border light:border-sky-200 light:text-sky-700"
                 title={`Открыть Telegram-канал ${internship.sourceChannel}`}
               >
                 <Bot className="w-4 h-4 text-sky-400" />
@@ -479,7 +486,9 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
             href={internship.applyUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-emerald-600/20 active:scale-95 transition-all"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm active:scale-95 transition-all
+              dark:bg-gradient-to-r dark:from-cyan-500 dark:to-emerald-400 dark:text-black dark:shadow-[0_0_15px_rgba(0,240,255,0.35)]
+              light:bg-slate-900 light:hover:bg-slate-800 light:text-white light:shadow-md"
             title={`Подать заявку на официальном сайте компании ${internship.company}`}
           >
             <span>Подать заявку на сайте {internship.company}</span>

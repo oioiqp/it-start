@@ -700,6 +700,44 @@ export const INITIAL_PARSED_POSTS: ParsedChannelPost[] = [
     url: 'https://t.me/sber_careers/512',
   },
 
+  // --- Авито ---
+  {
+    id: 'scan-avito-mobile',
+    channelHandle: '@avito_tech',
+    channelName: 'Avito Tech Jobs',
+    company: 'Avito Tech',
+    title: 'Стажёр Android-разработчик (Авито Старт)',
+    salary: 'от 70 000 до 95 000 ₽',
+    location: 'Москва / Санкт-Петербург / Удаленно',
+    format: 'Гибрид',
+    directionId: 'mobile',
+    subTrackId: 'android',
+    tags: ['Kotlin', 'Jetpack Compose', 'Coroutines', 'Авито Старт'],
+    snippet: 'Авито открывает набор на программу Авито Старт: разработка фичей для мобильного приложения объявлений на Kotlin и Jetpack Compose под кураторством Senior инженеров.',
+    publishedAt: '2026-03-29T16:40:00.000Z',
+    sourceType: 'telegram',
+    url: 'https://t.me/avito_tech/640',
+  },
+
+  // --- VK ---
+  {
+    id: 'scan-vk-qa',
+    channelHandle: '@vk_team',
+    channelName: 'VK Team / Карьера в VK',
+    company: 'VK',
+    title: 'Junior QA Automation Engineer (VK Team)',
+    salary: 'от 65 000 до 85 000 ₽',
+    location: 'Санкт-Петербург / Москва / Удаленно',
+    format: 'Удаленно',
+    directionId: 'qa',
+    subTrackId: 'auto_qa',
+    tags: ['Python', 'Pytest', 'Playwright', 'VK Team'],
+    snippet: 'VK объявляет весенний набор стажёров: автоматизация тестирования веб-сервисов ВКонтакте и VK Видео, разработка надежных E2E-тестов на Python и Playwright.',
+    publishedAt: '2026-03-29T17:00:00.000Z',
+    sourceType: 'telegram',
+    url: 'https://t.me/vk_team/815',
+  },
+
   // --- Норм работа (Агрегатор) ---
   {
     id: 'scan-normrabota-qa',

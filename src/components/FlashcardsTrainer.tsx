@@ -83,10 +83,13 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
 
   if (!currentCard || deck.length === 0) {
     return (
-      <div className="p-8 text-center bg-slate-900 border border-slate-800 rounded-3xl">
-        <HelpCircle className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-        <h3 className="text-lg font-bold text-white mb-1">Вопросы не найдены</h3>
-        <p className="text-xs text-slate-400">
+      <div className="p-8 text-center rounded-3xl cyber-corner transition-colors
+        dark:bg-[#0c101c] dark:border dark:border-slate-800
+        light:bg-white light:border light:border-slate-200 light:shadow-sm"
+      >
+        <HelpCircle className="w-12 h-12 mx-auto mb-3 dark:text-slate-600 light:text-slate-400" />
+        <h3 className="text-lg font-bold mb-1 font-sans dark:text-white light:text-slate-900">Вопросы не найдены</h3>
+        <p className="text-xs dark:text-slate-400 light:text-slate-500">
           Попробуйте сбросить фильтры направления или ветки в панели выше.
         </p>
       </div>
@@ -99,18 +102,24 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
   return (
     <div className="max-w-2xl mx-auto space-y-4">
       {/* Top Controls Bar */}
-      <div className="flex items-center justify-between text-xs text-slate-400 px-1">
+      <div className="flex items-center justify-between text-xs px-1 font-mono dark:text-slate-400 light:text-slate-600">
         <div className="flex items-center gap-2">
-          <span className="font-bold text-white text-sm">
+          <span className="font-bold text-sm dark:text-white light:text-slate-900">
             Карточка {currentIndex + 1} из {deck.length}
           </span>
           {isLearned && (
-            <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">
+            <span className="px-2 py-0.5 rounded-full font-bold border
+              dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-500/30
+              light:bg-emerald-100 light:text-emerald-800 light:border-emerald-300"
+            >
               Изучено
             </span>
           )}
           {isRepeat && (
-            <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">
+            <span className="px-2 py-0.5 rounded-full font-bold border
+              dark:bg-amber-500/20 dark:text-amber-300 dark:border-amber-500/30
+              light:bg-amber-100 light:text-amber-800 light:border-amber-300"
+            >
               На повторение
             </span>
           )}
@@ -118,7 +127,9 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
 
         <button
           onClick={handleShuffle}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition-colors"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border transition-colors
+            dark:bg-[#06080f] dark:hover:bg-slate-800 dark:text-slate-300 dark:border-slate-800
+            light:bg-white light:hover:bg-slate-100 light:text-slate-700 light:border-slate-200 shadow-sm"
         >
           <Shuffle className="w-3.5 h-3.5" />
           <span>Перемешать</span>
@@ -128,14 +139,19 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
       {/* Flashcard interactive body */}
       <div
         onClick={handleFlip}
-        className="relative min-h-[340px] p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900 to-indigo-950/40 border border-slate-800 hover:border-indigo-500/50 shadow-2xl cursor-pointer select-none transition-all flex flex-col justify-between group"
+        className="relative min-h-[340px] p-6 sm:p-8 rounded-3xl cyber-corner shadow-2xl cursor-pointer select-none transition-all flex flex-col justify-between group
+          dark:bg-gradient-to-br dark:from-[#0c101c] dark:via-[#0c101c] dark:to-cyan-950/20 dark:border dark:border-cyan-500/25 dark:hover:border-cyan-400/60 dark:hover:shadow-[0_0_24px_rgba(0,240,255,0.2)]
+          light:bg-white light:border light:border-slate-200 light:hover:border-sky-400 light:hover:shadow-xl light:shadow-md"
       >
         {/* Top Badges */}
-        <div className="flex items-center justify-between gap-2 mb-4">
-          <span className="px-3 py-1 rounded-full text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+        <div className="flex items-center justify-between gap-2 mb-4 font-mono">
+          <span className="px-3 py-1 rounded-full text-xs font-bold border
+            dark:bg-cyan-500/20 dark:text-cyan-300 dark:border-cyan-500/30
+            light:bg-sky-50 light:text-sky-800 light:border-sky-200"
+          >
             {currentCard.category}
           </span>
-          <span className="text-xs font-semibold text-slate-400">
+          <span className="text-xs font-semibold dark:text-slate-400 light:text-slate-500">
             Сложность: {currentCard.difficulty}
           </span>
         </div>
@@ -144,37 +160,43 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
         <div className="my-auto">
           {!isFlipped ? (
             <div className="space-y-4 animate-in fade-in zoom-in-95 duration-200">
-              <span className="text-xs font-bold text-sky-400 uppercase tracking-wider block">
+              <span className="text-xs font-bold uppercase tracking-wider block font-mono dark:text-cyan-400 light:text-sky-700">
                 Вопрос собеседования:
               </span>
-              <h3 className="text-lg sm:text-xl font-black text-white leading-snug">
+              <h3 className="text-lg sm:text-xl font-black leading-snug font-sans dark:text-white light:text-slate-900">
                 {currentCard.title}
               </h3>
-              <p className="text-sm text-slate-300 leading-relaxed">
+              <p className="text-sm leading-relaxed dark:text-slate-300 light:text-slate-600">
                 {currentCard.question}
               </p>
             </div>
           ) : (
             <div className="space-y-4 animate-in fade-in zoom-in-95 duration-200">
-              <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider block">
+              <span className="text-xs font-bold uppercase tracking-wider block font-mono dark:text-emerald-400 light:text-emerald-700">
                 Развернутый ответ:
               </span>
-              <p className="text-sm text-slate-200 leading-relaxed bg-slate-950/70 p-4 rounded-2xl border border-slate-800/80">
+              <p className="text-sm leading-relaxed p-4 rounded-2xl border transition-colors
+                dark:bg-[#06080f]/80 dark:border-slate-800/80 dark:text-slate-200
+                light:bg-slate-50 light:border-slate-200 light:text-slate-800"
+              >
                 {currentCard.answer}
               </p>
 
               {currentCard.codeSnippet && (
-                <pre className="p-3 bg-slate-950 rounded-xl border border-slate-800 text-xs font-mono text-emerald-300 overflow-x-auto">
+                <pre className="p-3 rounded-xl border text-xs font-mono text-emerald-300 overflow-x-auto
+                  dark:bg-[#06080f] dark:border-slate-800
+                  light:bg-slate-900 light:border-slate-800"
+                >
                   <code>{currentCard.codeSnippet}</code>
                 </pre>
               )}
 
               <div className="space-y-1">
-                <span className="text-xs font-semibold text-slate-400 block">Ключевые тезисы:</span>
-                <ul className="text-xs text-slate-300 space-y-1">
+                <span className="text-xs font-semibold block font-mono dark:text-slate-400 light:text-slate-500">Ключевые тезисы:</span>
+                <ul className="text-xs space-y-1 dark:text-slate-300 light:text-slate-600">
                   {currentCard.keyTakeaways.map((t, idx) => (
                     <li key={idx} className="flex items-start gap-1.5">
-                      <span className="text-indigo-400">•</span>
+                      <span className="dark:text-cyan-400 light:text-sky-600">•</span>
                       <span>{t}</span>
                     </li>
                   ))}
@@ -185,21 +207,26 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
         </div>
 
         {/* Flip hint at bottom */}
-        <div className="pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-500">
+        <div className="pt-4 border-t flex items-center justify-between text-xs font-mono
+          dark:border-slate-800/80 dark:text-slate-500
+          light:border-slate-200 light:text-slate-500"
+        >
           <span className="flex items-center gap-1.5">
-            <Eye className="w-3.5 h-3.5 text-indigo-400" />
+            <Eye className="w-3.5 h-3.5 dark:text-cyan-400 light:text-sky-600" />
             {isFlipped ? 'Нажмите, чтобы вернуться к вопросу' : 'Нажмите, чтобы увидеть ответ'}
           </span>
-          <span className="text-[11px] hidden sm:inline text-slate-600">Клик по карточке переворачивает</span>
+          <span className="text-[11px] hidden sm:inline opacity-70">Клик по карточке переворачивает</span>
         </div>
       </div>
 
       {/* Navigation and Rating Actions */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 font-mono">
         <button
           onClick={handlePrev}
           disabled={currentIndex === 0}
-          className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 text-xs font-semibold transition-colors disabled:opacity-40"
+          className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border text-xs font-semibold transition-colors disabled:opacity-40
+            dark:bg-[#06080f] dark:hover:bg-slate-800 dark:border-slate-800 dark:text-slate-300
+            light:bg-white light:hover:bg-slate-100 light:border-slate-200 light:text-slate-700 shadow-sm"
         >
           <ChevronLeft className="w-4 h-4" />
           <span>Назад</span>
@@ -207,7 +234,9 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
 
         <button
           onClick={handleRepeat}
-          className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-amber-600/20 hover:bg-amber-600/30 border border-amber-500/40 text-amber-300 text-xs font-bold transition-all active:scale-95"
+          className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-95 border
+            dark:bg-amber-600/20 dark:hover:bg-amber-600/30 dark:border-amber-500/40 dark:text-amber-300
+            light:bg-amber-100 light:hover:bg-amber-200 light:border-amber-300 light:text-amber-800"
         >
           <RotateCcw className="w-4 h-4" />
           <span>Повторить</span>
@@ -215,7 +244,9 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
 
         <button
           onClick={handleLearned}
-          className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/40 text-emerald-300 text-xs font-bold transition-all active:scale-95"
+          className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-95 border
+            dark:bg-emerald-600/20 dark:hover:bg-emerald-600/30 dark:border-emerald-500/40 dark:text-emerald-300
+            light:bg-emerald-600 light:hover:bg-emerald-500 light:text-white light:border-emerald-600 shadow-sm"
         >
           <CheckCircle2 className="w-4 h-4" />
           <span>Знаю отлично</span>
@@ -224,7 +255,9 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
         <button
           onClick={handleNext}
           disabled={currentIndex === deck.length - 1}
-          className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 text-xs font-semibold transition-colors disabled:opacity-40"
+          className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border text-xs font-semibold transition-colors disabled:opacity-40
+            dark:bg-[#06080f] dark:hover:bg-slate-800 dark:border-slate-800 dark:text-slate-300
+            light:bg-white light:hover:bg-slate-100 light:border-slate-200 light:text-slate-700 shadow-sm"
         >
           <span>Вперед</span>
           <ChevronRight className="w-4 h-4" />

@@ -3,6 +3,27 @@ import type { Internship, TelegramSubscription, UserProgress } from '../types';
 const PROGRESS_STORAGE_KEY = 'it_start_user_progress';
 const SUBSCRIPTION_STORAGE_KEY = 'it_start_local_subscription';
 const INTERNSHIPS_STORAGE_KEY = 'it_start_cached_internships';
+const THEME_STORAGE_KEY = 'it_start_theme';
+
+export function getLocalTheme(): 'dark' | 'light' {
+  if (typeof window === 'undefined') return 'dark';
+  try {
+    const raw = localStorage.getItem(THEME_STORAGE_KEY);
+    if (raw === 'light' || raw === 'dark') return raw;
+    return 'dark';
+  } catch {
+    return 'dark';
+  }
+}
+
+export function saveLocalTheme(theme: 'dark' | 'light'): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(THEME_STORAGE_KEY, theme);
+  } catch (e) {
+    console.warn('Failed to save theme to localStorage:', e);
+  }
+}
 
 export function getLocalProgress(): UserProgress {
   if (typeof window === 'undefined') {
