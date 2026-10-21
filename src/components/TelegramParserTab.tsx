@@ -675,6 +675,17 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
       addLog('success', `Push-уведомление успешно доставлено в Telegram для Chat ID: ${targetChat}`);
     }
 
+    // 5. Send VK push if peer ID is configured
+    if (vkPeerId) {
+      const isWeb = post.sourceType === 'website' || post.channelHandle.startsWith('http');
+      const vkMsg = `🔥 Новая вакансия из мониторинга!\n\n🏢 ${post.company} — ${post.title}\n💰 Зарплата: ${post.salary} | 📍 Формат: ${post.format}\n📢 Источник: ${post.channelHandle} (${isWeb ? 'Карьерный сайт' : 'Telegram'})\n\n🔗 Откликнуться: ${post.url || GITHUB_PAGES_URL}`;
+      sendVkMessage(vkPeerId, vkMsg, vkTokenInput.trim() || undefined).then((res) => {
+        if (res.success) {
+          addLog('success', `Push-уведомление успешно доставлено в VK (Peer ID: ${vkPeerId})`);
+        }
+      }).catch(() => {});
+    }
+
     setPublishingPostId(null);
     triggerHaptic('success');
     confetti({ particleCount: 50, spread: 60 });
@@ -805,13 +816,26 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
       }
     }
 
+    // Dispatch to VK if configured
+    if (vkPeerId) {
+      addLog('info', `Отправка уведомления о вакансии в VK подписчику (Peer ID: ${vkPeerId})...`);
+      const vkNotificationMsg = `🔥 Новая стажировка под твой стек!\n\n🏢 ${customCompany} — ${customTitle} (${dirTitle} / ${subTrackTitle})\n💰 Зарплата: ${customSalary}\n📢 Источник: ${customChannel}\n\n🎯 Персональный план подготовки доступен в IT-Старт:\n${GITHUB_PAGES_URL}`;
+      sendVkMessage(vkPeerId, vkNotificationMsg, vkTokenInput.trim() || undefined).then((res) => {
+        if (res.success) {
+          addLog('success', `Уведомление в VK успешно отправлено на Peer ID ${vkPeerId}`);
+        } else {
+          addLog('warning', `Не удалось отправить в VK: ${res.error}`);
+        }
+      }).catch(() => {});
+    }
+
     setIsPublishing(false);
     triggerHaptic('success');
     confetti({ particleCount: 100, spread: 80 });
 
     addLog(
       'success',
-      `Публикация завершена! Вакансия добавлена в ленту сайта. Разослано уведомлений: ${successCount} из ${recipientCount}.`
+      `Публикация завершена! Вакансия добавлена в ленту сайта. Разослано уведомлений в Telegram: ${successCount} из ${recipientCount}${vkPeerId ? ', также отправлено в VK' : ''}.`
     );
   };
 
@@ -1868,8 +1892,8 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
               <Send className={`w-5 h-5 ${isPublishing ? 'animate-spin' : ''}`} />
               <span>
                 {isPublishing
-                  ? 'Публикация и рассылка уведомлений в Telegram...'
-                  : 'Опубликовать стажировку и разослать уведомления в Telegram! 🚀'}
+                  ? 'Публикация и рассылка уведомлений в Telegram & VK...'
+                  : 'Опубликовать стажировку и разослать уведомления в Telegram & VK! 🚀'}
               </span>
             </button>
           </div>

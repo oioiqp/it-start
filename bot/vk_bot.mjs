@@ -16,6 +16,7 @@
  *   VK_BOT_TOKEN="ВАШ_ТОКЕН_ГРУППЫ" node bot/vk_bot.mjs
  */
 
+import http from 'node:http';
 import {
   COMPANIES_DATA,
   findCompanyByQuery,
@@ -51,9 +52,15 @@ export const VK_BOT_CONFIG = {
 // In-memory subscribers store for VK push notifications
 export const vkSubscribers = new Map();
 
-// Helper: strip HTML tags for VK messages
+// Helper: strip HTML tags & entities for VK messages
 export function cleanHtmlForVk(html = '') {
   return String(html)
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'")
+    .replace(/&amp;/gi, '&')
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
     .replace(/<br\s*\/?>/gi, '\n')
     .replace(/<b>(.*?)<\/b>/gi, '$1')
     .replace(/<strong>(.*?)<\/strong>/gi, '$1')
@@ -184,8 +191,7 @@ export const COMPANIES_VK_KEYBOARD = createVkKeyboard({
       { label: 'VK', payload: { cmd: 'company', id: 'vk' }, color: 'secondary' },
     ],
     [
-      { label: '💼 Все стажировки', payload: { cmd: 'vacancies' }, color: 'positive' },
-      { label: '🚀 Платформа IT-Старт', link: GITHUB_PAGES_URL },
+      { label: '💼 Все стажировки в IT-Старт', link: GITHUB_PAGES_URL },
     ],
   ],
 });
@@ -312,6 +318,13 @@ export async function getVkSubscribers() {
   return Array.from(vkSubscribers.values()).filter((s) => s.is_active);
 }
 
+// Cache of already notified VK subscribers to prevent duplicates on recurring scans
+export const notifiedVkKeys = new Set();
+
+export function clearVkNotifiedCache() {
+  notifiedVkKeys.clear();
+}
+
 /**
  * Notify all VK subscribers about newly parsed vacancies
  */
@@ -321,10 +334,27 @@ export async function notifyVkSubscribers(vacancies = [], token = VK_BOT_TOKEN) 
   if (subscribers.length === 0) return 0;
 
   let sentCount = 0;
-  const sample = vacancies.slice(0, 2);
+  const sample = vacancies.slice(0, 3);
 
   for (const sub of subscribers) {
+    const subDirs = Array.isArray(sub.directions) ? sub.directions : [];
+
     for (const vac of sample) {
+      if (!vac) continue;
+
+      // Filter by subscriber's selected directions if specified
+      const vacDir = vac.directionId || vac.direction;
+      if (subDirs.length > 0 && vacDir && !subDirs.includes(vacDir)) {
+        continue;
+      }
+
+      // Avoid spamming subscriber with same vacancy
+      const dedupeKey = `${sub.peer_id}_${vac.id || vac.title || vac.url}`;
+      if (notifiedVkKeys.has(dedupeKey)) {
+        continue;
+      }
+      notifiedVkKeys.add(dedupeKey);
+
       const msg =
         `🔥 Новая стажировка из мониторинга работодателей!\n\n` +
         `🏢 ${vac.company} — ${vac.title}\n` +
@@ -364,9 +394,17 @@ export async function notifyVkSubscribers(vacancies = [], token = VK_BOT_TOKEN) 
  * Handle incoming VK message and produce reply payload
  */
 export async function handleVkMessage(message, token = VK_BOT_TOKEN) {
+  if (!message) return { ok: false, error: 'Empty message' };
   const peerId = message.peer_id || message.from_id;
-  const textRaw = (message.text || '').trim();
+  if (!peerId) return { ok: false, error: 'Missing peer_id' };
+
+  // Strip VK group/user mention prefix: [club12345|@name] or [public12345|Name] or @name
+  const textRaw = (message.text || '')
+    .replace(/^\[(?:club|public|id)\d+\|[^\]]+\]\s*/i, '')
+    .replace(/^@[\w.\-_]+\s*/i, '')
+    .trim();
   const textLower = textRaw.toLowerCase();
+  const textClean = textLower.replace(/[!.,?]+$/g, '').trim();
 
   let payload = null;
   if (message.payload) {
@@ -379,15 +417,16 @@ export async function handleVkMessage(message, token = VK_BOT_TOKEN) {
 
   const cmd = payload?.cmd || '';
 
-  // 1. «Начать» / /start / Привет / Меню
+  // 1. «Начать» / /start / Привет / Меню / Старт
   if (
     cmd === 'start' ||
-    textLower === 'начать' ||
-    textLower === '/start' ||
-    textLower === 'start' ||
-    textLower === 'привет' ||
-    textLower === 'меню' ||
-    textLower === 'hello'
+    textClean === 'начать' ||
+    textClean === 'старт' ||
+    textClean.startsWith('/start') ||
+    textClean === 'start' ||
+    textClean === 'привет' ||
+    textClean === 'меню' ||
+    textClean === 'hello'
   ) {
     // Auto-register user as subscriber on /start
     await registerVkSubscriber(peerId, { first_name: 'Студент' });
@@ -417,10 +456,15 @@ export async function handleVkMessage(message, token = VK_BOT_TOKEN) {
   }
 
   // 2. «Стажировки» / /vacancies / Вакансии
-  if (cmd === 'vacancies' || textLower.startsWith('/vacancies') || textLower === 'стажировки' || textLower === 'вакансии') {
+  if (
+    cmd === 'vacancies' ||
+    textClean.startsWith('/vacancies') ||
+    textClean === 'стажировки' ||
+    textClean === 'вакансии'
+  ) {
     // Check if arguments supplied (e.g. /vacancies t1 or /vacancies frontend)
     const parts = textRaw.split(/\s+/);
-    const arg = parts.length > 1 ? parts[1].toLowerCase() : '';
+    const arg = parts.length > 1 ? parts.slice(1).join(' ').trim().toLowerCase() : '';
 
     const allVacancies = await getActiveInternships();
 
@@ -460,9 +504,31 @@ export async function handleVkMessage(message, token = VK_BOT_TOKEN) {
     return { ok: true, type: 'vacancies', reply, count: filtered.length };
   }
 
+  // Direction aliases dictionary for Russian & English commands
+  const dirAliases = {
+    frontend: ['frontend', 'фронтенд', 'фронт', '/frontend', 'react', 'веб'],
+    backend: ['backend', 'бэкенд', 'бек', 'бэк', '/backend', 'python', 'java', 'go', 'golang'],
+    mobile: ['mobile', 'мобилка', 'мобильная', 'android', 'ios', 'flutter', '/mobile'],
+    data_science: ['data_science', 'datascience', 'data science', 'ds', 'ml', 'дата сайнс', 'машинное обучение', '/data_science'],
+    qa: ['qa', 'тестирование', 'тестировщик', 'кьюа', 'тест', '/qa'],
+    devops: ['devops', 'девопс', 'инфраструктура', 'sre', 'docker', 'кубер', '/devops'],
+  };
+
+  let matchedDirId = null;
+  if (cmd === 'direction' && payload?.id) {
+    matchedDirId = payload.id;
+  } else {
+    for (const [dirKey, aliases] of Object.entries(dirAliases)) {
+      if (aliases.includes(textClean) || aliases.includes(textLower)) {
+        matchedDirId = dirKey;
+        break;
+      }
+    }
+  }
+
   // 3. Direction selection (Frontend, Backend, Mobile, Data Science, QA, DevOps)
-  if (cmd === 'direction' || ['/frontend', '/backend', '/mobile', '/qa', '/devops', '/data_science'].includes(textLower)) {
-    const dirId = payload?.id || textLower.replace('/', '');
+  if (matchedDirId) {
+    const dirId = matchedDirId;
     const allVacancies = await getActiveInternships();
     const filtered = allVacancies.filter((v) => (v.directionId || '').toLowerCase() === dirId.toLowerCase());
 
@@ -495,7 +561,7 @@ export async function handleVkMessage(message, token = VK_BOT_TOKEN) {
   }
 
   // 4. «Компании» / /companies
-  if (cmd === 'companies' || textLower === '/companies' || textLower === 'компании') {
+  if (cmd === 'companies' || textClean === '/companies' || textClean === 'компании') {
     let text = `🏢 Целевые IT-компании и программы стажировок:\n\n`;
 
     COMPANIES_DATA.forEach((c, idx) => {
@@ -524,12 +590,12 @@ export async function handleVkMessage(message, token = VK_BOT_TOKEN) {
   let targetCompany = null;
   if (cmd === 'company' && payload?.id) {
     targetCompany = findCompanyByQuery(payload.id);
-  } else if (textLower.startsWith('/company_')) {
-    const compId = textLower.replace('/company_', '');
+  } else if (textClean.startsWith('/company_')) {
+    const compId = textClean.replace('/company_', '');
     targetCompany = findCompanyByQuery(compId);
   } else {
     // Check if the whole message is a company alias
-    const matched = findCompanyByQuery(textLower);
+    const matched = findCompanyByQuery(textClean) || findCompanyByQuery(textLower);
     if (matched) {
       targetCompany = matched;
     }
@@ -575,7 +641,7 @@ export async function handleVkMessage(message, token = VK_BOT_TOKEN) {
   }
 
   // 6. «Роадмапы» / /roadmaps
-  if (cmd === 'roadmaps' || textLower === '/roadmaps' || textLower === 'роадмапы') {
+  if (cmd === 'roadmaps' || textClean === '/roadmaps' || textClean === 'роадмапы') {
     const text =
       `🗺 Интерактивные роадмапы подготовки к стажировкам:\n\n` +
       `Платформа IT-Старт содержит структурированные карты развития по 6 направлениям:\n` +
@@ -610,7 +676,7 @@ export async function handleVkMessage(message, token = VK_BOT_TOKEN) {
   }
 
   // 7. «Вопросы» / /questions
-  if (cmd === 'questions' || textLower === '/questions' || textLower === 'вопросы' || textLower === 'собеседование') {
+  if (cmd === 'questions' || textClean === '/questions' || textClean === 'вопросы' || textClean === 'собеседование') {
     const text =
       `❓ Тренажёр вопросов к собеседованию IT-Старт:\n\n` +
       `В приложении доступна библиотека из 55+ детально разобранных вопросов:\n` +
@@ -644,7 +710,7 @@ export async function handleVkMessage(message, token = VK_BOT_TOKEN) {
   }
 
   // 8. «Подписка» / /subscribe
-  if (cmd === 'subscribe' || textLower === '/subscribe' || textLower === 'подписка' || textLower === 'подписаться') {
+  if (cmd === 'subscribe' || textClean === '/subscribe' || textClean === 'подписка' || textClean === 'подписаться') {
     await registerVkSubscriber(peerId, { first_name: 'Пользователь VK' });
 
     const text =
@@ -666,7 +732,7 @@ export async function handleVkMessage(message, token = VK_BOT_TOKEN) {
   }
 
   // 9. «Отписаться» / /unsubscribe
-  if (cmd === 'unsubscribe' || textLower === '/unsubscribe' || textLower === 'отписаться') {
+  if (cmd === 'unsubscribe' || textClean === '/unsubscribe' || textClean === 'отписаться') {
     await unregisterVkSubscriber(peerId);
 
     const text = `❌ Вы отписались от уведомлений в VK. Чтобы возобновить рассылку, отправьте команду /subscribe.`;
@@ -687,11 +753,11 @@ export async function handleVkMessage(message, token = VK_BOT_TOKEN) {
   // 10. «Статус» / /status / /scan / /sync
   if (
     cmd === 'status' ||
-    textLower === '/status' ||
-    textLower === 'статус' ||
-    textLower === '/scan' ||
-    textLower === '/sync' ||
-    textLower === '/parse'
+    textClean === '/status' ||
+    textClean === 'статус' ||
+    textClean === '/scan' ||
+    textClean === '/sync' ||
+    textClean === '/parse'
   ) {
     const text =
       `⚡ Статус сервиса IT-Старт & VK Bot:\n\n` +
@@ -719,7 +785,7 @@ export async function handleVkMessage(message, token = VK_BOT_TOKEN) {
   }
 
   // 11. «Помощь» / /help
-  if (cmd === 'help' || textLower === '/help' || textLower === 'помощь' || textLower === 'справка') {
+  if (cmd === 'help' || textClean === '/help' || textClean === 'помощь' || textClean === 'справка') {
     const text =
       `ℹ️ Команды бота IT-Старт ВКонтакте:\n\n` +
       `• Начать / /start — Главное меню и клавиатура\n` +
@@ -863,13 +929,14 @@ export async function startVkBot(token = VK_BOT_TOKEN, options = {}) {
       }
 
       try {
-        const pollUrl = `${server}?act=a_check&key=${key}&ts=${ts}&wait=25`;
+        const host = server.startsWith('http://') || server.startsWith('https://') ? server : `https://${server}`;
+        const pollUrl = `${host}?act=a_check&key=${key}&ts=${ts}&wait=25`;
         const res = await fetch(pollUrl, { signal: pollingAbortController?.signal });
         const data = await res.json();
 
         if (data.failed === 1) {
           ts = data.ts;
-        } else if (data.failed === 2 || data.failed === 3) {
+        } else if (data.failed === 2 || data.failed === 3 || data.failed === 4) {
           serverReady = await getLongPollServer();
         } else if (data.ts) {
           ts = data.ts;
@@ -907,7 +974,7 @@ export function stopVkBot() {
   }
 }
 
-// Auto-start when executed directly from CLI: node bot/vk_bot.mjs
+// Auto-start and HTTP health check server when executed directly from CLI: node bot/vk_bot.mjs
 if (process.env.NODE_ENV !== 'test') {
   const isDirect =
     process.argv[1] &&
@@ -915,6 +982,40 @@ if (process.env.NODE_ENV !== 'test') {
 
   if (isDirect) {
     startVkBot().catch((e) => console.error('[VK Bot Startup Fatal]', e));
+
+    // HTTP Health Check server for Render.com Web Service
+    const VK_PORT = process.env.PORT || 3001;
+    const httpServer = http.createServer((req, res) => {
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+      if (req.method === 'OPTIONS') {
+        res.writeHead(204);
+        res.end();
+        return;
+      }
+
+      const urlPath = (req.url || '/').split('?')[0];
+      if (urlPath === '/health' || urlPath === '/status' || urlPath === '/vk/status') {
+        res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+        res.end(JSON.stringify(getVkBotStatus()));
+        return;
+      }
+
+      res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+      res.end('IT-Старт VK Bot работает 24/7! (Render Health Check OK)\n');
+    });
+
+    httpServer.listen(VK_PORT, () => {
+      console.log(`🌐 HTTP Health Check сервер VK-бота запущен на порту ${VK_PORT}`);
+    }).on('error', (err) => {
+      if (err.code === 'EADDRINUSE') {
+        console.warn(`[VK HTTP] Порт ${VK_PORT} уже используется, бот продолжает работу.`);
+      } else {
+        console.warn('[VK HTTP Server Warning]', err.message);
+      }
+    });
 
     process.on('SIGINT', () => {
       console.log('\nОстановка VK-бота...');

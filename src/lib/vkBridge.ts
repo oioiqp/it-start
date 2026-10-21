@@ -61,16 +61,33 @@ declare global {
  * Parse vk_* launch parameters from a query string or current window.location.search
  */
 export function parseVkLaunchParams(searchString?: string): VkLaunchParams {
-  const search =
+  let search =
     searchString !== undefined
       ? searchString
       : typeof window !== 'undefined'
       ? window.location.search
       : '';
 
+  // If search query is empty, check hash query (for SPA / GitHub Pages routing)
+  if (!search && typeof window !== 'undefined' && window.location.hash.includes('vk_')) {
+    const qIndex = window.location.hash.indexOf('?');
+    if (qIndex !== -1) {
+      search = window.location.hash.slice(qIndex);
+    } else {
+      search = window.location.hash.slice(1);
+    }
+  }
+
   if (!search) return {};
 
-  const clean = search.startsWith('?') ? search.slice(1) : search;
+  let clean = search;
+  const qIndex = clean.indexOf('?');
+  if (qIndex !== -1) {
+    clean = clean.slice(qIndex + 1);
+  } else if (clean.startsWith('#')) {
+    clean = clean.slice(1);
+  }
+
   const params = new URLSearchParams(clean);
   const result: VkLaunchParams = {};
 

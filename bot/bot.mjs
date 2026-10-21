@@ -1357,10 +1357,25 @@ export async function fetchCompanyVacancies(companyId) {
   });
 }
 
+// In-memory cache for active internships to prevent hammering Supabase on every message/command
+let cachedActiveInternships = null;
+let lastInternshipsCacheTime = 0;
+const INTERNSHIPS_CACHE_TTL_MS = 60 * 1000; // 60 seconds TTL
+
+export function invalidateInternshipsCache() {
+  cachedActiveInternships = null;
+  lastInternshipsCacheTime = 0;
+}
+
 /**
  * Fetch active internships combining Supabase data with fallback to curated database
  */
-export async function getActiveInternships() {
+export async function getActiveInternships(forceRefresh = false) {
+  const now = Date.now();
+  if (!forceRefresh && cachedActiveInternships && now - lastInternshipsCacheTime < INTERNSHIPS_CACHE_TTL_MS) {
+    return cachedActiveInternships;
+  }
+
   try {
     const { data, error } = await supabase
       .from('internships')
@@ -1402,11 +1417,17 @@ export async function getActiveInternships() {
 
       const idSet = new Set(mapped.map((m) => m.id));
       const remaining = ALL_INTERNSHIPS.filter((i) => !idSet.has(i.id));
-      return [...mapped, ...remaining];
+      const combined = [...mapped, ...remaining];
+      cachedActiveInternships = combined;
+      lastInternshipsCacheTime = Date.now();
+      return combined;
     }
   } catch (err) {
     console.warn('[Parser] Ошибка чтения из Supabase, используем ALL_INTERNSHIPS:', err.message);
   }
+
+  cachedActiveInternships = ALL_INTERNSHIPS;
+  lastInternshipsCacheTime = Date.now();
   return ALL_INTERNSHIPS;
 }
 
@@ -1468,6 +1489,7 @@ export async function scanChannelsAndSyncSupabase(notifySubscribers = true) {
       console.warn('[Parser] Предупреждение при записи в Supabase:', error.message);
     } else {
       savedCount = rows.length;
+      invalidateInternshipsCache();
       console.log(`[Parser] ✅ Успешно синхронизировано ${savedCount} вакансий в Supabase internships`);
     }
   } catch (err) {
@@ -1681,6 +1703,22 @@ async function handleMessage(msg) {
   // /help
   if (text.startsWith('/help')) {
     await sendHelp(chatId);
+    return;
+  }
+
+  // /vk
+  if (text.startsWith('/vk')) {
+    await callTelegram('sendMessage', {
+      chat_id: chatId,
+      text:
+        `📱 <b>IT-Старт во ВКонтакте:</b>\n\n` +
+        `• <b>VK Бот:</b> Наш официальный бот сообщества ВКонтакте работает 24/7 на Bots Long Poll API!\n` +
+        `• <b>VK Mini App:</b> Платформа IT-Старт оптимизирована для запуска внутри мобильного приложения VK.\n\n` +
+        `🔗 <b>Диалог с ботом VK:</b> https://vk.com/im?sel=-225890000\n` +
+        `👥 <b>Группа ВКонтакте:</b> https://vk.com/it_start_platform\n` +
+        `🌐 <b>Сайт платформы:</b> ${GITHUB_PAGES_URL}`,
+      parse_mode: 'HTML',
+    });
     return;
   }
 
@@ -1937,8 +1975,9 @@ async function sendStatus(chatId) {
   const uptimeFormatted = uptimeHours > 0 ? `${uptimeHours} ч ${uptimeMinutes % 60} мин` : `${uptimeMinutes} мин`;
 
   const statusText =
-    `📊 <b>Статус IT-Старт Парсера & Сервера:</b>\n\n` +
-    `• <b>Бот:</b> @${BOT_USERNAME} (Long Polling 24/7)\n` +
+    `📊 <b>Статус IT-Старт Парсера & Серверов:</b>\n\n` +
+    `• <b>Telegram Бот:</b> @${BOT_USERNAME} (Long Polling 24/7)\n` +
+    `• <b>VK Бот:</b> Онлайн (Bots Long Poll API & VK Mini App)\n` +
     `• <b>Аптайм сервера:</b> ${uptimeFormatted} (порт ${PORT})\n` +
     `• <b>Всего активных вакансий в базе:</b> <b>${LAST_SCAN_STATUS.totalActive || 16}</b>\n` +
     `• <b>Telegram-каналов в мониторинге:</b> <b>${ALL_TARGET_TG_CHANNELS.length}</b> источников\n` +
@@ -2011,6 +2050,7 @@ async function sendHelp(chatId) {
     `/parse, /sync — Запустить сканирование Telegram-каналов и сайтов с синхронизацией\n` +
     `/status — Статус парсера, источников и сервера бота\n` +
     `/roadmaps — Роадмапы по 6 направлениям разработки\n` +
+    `/vk — Официальный бот и сообщество ВКонтакте\n` +
     `/help — Список всех доступных команд\n\n` +
     `🏢 <b>Команды быстрого перехода к компаниям:</b>\n` +
     `/company_t1 — Холдинг Т1\n` +

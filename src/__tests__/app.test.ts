@@ -767,6 +767,12 @@ describe('12. VKontakte (VK) Bot & VK Mini App Integration', () => {
     // Empty search string returns empty object
     expect(parseVkLaunchParams('')).toEqual({});
 
+    // Parse from hash string (for SPA and GitHub Pages 404 routing)
+    const hashParsed = parseVkLaunchParams('#/?vk_user_id=777666&vk_app_id=51800000&vk_platform=desktop_web');
+    expect(hashParsed.vk_user_id).toBe(777666);
+    expect(hashParsed.vk_app_id).toBe(51800000);
+    expect(hashParsed.vk_platform).toBe('desktop_web');
+
     // Detect VK environment when window.vkBridge is present
     (window as any).vkBridge = {
       send: async (method: string) => {
@@ -844,13 +850,17 @@ describe('12. VKontakte (VK) Bot & VK Mini App Integration', () => {
 
     // 1. cleanHtmlForVk
     expect(typeof vkBotModule.cleanHtmlForVk).toBe('function');
-    const dirtyHtml = '🔥 <b>Новая стажировка!</b><br>Компания: <a href="https://t1.ru">Т1</a> <code>Java</code>';
+    const dirtyHtml = '🔥 <b>Новая стажировка!</b><br>Компания:&nbsp;<a href="https://t1.ru">Т1</a> &amp; <code>Java</code> &quot;Открытая школа&quot;';
     const cleaned = vkBotModule.cleanHtmlForVk(dirtyHtml);
     expect(cleaned).toContain('Новая стажировка!');
     expect(cleaned).not.toContain('<b>');
     expect(cleaned).not.toContain('</b>');
     expect(cleaned).not.toContain('<code>');
+    expect(cleaned).not.toContain('&nbsp;');
+    expect(cleaned).not.toContain('&amp;');
+    expect(cleaned).not.toContain('&quot;');
     expect(cleaned).toContain('Т1 (https://t1.ru)');
+    expect(cleaned).toContain('"Открытая школа"');
 
     // 2. createVkKeyboard
     expect(typeof vkBotModule.createVkKeyboard).toBe('function');
@@ -888,12 +898,21 @@ describe('12. VKontakte (VK) Bot & VK Mini App Integration', () => {
     expect(msg).toContain('от 70 000 ₽');
     expect(msg).toContain('https://t1.ru/school/');
 
-    // 4. Predefined keyboards
+    // 4. Predefined keyboards and VK API Inline 10-button limit
     expect(vkBotModule.MAIN_VK_KEYBOARD).toBeDefined();
     expect(vkBotModule.VACANCIES_VK_KEYBOARD).toBeDefined();
     expect(vkBotModule.COMPANIES_VK_KEYBOARD).toBeDefined();
+
     const mainKbParsed = JSON.parse(vkBotModule.MAIN_VK_KEYBOARD);
     expect(mainKbParsed.buttons.length).toBeGreaterThanOrEqual(3);
+
+    const vacKbParsed = JSON.parse(vkBotModule.VACANCIES_VK_KEYBOARD);
+    const vacTotalButtons = vacKbParsed.buttons.flat().length;
+    expect(vacTotalButtons).toBeLessThanOrEqual(10); // VK inline keyboard hard limit
+
+    const compKbParsed = JSON.parse(vkBotModule.COMPANIES_VK_KEYBOARD);
+    const compTotalButtons = compKbParsed.buttons.flat().length;
+    expect(compTotalButtons).toBeLessThanOrEqual(10); // VK inline keyboard hard limit
   });
 
   it('validates VK bot command handlers in bot/vk_bot.mjs (start, vacancies, companies, roadmaps, questions, subscribe, status, help)', async () => {
@@ -980,33 +999,82 @@ describe('12. VKontakte (VK) Bot & VK Mini App Integration', () => {
     expect(helpRes.type).toBe('help');
     expect(helpRes.reply.message).toContain('Команды');
 
-    // 11. Unknown command fallback
+    // 11. Russian direction keyword commands («фронтенд», «бэкенд»)
+    const frontRes = await vkBotModule.handleVkMessage({ peer_id: 1001, text: 'фронтенд' });
+    expect(frontRes.ok).toBe(true);
+    expect(frontRes.type).toBe('direction');
+    expect(frontRes.directionId).toBe('frontend');
+
+    const backRes = await vkBotModule.handleVkMessage({ peer_id: 1001, text: 'бэкенд' });
+    expect(backRes.ok).toBe(true);
+    expect(backRes.type).toBe('direction');
+    expect(backRes.directionId).toBe('backend');
+
+    // 12. Group conversation mention stripping: [club225890000|IT-Старт] /vacancies & @mention
+    const groupMentionRes = await vkBotModule.handleVkMessage({
+      peer_id: 2000000001,
+      text: '[club225890000|IT-Старт] /vacancies',
+    });
+    expect(groupMentionRes.ok).toBe(true);
+    expect(groupMentionRes.type).toBe('vacancies');
+
+    const atMentionRes = await vkBotModule.handleVkMessage({
+      peer_id: 2000000001,
+      text: '@it_start_platform стажировки',
+    });
+    expect(atMentionRes.ok).toBe(true);
+    expect(atMentionRes.type).toBe('vacancies');
+
+    // 13. Russian aliases with punctuation («Привет!», «Старт»)
+    const privetExclRes = await vkBotModule.handleVkMessage({ peer_id: 1001, text: 'Привет!' });
+    expect(privetExclRes.ok).toBe(true);
+    expect(privetExclRes.type).toBe('start');
+
+    const startRusRes = await vkBotModule.handleVkMessage({ peer_id: 1001, text: 'Старт' });
+    expect(startRusRes.ok).toBe(true);
+    expect(startRusRes.type).toBe('start');
+
+    // 14. Edge cases: null message, empty message, missing peer_id
+    expect((await vkBotModule.handleVkMessage(null)).ok).toBe(false);
+    expect((await vkBotModule.handleVkMessage({})).ok).toBe(false);
+
+    // 15. Unknown command fallback
     const unknownRes = await vkBotModule.handleVkMessage({ peer_id: 1001, text: 'абракадабра123' });
     expect(unknownRes.ok).toBe(true);
     expect(unknownRes.type).toBe('unknown');
-  });
+  }, 15000);
 
   it('validates VK subscribers management and notification push in bot/vk_bot.mjs', async () => {
     // @ts-ignore
     const vkBotModule: any = await import('../../bot/vk_bot.mjs');
+
+    // Reset deduplication cache
+    if (typeof vkBotModule.clearVkNotifiedCache === 'function') {
+      vkBotModule.clearVkNotifiedCache();
+    }
 
     // Register subscriber
     await vkBotModule.registerVkSubscriber('999901', { first_name: 'Тестер' });
     const subs = await vkBotModule.getVkSubscribers();
     expect(subs.some((s: any) => s.peer_id === '999901')).toBe(true);
 
-    // Push notification to subscribers
-    const sentCount = await vkBotModule.notifyVkSubscribers([
-      {
-        company: 'Холдинг Т1',
-        title: 'Стажёр Java (Открытая школа)',
-        salary: '80 000 ₽',
-        format: 'Удаленно',
-        sourceChannel: '@t1career',
-        url: 'https://t1.ru/school/',
-      },
-    ]);
-    expect(sentCount).toBeGreaterThanOrEqual(1);
+    const testVacancy = {
+      id: 'test-vac-001',
+      company: 'Холдинг Т1',
+      title: 'Стажёр Java (Открытая школа)',
+      salary: '80 000 ₽',
+      format: 'Удаленно',
+      sourceChannel: '@t1career',
+      url: 'https://t1.ru/school/',
+    };
+
+    // First push notification to subscribers
+    const sentCount1 = await vkBotModule.notifyVkSubscribers([testVacancy]);
+    expect(sentCount1).toBeGreaterThanOrEqual(1);
+
+    // Second push with same vacancy should be deduplicated (sentCount === 0)
+    const sentCount2 = await vkBotModule.notifyVkSubscribers([testVacancy]);
+    expect(sentCount2).toBe(0);
 
     // Unregister
     await vkBotModule.unregisterVkSubscriber('999901');
@@ -1029,6 +1097,19 @@ describe('12. VKontakte (VK) Bot & VK Mini App Integration', () => {
     expect(startRes.mode).toBe('fallback');
 
     expect(() => vkBotModule.stopVkBot()).not.toThrow();
+  });
+
+  it('validates VK bot status and cross-integration with server bot', async () => {
+    // @ts-ignore
+    const botModule: any = await import('../../bot/bot.mjs');
+    expect(botModule.LAST_SCAN_STATUS).toBeDefined();
+
+    // @ts-ignore
+    const vkBotModule: any = await import('../../bot/vk_bot.mjs');
+    const vkStatus = vkBotModule.getVkBotStatus();
+    expect(vkStatus.bot).toBe('IT-Старт VK Бот');
+    expect(vkStatus.commandsCount).toBe(8);
+    expect(vkStatus.version).toBe('5.199');
   });
 });
 
