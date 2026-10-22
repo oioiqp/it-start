@@ -5,27 +5,20 @@
 
 @layer base {
   :root {
-    --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    
-    /* Cyberpunk Theme Colors */
-    --cyber-cyan: #00f0ff;
-    --cyber-violet: #818cf8;
-    --cyber-emerald: #00ff9d;
-    --cyber-pink: #ff2a85;
-    --cyber-amber: #f59e0b;
+    --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
   }
 
-  /* Default Dark Mode (Cyberpunk Obsidian / Neo-Tokyo Minimal) */
+  /* Default Dark Mode (Liquid Glass Deep Obsidian) */
   html, body, html.dark, body.dark {
-    background-color: #080b12;
-    color: #f1f5f9;
+    background-color: #09090b;
+    color: #f4f4f5;
   }
 
-  /* Cyberpunk Light Mode (High-Tech Lab Minimal) */
+  /* Light Mode (Liquid Glass Minimalist White Canvas) */
   html.light, body.light {
-    background-color: #f8fafc;
-    color: #0f172a;
+    background-color: #f4f5f7;
+    color: #09090b;
   }
 
   body {
@@ -34,108 +27,70 @@
     margin: 0;
     padding: 0;
     overflow-x: hidden;
-    transition: background-color 0.25s ease, color 0.25s ease;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.25s cubic-bezier(0.16, 1, 0.3, 1), color 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   }
 }
 
-/* Cyberpunk Grid Background */
-.cyber-grid-dark {
+/* Apple Liquid Glass subtle backdrop ambient lighting */
+.liquid-ambient-dark {
+  background-color: #09090b;
   background-image: 
-    linear-gradient(to right, rgba(0, 240, 255, 0.035) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(0, 240, 255, 0.035) 1px, transparent 1px);
-  background-size: 32px 32px;
+    radial-gradient(at 15% 10%, rgba(255, 255, 255, 0.035) 0px, transparent 60%),
+    radial-gradient(at 85% 90%, rgba(255, 255, 255, 0.02) 0px, transparent 50%);
 }
 
-.cyber-grid-light {
+.liquid-ambient-light {
+  background-color: #f4f5f7;
   background-image: 
-    linear-gradient(to right, rgba(2, 132, 199, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(2, 132, 199, 0.05) 1px, transparent 1px);
-  background-size: 32px 32px;
+    radial-gradient(at 10% 0%, rgba(255, 255, 255, 0.9) 0px, transparent 50%),
+    radial-gradient(at 90% 100%, rgba(228, 231, 236, 0.6) 0px, transparent 50%),
+    radial-gradient(at 50% 50%, rgba(245, 246, 249, 0.7) 0px, transparent 80%);
 }
 
-/* Cyberpunk Neon Glow Effects */
-.cyber-glow-cyan {
-  box-shadow: 0 0 16px rgba(0, 240, 255, 0.25), inset 0 0 12px rgba(0, 240, 255, 0.05);
+/* Liquid Glass Cards & Bento Surfaces */
+.glass-panel {
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
 }
 
-.cyber-glow-emerald {
-  box-shadow: 0 0 16px rgba(0, 255, 157, 0.25), inset 0 0 12px rgba(0, 255, 157, 0.05);
+.glass-pill {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
-.cyber-glow-violet {
-  box-shadow: 0 0 16px rgba(129, 140, 248, 0.25), inset 0 0 12px rgba(129, 140, 248, 0.05);
-}
-
-.cyber-glow-pink {
-  box-shadow: 0 0 16px rgba(255, 42, 133, 0.25), inset 0 0 12px rgba(255, 42, 133, 0.05);
-}
-
-/* Futuristic HUD Corners on Cards */
-.cyber-corner {
-  position: relative;
-}
-
-.cyber-corner::before {
-  content: '';
-  position: absolute;
-  top: -1px;
-  left: -1px;
-  width: 8px;
-  height: 8px;
-  border-top: 2px solid currentColor;
-  border-left: 2px solid currentColor;
-  pointer-events: none;
-  border-top-left-radius: 4px;
-}
-
-.cyber-corner::after {
-  content: '';
-  position: absolute;
-  bottom: -1px;
-  right: -1px;
-  width: 8px;
-  height: 8px;
-  border-bottom: 2px solid currentColor;
-  border-right: 2px solid currentColor;
-  pointer-events: none;
-  border-bottom-right-radius: 4px;
-}
-
-/* Custom scrollbars for Cyberpunk Dark & Light */
+/* Custom Minimalist Apple-Style Scrollbars */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
 }
 
 .dark ::-webkit-scrollbar-track,
 ::-webkit-scrollbar-track {
-  background: #06080f;
+  background: transparent;
 }
 
 .light ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: transparent;
 }
 
 .dark ::-webkit-scrollbar-thumb,
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
-  border: 1px solid rgba(0, 240, 255, 0.2);
-  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: 9999px;
 }
 
 .light ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border: 1px solid rgba(2, 132, 199, 0.2);
-  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.16);
+  border-radius: 9999px;
 }
 
 .dark ::-webkit-scrollbar-thumb:hover,
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
-  border-color: rgba(0, 240, 255, 0.5);
+  background: rgba(255, 255, 255, 0.28);
 }
 
 .light ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-  border-color: rgba(2, 132, 199, 0.5);
+  background: rgba(0, 0, 0, 0.28);
 }

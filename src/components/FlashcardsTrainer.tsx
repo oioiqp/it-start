@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
-  RotateCcw,
-  CheckCircle2,
   ChevronLeft,
   ChevronRight,
+  RotateCcw,
+  CheckCircle2,
   Shuffle,
   Eye,
   HelpCircle,
@@ -15,8 +15,8 @@ import { triggerHaptic } from '../lib/telegram';
 interface FlashcardsTrainerProps {
   questions: Question[];
   userProgress: UserProgress;
-  onMarkLearned: (id: string) => void;
-  onMarkRepeat: (id: string) => void;
+  onMarkLearned: (questionId: string) => void;
+  onMarkRepeat: (questionId: string) => void;
 }
 
 export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
@@ -25,11 +25,12 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
   onMarkLearned,
   onMarkRepeat,
 }) => {
-  const [deck, setDeck] = useState<Question[]>([]);
+  const [deck, setDeck] = useState<Question[]>(questions);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [isFlipped, setIsFlipped] = useState<boolean>(false);
 
-  useEffect(() => {
+  // Sync deck when questions filter changes
+  React.useEffect(() => {
     setDeck(questions);
     setCurrentIndex(0);
     setIsFlipped(false);
@@ -37,25 +38,25 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
 
   const currentCard = deck[currentIndex];
 
+  const handleFlip = () => {
+    triggerHaptic('selection');
+    setIsFlipped(!isFlipped);
+  };
+
   const handleNext = () => {
+    triggerHaptic('selection');
     if (currentIndex < deck.length - 1) {
-      triggerHaptic('selection');
-      setIsFlipped(false);
       setCurrentIndex((prev) => prev + 1);
+      setIsFlipped(false);
     }
   };
 
   const handlePrev = () => {
+    triggerHaptic('selection');
     if (currentIndex > 0) {
-      triggerHaptic('selection');
-      setIsFlipped(false);
       setCurrentIndex((prev) => prev - 1);
+      setIsFlipped(false);
     }
-  };
-
-  const handleFlip = () => {
-    triggerHaptic('light');
-    setIsFlipped((prev) => !prev);
   };
 
   const handleShuffle = () => {
@@ -66,16 +67,16 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
     setIsFlipped(false);
   };
 
-  const handleLearned = () => {
-    if (!currentCard) return;
-    triggerHaptic('success');
+  const handleLearned = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    triggerHaptic('medium');
     onMarkLearned(currentCard.id);
-    confetti({ particleCount: 50, spread: 60 });
+    confetti({ particleCount: 30, spread: 50 });
     handleNext();
   };
 
-  const handleRepeat = () => {
-    if (!currentCard) return;
+  const handleRepeat = (e: React.MouseEvent) => {
+    e.stopPropagation();
     triggerHaptic('medium');
     onMarkRepeat(currentCard.id);
     handleNext();
@@ -83,13 +84,13 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
 
   if (!currentCard || deck.length === 0) {
     return (
-      <div className="p-8 text-center rounded-3xl cyber-corner transition-colors
-        dark:bg-[#0c101c] dark:border dark:border-slate-800
-        light:bg-white light:border light:border-slate-200 light:shadow-sm"
+      <div className="p-8 text-center rounded-3xl transition-colors
+        bg-white/80 border border-neutral-200/80 shadow-xs
+        dark:bg-neutral-900/60 dark:border-neutral-800"
       >
-        <HelpCircle className="w-12 h-12 mx-auto mb-3 dark:text-slate-600 light:text-slate-400" />
-        <h3 className="text-lg font-bold mb-1 font-sans dark:text-white light:text-slate-900">Вопросы не найдены</h3>
-        <p className="text-xs dark:text-slate-400 light:text-slate-500">
+        <HelpCircle className="w-12 h-12 mx-auto mb-3 text-neutral-400 dark:text-neutral-600" />
+        <h3 className="text-lg font-bold mb-1 font-sans text-neutral-900 dark:text-white">Вопросы не найдены</h3>
+        <p className="text-xs text-neutral-500 dark:text-neutral-400">
           Попробуйте сбросить фильтры направления или ветки в панели выше.
         </p>
       </div>
@@ -102,23 +103,23 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
   return (
     <div className="max-w-2xl mx-auto space-y-4">
       {/* Top Controls Bar */}
-      <div className="flex items-center justify-between text-xs px-1 font-mono dark:text-slate-400 light:text-slate-600">
+      <div className="flex items-center justify-between text-xs px-1 text-neutral-600 dark:text-neutral-400">
         <div className="flex items-center gap-2">
-          <span className="font-bold text-sm dark:text-white light:text-slate-900">
+          <span className="font-semibold text-sm text-neutral-900 dark:text-white">
             Карточка {currentIndex + 1} из {deck.length}
           </span>
           {isLearned && (
-            <span className="px-2 py-0.5 rounded-full font-bold border
-              dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-500/30
-              light:bg-emerald-100 light:text-emerald-800 light:border-emerald-300"
+            <span className="px-2.5 py-0.5 rounded-full font-medium text-[11px]
+              bg-emerald-500/10 text-emerald-700 border border-emerald-500/20
+              dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30"
             >
               Изучено
             </span>
           )}
           {isRepeat && (
-            <span className="px-2 py-0.5 rounded-full font-bold border
-              dark:bg-amber-500/20 dark:text-amber-300 dark:border-amber-500/30
-              light:bg-amber-100 light:text-amber-800 light:border-amber-300"
+            <span className="px-2.5 py-0.5 rounded-full font-medium text-[11px]
+              bg-amber-500/10 text-amber-700 border border-amber-500/20
+              dark:bg-amber-500/15 dark:text-amber-300 dark:border-amber-500/30"
             >
               На повторение
             </span>
@@ -127,9 +128,9 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
 
         <button
           onClick={handleShuffle}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border transition-colors
-            dark:bg-[#06080f] dark:hover:bg-slate-800 dark:text-slate-300 dark:border-slate-800
-            light:bg-white light:hover:bg-slate-100 light:text-slate-700 light:border-slate-200 shadow-sm"
+          className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border transition-colors
+            bg-white hover:bg-neutral-50 text-neutral-700 border-neutral-200/80 shadow-xs
+            dark:bg-neutral-850 dark:hover:bg-neutral-800 dark:text-neutral-300 dark:border-neutral-750"
         >
           <Shuffle className="w-3.5 h-3.5" />
           <span>Перемешать</span>
@@ -139,19 +140,19 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
       {/* Flashcard interactive body */}
       <div
         onClick={handleFlip}
-        className="relative min-h-[340px] p-6 sm:p-8 rounded-3xl cyber-corner shadow-2xl cursor-pointer select-none transition-all flex flex-col justify-between group
-          dark:bg-gradient-to-br dark:from-[#0c101c] dark:via-[#0c101c] dark:to-cyan-950/20 dark:border dark:border-cyan-500/25 dark:hover:border-cyan-400/60 dark:hover:shadow-[0_0_24px_rgba(0,240,255,0.2)]
-          light:bg-white light:border light:border-slate-200 light:hover:border-sky-400 light:hover:shadow-xl light:shadow-md"
+        className="relative min-h-[340px] p-6 sm:p-8 rounded-3xl cursor-pointer select-none transition-all flex flex-col justify-between group
+          bg-white/85 border border-neutral-200/80 hover:border-neutral-300 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_12px_40px_rgb(0,0,0,0.08)]
+          dark:bg-neutral-900/70 dark:border-neutral-800/80 dark:hover:border-neutral-700 dark:shadow-[0_8px_30px_rgb(0,0,0,0.5)]"
       >
         {/* Top Badges */}
-        <div className="flex items-center justify-between gap-2 mb-4 font-mono">
-          <span className="px-3 py-1 rounded-full text-xs font-bold border
-            dark:bg-cyan-500/20 dark:text-cyan-300 dark:border-cyan-500/30
-            light:bg-sky-50 light:text-sky-800 light:border-sky-200"
+        <div className="flex items-center justify-between gap-2 mb-4">
+          <span className="px-3 py-1 rounded-full text-xs font-medium border
+            bg-neutral-100 text-neutral-700 border-neutral-200/80
+            dark:bg-neutral-800 dark:text-neutral-300 dark:border-neutral-700"
           >
             {currentCard.category}
           </span>
-          <span className="text-xs font-semibold dark:text-slate-400 light:text-slate-500">
+          <span className="text-xs text-neutral-500 dark:text-neutral-400">
             Сложность: {currentCard.difficulty}
           </span>
         </div>
@@ -160,43 +161,42 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
         <div className="my-auto">
           {!isFlipped ? (
             <div className="space-y-4 animate-in fade-in zoom-in-95 duration-200">
-              <span className="text-xs font-bold uppercase tracking-wider block font-mono dark:text-cyan-400 light:text-sky-700">
+              <span className="text-xs font-semibold uppercase tracking-wider block text-neutral-500 dark:text-neutral-400">
                 Вопрос собеседования:
               </span>
-              <h3 className="text-lg sm:text-xl font-black leading-snug font-sans dark:text-white light:text-slate-900">
+              <h3 className="text-lg sm:text-xl font-bold leading-snug font-sans text-neutral-900 dark:text-white">
                 {currentCard.title}
               </h3>
-              <p className="text-sm leading-relaxed dark:text-slate-300 light:text-slate-600">
+              <p className="text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
                 {currentCard.question}
               </p>
             </div>
           ) : (
             <div className="space-y-4 animate-in fade-in zoom-in-95 duration-200">
-              <span className="text-xs font-bold uppercase tracking-wider block font-mono dark:text-emerald-400 light:text-emerald-700">
+              <span className="text-xs font-semibold uppercase tracking-wider block text-emerald-700 dark:text-emerald-400">
                 Развернутый ответ:
               </span>
               <p className="text-sm leading-relaxed p-4 rounded-2xl border transition-colors
-                dark:bg-[#06080f]/80 dark:border-slate-800/80 dark:text-slate-200
-                light:bg-slate-50 light:border-slate-200 light:text-slate-800"
+                bg-neutral-50/90 border-neutral-200/80 text-neutral-800
+                dark:bg-neutral-850/80 dark:border-neutral-800 dark:text-neutral-200"
               >
                 {currentCard.answer}
               </p>
 
               {currentCard.codeSnippet && (
-                <pre className="p-3 rounded-xl border text-xs font-mono text-emerald-300 overflow-x-auto
-                  dark:bg-[#06080f] dark:border-slate-800
-                  light:bg-slate-900 light:border-slate-800"
+                <pre className="p-3.5 rounded-2xl border text-xs font-mono text-neutral-200 overflow-x-auto
+                  bg-neutral-950 border-neutral-800 dark:bg-black dark:border-neutral-800"
                 >
                   <code>{currentCard.codeSnippet}</code>
                 </pre>
               )}
 
               <div className="space-y-1">
-                <span className="text-xs font-semibold block font-mono dark:text-slate-400 light:text-slate-500">Ключевые тезисы:</span>
-                <ul className="text-xs space-y-1 dark:text-slate-300 light:text-slate-600">
+                <span className="text-xs font-medium block text-neutral-500 dark:text-neutral-400">Ключевые тезисы:</span>
+                <ul className="text-xs space-y-1 text-neutral-600 dark:text-neutral-400">
                   {currentCard.keyTakeaways.map((t, idx) => (
                     <li key={idx} className="flex items-start gap-1.5">
-                      <span className="dark:text-cyan-400 light:text-sky-600">•</span>
+                      <span className="text-neutral-400">•</span>
                       <span>{t}</span>
                     </li>
                   ))}
@@ -207,12 +207,12 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
         </div>
 
         {/* Flip hint at bottom */}
-        <div className="pt-4 border-t flex items-center justify-between text-xs font-mono
-          dark:border-slate-800/80 dark:text-slate-500
-          light:border-slate-200 light:text-slate-500"
+        <div className="pt-4 border-t flex items-center justify-between text-xs
+          border-neutral-200/80 text-neutral-500
+          dark:border-neutral-800/80 dark:text-neutral-400"
         >
           <span className="flex items-center gap-1.5">
-            <Eye className="w-3.5 h-3.5 dark:text-cyan-400 light:text-sky-600" />
+            <Eye className="w-3.5 h-3.5" />
             {isFlipped ? 'Нажмите, чтобы вернуться к вопросу' : 'Нажмите, чтобы увидеть ответ'}
           </span>
           <span className="text-[11px] hidden sm:inline opacity-70">Клик по карточке переворачивает</span>
@@ -220,13 +220,13 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
       </div>
 
       {/* Navigation and Rating Actions */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 font-mono">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
         <button
           onClick={handlePrev}
           disabled={currentIndex === 0}
-          className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border text-xs font-semibold transition-colors disabled:opacity-40
-            dark:bg-[#06080f] dark:hover:bg-slate-800 dark:border-slate-800 dark:text-slate-300
-            light:bg-white light:hover:bg-slate-100 light:border-slate-200 light:text-slate-700 shadow-sm"
+          className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-full border text-xs font-medium transition-colors disabled:opacity-40
+            bg-white hover:bg-neutral-50 border-neutral-200/80 text-neutral-700 shadow-xs
+            dark:bg-neutral-850 dark:hover:bg-neutral-800 dark:border-neutral-750 dark:text-neutral-300"
         >
           <ChevronLeft className="w-4 h-4" />
           <span>Назад</span>
@@ -234,9 +234,9 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
 
         <button
           onClick={handleRepeat}
-          className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-95 border
-            dark:bg-amber-600/20 dark:hover:bg-amber-600/30 dark:border-amber-500/40 dark:text-amber-300
-            light:bg-amber-100 light:hover:bg-amber-200 light:border-amber-300 light:text-amber-800"
+          className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-medium transition-all active:scale-95 border
+            bg-amber-500/10 hover:bg-amber-500/20 border-amber-500/30 text-amber-700
+            dark:bg-amber-500/15 dark:hover:bg-amber-500/25 dark:border-amber-500/30 dark:text-amber-300"
         >
           <RotateCcw className="w-4 h-4" />
           <span>Повторить</span>
@@ -244,9 +244,9 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
 
         <button
           onClick={handleLearned}
-          className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-95 border
-            dark:bg-emerald-600/20 dark:hover:bg-emerald-600/30 dark:border-emerald-500/40 dark:text-emerald-300
-            light:bg-emerald-600 light:hover:bg-emerald-500 light:text-white light:border-emerald-600 shadow-sm"
+          className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-semibold transition-all active:scale-95
+            bg-neutral-900 hover:bg-black text-white shadow-xs
+            dark:bg-white dark:hover:bg-neutral-100 dark:text-neutral-950"
         >
           <CheckCircle2 className="w-4 h-4" />
           <span>Знаю отлично</span>
@@ -255,9 +255,9 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
         <button
           onClick={handleNext}
           disabled={currentIndex === deck.length - 1}
-          className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border text-xs font-semibold transition-colors disabled:opacity-40
-            dark:bg-[#06080f] dark:hover:bg-slate-800 dark:border-slate-800 dark:text-slate-300
-            light:bg-white light:hover:bg-slate-100 light:border-slate-200 light:text-slate-700 shadow-sm"
+          className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-full border text-xs font-medium transition-colors disabled:opacity-40
+            bg-white hover:bg-neutral-50 border-neutral-200/80 text-neutral-700 shadow-xs
+            dark:bg-neutral-850 dark:hover:bg-neutral-800 dark:border-neutral-750 dark:text-neutral-300"
         >
           <span>Вперед</span>
           <ChevronRight className="w-4 h-4" />
