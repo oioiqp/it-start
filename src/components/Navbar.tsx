@@ -47,10 +47,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   return (
     <header className="sticky top-2 sm:top-4 z-50 flex items-center justify-center px-2.5 sm:px-4 w-full pointer-events-none">
       <div
-        className="pointer-events-auto flex items-center justify-between gap-1 sm:gap-2 p-1.5 sm:p-2 rounded-full transition-all duration-300 max-w-5xl w-full sm:w-auto
-          bg-white/80 border border-black/[0.08] shadow-[0_12px_36px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(255,255,255,0.9)]
-          dark:bg-black/80 dark:border-white/12 dark:shadow-[0_20px_50px_rgba(0,0,0,0.9),inset_0_1px_1px_rgba(255,255,255,0.15)]
-          backdrop-blur-2xl"
+        className="pointer-events-auto flex items-center justify-between gap-1 sm:gap-2 p-1.5 sm:p-2 rounded-full transition-all duration-300 max-w-5xl w-full sm:w-auto liquid-glass-nav"
       >
         {/* Brand / Logo (Minimalist & Clean) */}
         <div

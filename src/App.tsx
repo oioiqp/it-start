@@ -333,11 +333,23 @@ export function App() {
   });
 
   return (
-    <div className={`min-h-screen flex flex-col transition-colors duration-250 ${
+    <div className={`min-h-screen flex flex-col transition-colors duration-250 relative ${
       theme === 'dark'
         ? 'dark bg-[#000000] text-neutral-100 liquid-ambient-dark selection:bg-white selection:text-neutral-950'
         : 'light bg-[#eceef2] text-neutral-900 liquid-ambient-light selection:bg-neutral-900 selection:text-white'
     }`}>
+      {/* Ambient Mesh Gradient Orbs (Refract through Liquid Glass components) */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10 select-none">
+        {/* Top-Right Soft Rose / Lavender Glow Orb */}
+        <div className="absolute -top-[15%] right-[-10%] w-[550px] h-[550px] sm:w-[750px] sm:h-[750px] rounded-full bg-gradient-to-br from-pink-500/25 via-rose-500/20 to-purple-600/25 blur-[120px] dark:from-pink-600/18 dark:via-rose-600/12 dark:to-purple-700/18 animate-ambient-slow" />
+        {/* Top-Left Indigo / Violet Glow Orb */}
+        <div className="absolute top-[20%] -left-[15%] w-[500px] h-[500px] sm:w-[700px] sm:h-[700px] rounded-full bg-gradient-to-tr from-indigo-500/20 via-purple-500/18 to-pink-400/15 blur-[130px] dark:from-indigo-600/15 dark:via-purple-600/12 dark:to-pink-600/10 animate-ambient-reverse" />
+        {/* Center-Right Aquamarine / Cyan Orb */}
+        <div className="absolute top-[55%] right-[2%] w-[450px] h-[450px] sm:w-[650px] sm:h-[650px] rounded-full bg-gradient-to-tr from-cyan-400/20 via-teal-400/15 to-blue-500/18 blur-[125px] dark:from-cyan-600/12 dark:via-blue-600/10 dark:to-indigo-600/10 animate-ambient-slow" />
+        {/* Bottom-Left Warm Amber / Coral Orb */}
+        <div className="absolute bottom-[5%] left-[5%] w-[400px] h-[400px] sm:w-[600px] sm:h-[600px] rounded-full bg-gradient-to-br from-amber-400/20 via-orange-400/15 to-rose-400/15 blur-[120px] dark:from-amber-600/10 dark:via-orange-600/8 dark:to-rose-600/10 animate-ambient-reverse" />
+      </div>
+
       {/* Navbar */}
       <Navbar
         activeTab={activeTab}
@@ -377,10 +389,7 @@ export function App() {
             </div>
 
             {/* Filter and Search Panel - Liquid Glass Capsule */}
-            <div className="rounded-3xl p-4 sm:p-6 space-y-4 transition-all duration-300
-              bg-white/80 border border-black/[0.06] shadow-[0_10px_30px_rgba(0,0,0,0.04),inset_0_1px_1px_rgba(255,255,255,0.8)]
-              dark:bg-white/[0.035] dark:backdrop-blur-2xl dark:border-white/10 dark:shadow-[0_20px_50px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.08)]"
-            >
+            <div className="rounded-[28px] sm:rounded-[32px] p-4 sm:p-6 space-y-4 liquid-glass">
               {/* Row 1: Search & Reset */}
               <div className="flex flex-col sm:flex-row items-center gap-3">
                 <div className="relative w-full sm:flex-1">
@@ -390,9 +399,7 @@ export function App() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Поиск по названию, компании или технологиям (React, Python, Go, C#, QA)..."
-                    className="w-full pl-10 pr-4 py-2.5 rounded-full text-xs sm:text-sm transition-all focus:outline-none
-                      bg-neutral-100/90 border border-neutral-200/90 text-neutral-900 placeholder:text-neutral-400 focus:border-neutral-400 focus:bg-white
-                      dark:bg-white/[0.04] dark:border-white/10 dark:text-neutral-100 dark:placeholder:text-neutral-500 dark:focus:border-white/30 dark:focus:bg-white/[0.07]"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-full text-xs sm:text-sm transition-all focus:outline-none liquid-glass-subtle text-neutral-900 placeholder:text-neutral-500 dark:text-white dark:placeholder:text-neutral-400 focus:border-white/90 dark:focus:border-white/40"
                   />
                 </div>
 
@@ -406,9 +413,7 @@ export function App() {
                       setSelectedFormat('all');
                       setSelectedSource('all');
                     }}
-                    className="w-full sm:w-auto px-4 py-2.5 rounded-full text-xs font-semibold transition-all duration-150 active:scale-95
-                      bg-neutral-100 hover:bg-neutral-200 text-neutral-700 border border-neutral-200/90
-                      dark:bg-white/[0.05] dark:hover:bg-white/[0.1] dark:text-neutral-300 dark:border-white/10"
+                    className="w-full sm:w-auto px-4 py-2.5 rounded-full text-xs font-semibold transition-all duration-150 active:scale-95 liquid-glass-pill hover:bg-white/80 dark:hover:bg-white/15 text-neutral-700 dark:text-neutral-200"
                   >
                     Сбросить фильтры
                   </button>
@@ -416,7 +421,7 @@ export function App() {
               </div>
 
               {/* Row 2: Company Filter */}
-              <div className="space-y-1.5 pt-1 border-t border-neutral-200/70 dark:border-white/[0.07]">
+              <div className="space-y-1.5 pt-1 border-t border-white/50 dark:border-white/10">
                 <div className="flex items-center justify-between text-[11px] font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                   <span className="flex items-center gap-1.5">
                     <Building2 className="w-3.5 h-3.5 text-neutral-500 dark:text-neutral-400" />
@@ -437,7 +442,7 @@ export function App() {
                     className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 ${
                       selectedCompany === 'all'
                         ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-sm'
-                        : 'bg-neutral-100/90 hover:bg-neutral-200/80 text-neutral-700 border border-neutral-200/80 dark:bg-white/[0.04] dark:border-white/[0.08] dark:text-neutral-300 dark:hover:bg-white/[0.08]'
+                        : 'liquid-glass-pill hover:bg-white/80 dark:hover:bg-white/15 text-neutral-700 dark:text-neutral-200'
                     }`}
                   >
                     Все ({internships.length})
@@ -449,10 +454,10 @@ export function App() {
                       <button
                         key={company}
                         onClick={() => setSelectedCompany(isSelected ? 'all' : company)}
-                        className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 flex items-center gap-1.5 border ${
+                        className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 flex items-center gap-1.5 ${
                           isSelected
-                            ? 'bg-neutral-900 text-white border-neutral-900 dark:bg-white dark:text-neutral-950 dark:border-white shadow-sm'
-                            : 'bg-neutral-100/90 hover:bg-neutral-200/80 border-neutral-200/80 text-neutral-700 dark:bg-white/[0.04] dark:border-white/[0.08] dark:text-neutral-300 dark:hover:bg-white/[0.08]'
+                            ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-sm'
+                            : 'liquid-glass-pill hover:bg-white/80 dark:hover:bg-white/15 text-neutral-700 dark:text-neutral-200'
                         }`}
                       >
                         <span>{company}</span>
@@ -460,7 +465,7 @@ export function App() {
                           className={`text-[10px] px-1.5 py-0.2 rounded-full font-medium ${
                             isSelected
                               ? 'bg-white/20 text-white dark:bg-black/10 dark:text-neutral-950'
-                              : 'bg-neutral-200/70 text-neutral-700 dark:bg-white/[0.08] dark:text-neutral-300'
+                              : 'bg-black/5 text-neutral-700 dark:bg-white/10 dark:text-neutral-300'
                           }`}
                         >
                           {count}
@@ -472,7 +477,7 @@ export function App() {
               </div>
 
               {/* Row 3: Direction tabs */}
-              <div className="space-y-1.5 pt-1 border-t border-neutral-200/70 dark:border-white/[0.07]">
+              <div className="space-y-1.5 pt-1 border-t border-white/50 dark:border-white/10">
                 <div className="text-[11px] font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                   Направление:
                 </div>
@@ -485,7 +490,7 @@ export function App() {
                     className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 ${
                       selectedDirection === 'all'
                         ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-sm'
-                        : 'bg-neutral-100/90 hover:bg-neutral-200/80 text-neutral-700 border border-neutral-200/80 dark:bg-white/[0.04] dark:border-white/[0.08] dark:text-neutral-300 dark:hover:bg-white/[0.08]'
+                        : 'liquid-glass-pill hover:bg-white/80 dark:hover:bg-white/15 text-neutral-700 dark:text-neutral-200'
                     }`}
                   >
                     Все направления ({internships.length})
@@ -497,10 +502,10 @@ export function App() {
                         setSelectedDirection(dir.id);
                         setSelectedSubTrack('all');
                       }}
-                      className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 border ${
+                      className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 ${
                         selectedDirection === dir.id
-                          ? 'bg-neutral-900 text-white border-neutral-900 dark:bg-white dark:text-neutral-950 dark:border-white shadow-sm'
-                          : 'bg-neutral-100/90 hover:bg-neutral-200/80 border-neutral-200/80 text-neutral-700 dark:bg-white/[0.04] dark:border-white/[0.08] dark:text-neutral-300 dark:hover:bg-white/[0.08]'
+                          ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-sm'
+                          : 'liquid-glass-pill hover:bg-white/80 dark:hover:bg-white/15 text-neutral-700 dark:text-neutral-200'
                       }`}
                     >
                       {dir.title.split('-')[0]}
@@ -511,7 +516,7 @@ export function App() {
 
               {/* Row 4: Sub-tracks */}
               {selectedDirection !== 'all' && (
-                <div className="space-y-1.5 pt-1 border-t border-neutral-200/70 dark:border-white/[0.07]">
+                <div className="space-y-1.5 pt-1 border-t border-white/50 dark:border-white/10">
                   <div className="text-[11px] font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                     Специализация:
                   </div>
@@ -521,7 +526,7 @@ export function App() {
                       className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
                         selectedSubTrack === 'all'
                           ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-sm'
-                          : 'bg-neutral-100 text-neutral-700 dark:bg-white/[0.04] dark:text-neutral-300'
+                          : 'liquid-glass-pill text-neutral-700 dark:text-neutral-200'
                       }`}
                     >
                       Все ветки
@@ -533,7 +538,7 @@ export function App() {
                         className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
                           selectedSubTrack === st.id
                             ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-sm'
-                            : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200 dark:bg-white/[0.04] dark:text-neutral-300 dark:hover:bg-white/[0.08]'
+                            : 'liquid-glass-pill hover:bg-white/80 dark:hover:bg-white/15 text-neutral-700 dark:text-neutral-200'
                         }`}
                       >
                         {st.name}
@@ -544,7 +549,7 @@ export function App() {
               )}
 
               {/* Row 5: Format & Source selectors */}
-              <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-neutral-200/70 dark:border-white/[0.07] text-xs">
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-white/50 dark:border-white/10 text-xs">
                 {/* Format Filter */}
                 <div className="flex items-center gap-1.5">
                   <span className="text-neutral-500 dark:text-neutral-400 font-medium">Формат:</span>
@@ -598,10 +603,7 @@ export function App() {
               </div>
 
               {filteredInternships.length === 0 ? (
-                <div className="p-12 text-center rounded-3xl space-y-3
-                  bg-white/80 border border-black/[0.06] text-neutral-700 shadow-sm
-                  dark:bg-white/[0.035] dark:backdrop-blur-2xl dark:border-white/10 dark:text-neutral-300"
-                >
+                <div className="p-12 text-center rounded-[28px] sm:rounded-[32px] space-y-3 liquid-glass text-neutral-700 dark:text-neutral-300">
                   <Briefcase className="w-12 h-12 text-neutral-400 dark:text-neutral-500 mx-auto" />
                   <h3 className="text-base font-bold text-neutral-900 dark:text-white font-sans">
                     Стажировки по заданным фильтрам не найдены
@@ -697,10 +699,7 @@ export function App() {
       />
 
       {/* Footer */}
-      <footer className="w-full py-8 px-4 sm:px-6 lg:px-8 text-xs mt-12 transition-colors border-t
-        bg-white/70 border-black/[0.06] text-neutral-500
-        dark:bg-white/[0.02] dark:border-white/[0.08] dark:text-neutral-400 backdrop-blur-xl"
-      >
+      <footer className="w-full py-8 px-4 sm:px-6 lg:px-8 text-xs mt-12 transition-colors border-t border-white/50 dark:border-white/10 liquid-glass-subtle text-neutral-600 dark:text-neutral-400">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs tracking-tight shadow-xs
@@ -709,7 +708,7 @@ export function App() {
               IT
             </div>
             <div>
-              <span className="font-bold text-neutral-900 dark:text-neutral-200 font-sans">IT-Старт © 2026</span>
+              <span className="font-bold text-neutral-900 dark:text-neutral-100 font-sans">IT-Старт © 2026</span>
               <p className="text-[11px] text-neutral-500 dark:text-neutral-400">
                 100% реальные IT-стажировки • Роадмапы • Telegram & VK Боты
               </p>
@@ -741,11 +740,8 @@ export function App() {
               Supabase Connected
             </span>
             <span>•</span>
-            <span className="text-[10px] px-2.5 py-0.5 rounded-full font-medium
-              bg-neutral-100 text-neutral-600 border border-neutral-200/80
-              dark:bg-white/[0.06] dark:text-neutral-300 dark:border-white/10"
-            >
-              Liquid Glass v3.0
+            <span className="text-[10px] px-2.5 py-0.5 rounded-full font-medium liquid-glass-pill text-neutral-700 dark:text-neutral-200">
+              Liquid Glass iOS
             </span>
           </div>
         </div>

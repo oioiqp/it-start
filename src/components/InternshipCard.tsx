@@ -53,39 +53,30 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
   };
 
   return (
-    <div className="group relative rounded-3xl p-5 sm:p-6 transition-all duration-300 flex flex-col justify-between
-      bg-white/80 backdrop-blur-2xl border border-black/[0.06] shadow-[0_12px_36px_rgba(0,0,0,0.05),inset_0_1px_1px_rgba(255,255,255,0.9)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.08)] hover:border-black/15
-      dark:bg-white/[0.035] dark:backdrop-blur-2xl dark:border-white/10 dark:shadow-[0_20px_50px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.12)] dark:hover:border-white/25"
-    >
+    <div className="group relative rounded-[28px] sm:rounded-[32px] p-5 sm:p-6 flex flex-col justify-between liquid-glass liquid-glass-interactive overflow-hidden">
       {/* Top row */}
       <div>
         <div className="flex items-start justify-between gap-3 mb-3.5">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl flex items-center justify-center font-bold text-sm shrink-0 overflow-hidden transition-colors
-              bg-neutral-100 border border-neutral-200/80 text-neutral-900
-              dark:bg-white/[0.06] dark:border-white/10 dark:text-white"
-            >
+            <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center font-bold text-base shrink-0 overflow-hidden liquid-glass-subtle text-neutral-900 dark:text-white transition-transform duration-300 group-hover:scale-105 shadow-xs">
               {internship.company.charAt(0)}
             </div>
             <div>
               <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="font-bold text-sm text-neutral-900 dark:text-neutral-100 font-sans">
+                <span className="font-bold text-sm text-neutral-900 dark:text-white font-sans">
                   {internship.company}
                 </span>
                 {internship.isHot && (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium
-                    bg-rose-500/10 text-rose-600 border border-rose-500/20
-                    dark:bg-rose-500/15 dark:text-rose-400 dark:border-rose-500/30"
-                  >
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold liquid-glass-pill bg-rose-500/15 text-rose-600 border-rose-500/30 dark:bg-rose-500/20 dark:text-rose-400 dark:border-rose-500/40 shadow-xs">
                     <Flame className="w-3 h-3 text-rose-500 animate-pulse" />
                     HOT
                   </span>
                 )}
-                <span className="text-[10px] px-2 py-0.5 rounded-full font-medium bg-neutral-100 text-neutral-600 border border-neutral-200/60 dark:bg-white/[0.06] dark:text-neutral-300 dark:border-white/[0.08]">
+                <span className="text-[10px] px-2.5 py-0.5 rounded-full font-medium liquid-glass-pill text-neutral-700 dark:text-neutral-200">
                   Верифицировано
                 </span>
               </div>
-              <div className="flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400 mt-0.5 flex-wrap">
+              <div className="flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400 mt-1 flex-wrap">
                 <span className="flex items-center gap-1">
                   <MapPin className="w-3 h-3 opacity-70" />
                   {internship.location}
@@ -101,7 +92,7 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
 
           {/* Salary */}
           <div className="text-right shrink-0">
-            <span className="text-xs sm:text-sm font-bold block text-neutral-950 dark:text-white">
+            <span className="text-xs sm:text-sm font-bold block text-neutral-950 dark:text-white tracking-tight">
               {internship.salary}
             </span>
             <span className="text-[10px] text-neutral-500 dark:text-neutral-400">
@@ -111,32 +102,27 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
         </div>
 
         {/* Position Title */}
-        <h3 className="text-sm sm:text-base font-bold transition-colors tracking-tight line-clamp-2 mb-2
-          text-neutral-900 group-hover:text-neutral-700
-          dark:text-white dark:group-hover:text-neutral-300 font-sans"
-        >
+        <h3 className="text-sm sm:text-base font-bold transition-colors tracking-tight line-clamp-2 mb-2 text-neutral-900 group-hover:text-black dark:text-white dark:group-hover:text-neutral-100 font-sans">
           {internship.title}
         </h3>
 
         {/* Description snippet */}
-        <p className="text-xs line-clamp-2 mb-3.5 leading-relaxed text-neutral-600 dark:text-neutral-400">
+        <p className="text-xs line-clamp-2 mb-3.5 leading-relaxed text-neutral-600 dark:text-neutral-300">
           {internship.description}
         </p>
 
-        {/* Tags (Capsule Pills) */}
+        {/* Tags (Glass Pills) */}
         <div className="flex flex-wrap gap-1.5 mb-4">
           {internship.tags.slice(0, 4).map((tag, idx) => (
             <span
               key={idx}
-              className="px-2.5 py-0.5 rounded-full text-[11px] font-medium transition-colors
-                bg-neutral-100/90 text-neutral-700 border border-neutral-200/60
-                dark:bg-white/[0.05] dark:text-neutral-300 dark:border-white/[0.08]"
+              className="px-2.5 py-1 rounded-full text-[11px] font-medium transition-all liquid-glass-pill text-neutral-800 dark:text-neutral-200 hover:bg-white/80 dark:hover:bg-white/15"
             >
               {tag}
             </span>
           ))}
           {internship.tags.length > 4 && (
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-medium text-neutral-500 bg-neutral-100/80 border border-neutral-200/50 dark:text-neutral-400 dark:bg-white/[0.04] dark:border-white/[0.06]">
+            <span className="px-2 py-1 rounded-full text-[10px] font-medium liquid-glass-pill text-neutral-600 dark:text-neutral-400">
               +{internship.tags.length - 4}
             </span>
           )}
@@ -144,20 +130,17 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
       </div>
 
       {/* Bottom section: Readiness bar & Buttons */}
-      <div className="pt-3.5 border-t border-neutral-200/70 dark:border-white/[0.07] space-y-3">
+      <div className="pt-3.5 border-t border-white/50 dark:border-white/10 space-y-3">
         {/* Readiness Bar */}
-        <div className="rounded-2xl p-2.5 transition-colors
-          bg-neutral-50/90 border border-neutral-200/60
-          dark:bg-white/[0.03] dark:border-white/[0.08]"
-        >
+        <div className="rounded-2xl p-3 transition-colors liquid-glass-subtle">
           <div className="flex items-center justify-between text-[11px] mb-1.5">
-            <span className="flex items-center gap-1.5 text-neutral-600 dark:text-neutral-400 font-medium">
+            <span className="flex items-center gap-1.5 text-neutral-700 dark:text-neutral-300 font-medium">
               <Sparkles className="w-3 h-3 text-neutral-500 dark:text-neutral-400" />
               Готовность к стеку:
             </span>
             <span className="font-semibold text-neutral-900 dark:text-white">{readinessPercent}%</span>
           </div>
-          <div className="w-full h-1.5 rounded-full overflow-hidden bg-neutral-200 dark:bg-white/10">
+          <div className="w-full h-1.5 rounded-full overflow-hidden bg-neutral-900/10 dark:bg-white/15">
             <div
               className="h-full rounded-full transition-all duration-500 bg-neutral-900 dark:bg-white"
               style={{ width: `${readinessPercent}%` }}
@@ -179,10 +162,10 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
                     href={`https://t.me/${cleanChannel}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-1 text-[11px] font-medium truncate text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
+                    className="flex items-center gap-1 text-[11px] font-medium truncate text-neutral-600 hover:text-black dark:text-neutral-400 dark:hover:text-white transition-colors"
                     title={`Открыть проверенный Telegram-канал ${verifiedChannel}`}
                   >
-                    <Bot className="w-3.5 h-3.5 shrink-0 text-neutral-400 dark:text-neutral-500" />
+                    <Bot className="w-3.5 h-3.5 shrink-0 text-neutral-500 dark:text-neutral-400" />
                     <span className="truncate underline decoration-neutral-300 dark:decoration-neutral-700">
                       {verifiedChannel}
                     </span>
@@ -197,9 +180,7 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
                 <div className="flex items-center gap-2 shrink-0">
                   <button
                     onClick={handleOpenPlan}
-                    className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all active:scale-95
-                      bg-neutral-100 hover:bg-neutral-200 text-neutral-800 border border-neutral-200/80 shadow-xs
-                      dark:bg-white/[0.06] dark:hover:bg-white/[0.12] dark:text-white dark:border-white/10"
+                    className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all active:scale-95 liquid-glass-pill hover:bg-white/80 dark:hover:bg-white/15 text-neutral-800 dark:text-white shadow-xs"
                   >
                     <GraduationCap className="w-3.5 h-3.5 text-neutral-600 dark:text-neutral-400" />
                     <span>План</span>
@@ -209,9 +190,7 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
                     href={verifiedApplyUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 px-4 sm:px-5 py-1.5 rounded-full text-xs font-semibold transition-all active:scale-95
-                      bg-neutral-900 hover:bg-black text-white shadow-md
-                      dark:bg-white dark:hover:bg-neutral-200 dark:text-neutral-950"
+                    className="flex items-center gap-1.5 px-4 sm:px-5 py-1.5 rounded-full text-xs font-bold transition-all active:scale-95 bg-neutral-900 hover:bg-black text-white shadow-md dark:bg-white dark:hover:bg-neutral-100 dark:text-neutral-950"
                     title={`Подать заявку на официальном сайте ${internship.company}`}
                   >
                     <span>Отклик</span>

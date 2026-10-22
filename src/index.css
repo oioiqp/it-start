@@ -37,10 +37,10 @@
 .liquid-ambient-dark {
   background-color: #000000;
   background-image: 
-    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(255, 255, 255, 0.1) 0%, transparent 65%),
-    radial-gradient(ellipse 60% 40% at 85% 25%, rgba(130, 135, 180, 0.08) 0%, transparent 55%),
-    radial-gradient(ellipse 60% 40% at 15% 75%, rgba(100, 120, 160, 0.07) 0%, transparent 55%),
-    radial-gradient(circle at 50% 95%, rgba(255, 255, 255, 0.05) 0%, transparent 60%);
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(255, 255, 255, 0.12) 0%, transparent 65%),
+    radial-gradient(ellipse 60% 40% at 85% 25%, rgba(140, 120, 220, 0.12) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 40% at 15% 75%, rgba(90, 150, 230, 0.10) 0%, transparent 55%),
+    radial-gradient(circle at 50% 95%, rgba(220, 100, 160, 0.08) 0%, transparent 60%);
   background-attachment: fixed;
 }
 
@@ -48,12 +48,137 @@
   background-color: #eceef2;
   background-image: 
     radial-gradient(ellipse 80% 50% at 50% -10%, rgba(255, 255, 255, 0.95) 0%, transparent 70%),
-    radial-gradient(ellipse 60% 50% at 90% 20%, rgba(220, 226, 238, 0.75) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 50% at 10% 80%, rgba(225, 230, 242, 0.75) 0%, transparent 60%);
+    radial-gradient(ellipse 60% 50% at 90% 20%, rgba(235, 215, 240, 0.65) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 10% 80%, rgba(215, 230, 250, 0.65) 0%, transparent 60%);
   background-attachment: fixed;
 }
 
-/* Liquid Glass Cards & Bento Surfaces */
+/* iOS 27 Liquid Glass Main Surface */
+.liquid-glass {
+  position: relative;
+  backdrop-filter: blur(32px) saturate(190%) contrast(102%);
+  -webkit-backdrop-filter: blur(32px) saturate(190%) contrast(102%);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.60) 0%, rgba(255, 255, 255, 0.38) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  box-shadow: 
+    inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.85),
+    inset 0 -1px 2px 0 rgba(255, 255, 255, 0.25),
+    0 20px 45px -12px rgba(0, 0, 0, 0.12),
+    0 4px 16px -2px rgba(0, 0, 0, 0.04);
+}
+
+.dark .liquid-glass,
+html.dark .liquid-glass {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.035) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.20);
+  box-shadow: 
+    inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.32),
+    inset 0 -1px 2px 0 rgba(255, 255, 255, 0.06),
+    0 25px 60px -15px rgba(0, 0, 0, 0.85),
+    0 4px 20px -2px rgba(0, 0, 0, 0.5);
+}
+
+.liquid-glass-interactive {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease;
+}
+
+.liquid-glass-interactive:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 255, 255, 0.95);
+  box-shadow: 
+    inset 0 1.5px 2.5px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1px 2px 0 rgba(255, 255, 255, 0.35),
+    0 28px 55px -12px rgba(0, 0, 0, 0.18),
+    0 6px 20px -2px rgba(0, 0, 0, 0.06);
+}
+
+.dark .liquid-glass-interactive:hover,
+html.dark .liquid-glass-interactive:hover {
+  border-color: rgba(255, 255, 255, 0.32);
+  box-shadow: 
+    inset 0 1.5px 2.5px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -1px 2px 0 rgba(255, 255, 255, 0.10),
+    0 32px 70px -15px rgba(0, 0, 0, 0.95),
+    0 6px 24px -2px rgba(0, 0, 0, 0.6);
+}
+
+/* iOS 27 Liquid Glass Subtle Surface (Inner widgets, topic steps) */
+.liquid-glass-subtle {
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  background: rgba(255, 255, 255, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow: 
+    inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.75),
+    0 4px 14px -2px rgba(0, 0, 0, 0.04);
+}
+
+.dark .liquid-glass-subtle,
+html.dark .liquid-glass-subtle {
+  background: rgba(255, 255, 255, 0.055);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  box-shadow: 
+    inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.20),
+    0 6px 18px -2px rgba(0, 0, 0, 0.45);
+}
+
+/* iOS 27 Liquid Glass Pill (Tags, badges, action capsules) */
+.liquid-glass-pill {
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  background: rgba(255, 255, 255, 0.52);
+  border: 1px solid rgba(255, 255, 255, 0.70);
+  box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.80);
+}
+
+.dark .liquid-glass-pill,
+html.dark .liquid-glass-pill {
+  background: rgba(255, 255, 255, 0.065);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+/* iOS 27 Floating Navigation Glass */
+.liquid-glass-nav {
+  backdrop-filter: blur(36px) saturate(200%);
+  -webkit-backdrop-filter: blur(36px) saturate(200%);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0.48) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.78);
+  box-shadow: 
+    inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.90),
+    inset 0 -1px 2px 0 rgba(255, 255, 255, 0.25),
+    0 16px 40px -8px rgba(0, 0, 0, 0.10);
+}
+
+.dark .liquid-glass-nav,
+html.dark .liquid-glass-nav {
+  background: linear-gradient(135deg, rgba(20, 20, 26, 0.78) 0%, rgba(10, 10, 14, 0.68) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 
+    inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.25),
+    inset 0 -1px 2px 0 rgba(255, 255, 255, 0.08),
+    0 24px 55px -12px rgba(0, 0, 0, 0.95);
+}
+
+/* Ambient glow animations for background orbs */
+@keyframes ambient-float {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(15px, -20px) scale(1.05);
+  }
+}
+
+.animate-ambient-slow {
+  animation: ambient-float 14s ease-in-out infinite;
+}
+
+.animate-ambient-reverse {
+  animation: ambient-float 18s ease-in-out infinite reverse;
+}
+
+/* Legacy aliases for backward compatibility */
 .glass-panel {
   backdrop-filter: blur(28px) saturate(180%);
   -webkit-backdrop-filter: blur(28px) saturate(180%);

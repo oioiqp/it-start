@@ -140,16 +140,11 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
       {/* Flashcard interactive body */}
       <div
         onClick={handleFlip}
-        className="relative min-h-[340px] p-6 sm:p-8 rounded-3xl cursor-pointer select-none transition-all flex flex-col justify-between group
-          bg-white/85 backdrop-blur-2xl border border-black/[0.06] hover:border-black/15 shadow-[0_12px_36px_rgba(0,0,0,0.05),inset_0_1px_1px_rgba(255,255,255,0.9)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.08)]
-          dark:bg-white/[0.035] dark:backdrop-blur-2xl dark:border-white/10 dark:hover:border-white/20 dark:shadow-[0_20px_50px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.12)]"
+        className="relative min-h-[340px] p-6 sm:p-8 rounded-[32px] cursor-pointer select-none transition-all flex flex-col justify-between group liquid-glass liquid-glass-interactive overflow-hidden"
       >
         {/* Top Badges */}
         <div className="flex items-center justify-between gap-2 mb-4">
-          <span className="px-3 py-1 rounded-full text-xs font-medium border
-            bg-neutral-100 text-neutral-700 border-neutral-200/80
-            dark:bg-white/[0.06] dark:text-neutral-300 dark:border-white/[0.08]"
-          >
+          <span className="px-3 py-1 rounded-full text-xs font-medium liquid-glass-pill text-neutral-700 dark:text-neutral-200">
             {currentCard.category}
           </span>
           <span className="text-xs text-neutral-500 dark:text-neutral-400">

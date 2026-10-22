@@ -138,11 +138,8 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
   const statusBadge = getStatusBadge();
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-xl overflow-y-auto">
-      <div className="relative w-full max-w-3xl rounded-3xl p-6 sm:p-8 my-8 max-h-[90vh] flex flex-col transition-all duration-300
-        bg-white/90 border border-black/[0.08] shadow-[0_25px_60px_rgba(0,0,0,0.08),inset_0_1px_1px_rgba(255,255,255,0.9)] text-neutral-900
-        dark:bg-[#0a0a0c]/90 dark:backdrop-blur-2xl dark:border-white/10 dark:shadow-[0_25px_60px_rgba(0,0,0,0.9),inset_0_1px_1px_rgba(255,255,255,0.12)] dark:text-neutral-100"
-      >
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 dark:bg-black/80 backdrop-blur-2xl overflow-y-auto">
+      <div className="relative w-full max-w-3xl rounded-[32px] p-6 sm:p-8 my-8 max-h-[90vh] flex flex-col liquid-glass text-neutral-900 dark:text-neutral-100 overflow-hidden">
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -154,12 +151,9 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
         </button>
 
         {/* Modal Header */}
-        <div className="shrink-0 pb-4 border-b pr-10 border-neutral-200/80 dark:border-white/10">
+        <div className="shrink-0 pb-4 border-b pr-10 border-white/50 dark:border-white/10">
           <div className="flex items-center gap-2 mb-2 flex-wrap">
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold
-              bg-neutral-100 text-neutral-800 border border-neutral-200/80
-              dark:bg-white/[0.06] dark:text-neutral-200 dark:border-white/10"
-            >
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold liquid-glass-pill text-neutral-800 dark:text-neutral-200">
               {internship.company}
             </span>
             <span className="text-xs text-neutral-500 dark:text-neutral-400 flex items-center gap-1">
@@ -177,16 +171,10 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
           </h2>
 
           <div className="flex flex-wrap items-center gap-2 mt-2">
-            <span className="text-xs font-semibold px-2.5 py-1 rounded-full
-              text-neutral-800 bg-neutral-100 border border-neutral-200/70
-              dark:text-neutral-200 dark:bg-white/[0.06] dark:border-white/10"
-            >
+            <span className="text-xs font-semibold px-2.5 py-1 rounded-full liquid-glass-pill text-neutral-800 dark:text-neutral-200">
               {internship.salary}
             </span>
-            <span className="text-xs px-2.5 py-1 rounded-full
-              text-neutral-600 bg-neutral-100/70 border border-neutral-200/60
-              dark:text-neutral-400 dark:bg-white/[0.04] dark:border-white/[0.08]"
-            >
+            <span className="text-xs px-2.5 py-1 rounded-full liquid-glass-pill text-neutral-600 dark:text-neutral-400">
               Источник: {internship.sourceChannel}
             </span>
           </div>
@@ -195,10 +183,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
         {/* Scrollable Content */}
         <div className="overflow-y-auto py-4 space-y-6 flex-1 pr-1 custom-scroll">
           {/* Readiness Progress Bar Card */}
-          <div className="p-4 sm:p-5 rounded-2xl border transition-colors
-            bg-neutral-50/80 border-neutral-200/80
-            dark:bg-white/[0.035] dark:backdrop-blur-2xl dark:border-white/10"
-          >
+          <div className="p-4 sm:p-5 rounded-2xl liquid-glass-subtle transition-colors">
             <div className="flex items-center justify-between gap-3 mb-2 flex-wrap">
               <div className="flex items-center gap-2">
                 <Trophy className="w-5 h-5 text-amber-500" />
@@ -247,10 +232,10 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                     key={topic.id}
                     className={`p-4 rounded-2xl border transition-all ${
                       isDone
-                        ? 'bg-emerald-500/5 border-emerald-500/20 dark:bg-emerald-500/10 dark:border-emerald-500/30'
+                        ? 'bg-emerald-500/10 border-emerald-500/25 dark:bg-emerald-500/15 dark:border-emerald-500/35'
                         : percent > 0
-                        ? 'bg-neutral-100/70 border-neutral-300 dark:bg-white/[0.06] dark:border-white/20'
-                        : 'bg-white/80 border-neutral-200/80 dark:bg-white/[0.035] dark:border-white/10'
+                        ? 'liquid-glass-subtle border-white/70 dark:border-white/20'
+                        : 'liquid-glass-subtle'
                     }`}
                   >
                     <div className="flex items-start justify-between gap-3">
@@ -270,14 +255,14 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                         <div>
                           <div className="flex items-center gap-2 flex-wrap">
                             <span className="text-sm font-semibold text-neutral-900 dark:text-white font-sans">{topic.title}</span>
-                            <span className="text-[10px] uppercase font-semibold px-2 py-0.5 rounded-full bg-neutral-100 text-neutral-600 dark:bg-white/[0.06] dark:text-neutral-300">
+                            <span className="text-[10px] uppercase font-semibold px-2 py-0.5 rounded-full liquid-glass-pill text-neutral-700 dark:text-neutral-200">
                               {topic.category === 'core' ? 'База' : 'Стек'}
                             </span>
-                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-neutral-100 text-neutral-600 dark:bg-white/[0.06] dark:text-neutral-300">
+                            <span className="text-[10px] px-2 py-0.5 rounded-full liquid-glass-pill text-neutral-700 dark:text-neutral-200">
                               {topic.difficulty}
                             </span>
                           </div>
-                          <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">{topic.description}</p>
+                          <p className="text-xs text-neutral-600 dark:text-neutral-300 mt-1">{topic.description}</p>
                           <div className="mt-2 text-[11px] p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-800 dark:text-amber-300">
                             <strong>Совет для интервью:</strong> {topic.interviewTip}
                           </div>
@@ -288,9 +273,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                         href={topic.externalDocUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="p-1.5 rounded-full transition-colors shrink-0
-                          bg-neutral-100 hover:bg-neutral-200 text-neutral-600 hover:text-neutral-900
-                          dark:bg-white/[0.06] dark:hover:bg-white/[0.12] dark:text-neutral-300 dark:hover:text-white"
+                        className="p-1.5 rounded-full transition-colors shrink-0 liquid-glass-pill hover:bg-white/80 dark:hover:bg-white/15 text-neutral-700 dark:text-neutral-200"
                         title="Открыть документацию"
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
@@ -298,17 +281,14 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                     </div>
 
                     {/* Topic Progress Bar */}
-                    <div className="rounded-xl p-2.5 my-3 border
-                      bg-neutral-50/80 border-neutral-200/60
-                      dark:bg-white/[0.025] dark:border-white/[0.06]"
-                    >
+                    <div className="rounded-xl p-2.5 my-3 liquid-glass-pill">
                       <div className="flex items-center justify-between text-[11px] mb-1">
                         <span className="text-neutral-600 dark:text-neutral-400">Прогресс раздела:</span>
                         <span className={`font-semibold ${isDone ? 'text-emerald-600 dark:text-emerald-400' : 'text-neutral-900 dark:text-white'}`}>
                           {percent}% ({checked} из {total} подтем)
                         </span>
                       </div>
-                      <div className="w-full h-1.5 rounded-full overflow-hidden bg-neutral-200 dark:bg-white/10">
+                      <div className="w-full h-1.5 rounded-full overflow-hidden bg-neutral-900/10 dark:bg-white/15">
                         <div
                           className={`h-full rounded-full transition-all duration-300 ${
                             isDone ? 'bg-emerald-500' : 'bg-neutral-900 dark:bg-white'
@@ -319,7 +299,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                     </div>
 
                     {topic.subtopics && topic.subtopics.length > 0 && (
-                      <div className="pt-2 border-t border-neutral-200/60 dark:border-white/[0.08]">
+                      <div className="pt-2 border-t border-white/50 dark:border-white/10">
                         <div className="text-[11px] font-medium uppercase tracking-wider mb-2 text-neutral-500 dark:text-neutral-400">
                           Ключевые подтемы (отметьте изученные):
                         </div>
@@ -333,8 +313,8 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                                 onClick={() => handleToggleSubtopic(topic.id, sIdx)}
                                 className={`flex items-start gap-2 p-2 rounded-xl text-left text-xs transition-colors select-none ${
                                   isSubDone
-                                    ? 'bg-emerald-500/10 text-emerald-800 border border-emerald-500/20 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30'
-                                    : 'bg-neutral-100/70 text-neutral-700 border border-neutral-200/70 hover:bg-neutral-200/60 dark:bg-white/[0.04] dark:text-neutral-300 dark:border-white/[0.08]'
+                                    ? 'bg-emerald-500/15 text-emerald-800 border border-emerald-500/25 dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-500/35'
+                                    : 'liquid-glass-pill text-neutral-700 hover:bg-white/80 dark:text-neutral-300 dark:hover:bg-white/15'
                                 }`}
                               >
                                 {isSubDone ? (
@@ -376,8 +356,8 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                     key={q.id}
                     className={`rounded-2xl border transition-all ${
                       isCompleted
-                        ? 'bg-emerald-500/5 border-emerald-500/20 dark:bg-emerald-500/10 dark:border-emerald-500/30'
-                        : 'bg-white/80 border-neutral-200/80 dark:bg-white/[0.035] dark:border-white/10'
+                        ? 'bg-emerald-500/10 border-emerald-500/25 dark:bg-emerald-500/15 dark:border-emerald-500/35'
+                        : 'liquid-glass-subtle'
                     }`}
                   >
                     <div className="p-3.5 flex items-start justify-between gap-3">
@@ -473,9 +453,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                   href={`https://t.me/${cleanChannel}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs transition-colors
-                    bg-neutral-100 hover:bg-neutral-200 text-neutral-700 border border-neutral-200/80
-                    dark:bg-white/[0.06] dark:hover:bg-white/[0.12] dark:text-neutral-300 dark:border-white/10"
+                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs transition-colors liquid-glass-pill hover:bg-white/80 dark:hover:bg-white/15 text-neutral-700 dark:text-neutral-200"
                   title={`Открыть проверенный Telegram-канал ${verifiedChannel}`}
                 >
                   <Bot className="w-3.5 h-3.5 text-neutral-500" />
@@ -493,9 +471,9 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                 href={verifiedApplyUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 px-5 py-2 rounded-full font-semibold text-xs sm:text-sm active:scale-95 transition-all
-                  bg-neutral-900 hover:bg-black text-white shadow-xs
-                  dark:bg-white dark:hover:bg-neutral-200 dark:text-neutral-950"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-full font-bold text-xs sm:text-sm active:scale-95 transition-all
+                  bg-neutral-900 hover:bg-black text-white shadow-md
+                  dark:bg-white dark:hover:bg-neutral-100 dark:text-neutral-950"
                 title={`Подать заявку на официальном сайте компании ${internship.company}`}
               >
                 <span>Подать заявку на сайте {internship.company}</span>

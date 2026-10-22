@@ -102,32 +102,23 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
   return (
     <div className="space-y-6">
       {/* Top Banner & Stats - Apple Minimalist Liquid Glass */}
-      <div className="rounded-3xl p-5 sm:p-6 flex flex-col md:flex-row items-center justify-between gap-4 transition-all duration-300
-        bg-white/80 border border-black/[0.06] shadow-[0_10px_30px_rgba(0,0,0,0.04),inset_0_1px_1px_rgba(255,255,255,0.8)]
-        dark:bg-white/[0.035] dark:backdrop-blur-2xl dark:border-white/10 dark:shadow-[0_20px_50px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.08)]"
-      >
+      <div className="rounded-[28px] sm:rounded-[32px] p-5 sm:p-6 flex flex-col md:flex-row items-center justify-between gap-4 transition-all duration-300 liquid-glass">
         <div>
           <div className="flex items-center gap-2 mb-1 flex-wrap">
             <h2 className="text-lg sm:text-xl font-bold tracking-tight flex items-center gap-2 font-sans text-neutral-900 dark:text-white">
               Тренажёр вопросов к собеседованию
             </h2>
-            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-medium
-              bg-neutral-100 text-neutral-700 border border-neutral-200/70
-              dark:bg-white/[0.06] dark:text-neutral-300 dark:border-white/[0.08]"
-            >
+            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-medium liquid-glass-pill text-neutral-700 dark:text-neutral-200">
               {questions.length} вопросов
             </span>
           </div>
-          <p className="text-xs leading-relaxed text-neutral-600 dark:text-neutral-400">
+          <p className="text-xs leading-relaxed text-neutral-600 dark:text-neutral-300">
             Реальные вопросы с интервью стажёров: пишите ответ, сверяйте с эталоном и тренируйте насмотренность.
           </p>
         </div>
 
         {/* View Mode Switcher: 3 Modes (Segmented Capsule Control) */}
-        <div className="flex items-center p-1 rounded-full shrink-0 text-xs transition-colors
-          bg-neutral-100/90 border border-neutral-200/80
-          dark:bg-white/[0.04] dark:border-white/10"
-        >
+        <div className="flex items-center p-1 rounded-full shrink-0 text-xs transition-colors liquid-glass-subtle">
           <button
             onClick={() => {
               triggerHaptic('selection');
@@ -176,10 +167,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
       </div>
 
       {/* Filters Bar */}
-      <div className="rounded-3xl p-4 sm:p-5 space-y-3.5 transition-all duration-300
-        bg-white/80 border border-black/[0.06] shadow-[0_10px_30px_rgba(0,0,0,0.04),inset_0_1px_1px_rgba(255,255,255,0.8)]
-        dark:bg-white/[0.035] dark:backdrop-blur-2xl dark:border-white/10 dark:shadow-[0_20px_50px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.08)]"
-      >
+      <div className="rounded-[28px] sm:rounded-[32px] p-4 sm:p-5 space-y-3.5 transition-all duration-300 liquid-glass">
         {/* Row 1: Search + Status tabs */}
         <div className="flex flex-col sm:flex-row items-center gap-3">
           <div className="relative w-full sm:flex-1">
@@ -189,29 +177,27 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Поиск по вопросу, ключевому слову или коду..."
-              className="w-full pl-9 pr-4 py-2 rounded-full text-xs sm:text-sm transition-all focus:outline-none
-                bg-neutral-100/90 border border-neutral-200/90 text-neutral-900 placeholder:text-neutral-400 focus:border-neutral-400 focus:bg-white
-                dark:bg-white/[0.04] dark:border-white/10 dark:text-neutral-100 dark:placeholder:text-neutral-500 dark:focus:border-white/30 dark:focus:bg-white/[0.07]"
+              className="w-full pl-9 pr-4 py-2 rounded-full text-xs sm:text-sm transition-all focus:outline-none liquid-glass-subtle text-neutral-900 placeholder:text-neutral-500 dark:text-white dark:placeholder:text-neutral-400 focus:border-white/90 dark:focus:border-white/40"
             />
           </div>
 
           <div className="flex items-center gap-1.5 w-full sm:w-auto overflow-x-auto no-scrollbar shrink-0">
             <button
               onClick={() => setStatusFilter('all')}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap border transition-all duration-150 active:scale-95 ${
+              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 ${
                 statusFilter === 'all'
-                  ? 'bg-neutral-900 text-white border-neutral-900 dark:bg-white dark:text-neutral-950 dark:border-white shadow-sm'
-                  : 'bg-neutral-100/90 hover:bg-neutral-200/80 text-neutral-700 border-neutral-200/80 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] dark:text-neutral-300 dark:border-white/[0.08]'
+                  ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-sm'
+                  : 'liquid-glass-pill hover:bg-white/80 dark:hover:bg-white/15 text-neutral-700 dark:text-neutral-200'
               }`}
             >
               Все ({questions.length})
             </button>
             <button
               onClick={() => setStatusFilter('repeat')}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap border transition-all duration-150 active:scale-95 ${
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 ${
                 statusFilter === 'repeat'
-                  ? 'bg-amber-500 text-white border-amber-500 shadow-sm'
-                  : 'bg-neutral-100/90 hover:bg-neutral-200/80 text-amber-700 border-neutral-200/80 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] dark:text-amber-400 dark:border-white/[0.08]'
+                  ? 'bg-amber-500 text-white shadow-sm'
+                  : 'liquid-glass-pill hover:bg-white/80 dark:hover:bg-white/15 text-amber-700 dark:text-amber-400'
               }`}
             >
               <RotateCcw className="w-3 h-3" />
@@ -219,10 +205,10 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
             </button>
             <button
               onClick={() => setStatusFilter('completed')}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap border transition-all duration-150 active:scale-95 ${
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 ${
                 statusFilter === 'completed'
-                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
-                  : 'bg-neutral-100/90 hover:bg-neutral-200/80 text-emerald-700 border-neutral-200/80 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] dark:text-emerald-400 dark:border-white/[0.08]'
+                  ? 'bg-emerald-600 text-white shadow-sm'
+                  : 'liquid-glass-pill hover:bg-white/80 dark:hover:bg-white/15 text-emerald-700 dark:text-emerald-400'
               }`}
             >
               <CheckCircle2 className="w-3.5 h-3.5" />
@@ -338,12 +324,12 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
               return (
                 <div
                   key={q.id}
-                  className={`rounded-3xl border transition-all duration-300 ${
+                  className={`rounded-[28px] border transition-all duration-300 ${
                     isCompleted
-                      ? 'bg-emerald-500/10 border-emerald-500/25 dark:bg-emerald-500/15 dark:border-emerald-500/30'
+                      ? 'bg-emerald-500/10 border-emerald-500/25 dark:bg-emerald-500/15 dark:border-emerald-500/35 liquid-glass-interactive'
                       : isRepeat
-                      ? 'bg-amber-500/10 border-amber-500/25 dark:bg-amber-500/15 dark:border-amber-500/30'
-                      : 'bg-white/85 border-black/[0.06] shadow-[0_10px_30px_rgba(0,0,0,0.04),inset_0_1px_1px_rgba(255,255,255,0.9)] dark:bg-white/[0.035] dark:backdrop-blur-2xl dark:border-white/10 dark:shadow-[0_20px_50px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.1)] hover:border-neutral-300 dark:hover:border-white/20'
+                      ? 'bg-amber-500/10 border-amber-500/25 dark:bg-amber-500/15 dark:border-amber-500/35 liquid-glass-interactive'
+                      : 'liquid-glass liquid-glass-interactive'
                   }`}
                 >
                   <div className="p-5 flex items-start justify-between gap-3">
@@ -366,17 +352,14 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                         onClick={() => setExpandedId(isExpanded ? null : q.id)}
                       >
                         <div className="flex items-center gap-2 flex-wrap mb-1.5">
-                          <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full border
-                            bg-neutral-100 text-neutral-700 border-neutral-200/70
-                            dark:bg-white/[0.06] dark:text-neutral-300 dark:border-white/[0.08]"
-                          >
+                          <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full liquid-glass-pill text-neutral-700 dark:text-neutral-200">
                             {q.category}
                           </span>
                           <span className="text-[11px] text-neutral-500 dark:text-neutral-400">{q.difficulty}</span>
                           {isRepeat && (
                             <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full border
-                              bg-amber-500/10 text-amber-700 border-amber-500/20
-                              dark:bg-amber-500/15 dark:text-amber-400 dark:border-amber-500/30"
+                              bg-amber-500/15 text-amber-700 border-amber-500/30
+                              dark:bg-amber-500/20 dark:text-amber-300 dark:border-amber-500/40"
                             >
                               В повторении
                             </span>
