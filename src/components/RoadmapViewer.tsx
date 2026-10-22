@@ -131,9 +131,9 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
   return (
     <div className="space-y-6">
       {/* Direction Tabs (6 Main Directions) */}
-      <div className="rounded-3xl p-2.5 sm:p-3 transition-colors
-        bg-white/80 border border-neutral-200/80 shadow-xs
-        dark:bg-neutral-900/60 dark:border-neutral-800/80"
+      <div className="rounded-3xl p-3 sm:p-4 transition-all duration-300
+        bg-white/80 border border-black/[0.06] shadow-[0_10px_30px_rgba(0,0,0,0.04),inset_0_1px_1px_rgba(255,255,255,0.8)]
+        dark:bg-white/[0.035] dark:backdrop-blur-2xl dark:border-white/10 dark:shadow-[0_20px_50px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.08)]"
       >
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
           {DIRECTIONS.map((dir) => {
@@ -142,22 +142,22 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
               <button
                 key={dir.id}
                 onClick={() => handleSelectDirection(dir.id)}
-                className={`flex flex-col items-center justify-center p-3 rounded-2xl border text-center transition-all ${
+                className={`flex flex-col items-center justify-center p-3 rounded-2xl border text-center transition-all duration-150 active:scale-95 ${
                   isSelected
-                    ? 'bg-neutral-900 text-white border-neutral-900 dark:bg-white dark:text-neutral-950 dark:border-white shadow-xs'
-                    : 'bg-neutral-100/70 border-neutral-200/60 text-neutral-600 hover:text-neutral-950 hover:bg-neutral-200/60 dark:bg-neutral-850/60 dark:border-neutral-800/60 dark:text-neutral-400 dark:hover:text-white dark:hover:bg-neutral-800/70'
+                    ? 'bg-neutral-900 text-white border-neutral-900 dark:bg-white dark:text-neutral-950 dark:border-white shadow-sm'
+                    : 'bg-neutral-100/80 border-neutral-200/80 text-neutral-700 hover:text-neutral-950 hover:bg-neutral-200/70 dark:bg-white/[0.04] dark:border-white/[0.08] dark:text-neutral-300 dark:hover:bg-white/[0.08]'
                 }`}
               >
                 <div
                   className={`w-8 h-8 rounded-xl flex items-center justify-center mb-1.5 transition-transform ${
                     isSelected
                       ? 'bg-white/20 text-white dark:bg-black/10 dark:text-neutral-950'
-                      : 'bg-neutral-200/70 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300'
+                      : 'bg-neutral-200/70 text-neutral-700 dark:bg-white/[0.08] dark:text-neutral-300'
                   }`}
                 >
                   <Layers className="w-4 h-4" />
                 </div>
-                <span className="text-xs font-semibold leading-tight">{dir.title.split('-')[0]}</span>
+                <span className="text-xs font-bold leading-tight">{dir.title.split('-')[0]}</span>
               </button>
             );
           })}
@@ -165,9 +165,9 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
       </div>
 
       {/* Sub-track switcher & Track progress header */}
-      <div className="rounded-3xl p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-colors
-        bg-white/80 border border-neutral-200/80 shadow-xs
-        dark:bg-neutral-900/60 dark:border-neutral-800/80"
+      <div className="rounded-3xl p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all duration-300
+        bg-white/80 border border-black/[0.06] shadow-[0_10px_30px_rgba(0,0,0,0.04),inset_0_1px_1px_rgba(255,255,255,0.8)]
+        dark:bg-white/[0.035] dark:backdrop-blur-2xl dark:border-white/10 dark:shadow-[0_20px_50px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.08)]"
       >
         <div>
           <div className="flex items-center gap-2 mb-1.5">
@@ -184,10 +184,10 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                 <button
                   key={st.id}
                   onClick={() => handleSelectSubTrack(st.id)}
-                  className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium border transition-all ${
+                  className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-all duration-150 active:scale-95 ${
                     isSelected
-                      ? 'bg-neutral-900 text-white border-neutral-900 shadow-xs dark:bg-white dark:text-neutral-950 dark:border-white'
-                      : 'bg-neutral-100 hover:bg-neutral-200/80 text-neutral-700 border-neutral-200/80 dark:bg-neutral-850 dark:hover:bg-neutral-800 dark:text-neutral-300 dark:border-neutral-750'
+                      ? 'bg-neutral-900 text-white border-neutral-900 shadow-sm dark:bg-white dark:text-neutral-950 dark:border-white'
+                      : 'bg-neutral-100/90 hover:bg-neutral-200/80 text-neutral-700 border-neutral-200/80 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] dark:text-neutral-300 dark:border-white/[0.08]'
                   }`}
                 >
                   <span>{st.name}</span>
@@ -201,7 +201,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
         {/* Track Progress Indicator */}
         <div className="rounded-2xl p-3.5 shrink-0 min-w-[220px] transition-colors
           bg-neutral-50/90 border border-neutral-200/70
-          dark:bg-neutral-850/80 dark:border-neutral-800"
+          dark:bg-white/[0.03] dark:border-white/[0.08]"
         >
           <div className="flex items-center justify-between text-xs mb-1.5">
             <span className="text-neutral-600 dark:text-neutral-400 font-medium flex items-center gap-1.5">
@@ -212,7 +212,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
               {completedInTrack} из {allVisibleTopics.length} ({trackProgressPercent}%)
             </span>
           </div>
-          <div className="w-full h-2 rounded-full overflow-hidden bg-neutral-200 dark:bg-neutral-700">
+          <div className="w-full h-2 rounded-full overflow-hidden bg-neutral-200 dark:bg-white/10">
             <div
               className="h-full rounded-full transition-all duration-500 bg-neutral-900 dark:bg-white"
               style={{ width: `${trackProgressPercent}%` }}
@@ -261,16 +261,16 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                   </div>
 
                   {/* Horizontal Branch Connector Arm */}
-                  <div className="absolute -left-4 sm:-left-6 top-10 w-4 sm:w-6 h-0.5 -translate-y-1/2 z-10 bg-neutral-200 dark:bg-neutral-800"></div>
+                  <div className="absolute -left-4 sm:-left-6 top-10 w-4 sm:w-6 h-0.5 -translate-y-1/2 z-10 bg-neutral-300 dark:bg-white/15"></div>
 
                   {/* Node Card */}
                   <div
-                    className={`p-5 sm:p-6 rounded-3xl border transition-all ${
+                    className={`p-5 sm:p-6 rounded-3xl border transition-all duration-300 ${
                       isDone
-                        ? 'bg-emerald-500/5 border-emerald-500/25 dark:bg-emerald-500/10 dark:border-emerald-500/30'
+                        ? 'bg-emerald-500/10 border-emerald-500/25 dark:bg-emerald-500/15 dark:border-emerald-500/30'
                         : percent > 0
-                        ? 'bg-neutral-50/90 border-neutral-300 dark:bg-neutral-850/80 dark:border-neutral-700'
-                        : 'bg-white/80 border-neutral-200/80 dark:bg-neutral-900/60 dark:border-neutral-800/80 shadow-xs hover:border-neutral-300 dark:hover:border-neutral-700'
+                        ? 'bg-white/95 border-neutral-300 dark:bg-white/[0.06] dark:border-white/20 shadow-md'
+                        : 'bg-white/85 border-black/[0.06] shadow-[0_10px_30px_rgba(0,0,0,0.04),inset_0_1px_1px_rgba(255,255,255,0.9)] dark:bg-white/[0.035] dark:backdrop-blur-2xl dark:border-white/10 dark:shadow-[0_20px_50px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.1)] hover:border-neutral-300 dark:hover:border-white/20'
                     }`}
                   >
                     {/* Header: Title, Order & Doc Link */}
@@ -543,16 +543,16 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                   </div>
 
                   {/* Horizontal Branch Connector Arm */}
-                  <div className="absolute -left-4 sm:-left-6 top-10 w-4 sm:w-6 h-0.5 -translate-y-1/2 z-10 bg-neutral-200 dark:bg-neutral-800"></div>
+                  <div className="absolute -left-4 sm:-left-6 top-10 w-4 sm:w-6 h-0.5 -translate-y-1/2 z-10 bg-neutral-300 dark:bg-white/15"></div>
 
                   {/* Node Card */}
                   <div
-                    className={`p-5 sm:p-6 rounded-3xl border transition-all ${
+                    className={`p-5 sm:p-6 rounded-3xl border transition-all duration-300 ${
                       isDone
-                        ? 'bg-emerald-500/5 border-emerald-500/25 dark:bg-emerald-500/10 dark:border-emerald-500/30'
+                        ? 'bg-emerald-500/10 border-emerald-500/25 dark:bg-emerald-500/15 dark:border-emerald-500/30'
                         : percent > 0
-                        ? 'bg-neutral-50/90 border-neutral-300 dark:bg-neutral-850/80 dark:border-neutral-700'
-                        : 'bg-white/80 border-neutral-200/80 dark:bg-neutral-900/60 dark:border-neutral-800/80 shadow-xs hover:border-neutral-300 dark:hover:border-neutral-700'
+                        ? 'bg-white/95 border-neutral-300 dark:bg-white/[0.06] dark:border-white/20 shadow-md'
+                        : 'bg-white/85 border-black/[0.06] shadow-[0_10px_30px_rgba(0,0,0,0.04),inset_0_1px_1px_rgba(255,255,255,0.9)] dark:bg-white/[0.035] dark:backdrop-blur-2xl dark:border-white/10 dark:shadow-[0_20px_50px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.1)] hover:border-neutral-300 dark:hover:border-white/20'
                     }`}
                   >
                     {/* Header: Title, Order & Doc Link */}

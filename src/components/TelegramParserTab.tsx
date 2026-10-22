@@ -925,7 +925,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
   return (
     <div className="space-y-8">
       {/* Tab Header Banner */}
-      <div className="glass-panel rounded-3xl p-6 sm:p-8 space-y-5 border border-neutral-200/80 dark:border-neutral-800/80 bg-white/80 dark:bg-neutral-900/60 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)]">
+      <div className="glass-panel rounded-3xl p-6 sm:p-8 space-y-5 transition-all duration-300 border border-black/[0.06] shadow-[0_10px_30px_rgba(0,0,0,0.04),inset_0_1px_1px_rgba(255,255,255,0.8)] dark:bg-white/[0.035] dark:backdrop-blur-2xl dark:border-white/10 dark:shadow-[0_20px_50px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.08)]">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-2 flex-wrap">

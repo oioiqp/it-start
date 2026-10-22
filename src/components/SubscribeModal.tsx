@@ -216,10 +216,10 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
   const botToken = getSavedBotToken();
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-md overflow-y-auto">
-      <div className="relative w-full max-w-xl rounded-3xl shadow-2xl p-6 sm:p-7 my-8 animate-in fade-in zoom-in-95 duration-200 transition-colors
-        bg-white/95 border border-neutral-200/80 text-neutral-900
-        dark:bg-neutral-900/95 dark:border-neutral-800/80 dark:shadow-[0_16px_50px_rgba(0,0,0,0.6)] dark:text-neutral-100"
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-xl overflow-y-auto">
+      <div className="relative w-full max-w-xl rounded-3xl shadow-2xl p-6 sm:p-7 my-8 animate-in fade-in zoom-in-95 duration-200 transition-all duration-300
+        bg-white/90 border border-black/[0.08] shadow-[0_25px_60px_rgba(0,0,0,0.08),inset_0_1px_1px_rgba(255,255,255,0.9)] text-neutral-900
+        dark:bg-[#0a0a0c]/90 dark:backdrop-blur-2xl dark:border-white/10 dark:shadow-[0_25px_60px_rgba(0,0,0,0.9),inset_0_1px_1px_rgba(255,255,255,0.12)] dark:text-neutral-100"
       >
         {/* Close Button */}
         <button

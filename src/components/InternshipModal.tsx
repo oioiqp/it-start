@@ -137,10 +137,10 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
   const statusBadge = getStatusBadge();
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-md overflow-y-auto">
-      <div className="relative w-full max-w-3xl rounded-3xl p-6 sm:p-8 my-8 max-h-[90vh] flex flex-col transition-colors
-        bg-white/95 border border-neutral-200/80 shadow-2xl text-neutral-900
-        dark:bg-neutral-900/95 dark:border-neutral-800/80 dark:shadow-[0_16px_50px_rgba(0,0,0,0.7)] dark:text-neutral-100"
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-xl overflow-y-auto">
+      <div className="relative w-full max-w-3xl rounded-3xl p-6 sm:p-8 my-8 max-h-[90vh] flex flex-col transition-all duration-300
+        bg-white/90 border border-black/[0.08] shadow-[0_25px_60px_rgba(0,0,0,0.08),inset_0_1px_1px_rgba(255,255,255,0.9)] text-neutral-900
+        dark:bg-[#0a0a0c]/90 dark:backdrop-blur-2xl dark:border-white/10 dark:shadow-[0_25px_60px_rgba(0,0,0,0.9),inset_0_1px_1px_rgba(255,255,255,0.12)] dark:text-neutral-100"
       >
         {/* Close Button */}
         <button

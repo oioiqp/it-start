@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react';
 import {
   Search,
+  Building2,
   Briefcase,
-  ExternalLink,
   Bot,
   RefreshCw,
-  Bell,
-  Building2,
 } from 'lucide-react';
 import type {
   DirectionId,
@@ -100,13 +98,13 @@ export function App() {
       root.classList.remove('light');
       document.body.classList.add('dark');
       document.body.classList.remove('light');
-      if (metaThemeColor) metaThemeColor.setAttribute('content', '#09090b');
+      if (metaThemeColor) metaThemeColor.setAttribute('content', '#000000');
     } else {
       root.classList.add('light');
       root.classList.remove('dark');
       document.body.classList.add('light');
       document.body.classList.remove('dark');
-      if (metaThemeColor) metaThemeColor.setAttribute('content', '#f4f5f7');
+      if (metaThemeColor) metaThemeColor.setAttribute('content', '#eceef2');
     }
     saveLocalTheme(theme);
   }, [theme]);
@@ -337,8 +335,8 @@ export function App() {
   return (
     <div className={`min-h-screen flex flex-col transition-colors duration-250 ${
       theme === 'dark'
-        ? 'dark bg-[#09090b] text-neutral-100 liquid-ambient-dark selection:bg-white selection:text-neutral-950'
-        : 'light bg-[#f4f5f7] text-neutral-900 liquid-ambient-light selection:bg-neutral-900 selection:text-white'
+        ? 'dark bg-[#000000] text-neutral-100 liquid-ambient-dark selection:bg-white selection:text-neutral-950'
+        : 'light bg-[#eceef2] text-neutral-900 liquid-ambient-light selection:bg-neutral-900 selection:text-white'
     }`}>
       {/* Navbar */}
       <Navbar
@@ -357,88 +355,31 @@ export function App() {
       />
 
       {/* Main Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-7">
         {/* TAB 1: INTERNSHIPS FEED */}
         {activeTab === 'internships' && (
           <div className="space-y-6">
-            {/* Hero Header - Apple Liquid Glass Bento */}
-            <div className="rounded-3xl p-6 sm:p-8 space-y-4 transition-all duration-200
-              bg-white/80 border border-neutral-200/80 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.04)]
-              dark:bg-neutral-900/60 dark:border-neutral-800/80 dark:shadow-[0_4px_30px_rgba(0,0,0,0.4)]"
-            >
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium
-                  bg-neutral-100 text-neutral-800 border border-neutral-200/80
-                  dark:bg-neutral-800 dark:text-neutral-200 dark:border-neutral-700"
-                >
-                  <Briefcase className="w-3.5 h-3.5 text-neutral-600 dark:text-neutral-400" />
-                  Стажировки 2026
-                </span>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium
-                  bg-emerald-500/10 text-emerald-700 border border-emerald-500/20
-                  dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30"
-                >
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                  Верифицированные вакансии
+            {/* Hero Header - Apple Liquid Glass Minimalist */}
+            <div className="relative pt-2 sm:pt-6 pb-2 sm:pb-3 text-center space-y-2.5 select-none">
+              {/* Subtle ambient typography watermark behind cards like "Pricing" in the reference image */}
+              <div className="absolute inset-0 -top-6 flex items-center justify-center -z-10 pointer-events-none overflow-hidden select-none opacity-[0.035] dark:opacity-[0.06] blur-[0.5px]">
+                <span className="text-7xl sm:text-9xl md:text-[140px] font-black tracking-tight uppercase">
+                  IT-СТАРТ
                 </span>
               </div>
 
-              <div className="max-w-3xl space-y-2">
-                <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight leading-tight font-sans text-neutral-900 dark:text-white">
-                  Агрегатор IT-стажировок, интерактивные роадмапы и тренажёр
-                </h1>
-                <p className="text-xs sm:text-sm leading-relaxed max-w-2xl text-neutral-600 dark:text-neutral-300">
-                  Подлинные позиции для стажёров и Junior-разработчиков: Т-Банк, Яндекс, Сбер, Ozon Tech, VK, Авито, Контур, Холдинг Т1 и Directum. Выбирайте вакансию для автоматического расчёта готовности по стеку и тренируйтесь перед интервью.
-                </p>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2.5 pt-1">
-                <button
-                  onClick={() => {
-                    triggerHaptic('medium');
-                    setIsSubscribeModalOpen(true);
-                  }}
-                  className="flex items-center gap-2 px-4 py-2.5 rounded-full font-medium text-xs sm:text-sm active:scale-95 transition-all
-                    bg-neutral-900 hover:bg-black text-white shadow-xs
-                    dark:bg-white dark:hover:bg-neutral-100 dark:text-neutral-950"
-                >
-                  <Bell className="w-3.5 h-3.5" />
-                  <span>Уведомления в Telegram</span>
-                </button>
-
-                <button
-                  onClick={() => {
-                    triggerHaptic('selection');
-                    setActiveTab('roadmaps');
-                  }}
-                  className="flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs sm:text-sm font-medium transition-colors
-                    bg-neutral-100 hover:bg-neutral-200 text-neutral-800 border border-neutral-200/80
-                    dark:bg-neutral-800 dark:hover:bg-neutral-750 dark:text-neutral-200 dark:border-neutral-700"
-                >
-                  <span>Роадмапы</span>
-                  <ExternalLink className="w-3 h-3 opacity-70" />
-                </button>
-
-                {!telegramUser && (
-                  <a
-                    href={TELEGRAM_BOT_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs sm:text-sm font-medium transition-colors
-                      bg-neutral-100 hover:bg-neutral-200 text-neutral-700 border border-neutral-200/80
-                      dark:bg-neutral-800 dark:hover:bg-neutral-750 dark:text-neutral-300 dark:border-neutral-700"
-                  >
-                    <Bot className="w-3.5 h-3.5 text-neutral-500" />
-                    <span>Бот @{TELEGRAM_BOT_USERNAME}</span>
-                  </a>
-                )}
-              </div>
+              <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight font-sans text-neutral-900 dark:text-white">
+                Агрегатор IT-стажировок
+              </h1>
+              <p className="text-xs sm:text-sm font-medium leading-relaxed max-w-xl mx-auto text-neutral-600 dark:text-neutral-400">
+                Интерактивная дорожная карта • Тренажёры • Подлинные позиции
+              </p>
             </div>
 
-            {/* Filter and Search Panel */}
-            <div className="rounded-3xl p-5 sm:p-6 space-y-4 transition-all duration-200
-              bg-white/80 border border-neutral-200/80 shadow-xs
-              dark:bg-neutral-900/60 dark:border-neutral-800/80"
+            {/* Filter and Search Panel - Liquid Glass Capsule */}
+            <div className="rounded-3xl p-4 sm:p-6 space-y-4 transition-all duration-300
+              bg-white/80 border border-black/[0.06] shadow-[0_10px_30px_rgba(0,0,0,0.04),inset_0_1px_1px_rgba(255,255,255,0.8)]
+              dark:bg-white/[0.035] dark:backdrop-blur-2xl dark:border-white/10 dark:shadow-[0_20px_50px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.08)]"
             >
               {/* Row 1: Search & Reset */}
               <div className="flex flex-col sm:flex-row items-center gap-3">
@@ -449,9 +390,9 @@ export function App() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Поиск по названию, компании или технологиям (React, Python, Go, C#, QA)..."
-                    className="w-full pl-10 pr-4 py-2.5 rounded-full text-xs sm:text-sm transition-colors focus:outline-none
-                      bg-neutral-100/80 border border-neutral-200/80 text-neutral-900 placeholder:text-neutral-400 focus:border-neutral-400
-                      dark:bg-neutral-850/80 dark:border-neutral-750 dark:text-neutral-100 dark:placeholder:text-neutral-500 dark:focus:border-neutral-500"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-full text-xs sm:text-sm transition-all focus:outline-none
+                      bg-neutral-100/90 border border-neutral-200/90 text-neutral-900 placeholder:text-neutral-400 focus:border-neutral-400 focus:bg-white
+                      dark:bg-white/[0.04] dark:border-white/10 dark:text-neutral-100 dark:placeholder:text-neutral-500 dark:focus:border-white/30 dark:focus:bg-white/[0.07]"
                   />
                 </div>
 
@@ -465,9 +406,9 @@ export function App() {
                       setSelectedFormat('all');
                       setSelectedSource('all');
                     }}
-                    className="w-full sm:w-auto px-4 py-2.5 rounded-full text-xs font-medium transition-colors
-                      bg-neutral-100 hover:bg-neutral-200 text-neutral-600 border border-neutral-200/80
-                      dark:bg-neutral-800 dark:hover:bg-neutral-750 dark:text-neutral-300 dark:border-neutral-700"
+                    className="w-full sm:w-auto px-4 py-2.5 rounded-full text-xs font-semibold transition-all duration-150 active:scale-95
+                      bg-neutral-100 hover:bg-neutral-200 text-neutral-700 border border-neutral-200/90
+                      dark:bg-white/[0.05] dark:hover:bg-white/[0.1] dark:text-neutral-300 dark:border-white/10"
                   >
                     Сбросить фильтры
                   </button>
@@ -475,10 +416,10 @@ export function App() {
               </div>
 
               {/* Row 2: Company Filter */}
-              <div className="space-y-1.5 pt-1 border-t border-neutral-200/70 dark:border-neutral-800">
+              <div className="space-y-1.5 pt-1 border-t border-neutral-200/70 dark:border-white/[0.07]">
                 <div className="flex items-center justify-between text-[11px] font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                   <span className="flex items-center gap-1.5">
-                    <Building2 className="w-3.5 h-3.5 text-neutral-500" />
+                    <Building2 className="w-3.5 h-3.5 text-neutral-500 dark:text-neutral-400" />
                     Работодатель (Топ IT-компании):
                   </span>
                   {selectedCompany !== 'all' && (
@@ -493,10 +434,10 @@ export function App() {
                 <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
                   <button
                     onClick={() => setSelectedCompany('all')}
-                    className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
+                    className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 ${
                       selectedCompany === 'all'
-                        ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-xs'
-                        : 'bg-neutral-100 hover:bg-neutral-200/80 text-neutral-700 border border-neutral-200/70 dark:bg-neutral-850 dark:hover:bg-neutral-800 dark:text-neutral-300 dark:border-neutral-750'
+                        ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-sm'
+                        : 'bg-neutral-100/90 hover:bg-neutral-200/80 text-neutral-700 border border-neutral-200/80 dark:bg-white/[0.04] dark:border-white/[0.08] dark:text-neutral-300 dark:hover:bg-white/[0.08]'
                     }`}
                   >
                     Все ({internships.length})
@@ -508,10 +449,10 @@ export function App() {
                       <button
                         key={company}
                         onClick={() => setSelectedCompany(isSelected ? 'all' : company)}
-                        className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 border ${
+                        className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 flex items-center gap-1.5 border ${
                           isSelected
-                            ? 'bg-neutral-900 text-white border-neutral-900 dark:bg-white dark:text-neutral-950 dark:border-white shadow-xs'
-                            : 'bg-neutral-100/80 hover:bg-neutral-200/80 border-neutral-200/70 text-neutral-700 dark:bg-neutral-850/80 dark:border-neutral-750 dark:text-neutral-300 dark:hover:bg-neutral-800'
+                            ? 'bg-neutral-900 text-white border-neutral-900 dark:bg-white dark:text-neutral-950 dark:border-white shadow-sm'
+                            : 'bg-neutral-100/90 hover:bg-neutral-200/80 border-neutral-200/80 text-neutral-700 dark:bg-white/[0.04] dark:border-white/[0.08] dark:text-neutral-300 dark:hover:bg-white/[0.08]'
                         }`}
                       >
                         <span>{company}</span>
@@ -519,7 +460,7 @@ export function App() {
                           className={`text-[10px] px-1.5 py-0.2 rounded-full font-medium ${
                             isSelected
                               ? 'bg-white/20 text-white dark:bg-black/10 dark:text-neutral-950'
-                              : 'bg-neutral-200/70 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300'
+                              : 'bg-neutral-200/70 text-neutral-700 dark:bg-white/[0.08] dark:text-neutral-300'
                           }`}
                         >
                           {count}
@@ -531,7 +472,7 @@ export function App() {
               </div>
 
               {/* Row 3: Direction tabs */}
-              <div className="space-y-1.5 pt-1 border-t border-neutral-200/70 dark:border-neutral-800">
+              <div className="space-y-1.5 pt-1 border-t border-neutral-200/70 dark:border-white/[0.07]">
                 <div className="text-[11px] font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                   Направление:
                 </div>
@@ -541,10 +482,10 @@ export function App() {
                       setSelectedDirection('all');
                       setSelectedSubTrack('all');
                     }}
-                    className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
+                    className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 ${
                       selectedDirection === 'all'
-                        ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-xs'
-                        : 'bg-neutral-100 hover:bg-neutral-200/80 text-neutral-700 border border-neutral-200/70 dark:bg-neutral-850 dark:hover:bg-neutral-800 dark:text-neutral-300 dark:border-neutral-750'
+                        ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-sm'
+                        : 'bg-neutral-100/90 hover:bg-neutral-200/80 text-neutral-700 border border-neutral-200/80 dark:bg-white/[0.04] dark:border-white/[0.08] dark:text-neutral-300 dark:hover:bg-white/[0.08]'
                     }`}
                   >
                     Все направления ({internships.length})
@@ -556,10 +497,10 @@ export function App() {
                         setSelectedDirection(dir.id);
                         setSelectedSubTrack('all');
                       }}
-                      className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all border ${
+                      className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 border ${
                         selectedDirection === dir.id
-                          ? 'bg-neutral-900 text-white border-neutral-900 dark:bg-white dark:text-neutral-950 dark:border-white shadow-xs'
-                          : 'bg-neutral-100/80 hover:bg-neutral-200/80 border-neutral-200/70 text-neutral-700 dark:bg-neutral-850/80 dark:border-neutral-750 dark:text-neutral-300 dark:hover:bg-neutral-800'
+                          ? 'bg-neutral-900 text-white border-neutral-900 dark:bg-white dark:text-neutral-950 dark:border-white shadow-sm'
+                          : 'bg-neutral-100/90 hover:bg-neutral-200/80 border-neutral-200/80 text-neutral-700 dark:bg-white/[0.04] dark:border-white/[0.08] dark:text-neutral-300 dark:hover:bg-white/[0.08]'
                       }`}
                     >
                       {dir.title.split('-')[0]}
@@ -570,7 +511,7 @@ export function App() {
 
               {/* Row 4: Sub-tracks */}
               {selectedDirection !== 'all' && (
-                <div className="space-y-1.5 pt-1 border-t border-neutral-200/70 dark:border-neutral-800">
+                <div className="space-y-1.5 pt-1 border-t border-neutral-200/70 dark:border-white/[0.07]">
                   <div className="text-[11px] font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                     Специализация:
                   </div>
@@ -579,8 +520,8 @@ export function App() {
                       onClick={() => setSelectedSubTrack('all')}
                       className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
                         selectedSubTrack === 'all'
-                          ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-xs'
-                          : 'bg-neutral-100 text-neutral-700 dark:bg-neutral-850 dark:text-neutral-300'
+                          ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-sm'
+                          : 'bg-neutral-100 text-neutral-700 dark:bg-white/[0.04] dark:text-neutral-300'
                       }`}
                     >
                       Все ветки
@@ -591,8 +532,8 @@ export function App() {
                         onClick={() => setSelectedSubTrack(st.id)}
                         className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
                           selectedSubTrack === st.id
-                            ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-xs'
-                            : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200 dark:bg-neutral-850 dark:text-neutral-300 dark:hover:bg-neutral-800'
+                            ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-sm'
+                            : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200 dark:bg-white/[0.04] dark:text-neutral-300 dark:hover:bg-white/[0.08]'
                         }`}
                       >
                         {st.name}
@@ -603,7 +544,7 @@ export function App() {
               )}
 
               {/* Row 5: Format & Source selectors */}
-              <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-neutral-200/70 dark:border-neutral-800 text-xs">
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-neutral-200/70 dark:border-white/[0.07] text-xs">
                 {/* Format Filter */}
                 <div className="flex items-center gap-1.5">
                   <span className="text-neutral-500 dark:text-neutral-400 font-medium">Формат:</span>
@@ -613,7 +554,7 @@ export function App() {
                       onClick={() => setSelectedFormat(fmt)}
                       className={`px-3 py-1 rounded-full transition-colors font-medium ${
                         selectedFormat === fmt
-                          ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-xs'
+                          ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-sm'
                           : 'text-neutral-600 hover:text-neutral-950 dark:text-neutral-400 dark:hover:text-white'
                       }`}
                     >
@@ -631,7 +572,7 @@ export function App() {
                       onClick={() => setSelectedSource(src)}
                       className={`px-3 py-1 rounded-full transition-colors font-medium ${
                         selectedSource === src
-                          ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-xs'
+                          ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-sm'
                           : 'text-neutral-600 hover:text-neutral-950 dark:text-neutral-400 dark:hover:text-white'
                       }`}
                     >
