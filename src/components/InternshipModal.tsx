@@ -18,6 +18,7 @@ import {
 import confetti from 'canvas-confetti';
 import type { Internship, Question, RoadmapTopic, UserProgress } from '../types';
 import { triggerHaptic } from '../lib/telegram';
+import { resolveApplyUrl, resolveChannelHandle } from '../lib/vacancyUrl';
 
 interface InternshipModalProps {
   internship: Internship | null;
@@ -463,35 +464,45 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
               Закрыть
             </button>
 
-            {internship.sourceChannel.startsWith('@') && (
-              <a
-                href={`https://t.me/${internship.sourceChannel.replace(/^@/, '')}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs transition-colors
-                  bg-neutral-100 hover:bg-neutral-200 text-neutral-700 border border-neutral-200/80
-                  dark:bg-white/[0.06] dark:hover:bg-white/[0.12] dark:text-neutral-300 dark:border-white/10"
-                title={`Открыть Telegram-канал ${internship.sourceChannel}`}
-              >
-                <Bot className="w-3.5 h-3.5 text-neutral-500" />
-                <span>Канал {internship.sourceChannel}</span>
-                <ExternalLink className="w-3 h-3" />
-              </a>
-            )}
+            {(() => {
+              const verifiedChannel = resolveChannelHandle(internship.sourceChannel, internship.company);
+              const cleanChannel = verifiedChannel.replace(/^@/, '');
+
+              return verifiedChannel.startsWith('@') ? (
+                <a
+                  href={`https://t.me/${cleanChannel}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs transition-colors
+                    bg-neutral-100 hover:bg-neutral-200 text-neutral-700 border border-neutral-200/80
+                    dark:bg-white/[0.06] dark:hover:bg-white/[0.12] dark:text-neutral-300 dark:border-white/10"
+                  title={`Открыть проверенный Telegram-канал ${verifiedChannel}`}
+                >
+                  <Bot className="w-3.5 h-3.5 text-neutral-500" />
+                  <span>Канал {verifiedChannel}</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              ) : null;
+            })()}
           </div>
 
-          <a
-            href={internship.applyUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 px-5 py-2 rounded-full font-semibold text-xs sm:text-sm active:scale-95 transition-all
-              bg-neutral-900 hover:bg-black text-white shadow-xs
-              dark:bg-white dark:hover:bg-neutral-200 dark:text-neutral-950"
-            title={`Подать заявку на официальном сайте компании ${internship.company}`}
-          >
-            <span>Подать заявку на сайте {internship.company}</span>
-            <ExternalLink className="w-3.5 h-3.5" />
-          </a>
+          {(() => {
+            const verifiedApplyUrl = resolveApplyUrl(internship.applyUrl, internship.company);
+            return (
+              <a
+                href={verifiedApplyUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-5 py-2 rounded-full font-semibold text-xs sm:text-sm active:scale-95 transition-all
+                  bg-neutral-900 hover:bg-black text-white shadow-xs
+                  dark:bg-white dark:hover:bg-neutral-200 dark:text-neutral-950"
+                title={`Подать заявку на официальном сайте компании ${internship.company}`}
+              >
+                <span>Подать заявку на сайте {internship.company}</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+            );
+          })()}
         </div>
       </div>
     </div>

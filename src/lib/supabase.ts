@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Internship, TelegramSubscription, UserProgress } from '../types';
+import { resolveApplyUrl, resolveChannelHandle } from './vacancyUrl';
 
 export const SUPABASE_URL = 'https://pmgsymacvhzsixbpndsn.supabase.co';
 export const SUPABASE_ANON_KEY =
@@ -88,9 +89,9 @@ export async function fetchInternshipsFromSupabase(): Promise<Internship[] | nul
           description: item.description || '',
           requirements: parseArray(item.requirements, defaultRequirements),
           responsibilities: parseArray(item.responsibilities, defaultResponsibilities),
-          sourceChannel: item.source_name || item.source_channel || '@IT_start_izh_bot',
+          sourceChannel: resolveChannelHandle(item.source_name || item.source_channel, item.company),
           sourceType: (item.source_type || 'telegram') as 'telegram' | 'portal',
-          applyUrl: item.source_url || item.apply_url || TELEGRAM_BOT_URL,
+          applyUrl: resolveApplyUrl(item.source_url || item.apply_url, item.company),
           publishedAt: item.published_at || new Date().toISOString(),
           isHot: Boolean(item.is_hot),
         };

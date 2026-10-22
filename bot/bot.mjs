@@ -197,7 +197,7 @@ export const ALL_INTERNSHIPS = [
     "channel": "@yandex_intern",
     "directionId": "backend",
     "subTrackId": "python",
-    "url": "https://yandex.ru/yabackend/",
+    "url": "https://yandex.ru/jobs/",
     "description": "Стажировка в сервисах Яндекс Маркета или Поиска. Реальные задачи масштабирования высоконагруженных микросервисов с менторской поддержкой.",
     "tags": [
       "Python 3.12",
@@ -260,7 +260,7 @@ export const ALL_INTERNSHIPS = [
     "channel": "@avito_tech",
     "directionId": "mobile",
     "subTrackId": "android",
-    "url": "https://career.avito.com/internship/",
+    "url": "https://career.avito.com/",
     "description": "Разработка фичей для мобильного приложения Авито с десятками миллионов пользователей. Чистая архитектура, дизайн-система и лучшие инженерные практики.",
     "tags": [
       "Kotlin",
@@ -344,7 +344,7 @@ export const ALL_INTERNSHIPS = [
     "channel": "@KonturTech",
     "directionId": "frontend",
     "subTrackId": "angular",
-    "url": "https://kontur.ru/career",
+    "url": "https://kontur.ru/career/vacancies",
     "description": "Разработка веб-сервисов электронного документооборота и бухгалтерии Контура, которыми пользуются миллионы предпринимателей.",
     "tags": [
       "Angular 18",
@@ -386,7 +386,7 @@ export const ALL_INTERNSHIPS = [
     "channel": "@yandex_intern",
     "directionId": "mobile",
     "subTrackId": "ios",
-    "url": "https://yandex.ru/yabackend/",
+    "url": "https://yandex.ru/jobs/",
     "description": "Разработка супераппа Яндекс Go (Такси, Доставка, Самокаты). Работа с плавной анимацией карты, высокими требованиями к отзывчивости UI.",
     "tags": [
       "Swift 6",
@@ -470,7 +470,7 @@ export const ALL_INTERNSHIPS = [
     "channel": "@avito_tech",
     "directionId": "devops",
     "subTrackId": "k8s_iac",
-    "url": "https://career.avito.com/internship/",
+    "url": "https://career.avito.com/",
     "description": "Команда Core Platform в Авито. Мы развиваем внутреннюю платформу разработки на базе K8s, обслуживающую сотни микросервисов.",
     "tags": [
       "Kubernetes",
@@ -512,7 +512,7 @@ export const ALL_INTERNSHIPS = [
     "channel": "@yandex_intern",
     "directionId": "data_science",
     "subTrackId": "ml",
-    "url": "https://yandex.ru/yabackend/",
+    "url": "https://yandex.ru/jobs/",
     "description": "Участие в обучении и дообучении языковых моделей YandexGPT. Настройка пайплайнов RAG, оценка качества генерации и файнтюнинг.",
     "tags": [
       "PyTorch",
@@ -533,7 +533,7 @@ export const ALL_INTERNSHIPS = [
     "channel": "@KonturTech",
     "directionId": "backend",
     "subTrackId": "golang",
-    "url": "https://kontur.ru/career",
+    "url": "https://kontur.ru/career/vacancies",
     "description": "Разработка масштабируемых сервисов Контур.Фокус и Контур.Диадок. Чистая архитектура, code review от признанных экспертов.",
     "tags": [
       "Go",
@@ -554,7 +554,7 @@ export const ALL_INTERNSHIPS = [
     "channel": "@t1career",
     "directionId": "backend",
     "subTrackId": "java",
-    "url": "https://t1.ru/school/",
+    "url": "https://career.t1.ru/",
     "description": "Обучение и стажировка в Открытой школе Т1 с переходом в штат. Разработка надежных Enterprise-сервисов для крупнейших корпоративных заказчиков.",
     "tags": [
       "Java 21",
@@ -575,7 +575,7 @@ export const ALL_INTERNSHIPS = [
     "channel": "@t1career",
     "directionId": "devops",
     "subTrackId": "cicd_docker",
-    "url": "https://t1.ru/school/",
+    "url": "https://career.t1.ru/",
     "description": "Поддержка и автоматизация инфраструктуры масштабируемых облачных решений Т1 Облако.",
     "tags": [
       "Linux",
@@ -596,7 +596,7 @@ export const ALL_INTERNSHIPS = [
     "channel": "@t1career",
     "directionId": "qa",
     "subTrackId": "auto_qa",
-    "url": "https://t1.ru/school/",
+    "url": "https://career.t1.ru/",
     "description": "Автоматизация тестирования банковских и интеграционных платформ группы Т1.",
     "tags": [
       "QA Automation",
@@ -617,7 +617,7 @@ export const ALL_INTERNSHIPS = [
     "channel": "@Life_in_Directum",
     "directionId": "frontend",
     "subTrackId": "react",
-    "url": "https://career.directum.ru/",
+    "url": "https://career.directum.ru/vacancy",
     "description": "Разработка веб-клиента флагманской платформы управления цифровыми процессами и документами Directum RX в Ижевске.",
     "tags": [
       "React",
@@ -639,7 +639,7 @@ export const ALL_INTERNSHIPS = [
     "channel": "@Life_in_Directum",
     "directionId": "backend",
     "subTrackId": "java",
-    "url": "https://career.directum.ru/",
+    "url": "https://career.directum.ru/vacancy",
     "description": "Разработка масштабируемого бэкенда интеллектуальной системы управления документами Directum RX. Микросервисы, асинхронная обработка и AI-модули.",
     "tags": [
       "C#",
@@ -662,7 +662,7 @@ export const ALL_INTERNSHIPS = [
     "channel": "@Life_in_Directum",
     "directionId": "qa",
     "subTrackId": "manual_qa",
-    "url": "https://career.directum.ru/",
+    "url": "https://career.directum.ru/vacancy",
     "description": "Тестирование веб- и десктоп-клиентов Directum RX, поиск дефектов в бизнес-процессах электронного документооборота.",
     "tags": [
       "Manual QA",
@@ -684,7 +684,7 @@ export const ALL_INTERNSHIPS = [
     "channel": "@KonturTech",
     "directionId": "frontend",
     "subTrackId": "react",
-    "url": "https://kontur.ru/career",
+    "url": "https://kontur.ru/career/vacancies",
     "description": "Оплачиваемая стажировка Контур.Старт 2026 с индивидуальным наставником. Разработка современных интерфейсов для экосистемы Контура.",
     "tags": [
       "React",
@@ -705,7 +705,7 @@ export const ALL_INTERNSHIPS = [
     "channel": "@KonturTech",
     "directionId": "backend",
     "subTrackId": "python",
-    "url": "https://kontur.ru/career",
+    "url": "https://kontur.ru/career/vacancies",
     "description": "Программа стажировки Контур.Старт для начинающих бэкендеров. Решение реальных бизнес-задач под менторством Senior-разработчиков.",
     "tags": [
       "Python",
@@ -811,7 +811,7 @@ export const ALL_INTERNSHIPS = [
     "channel": "@avito_tech",
     "directionId": "frontend",
     "subTrackId": "react",
-    "url": "https://career.avito.com/internship/",
+    "url": "https://career.avito.com/",
     "description": "Программа стажировки Авито Старт: разработка ключевых разделов Avito.ru с миллионной аудиторией. Дизайн-система, микрофронтенды и высокие стандарты качества.",
     "tags": [
       "React",
@@ -832,7 +832,7 @@ export const ALL_INTERNSHIPS = [
     "channel": "@avito_tech",
     "directionId": "backend",
     "subTrackId": "python",
-    "url": "https://career.avito.com/internship/",
+    "url": "https://career.avito.com/",
     "description": "Разработка распределенных микросервисов поиска и рекомендаций Авито. Решение алгоритмических задач и обработка терабайтов данных под руководством Senior ментора.",
     "tags": [
       "Python 3.12",
@@ -938,7 +938,7 @@ export const ALL_INTERNSHIPS = [
     "channel": "@KonturTech",
     "directionId": "qa",
     "subTrackId": "manual_qa",
-    "url": "https://kontur.ru/career",
+    "url": "https://kontur.ru/career/vacancies",
     "description": "Программа стажировки Контур.Старт 2026 для инженеров по тестированию. Тестирование веб-сервисов Диадок, Фокус и Бухгалтерия с персональным наставником.",
     "tags": [
       "Контур.Старт",
@@ -959,7 +959,7 @@ export const ALL_INTERNSHIPS = [
     "channel": "@Life_in_Directum",
     "directionId": "backend",
     "subTrackId": "java",
-    "url": "https://career.directum.ru/",
+    "url": "https://career.directum.ru/vacancy",
     "description": "Разработка ядра интеллектуальной платформы управления цифровыми процессами и документами Directum RX в Ижевске. AI-сервисы, распределенная архитектура.",
     "tags": [
       "Directum RX",
@@ -1002,7 +1002,7 @@ export const ALL_INTERNSHIPS = [
     "channel": "@yandex_intern",
     "directionId": "frontend",
     "subTrackId": "react",
-    "url": "https://yandex.ru/yabackend/",
+    "url": "https://yandex.ru/jobs/",
     "description": "Оплачиваемая стажировка в Яндексе (Young Con): разработка сложных интерфейсов сервисов Поиска, Маркета и Go на React, TypeScript, SSR и микрофронтендах.",
     "tags": [
       "React",
@@ -1045,7 +1045,7 @@ export const ALL_INTERNSHIPS = [
     "channel": "@avito_tech",
     "directionId": "data_science",
     "subTrackId": "analytics",
-    "url": "https://career.avito.com/internship/",
+    "url": "https://career.avito.com/",
     "description": "Оплачиваемая программа стажировки Авито Старт для аналитиков данных: анализ пользовательского поведения, проведение A/B тестов, расчет продуктовых метрик и дашборды.",
     "tags": [
       "SQL",
@@ -1175,7 +1175,7 @@ export const CAREER_WEBSITES_DATA = [
     companyId: 't1',
     company: 'Холдинг Т1',
     name: 'Открытая школа Т1 & Карьера',
-    url: 'https://t1.ru/school/',
+    url: 'https://career.t1.ru/',
     category: 'Официальный образовательный интенсив Т1',
     type: 'direct_site',
     city: 'Москва / Удаленно',
@@ -1255,7 +1255,7 @@ export const CAREER_WEBSITES_DATA = [
     companyId: 'yandex',
     company: 'Яндекс',
     name: 'Яндекс Интерны & Young Con',
-    url: 'https://yandex.ru/yabackend/',
+    url: 'https://yandex.ru/jobs/',
     category: 'Официальный портал стажировок Яндекса',
     type: 'direct_site',
     city: 'Москва / Гибрид',
@@ -1285,7 +1285,7 @@ export const CAREER_WEBSITES_DATA = [
     companyId: 'avito',
     company: 'Авито',
     name: 'Карьера в Avito Tech',
-    url: 'https://career.avito.com/internship/',
+    url: 'https://career.avito.com/',
     category: 'Официальная программа стажировок Авито',
     type: 'direct_site',
     city: 'Москва / Санкт-Петербург',
@@ -1513,6 +1513,77 @@ export function detectVacancyTrack(title = '', text = '') {
   return { directionId: 'backend', subTrackId: 'python' };
 }
 
+export const COMPANY_OFFICIAL_PORTALS = {
+  tbank: 'https://www.tbank.ru/career/it/',
+  kontur: 'https://kontur.ru/career/vacancies',
+  directum: 'https://career.directum.ru/vacancy',
+  t1: 'https://career.t1.ru/',
+  yandex: 'https://yandex.ru/jobs/',
+  ozon: 'https://job.ozon.ru/it/',
+  sber: 'https://sbergraduate.ru/',
+  avito: 'https://career.avito.com/',
+  vk: 'https://internship.vk.company/',
+};
+
+/**
+ * Strict validator for real IT internship and junior positions.
+ * Rejects PR articles, podcasts, surveys, celebrations, contests, and non-IT roles.
+ */
+export function isStrictVacancyPost(title = '', text = '') {
+  const combined = (title + ' ' + text).toLowerCase();
+
+  // 1. Strict STOP WORDS (PR, podcasts, news, surveys, celebrations, general articles, contests)
+  const stopWords = [
+    'девушки в', 'девушек в',
+    'подкаст', 'podcast',
+    'опрос', 'голосован', 'голосуйте',
+    'вебинар', 'митап', 'meetup', 'круглый стол',
+    'поздравл', 'с 8 марта', 'с новым годом', 'с праздником',
+    'итоги года', 'розыгрыш', 'дарим', 'мерч', 'футболк',
+    'статья на хабр', 'vc.ru', 'habr.com',
+    'какая ide', 'какую ide',
+    'сегодня важный день', 'нужно только рассказать',
+    'где-то ходит один', 'отменяет плату',
+    'видеокреатор', 'crm-маркетолог', 'менеджер по продажам',
+    'smm', 'смм', 'конкурс школьниц', 'школьниц', 'авиация начинается'
+  ];
+
+  for (const stop of stopWords) {
+    if (combined.includes(stop)) {
+      return false;
+    }
+  }
+
+  // 2. Must indicate a vacancy / trainee / junior role
+  const roleKeywords = [
+    'стаж', 'стажировк', 'intern', 'trainee',
+    'junior', 'джуниор', 'джун',
+    'открытая школа', 'школа разработк', 'контур.старт', 'ozon camp', 'sberseasons', 'авито старт'
+  ];
+  if (!roleKeywords.some((k) => combined.includes(k))) return false;
+
+  // 3. Must indicate hiring action or job structure
+  const jobStructureKeywords = [
+    'ищем', 'ваканси', 'отклик', 'подать заявку', 'резюме',
+    'требования', 'требован', 'задачи', 'обязанности', 'мы ждем',
+    'опыт', 'стек', 'стек:', 'локация', 'формат'
+  ];
+  if (!jobStructureKeywords.some((k) => combined.includes(k))) return false;
+
+  // 4. Must indicate IT / engineering direction or technical skills
+  const techKeywords = [
+    'разработчик', 'developer', 'инженер', 'engineer',
+    'программист', 'тестиров', 'qa', 'devops', 'sre',
+    'frontend', 'backend', 'fullstack',
+    'python', 'java', 'c#', '.net', 'golang', 'go', 'react', 'vue', 'angular',
+    'javascript', 'typescript', 'sql', 'postgresql', 'docker', 'kubernetes',
+    'android', 'ios', 'kotlin', 'swift', 'data science', 'ml', 'machine learning'
+  ];
+  if (!techKeywords.some((k) => combined.includes(k))) return false;
+
+  return true;
+}
+
 /**
  * Parse public Telegram channel web preview (https://t.me/s/<channel>)
  * Extracts posts, filters IT vacancies, maps to Internship format
@@ -1551,10 +1622,6 @@ export async function parseChannelPosts(channelHandle, companyInfo) {
       const publishedAt = timeMatch ? timeMatch[1] : new Date().toISOString();
       const rawHtmlText = textMatch[1];
 
-      // Extract external apply/vacancy link if present in message
-      const linkMatch = rawHtmlText.match(/href="((?:https?:\/\/)(?!t\.me|telegram\.org)[^"]+)"/i);
-      const applyUrl = linkMatch ? linkMatch[1] : `https://t.me/${postSlug}`;
-
       const text = rawHtmlText
         .replace(/<br\s*\/?>/gi, '\n')
         .replace(/<[^>]+>/g, ' ')
@@ -1565,30 +1632,40 @@ export async function parseChannelPosts(channelHandle, companyInfo) {
         .replace(/&#x([0-9a-fA-F]+);/g, (_, code) => String.fromCharCode(parseInt(code, 16)))
         .trim();
 
-      const textLower = text.toLowerCase();
-      // Filter for junior/intern/it vacancy keywords
-      const isVacancy =
-        textLower.includes('стаж') ||
-        textLower.includes('junior') ||
-        textLower.includes('джуниор') ||
-        textLower.includes('интенсив') ||
-        textLower.includes('школ') ||
-        textLower.includes('ваканси') ||
-        textLower.includes('ищем') ||
-        textLower.includes('разработчик') ||
-        textLower.includes('инженер') ||
-        textLower.includes('qa') ||
-        textLower.includes('тестиров') ||
-        textLower.includes('devops') ||
-        textLower.includes('camp') ||
-        textLower.includes('start');
-
-      if (!isVacancy) continue;
-
       // Extract first meaningful line as title candidate
       const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
       const firstLine = (lines[0] || 'IT-Стажировка').replace(/^[^\p{L}\p{N}]+/u, '');
       const title = firstLine.length > 70 ? firstLine.slice(0, 67) + '...' : firstLine;
+
+      // Strict validation: eliminate PR posts, podcasts, news, surveys
+      if (!isStrictVacancyPost(title, text)) {
+        continue;
+      }
+
+      // Safe application URL: prefer official portals or verified domain links
+      const companyPortal = COMPANY_OFFICIAL_PORTALS[companyInfo.id] || 'https://career.directum.ru/vacancy';
+      let applyUrl = companyPortal;
+      const linkMatch = rawHtmlText.match(/href="((?:https?:\/\/)(?!t\.me|telegram\.org)[^"]+)"/i);
+      if (linkMatch) {
+        const foundUrl = linkMatch[1];
+        const isOfficialOrJobBoard =
+          foundUrl.includes('directum.ru') ||
+          foundUrl.includes('kontur.ru') ||
+          foundUrl.includes('tbank.ru') ||
+          foundUrl.includes('t1.ru') ||
+          foundUrl.includes('yandex.ru') ||
+          foundUrl.includes('ozon.ru') ||
+          foundUrl.includes('sbergraduate.ru') ||
+          foundUrl.includes('sberbank.ru') ||
+          foundUrl.includes('avito.com') ||
+          foundUrl.includes('vk.company') ||
+          foundUrl.includes('hh.ru/vacancy') ||
+          foundUrl.includes('career.habr.com/vacancies');
+
+        if (isOfficialOrJobBoard) {
+          applyUrl = foundUrl;
+        }
+      }
 
       // Direction detection using unified helper
       const { directionId, subTrackId } = detectVacancyTrack(title, text);
@@ -1718,7 +1795,7 @@ export const PORTAL_FALLBACK_VACANCIES = [
       channel: 't1.ru/school',
       directionId: 'backend',
       subTrackId: 'java',
-      url: 'https://t1.ru/school/',
+      url: 'https://career.t1.ru/',
       description: 'Открытая школа Т1: оплачиваемый интенсив по разработке корпоративных сервисов на Java/Spring с менторством экспертов.',
       tags: ['Холдинг Т1', 'Java 21', 'Spring Boot', 'Открытая школа'],
       sourceType: 'portal',
@@ -1750,7 +1827,7 @@ export const PORTAL_FALLBACK_VACANCIES = [
       channel: 'yandex.ru/yabackend',
       directionId: 'backend',
       subTrackId: 'python',
-      url: 'https://yandex.ru/yabackend/',
+      url: 'https://yandex.ru/jobs/',
       description: 'Стажировка Young Con в сервисах Яндекс Маркета и Поиска. Реальные задачи масштабирования высоконагруженных микросервисов.',
       tags: ['Яндекс', 'Python 3.12', 'FastAPI', 'Young Con'],
       sourceType: 'portal',
@@ -1798,7 +1875,7 @@ export const PORTAL_FALLBACK_VACANCIES = [
       channel: 'career.avito.com',
       directionId: 'mobile',
       subTrackId: 'android',
-      url: 'https://career.avito.com/internship/',
+      url: 'https://career.avito.com/',
       description: 'Стажировка в командах мобильной разработки Авито: создание фичей супераппа на Kotlin, Jetpack Compose и Coroutines.',
       tags: ['Авито', 'Android', 'Kotlin', 'Compose'],
       sourceType: 'portal',
@@ -1911,8 +1988,28 @@ export async function parseCareerWebsites() {
           let m;
           let count = 0;
           while ((m = vacancyRegex.exec(html)) !== null && count < 5) {
-            count++;
             const rawTitle = m[2].replace(/<[^>]+>/g, '').trim();
+            const rawTitleLower = rawTitle.toLowerCase();
+            const isJuniorOrIntern =
+              rawTitleLower.includes('стаж') ||
+              rawTitleLower.includes('junior') ||
+              rawTitleLower.includes('джуниор') ||
+              rawTitleLower.includes('trainee') ||
+              rawTitleLower.includes('младш');
+            const isNonIT =
+              rawTitleLower.includes('юрист') ||
+              rawTitleLower.includes('осаго') ||
+              rawTitleLower.includes('клиент') ||
+              rawTitleLower.includes('персонал') ||
+              rawTitleLower.includes('аудит') ||
+              rawTitleLower.includes('оплат') ||
+              rawTitleLower.includes('документ') ||
+              rawTitleLower.includes('выездного сервиса') ||
+              rawTitleLower.includes('дежурной смены') ||
+              rawTitleLower.includes('продаж');
+            if (!isJuniorOrIntern || isNonIT) continue;
+
+            count++;
             const cleanUrl = m[1].split('?')[0];
             const numId = cleanUrl.match(/\/(\d+)/)?.[1] || Math.random().toString(36).slice(2, 7);
             const { directionId, subTrackId } = detectVacancyTrack(rawTitle);

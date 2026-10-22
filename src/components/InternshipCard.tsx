@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import type { Internship, Question, RoadmapTopic, UserProgress } from '../types';
 import { triggerHaptic } from '../lib/telegram';
+import { resolveApplyUrl, resolveChannelHandle } from '../lib/vacancyUrl';
 
 interface InternshipCardProps {
   internship: Internship;
@@ -166,50 +167,60 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
 
         {/* Source and Actions */}
         <div className="flex items-center justify-between gap-2">
-          {internship.sourceChannel.startsWith('@') ? (
-            <a
-              href={`https://t.me/${internship.sourceChannel.replace(/^@/, '')}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1 text-[11px] font-medium truncate text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
-              title={`Открыть Telegram-канал ${internship.sourceChannel}`}
-            >
-              <Bot className="w-3.5 h-3.5 shrink-0 text-neutral-400 dark:text-neutral-500" />
-              <span className="truncate underline decoration-neutral-300 dark:decoration-neutral-700">
-                {internship.sourceChannel}
-              </span>
-            </a>
-          ) : (
-            <div className="flex items-center gap-1 text-[11px] text-neutral-500 dark:text-neutral-400 font-medium truncate">
-              <Bot className="w-3.5 h-3.5 shrink-0 opacity-70" />
-              <span className="truncate">{internship.sourceChannel}</span>
-            </div>
-          )}
+          {(() => {
+            const verifiedApplyUrl = resolveApplyUrl(internship.applyUrl, internship.company);
+            const verifiedChannel = resolveChannelHandle(internship.sourceChannel, internship.company);
+            const cleanChannel = verifiedChannel.replace(/^@/, '');
 
-          <div className="flex items-center gap-2 shrink-0">
-            <button
-              onClick={handleOpenPlan}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all active:scale-95
-                bg-neutral-100 hover:bg-neutral-200 text-neutral-800 border border-neutral-200/80 shadow-xs
-                dark:bg-white/[0.06] dark:hover:bg-white/[0.12] dark:text-white dark:border-white/10"
-            >
-              <GraduationCap className="w-3.5 h-3.5 text-neutral-600 dark:text-neutral-400" />
-              <span>План</span>
-            </button>
+            return (
+              <>
+                {verifiedChannel.startsWith('@') ? (
+                  <a
+                    href={`https://t.me/${cleanChannel}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 text-[11px] font-medium truncate text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
+                    title={`Открыть проверенный Telegram-канал ${verifiedChannel}`}
+                  >
+                    <Bot className="w-3.5 h-3.5 shrink-0 text-neutral-400 dark:text-neutral-500" />
+                    <span className="truncate underline decoration-neutral-300 dark:decoration-neutral-700">
+                      {verifiedChannel}
+                    </span>
+                  </a>
+                ) : (
+                  <div className="flex items-center gap-1 text-[11px] text-neutral-500 dark:text-neutral-400 font-medium truncate">
+                    <Bot className="w-3.5 h-3.5 shrink-0 opacity-70" />
+                    <span className="truncate">{verifiedChannel}</span>
+                  </div>
+                )}
 
-            <a
-              href={internship.applyUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 px-4 sm:px-5 py-1.5 rounded-full text-xs font-semibold transition-all active:scale-95
-                bg-neutral-900 hover:bg-black text-white shadow-md
-                dark:bg-white dark:hover:bg-neutral-200 dark:text-neutral-950"
-              title={`Подать заявку на официальном сайте ${internship.company}`}
-            >
-              <span>Отклик</span>
-              <ExternalLink className="w-3 h-3" />
-            </a>
-          </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    onClick={handleOpenPlan}
+                    className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all active:scale-95
+                      bg-neutral-100 hover:bg-neutral-200 text-neutral-800 border border-neutral-200/80 shadow-xs
+                      dark:bg-white/[0.06] dark:hover:bg-white/[0.12] dark:text-white dark:border-white/10"
+                  >
+                    <GraduationCap className="w-3.5 h-3.5 text-neutral-600 dark:text-neutral-400" />
+                    <span>План</span>
+                  </button>
+
+                  <a
+                    href={verifiedApplyUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 px-4 sm:px-5 py-1.5 rounded-full text-xs font-semibold transition-all active:scale-95
+                      bg-neutral-900 hover:bg-black text-white shadow-md
+                      dark:bg-white dark:hover:bg-neutral-200 dark:text-neutral-950"
+                    title={`Подать заявку на официальном сайте ${internship.company}`}
+                  >
+                    <span>Отклик</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+              </>
+            );
+          })()}
         </div>
       </div>
     </div>

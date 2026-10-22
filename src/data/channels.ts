@@ -95,15 +95,15 @@ export const MONITORED_CHANNELS_LIST: MonitoredChannel[] = [
   {
     id: 'kontur_career',
     name: 'Карьера в Контуре (Официальный)',
-    handle: '@kontur_career',
+    handle: 'kontur.ru/career',
     company: 'Контур',
     category: 'Вакансии и практики СКБ Контур',
     status: 'active',
     postCount: 18,
     lastChecked: '3 мин назад',
-    url: 'https://t.me/kontur_career',
+    url: 'https://kontur.ru/career/vacancies',
     avatarColor: 'from-rose-500 to-red-700',
-    sourceType: 'telegram',
+    sourceType: 'website',
     verifiedBadge: true,
   },
 
@@ -169,15 +169,15 @@ export const MONITORED_CHANNELS_LIST: MonitoredChannel[] = [
   {
     id: 'directum_career',
     name: 'Directum Карьера (Ижевск)',
-    handle: '@directum_career',
+    handle: 'career.directum.ru',
     company: 'Directum',
     category: 'Студенческие практики & Junior',
     status: 'active',
     postCount: 12,
     lastChecked: '8 мин назад',
-    url: 'https://t.me/directum_career',
+    url: 'https://career.directum.ru/vacancy',
     avatarColor: 'from-sky-500 to-blue-700',
-    sourceType: 'telegram',
+    sourceType: 'website',
     verifiedBadge: true,
   },
 
@@ -498,7 +498,7 @@ export const INITIAL_PARSED_POSTS: ParsedChannelPost[] = [
     snippet: 'Холдинг Т1 открывает регистрацию в Открытую школу: оплачиваемый интенсив по разработке на Java/Spring с менторством ведущих архитекторов холдинга и последующим трудоустройством в штат.',
     publishedAt: '2026-03-29T10:00:00.000Z',
     sourceType: 'telegram',
-    url: 'https://t.me/t1career/412',
+    url: 'https://career.t1.ru/',
   },
   {
     id: 'scan-t1-devops',
@@ -515,7 +515,7 @@ export const INITIAL_PARSED_POSTS: ParsedChannelPost[] = [
     snippet: 'Автоматизация пайплайнов и поддержка масштабируемой облачной инфраструктуры Т1 Облако. Обучение работе с высоконагруженными средами под контролем Team Lead.',
     publishedAt: '2026-03-29T14:30:00.000Z',
     sourceType: 'telegram',
-    url: 'https://t.me/t1career/415',
+    url: 'https://career.t1.ru/',
   },
 
   // --- СКБ Контур ---
@@ -534,11 +534,11 @@ export const INITIAL_PARSED_POSTS: ParsedChannelPost[] = [
     snippet: 'Контур.Старт 2026: ищем начинающих фронтендеров на React/TypeScript. Реальные продуктовые задачи в сервисах Диадок и Экстерн, персональный наставник и стипендия.',
     publishedAt: '2026-03-29T13:15:00.000Z',
     sourceType: 'telegram',
-    url: 'https://t.me/KonturTech/890',
+    url: 'https://kontur.ru/career/vacancies',
   },
   {
     id: 'scan-kontur-be',
-    channelHandle: '@kontur_career',
+    channelHandle: '@KonturTech',
     channelName: 'Карьера в Контуре',
     company: 'Контур',
     title: 'Стажёр Backend C# / Python (Контур.Старт)',
@@ -551,7 +551,7 @@ export const INITIAL_PARSED_POSTS: ParsedChannelPost[] = [
     snippet: 'Разработка распределенных серверных компонентов Контура. Работа со сложной бизнес-логикой, реляционными базами данных и микросервисами.',
     publishedAt: '2026-03-29T15:00:00.000Z',
     sourceType: 'telegram',
-    url: 'https://t.me/kontur_career/341',
+    url: 'https://kontur.ru/career/vacancies',
   },
 
   // --- Directum (Ижевск) ---
@@ -570,7 +570,7 @@ export const INITIAL_PARSED_POSTS: ParsedChannelPost[] = [
     snippet: 'Directum приглашает студентов и начинающих разработчиков в команду веб-клиента платформы Directum RX в Ижевске. Комфортный офис, гибкий график под учебу и помощь ментора.',
     publishedAt: '2026-03-29T11:00:00.000Z',
     sourceType: 'telegram',
-    url: 'https://t.me/Life_in_Directum/521',
+    url: 'https://career.directum.ru/vacancy',
   },
   {
     id: 'scan-directum-site-rx',
@@ -604,7 +604,7 @@ export const INITIAL_PARSED_POSTS: ParsedChannelPost[] = [
     snippet: 'Стажировка в отделе тестирования Directum в Ижевске: функциональное тестирование экосистемы Directum RX, проектирование тест-кейсов и работа с API. Опыт работы не требуется.',
     publishedAt: '2026-03-28T16:00:00.000Z',
     sourceType: 'telegram',
-    url: 'https://t.me/Life_in_Directum/519',
+    url: 'https://career.directum.ru/vacancy',
   },
 
   // --- Т-Банк ---
@@ -623,7 +623,7 @@ export const INITIAL_PARSED_POSTS: ParsedChannelPost[] = [
     snippet: 'Разработка новых витрин и финансовых сервисов для мобильного и веб-банкинга Т-Банка. Компонентный подход, высокая производительность и современные стандарты кода.',
     publishedAt: '2026-03-29T12:00:00.000Z',
     sourceType: 'telegram',
-    url: 'https://t.me/tbank_team/1120',
+    url: 'https://fintech.tbank.ru/start/',
   },
   {
     id: 'scan-tbank-sre',
@@ -659,7 +659,7 @@ export const INITIAL_PARSED_POSTS: ParsedChannelPost[] = [
     snippet: 'Масштабирование микросервисов Яндекс Маркета и Поиска. Реальные задачи в продакшене под руководством ведущих разработчиков Яндекса.',
     publishedAt: '2026-03-29T09:30:00.000Z',
     sourceType: 'telegram',
-    url: 'https://t.me/yandex_intern/305',
+    url: 'https://yandex.ru/jobs/',
   },
 
   // --- Ozon Tech ---
@@ -678,7 +678,7 @@ export const INITIAL_PARSED_POSTS: ParsedChannelPost[] = [
     snippet: 'Ozon Camp: микросервисная архитектура на Go, высоконагруженная маршрутизация заказов и работа с очередями Kafka под руководством опытных инженеров.',
     publishedAt: '2026-03-29T14:00:00.000Z',
     sourceType: 'telegram',
-    url: 'https://t.me/ozon_tech_career/219',
+    url: 'https://job.ozon.ru/it/',
   },
 
   // --- Сбер ---
@@ -697,7 +697,7 @@ export const INITIAL_PARSED_POSTS: ParsedChannelPost[] = [
     snippet: 'Программа SberSeasons в блоке AI: обучение моделей ранжирования, NLP и классических табличных бустингов для сервисов банка.',
     publishedAt: '2026-03-29T16:00:00.000Z',
     sourceType: 'telegram',
-    url: 'https://t.me/sber_careers/512',
+    url: 'https://sbergraduate.ru/',
   },
 
   // --- Авито ---
@@ -716,7 +716,7 @@ export const INITIAL_PARSED_POSTS: ParsedChannelPost[] = [
     snippet: 'Авито открывает набор на программу Авито Старт: разработка фичей для мобильного приложения объявлений на Kotlin и Jetpack Compose под кураторством Senior инженеров.',
     publishedAt: '2026-03-29T16:40:00.000Z',
     sourceType: 'telegram',
-    url: 'https://t.me/avito_tech/640',
+    url: 'https://career.avito.com/',
   },
 
   // --- VK ---
@@ -735,7 +735,7 @@ export const INITIAL_PARSED_POSTS: ParsedChannelPost[] = [
     snippet: 'VK объявляет весенний набор стажёров: автоматизация тестирования веб-сервисов ВКонтакте и VK Видео, разработка надежных E2E-тестов на Python и Playwright.',
     publishedAt: '2026-03-29T17:00:00.000Z',
     sourceType: 'telegram',
-    url: 'https://t.me/vk_team/815',
+    url: 'https://internship.vk.company/',
   },
 
   // --- Норм работа (Агрегатор) ---

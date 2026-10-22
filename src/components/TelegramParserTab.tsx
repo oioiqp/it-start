@@ -52,6 +52,7 @@ import {
   VK_BOT_NAME,
 } from '../lib/vk';
 import { saveLocalSubscription } from '../lib/storage';
+import { resolveApplyUrl, resolveChannelHandle } from '../lib/vacancyUrl';
 
 interface TelegramParserTabProps {
   telegramUser: TelegramUser | null;
@@ -87,7 +88,7 @@ const PRESET_VACANCIES = [
     directionId: 'backend' as DirectionId,
     subTrackId: 'java' as SubTrackId,
     sourceChannel: '@t1career',
-    applyUrl: 'https://t1.ru/school/',
+    applyUrl: 'https://career.t1.ru/',
     description: 'Обучение и стажировка в Открытой школе Т1 с переходом в штат. Разработка надежных Enterprise-сервисов.',
     tags: ['Java 21', 'Spring Boot', 'Открытая школа Т1', 'PostgreSQL'],
   },
@@ -100,7 +101,7 @@ const PRESET_VACANCIES = [
     directionId: 'frontend' as DirectionId,
     subTrackId: 'react' as SubTrackId,
     sourceChannel: '@KonturTech',
-    applyUrl: 'https://kontur.ru/career',
+    applyUrl: 'https://kontur.ru/career/vacancies',
     description: 'Оплачиваемая программа Контур.Старт 2026: разработка веб-сервисов на React/TypeScript с наставником.',
     tags: ['React', 'TypeScript', 'Контур.Старт', 'Jest'],
   },
@@ -126,7 +127,7 @@ const PRESET_VACANCIES = [
     directionId: 'frontend' as DirectionId,
     subTrackId: 'react' as SubTrackId,
     sourceChannel: '@Life_in_Directum',
-    applyUrl: 'https://career.directum.ru/',
+    applyUrl: 'https://career.directum.ru/vacancy',
     description: 'Разработка веб-клиента флагманской платформы Directum RX в Ижевске на современном TypeScript и React.',
     tags: ['React', 'TypeScript', 'Directum RX', 'Ижевск'],
   },
@@ -139,7 +140,7 @@ const PRESET_VACANCIES = [
     directionId: 'backend' as DirectionId,
     subTrackId: 'python' as SubTrackId,
     sourceChannel: '@yandex_intern',
-    applyUrl: 'https://yandex.ru/yabackend/',
+    applyUrl: 'https://yandex.ru/jobs/',
     description: 'Разработка высоконагруженных бэкенд-сервисов на FastAPI и асинхронном Python.',
     tags: ['Python 3.12', 'FastAPI', 'PostgreSQL', 'asyncio'],
   },
@@ -178,7 +179,7 @@ const PRESET_VACANCIES = [
     directionId: 'mobile' as DirectionId,
     subTrackId: 'android' as SubTrackId,
     sourceChannel: '@avito_tech',
-    applyUrl: 'https://career.avito.com/internship/',
+    applyUrl: 'https://career.avito.com/',
     description: 'Фичи для супераппа объявлений Авито на Kotlin и Jetpack Compose.',
     tags: ['Kotlin', 'Jetpack Compose', 'Coroutines'],
   },
@@ -661,9 +662,9 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
         'Разработка сервисов и модулей под менторством старших инженеров',
         'Участие в код-ревью и командных встречах',
       ],
-      sourceChannel: post.channelHandle,
+      sourceChannel: resolveChannelHandle(post.channelHandle, post.company),
       sourceType: post.sourceType === 'website' || post.channelHandle.startsWith('http') ? 'portal' : 'telegram',
-      applyUrl: post.url || (post.channelHandle.startsWith('http') ? post.channelHandle : `https://t.me/${post.channelHandle.replace('@', '')}`),
+      applyUrl: resolveApplyUrl(post.url, post.company),
       publishedAt: new Date().toISOString(),
       isHot: true,
     };
@@ -753,12 +754,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
     addLog('info', `1/3: Симуляция парсинга нового поста из Telegram-канала ${customChannel}...`);
 
     const p = PRESET_VACANCIES[presetIndex];
-    const resolvedApplyUrl =
-      customApplyUrl ||
-      p?.applyUrl ||
-      (customChannel.startsWith('http')
-        ? customChannel
-        : `https://t.me/${customChannel.replace('@', '')}`);
+    const resolvedApplyUrl = resolveApplyUrl(customApplyUrl || p?.applyUrl, customCompany);
 
     const newVacancy: Internship = {
       id: 'int-new-' + Date.now(),
@@ -1296,7 +1292,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                         )}
                       </div>
                       <a
-                        href={post.url || (post.channelHandle.startsWith('http') ? post.channelHandle : `https://t.me/${post.channelHandle.replace('@', '')}`)}
+                        href={resolveApplyUrl(post.url, post.company)}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-[11px] font-mono flex items-center gap-1 text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200"
