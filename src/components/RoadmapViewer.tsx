@@ -229,18 +229,18 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
           <div className="flex items-center gap-3 mb-6">
             <div className="px-3.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wider
               bg-neutral-100 border border-neutral-200/80 text-neutral-800
-              dark:bg-neutral-800 dark:border-neutral-700/80 dark:text-neutral-200"
+              dark:bg-white/[0.06] dark:border-white/10 dark:text-neutral-200"
             >
               {currentDirection.coreTitle}
             </div>
-            <div className="h-px flex-1 bg-neutral-200 dark:bg-neutral-800"></div>
+            <div className="h-px flex-1 bg-neutral-200 dark:bg-white/10"></div>
             <span className="text-xs text-neutral-500 dark:text-neutral-400">Базовый фундамент (Обязательно для всех)</span>
           </div>
 
           {/* Core Nodes Spine */}
           <div className="relative pl-8 sm:pl-12 space-y-6">
             {/* Continuous vertical connecting line */}
-            <div className="absolute left-4 sm:left-6 top-6 bottom-0 w-0.5 -translate-x-1/2 bg-neutral-200 dark:bg-neutral-800"></div>
+            <div className="absolute left-4 sm:left-6 top-6 bottom-0 w-0.5 -translate-x-1/2 bg-neutral-200 dark:bg-white/10"></div>
 
             {coreTopics.map((topic, idx) => {
               const { total, checked, percent, isDone } = getTopicProgress(topic);
@@ -253,8 +253,8 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                       isDone
                         ? 'bg-neutral-900 border-neutral-900 text-white dark:bg-white dark:border-white dark:text-neutral-950 shadow-xs'
                         : percent > 0
-                        ? 'bg-white border-neutral-900 text-neutral-900 dark:bg-neutral-800 dark:border-neutral-400 dark:text-white shadow-xs'
-                        : 'bg-white border-neutral-300 text-neutral-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400'
+                        ? 'bg-white border-neutral-900 text-neutral-900 dark:bg-white/20 dark:border-white/60 dark:text-white shadow-xs'
+                        : 'bg-white border-neutral-300 text-neutral-500 dark:bg-black dark:border-white/20 dark:text-neutral-400'
                     }`}
                   >
                     {idx + 1}
@@ -284,7 +284,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                         </h4>
                         <span className="px-2.5 py-0.5 rounded-full text-[10px] font-medium
                           bg-neutral-100 text-neutral-600 border border-neutral-200/60
-                          dark:bg-neutral-800 dark:text-neutral-400 dark:border-neutral-700/60"
+                          dark:bg-white/[0.06] dark:text-neutral-300 dark:border-white/[0.08]"
                         >
                           {topic.difficulty}
                         </span>
@@ -297,7 +297,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                           rel="noopener noreferrer"
                           className="p-1.5 rounded-full transition-colors
                             bg-neutral-100 hover:bg-neutral-200 text-neutral-600 hover:text-neutral-900
-                            dark:bg-neutral-800 dark:hover:bg-neutral-750 dark:text-neutral-400 dark:hover:text-white"
+                            dark:bg-white/[0.06] dark:hover:bg-white/[0.12] dark:text-neutral-300 dark:hover:text-white"
                           title="Документация roadmap.sh"
                         >
                           <ExternalLink className="w-3.5 h-3.5" />
@@ -310,7 +310,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                     {/* Section Progress Bar */}
                     <div className="rounded-2xl p-2.5 mb-3.5 transition-colors
                       bg-neutral-50/80 border border-neutral-200/60
-                      dark:bg-neutral-950/60 dark:border-neutral-800/60"
+                      dark:bg-white/[0.03] dark:border-white/[0.08]"
                     >
                       <div className="flex items-center justify-between text-[11px] mb-1">
                         <span className="text-neutral-600 dark:text-neutral-400 font-medium">
@@ -326,7 +326,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                           {percent}% ({checked} из {total} подтем)
                         </span>
                       </div>
-                      <div className="w-full h-1.5 rounded-full overflow-hidden bg-neutral-200 dark:bg-neutral-700">
+                      <div className="w-full h-1.5 rounded-full overflow-hidden bg-neutral-200 dark:bg-white/15">
                         <div
                           className={`h-full rounded-full transition-all duration-300 ${
                             isDone ? 'bg-emerald-500' : 'bg-neutral-900 dark:bg-white'
@@ -351,7 +351,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                               className={`flex items-start gap-2.5 p-2 rounded-xl border text-xs cursor-pointer select-none transition-all ${
                                 isSubChecked
                                   ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-900 dark:bg-emerald-500/15 dark:border-emerald-500/30 dark:text-emerald-300'
-                                  : 'bg-neutral-100/70 border-neutral-200/70 text-neutral-700 hover:bg-neutral-200/60 dark:bg-neutral-850/60 dark:border-neutral-800/70 dark:text-neutral-300 dark:hover:bg-neutral-800/80'
+                                  : 'bg-neutral-100/70 border-neutral-200/70 text-neutral-700 hover:bg-neutral-200/60 dark:bg-white/[0.03] dark:border-white/[0.06] dark:text-neutral-300 dark:hover:bg-white/[0.07]'
                               }`}
                             >
                               <button
@@ -392,7 +392,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                       className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-full text-xs font-semibold border transition-all ${
                         isDone
                           ? 'bg-emerald-500 text-white border-emerald-500 shadow-xs'
-                          : 'bg-neutral-100 border-neutral-200/80 text-neutral-800 hover:bg-neutral-200/80 dark:bg-neutral-850 dark:border-neutral-750 dark:text-neutral-300 dark:hover:bg-neutral-800'
+                          : 'bg-neutral-100 border-neutral-200/80 text-neutral-800 hover:bg-neutral-200/80 dark:bg-white/[0.05] dark:border-white/10 dark:text-neutral-200 dark:hover:bg-white/[0.1]'
                       }`}
                     >
                       {isDone ? (
@@ -417,7 +417,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
         {/* FORK NODE: SPECIALIZATION BRANCH CONNECTOR */}
         <div className="relative py-8 my-2">
           {/* Continuous vertical connecting line through the fork */}
-          <div className="absolute left-4 sm:left-6 top-0 bottom-0 w-0.5 -translate-x-1/2 bg-neutral-200 dark:bg-neutral-800"></div>
+          <div className="absolute left-4 sm:left-6 top-0 bottom-0 w-0.5 -translate-x-1/2 bg-neutral-200 dark:bg-white/10"></div>
 
           <div className="relative pl-8 sm:pl-12">
             {/* Fork icon badge exactly on spine */}
@@ -428,12 +428,12 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
             </div>
 
             {/* Horizontal Branch Connector Arm */}
-            <div className="absolute -left-4 sm:-left-6 top-10 w-4 sm:w-6 h-0.5 -translate-y-1/2 z-10 bg-neutral-300 dark:bg-neutral-700"></div>
+            <div className="absolute -left-4 sm:-left-6 top-10 w-4 sm:w-6 h-0.5 -translate-y-1/2 z-10 bg-neutral-300 dark:bg-white/15"></div>
 
             {/* Fork Card */}
             <div className="p-5 sm:p-6 rounded-3xl transition-colors space-y-4
-              bg-white/90 border border-neutral-300/80 shadow-sm
-              dark:bg-neutral-900/70 dark:border-neutral-750"
+              bg-white/90 border border-black/[0.06] shadow-sm
+              dark:bg-white/[0.035] dark:backdrop-blur-2xl dark:border-white/10 dark:shadow-[0_20px_50px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.1)]"
             >
               <div className="flex items-center gap-2.5 flex-wrap">
                 <span className="px-3.5 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 shadow-xs
@@ -457,7 +457,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
               </div>
 
               {/* Interactive Branch Switcher Buttons */}
-              <div className="space-y-2 pt-2 border-t border-neutral-200/80 dark:border-neutral-800">
+              <div className="space-y-2 pt-2 border-t border-neutral-200/80 dark:border-white/[0.08]">
                 <span className="text-xs font-semibold block text-neutral-500 dark:text-neutral-400">
                   Ветки направления «{currentDirection.title}»:
                 </span>
@@ -471,7 +471,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                         className={`flex items-center justify-between p-3.5 rounded-2xl border text-left transition-all ${
                           isCurrent
                             ? 'bg-neutral-900 border-neutral-900 text-white dark:bg-white dark:border-white dark:text-neutral-950 shadow-xs'
-                            : 'bg-neutral-100/70 border-neutral-200/70 text-neutral-700 hover:bg-neutral-200/60 dark:bg-neutral-850/60 dark:border-neutral-800/70 dark:text-neutral-300 dark:hover:bg-neutral-800/80'
+                            : 'bg-neutral-100/70 border-neutral-200/70 text-neutral-700 hover:bg-neutral-200/60 dark:bg-white/[0.03] dark:border-white/[0.08] dark:text-neutral-300 dark:hover:bg-white/[0.07]'
                         }`}
                       >
                         <div>
@@ -510,18 +510,18 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
           <div className="flex items-center gap-3 mb-6">
             <div className="px-3.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wider
               bg-neutral-100 border border-neutral-200/80 text-neutral-800
-              dark:bg-neutral-800 dark:border-neutral-700/80 dark:text-neutral-200"
+              dark:bg-white/[0.06] dark:border-white/10 dark:text-neutral-200"
             >
               Ветка: {currentDirection.subTracks.find((s) => s.id === validSubTrack)?.name}
             </div>
-            <div className="h-px flex-1 bg-neutral-200 dark:bg-neutral-800"></div>
+            <div className="h-px flex-1 bg-neutral-200 dark:bg-white/10"></div>
             <span className="text-xs text-neutral-500 dark:text-neutral-400">Профильные требования к стажёрам</span>
           </div>
 
           {/* Sub-track Nodes Spine */}
           <div className="relative pl-8 sm:pl-12 space-y-6">
             {/* Continuous vertical connecting line */}
-            <div className="absolute left-4 sm:left-6 top-0 bottom-6 w-0.5 -translate-x-1/2 bg-neutral-200 dark:bg-neutral-800"></div>
+            <div className="absolute left-4 sm:left-6 top-0 bottom-6 w-0.5 -translate-x-1/2 bg-neutral-200 dark:bg-white/10"></div>
 
             {subTrackTopics.map((topic, idx) => {
               const { total, checked, percent, isDone } = getTopicProgress(topic);
@@ -535,8 +535,8 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                       isDone
                         ? 'bg-neutral-900 border-neutral-900 text-white dark:bg-white dark:border-white dark:text-neutral-950 shadow-xs'
                         : percent > 0
-                        ? 'bg-white border-neutral-900 text-neutral-900 dark:bg-neutral-800 dark:border-neutral-400 dark:text-white shadow-xs'
-                        : 'bg-white border-neutral-300 text-neutral-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400'
+                        ? 'bg-white border-neutral-900 text-neutral-900 dark:bg-white/20 dark:border-white/60 dark:text-white shadow-xs'
+                        : 'bg-white border-neutral-300 text-neutral-500 dark:bg-black dark:border-white/20 dark:text-neutral-400'
                     }`}
                   >
                     {nodeNumber}
@@ -563,7 +563,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                         </span>
                         <span className="px-2.5 py-0.5 rounded-full text-[10px] font-medium
                           bg-neutral-100 text-neutral-700 border border-neutral-200/60
-                          dark:bg-neutral-800 dark:text-neutral-300 dark:border-neutral-700/60"
+                          dark:bg-white/[0.06] dark:text-neutral-300 dark:border-white/[0.08]"
                         >
                           {currentDirection.subTracks.find((s) => s.id === validSubTrack)?.name}
                         </span>
@@ -572,7 +572,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                         </h4>
                         <span className="px-2.5 py-0.5 rounded-full text-[10px] font-medium
                           bg-neutral-100 text-neutral-600 border border-neutral-200/60
-                          dark:bg-neutral-800 dark:text-neutral-400 dark:border-neutral-700/60"
+                          dark:bg-white/[0.06] dark:text-neutral-300 dark:border-white/[0.08]"
                         >
                           {topic.difficulty}
                         </span>
@@ -585,7 +585,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                           rel="noopener noreferrer"
                           className="p-1.5 rounded-full transition-colors
                             bg-neutral-100 hover:bg-neutral-200 text-neutral-600 hover:text-neutral-900
-                            dark:bg-neutral-800 dark:hover:bg-neutral-750 dark:text-neutral-400 dark:hover:text-white"
+                            dark:bg-white/[0.06] dark:hover:bg-white/[0.12] dark:text-neutral-300 dark:hover:text-white"
                           title="Документация roadmap.sh"
                         >
                           <ExternalLink className="w-3.5 h-3.5" />
@@ -598,7 +598,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                     {/* Section Progress Bar */}
                     <div className="rounded-2xl p-2.5 mb-3.5 transition-colors
                       bg-neutral-50/80 border border-neutral-200/60
-                      dark:bg-neutral-950/60 dark:border-neutral-800/60"
+                      dark:bg-white/[0.03] dark:border-white/[0.08]"
                     >
                       <div className="flex items-center justify-between text-[11px] mb-1">
                         <span className="text-neutral-600 dark:text-neutral-400 font-medium">
@@ -614,7 +614,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                           {percent}% ({checked} из {total} подтем)
                         </span>
                       </div>
-                      <div className="w-full h-1.5 rounded-full overflow-hidden bg-neutral-200 dark:bg-neutral-700">
+                      <div className="w-full h-1.5 rounded-full overflow-hidden bg-neutral-200 dark:bg-white/15">
                         <div
                           className={`h-full rounded-full transition-all duration-300 ${
                             isDone ? 'bg-emerald-500' : 'bg-neutral-900 dark:bg-white'
@@ -639,7 +639,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                               className={`flex items-start gap-2.5 p-2 rounded-xl border text-xs cursor-pointer select-none transition-all ${
                                 isSubChecked
                                   ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-900 dark:bg-emerald-500/15 dark:border-emerald-500/30 dark:text-emerald-300'
-                                  : 'bg-neutral-100/70 border-neutral-200/70 text-neutral-700 hover:bg-neutral-200/60 dark:bg-neutral-850/60 dark:border-neutral-800/70 dark:text-neutral-300 dark:hover:bg-neutral-800/80'
+                                  : 'bg-neutral-100/70 border-neutral-200/70 text-neutral-700 hover:bg-neutral-200/60 dark:bg-white/[0.03] dark:border-white/[0.06] dark:text-neutral-300 dark:hover:bg-white/[0.07]'
                               }`}
                             >
                               <button
@@ -680,7 +680,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                       className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-full text-xs font-semibold border transition-all ${
                         isDone
                           ? 'bg-emerald-500 text-white border-emerald-500 shadow-xs'
-                          : 'bg-neutral-100 border-neutral-200/80 text-neutral-800 hover:bg-neutral-200/80 dark:bg-neutral-850 dark:border-neutral-750 dark:text-neutral-300 dark:hover:bg-neutral-800'
+                          : 'bg-neutral-100 border-neutral-200/80 text-neutral-800 hover:bg-neutral-200/80 dark:bg-white/[0.05] dark:border-white/10 dark:text-neutral-200 dark:hover:bg-white/[0.1]'
                       }`}
                     >
                       {isDone ? (

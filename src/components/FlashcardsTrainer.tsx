@@ -85,10 +85,10 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
   if (!currentCard || deck.length === 0) {
     return (
       <div className="p-8 text-center rounded-3xl transition-colors
-        bg-white/80 border border-neutral-200/80 shadow-xs
-        dark:bg-neutral-900/60 dark:border-neutral-800"
+        bg-white/80 border border-black/[0.06] shadow-xs
+        dark:bg-white/[0.035] dark:backdrop-blur-2xl dark:border-white/10"
       >
-        <HelpCircle className="w-12 h-12 mx-auto mb-3 text-neutral-400 dark:text-neutral-600" />
+        <HelpCircle className="w-12 h-12 mx-auto mb-3 text-neutral-400 dark:text-neutral-500" />
         <h3 className="text-lg font-bold mb-1 font-sans text-neutral-900 dark:text-white">Вопросы не найдены</h3>
         <p className="text-xs text-neutral-500 dark:text-neutral-400">
           Попробуйте сбросить фильтры направления или ветки в панели выше.
@@ -130,7 +130,7 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
           onClick={handleShuffle}
           className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border transition-colors
             bg-white hover:bg-neutral-50 text-neutral-700 border-neutral-200/80 shadow-xs
-            dark:bg-neutral-850 dark:hover:bg-neutral-800 dark:text-neutral-300 dark:border-neutral-750"
+            dark:bg-white/[0.06] dark:hover:bg-white/[0.12] dark:text-neutral-300 dark:border-white/10"
         >
           <Shuffle className="w-3.5 h-3.5" />
           <span>Перемешать</span>
@@ -141,14 +141,14 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
       <div
         onClick={handleFlip}
         className="relative min-h-[340px] p-6 sm:p-8 rounded-3xl cursor-pointer select-none transition-all flex flex-col justify-between group
-          bg-white/85 border border-neutral-200/80 hover:border-neutral-300 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_12px_40px_rgb(0,0,0,0.08)]
-          dark:bg-neutral-900/70 dark:border-neutral-800/80 dark:hover:border-neutral-700 dark:shadow-[0_8px_30px_rgb(0,0,0,0.5)]"
+          bg-white/85 backdrop-blur-2xl border border-black/[0.06] hover:border-black/15 shadow-[0_12px_36px_rgba(0,0,0,0.05),inset_0_1px_1px_rgba(255,255,255,0.9)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.08)]
+          dark:bg-white/[0.035] dark:backdrop-blur-2xl dark:border-white/10 dark:hover:border-white/20 dark:shadow-[0_20px_50px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.12)]"
       >
         {/* Top Badges */}
         <div className="flex items-center justify-between gap-2 mb-4">
           <span className="px-3 py-1 rounded-full text-xs font-medium border
             bg-neutral-100 text-neutral-700 border-neutral-200/80
-            dark:bg-neutral-800 dark:text-neutral-300 dark:border-neutral-700"
+            dark:bg-white/[0.06] dark:text-neutral-300 dark:border-white/[0.08]"
           >
             {currentCard.category}
           </span>
@@ -178,14 +178,14 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
               </span>
               <p className="text-sm leading-relaxed p-4 rounded-2xl border transition-colors
                 bg-neutral-50/90 border-neutral-200/80 text-neutral-800
-                dark:bg-neutral-850/80 dark:border-neutral-800 dark:text-neutral-200"
+                dark:bg-white/[0.03] dark:border-white/[0.08] dark:text-neutral-200"
               >
                 {currentCard.answer}
               </p>
 
               {currentCard.codeSnippet && (
                 <pre className="p-3.5 rounded-2xl border text-xs font-mono text-neutral-200 overflow-x-auto
-                  bg-neutral-950 border-neutral-800 dark:bg-black dark:border-neutral-800"
+                  bg-neutral-950 border-neutral-800 dark:bg-black dark:border-white/10"
                 >
                   <code>{currentCard.codeSnippet}</code>
                 </pre>
@@ -209,7 +209,7 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
         {/* Flip hint at bottom */}
         <div className="pt-4 border-t flex items-center justify-between text-xs
           border-neutral-200/80 text-neutral-500
-          dark:border-neutral-800/80 dark:text-neutral-400"
+          dark:border-white/[0.08] dark:text-neutral-400"
         >
           <span className="flex items-center gap-1.5">
             <Eye className="w-3.5 h-3.5" />
@@ -226,7 +226,7 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
           disabled={currentIndex === 0}
           className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-full border text-xs font-medium transition-colors disabled:opacity-40
             bg-white hover:bg-neutral-50 border-neutral-200/80 text-neutral-700 shadow-xs
-            dark:bg-neutral-850 dark:hover:bg-neutral-800 dark:border-neutral-750 dark:text-neutral-300"
+            dark:bg-white/[0.06] dark:hover:bg-white/[0.12] dark:border-white/10 dark:text-neutral-300"
         >
           <ChevronLeft className="w-4 h-4" />
           <span>Назад</span>
@@ -246,7 +246,7 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
           onClick={handleLearned}
           className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-semibold transition-all active:scale-95
             bg-neutral-900 hover:bg-black text-white shadow-xs
-            dark:bg-white dark:hover:bg-neutral-100 dark:text-neutral-950"
+            dark:bg-white dark:hover:bg-neutral-200 dark:text-neutral-950"
         >
           <CheckCircle2 className="w-4 h-4" />
           <span>Знаю отлично</span>
@@ -257,7 +257,7 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
           disabled={currentIndex === deck.length - 1}
           className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-full border text-xs font-medium transition-colors disabled:opacity-40
             bg-white hover:bg-neutral-50 border-neutral-200/80 text-neutral-700 shadow-xs
-            dark:bg-neutral-850 dark:hover:bg-neutral-800 dark:border-neutral-750 dark:text-neutral-300"
+            dark:bg-white/[0.06] dark:hover:bg-white/[0.12] dark:border-white/10 dark:text-neutral-300"
         >
           <span>Вперед</span>
           <ChevronRight className="w-4 h-4" />

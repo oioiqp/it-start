@@ -48,9 +48,9 @@ export const Navbar: React.FC<NavbarProps> = ({
     <header className="sticky top-2 sm:top-4 z-50 flex items-center justify-center px-2.5 sm:px-4 w-full pointer-events-none">
       <div
         className="pointer-events-auto flex items-center justify-between gap-1 sm:gap-2 p-1.5 sm:p-2 rounded-full transition-all duration-300 max-w-5xl w-full sm:w-auto
-          backdrop-blur-2xl
-          dark:bg-black/80 dark:border dark:border-white/10 dark:shadow-[0_20px_50px_rgba(0,0,0,0.9),inset_0_1px_1px_rgba(255,255,255,0.12)]
-          light:bg-white/85 light:border light:border-black/[0.08] light:shadow-[0_12px_36px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(255,255,255,0.9)]"
+          bg-white/80 border border-black/[0.08] shadow-[0_12px_36px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(255,255,255,0.9)]
+          dark:bg-black/80 dark:border-white/12 dark:shadow-[0_20px_50px_rgba(0,0,0,0.9),inset_0_1px_1px_rgba(255,255,255,0.15)]
+          backdrop-blur-2xl"
       >
         {/* Brand / Logo (Minimalist & Clean) */}
         <div
@@ -60,18 +60,17 @@ export const Navbar: React.FC<NavbarProps> = ({
         >
           <div
             className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center font-bold text-xs tracking-tight transition-transform duration-200 group-hover:scale-105 shadow-sm
-              dark:bg-white dark:text-black
-              light:bg-neutral-900 light:text-white"
+              bg-neutral-900 text-white dark:bg-white dark:text-black"
           >
             IT
           </div>
-          <span className="text-xs sm:text-sm font-bold tracking-tight hidden sm:inline dark:text-white light:text-neutral-900">
+          <span className="text-xs sm:text-sm font-bold tracking-tight hidden sm:inline text-neutral-900 dark:text-white">
             IT-Старт
           </span>
         </div>
 
         {/* Subtle Divider */}
-        <div className="h-4 w-px shrink-0 mx-0.5 dark:bg-white/10 light:bg-black/10" />
+        <div className="h-4 w-px shrink-0 mx-0.5 bg-black/10 dark:bg-white/10" />
 
         {/* Center Navigation Tabs - Uniform style, height and rounded-full pill indicator */}
         <nav className="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5 px-0.5">
@@ -84,8 +83,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                 onClick={() => handleTabClick(tab.id)}
                 className={`flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 active:scale-95 ${
                   isActive
-                    ? 'dark:bg-white dark:text-black dark:shadow-md light:bg-neutral-900 light:text-white light:shadow-sm'
-                    : 'dark:text-neutral-400 dark:hover:text-white dark:hover:bg-white/[0.08] light:text-neutral-600 light:hover:text-neutral-900 light:hover:bg-neutral-200/60'
+                    ? 'bg-neutral-900 text-white shadow-sm dark:bg-white dark:text-black dark:shadow-md'
+                    : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-200/60 dark:text-neutral-400 dark:hover:text-white dark:hover:bg-white/[0.08]'
                 }`}
               >
                 <Icon className="w-3.5 h-3.5" />
@@ -96,7 +95,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         </nav>
 
         {/* Subtle Divider */}
-        <div className="h-4 w-px shrink-0 mx-0.5 dark:bg-white/10 light:bg-black/10" />
+        <div className="h-4 w-px shrink-0 mx-0.5 bg-black/10 dark:bg-white/10" />
 
         {/* Right Controls: Theme Switcher + Telegram Bot / Notifications Pill */}
         <div className="flex items-center gap-1 sm:gap-1.5 shrink-0 pr-1">
@@ -104,8 +103,8 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             onClick={onToggleTheme}
             className="w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 active:scale-90
-              dark:text-neutral-300 dark:hover:text-white dark:hover:bg-white/[0.1]
-              light:text-neutral-600 light:hover:text-neutral-900 light:hover:bg-neutral-200/60"
+              text-neutral-600 hover:text-neutral-900 hover:bg-neutral-200/60
+              dark:text-neutral-300 dark:hover:text-white dark:hover:bg-white/[0.1]"
             title={theme === 'dark' ? 'Переключить на светлую тему' : 'Переключить на тёмную тему'}
             aria-label="Переключить тему"
           >
@@ -123,14 +122,12 @@ export const Navbar: React.FC<NavbarProps> = ({
               onOpenSubscribeModal();
             }}
             className="flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full font-semibold text-xs transition-all duration-200 active:scale-95 shadow-md
-              dark:bg-white dark:text-black dark:hover:bg-neutral-200
-              light:bg-neutral-900 light:text-white light:hover:bg-black"
-            title="Telegram Бот и уведомления"
+              bg-neutral-900 hover:bg-black text-white
+              dark:bg-white dark:text-black dark:hover:bg-neutral-200"
+            title={telegramUser ? `Telegram: ${telegramUser.username ? '@' + telegramUser.username : telegramUser.first_name || 'Подключен'}` : 'Telegram-бот и уведомления'}
           >
             <Bot className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">
-              {telegramUser ? 'Уведомления' : 'Бот в TG'}
-            </span>
+            <span className="hidden sm:inline">Бот в TG</span>
             <span className="sm:hidden font-medium">TG</span>
           </button>
         </div>

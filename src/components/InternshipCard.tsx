@@ -53,8 +53,8 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
 
   return (
     <div className="group relative rounded-3xl p-5 sm:p-6 transition-all duration-300 flex flex-col justify-between
-      bg-white/85 border border-black/[0.06] shadow-[0_12px_36px_rgba(0,0,0,0.05),inset_0_1px_1px_rgba(255,255,255,0.9)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.08)] hover:border-neutral-300
-      dark:bg-white/[0.035] dark:backdrop-blur-2xl dark:border-white/10 dark:shadow-[0_20px_50px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.1)] dark:hover:border-white/20"
+      bg-white/80 backdrop-blur-2xl border border-black/[0.06] shadow-[0_12px_36px_rgba(0,0,0,0.05),inset_0_1px_1px_rgba(255,255,255,0.9)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.08)] hover:border-black/15
+      dark:bg-white/[0.035] dark:backdrop-blur-2xl dark:border-white/10 dark:shadow-[0_20px_50px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.12)] dark:hover:border-white/25"
     >
       {/* Top row */}
       <div>

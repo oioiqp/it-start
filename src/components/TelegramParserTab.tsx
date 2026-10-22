@@ -929,11 +929,11 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-2 flex-wrap">
-              <span className="px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1.5 bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 border border-neutral-200/60 dark:border-neutral-700/60">
+              <span className="px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1.5 bg-neutral-100 dark:bg-white/[0.06] text-neutral-800 dark:text-neutral-200 border border-neutral-200/60 dark:border-white/10">
                 <Bot className="w-3.5 h-3.5 text-neutral-600 dark:text-neutral-400" />
                 Telegram Bot API & WebApp
               </span>
-              <span className="px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1.5 bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 border border-neutral-200/60 dark:border-neutral-700/60">
+              <span className="px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1.5 bg-neutral-100 dark:bg-white/[0.06] text-neutral-800 dark:text-neutral-200 border border-neutral-200/60 dark:border-white/10">
                 <MessageSquare className="w-3.5 h-3.5 text-neutral-600 dark:text-neutral-400" />
                 ВКонтакте Bot & VK Mini App
               </span>
@@ -956,7 +956,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
               href={TELEGRAM_BOT_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 px-4 py-2 rounded-full border border-neutral-200/80 dark:border-neutral-800/80 bg-white/60 dark:bg-neutral-800/60 hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-800 dark:text-neutral-200 text-xs sm:text-sm font-medium transition-all shrink-0 shadow-sm"
+              className="flex items-center gap-2 px-4 py-2 rounded-full border border-neutral-200/80 dark:border-white/10 bg-white/60 dark:bg-white/[0.06] hover:bg-neutral-100 dark:hover:bg-white/10 text-neutral-800 dark:text-neutral-200 text-xs sm:text-sm font-medium transition-all shrink-0 shadow-sm"
             >
               <Bot className="w-4 h-4 text-neutral-700 dark:text-neutral-300" />
               <span>@{TELEGRAM_BOT_USERNAME}</span>
@@ -966,7 +966,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
               href={VK_BOT_DIALOG_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 px-4 py-2 rounded-full border border-neutral-200/80 dark:border-neutral-800/80 bg-white/60 dark:bg-neutral-800/60 hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-800 dark:text-neutral-200 text-xs sm:text-sm font-medium transition-all shrink-0 shadow-sm"
+              className="flex items-center gap-2 px-4 py-2 rounded-full border border-neutral-200/80 dark:border-white/10 bg-white/60 dark:bg-white/[0.06] hover:bg-neutral-100 dark:hover:bg-white/10 text-neutral-800 dark:text-neutral-200 text-xs sm:text-sm font-medium transition-all shrink-0 shadow-sm"
             >
               <MessageSquare className="w-4 h-4 text-neutral-700 dark:text-neutral-300" />
               <span>VK Бот IT-Старт</span>
@@ -976,25 +976,27 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
         </div>
 
         {/* Server Architecture Note */}
-        <div className="p-4 rounded-2xl border border-neutral-200/80 dark:border-neutral-800/80 bg-neutral-50/70 dark:bg-neutral-950/40 text-xs space-y-1.5 transition-colors">
+        <div className="p-4 rounded-2xl border border-neutral-200/80 dark:border-white/10 bg-neutral-50/70 dark:bg-white/[0.025] text-xs space-y-1.5 transition-colors">
           <div className="flex items-center gap-2 font-medium text-neutral-900 dark:text-white">
             <Terminal className="w-4 h-4 text-neutral-500" />
             <span>Архитектура 24/7 ботов и фонового парсинга:</span>
           </div>
           <p className="leading-relaxed text-neutral-600 dark:text-neutral-400">
-            Автономные серверные боты на Node.js развернуты в файлах <code className="text-neutral-900 dark:text-neutral-200 bg-neutral-200/60 dark:bg-neutral-800 px-1.5 py-0.5 rounded font-mono">bot/bot.mjs</code> (Telegram) и <code className="text-neutral-900 dark:text-neutral-200 bg-neutral-200/60 dark:bg-neutral-800 px-1.5 py-0.5 rounded font-mono">bot/vk_bot.mjs</code> (ВКонтакте) и работают на Render.com. Они непрерывно сканируют каналы и сайты, записывают свежие вакансии в Supabase и рассылают персонализированные пуши. Запуск: <code className="text-neutral-900 dark:text-neutral-200 bg-neutral-200/60 dark:bg-neutral-800 px-1.5 py-0.5 rounded font-mono">npm run bot:all</code>.
+            Автономные серверные боты на Node.js развернуты в файлах <code className="text-neutral-900 dark:text-neutral-200 bg-neutral-200/60 dark:bg-white/10 px-1.5 py-0.5 rounded font-mono">bot/bot.mjs</code> (Telegram) и <code className="text-neutral-900 dark:text-neutral-200 bg-neutral-200/60 dark:bg-white/10 px-1.5 py-0.5 rounded font-mono">bot/vk_bot.mjs</code> (ВКонтакте) и работают на Render.com. Они непрерывно сканируют каналы и сайты, записывают свежие вакансии в Supabase и рассылают персонализированные пуши. Запуск: <code className="text-neutral-900 dark:text-neutral-200 bg-neutral-200/60 dark:bg-white/10 px-1.5 py-0.5 rounded font-mono">npm run bot:all</code>.
           </p>
         </div>
       </div>
 
       {/* SECTION: INTERACTIVE TELEGRAM CHANNELS & WEBSITES MONITOR */}
-      <div className="glass-panel rounded-3xl p-6 sm:p-8 space-y-6 border border-neutral-200/80 dark:border-neutral-800/80 bg-white/80 dark:bg-neutral-900/60 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)]">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-neutral-200/80 dark:border-neutral-800/80">
+      <div className="glass-panel rounded-3xl p-6 sm:p-8 space-y-6 transition-all duration-300
+        border border-black/[0.06] shadow-[0_10px_30px_rgba(0,0,0,0.04),inset_0_1px_1px_rgba(255,255,255,0.8)]
+        dark:bg-white/[0.035] dark:backdrop-blur-2xl dark:border-white/10 dark:shadow-[0_20px_50px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.08)]">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-neutral-200/80 dark:border-white/10">
           <div>
             <div className="flex items-center gap-2 mb-1 flex-wrap">
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-medium flex items-center gap-1.5
                 bg-neutral-100 text-neutral-800 border border-neutral-200/80
-                dark:bg-neutral-800 dark:text-neutral-200 dark:border-neutral-700"
+                dark:bg-white/[0.06] dark:text-neutral-200 dark:border-white/10"
               >
                 <Radio className="w-3 h-3 text-emerald-500 animate-pulse" />
                 Live мониторинг источников
@@ -1004,7 +1006,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                 {monitoredChannels.length + monitoredWebsites.length} источников ({monitoredChannels.length} каналов + {monitoredWebsites.length} сайтов)
               </span>
             </div>
-            <h3 className="text-lg sm:text-xl font-bold flex items-center gap-2 font-sans text-neutral-900 dark:text-white">
+            <h3 className="text-lg sm:xl font-bold flex items-center gap-2 font-sans text-neutral-900 dark:text-white">
               <Building2 className="w-5 h-5 text-neutral-700 dark:text-neutral-300" />
               Монитор Telegram-каналов & Карьерных сайтов работодателей
             </h3>
@@ -1018,8 +1020,8 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
               type="button"
               onClick={handleScanChannels}
               disabled={isScanningChannels}
-              className="w-full md:w-auto flex items-center justify-center gap-2 px-5 py-2.5 rounded-full font-medium text-xs sm:text-sm active:scale-95 transition-all disabled:opacity-50
-                bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white dark:hover:bg-neutral-100 dark:text-neutral-900 shadow-sm"
+              className="w-full md:w-auto flex items-center justify-center gap-2 px-5 py-2.5 rounded-full font-semibold text-xs sm:text-sm active:scale-95 transition-all disabled:opacity-50
+                bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white dark:hover:bg-neutral-200 dark:text-neutral-950 shadow-sm"
             >
               <RefreshCw className={`w-4 h-4 ${isScanningChannels ? 'animate-spin' : ''}`} />
               <span>{isScanningChannels ? `Сканирование... ${scanProgress}%` : 'Запустить сканирование сайтов и каналов'}</span>
@@ -1029,7 +1031,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
 
         {/* Progress Bar during scan */}
         {isScanningChannels && (
-          <div className="space-y-1.5 p-4 rounded-2xl border border-neutral-200/80 dark:border-neutral-800/80 bg-neutral-50/70 dark:bg-neutral-950/40 transition-colors">
+          <div className="space-y-1.5 p-4 rounded-2xl border border-neutral-200/80 dark:border-white/10 bg-neutral-50/70 dark:bg-white/[0.025] transition-colors">
             <div className="flex justify-between text-xs">
               <span className="flex items-center gap-2 text-neutral-700 dark:text-neutral-300">
                 <RefreshCw className="w-3.5 h-3.5 animate-spin text-neutral-500" />
@@ -1037,7 +1039,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
               </span>
               <span className="font-semibold text-neutral-900 dark:text-white">{scanProgress}%</span>
             </div>
-            <div className="w-full h-1.5 rounded-full overflow-hidden bg-neutral-200 dark:bg-neutral-800">
+            <div className="w-full h-1.5 rounded-full overflow-hidden bg-neutral-200 dark:bg-white/10">
               <div
                 className="h-full bg-neutral-900 dark:bg-white transition-all duration-300 rounded-full"
                 style={{ width: `${scanProgress}%` }}
@@ -1047,7 +1049,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
         )}
 
         {/* Source Type Filter Tabs */}
-        <div className="flex items-center gap-1.5 p-1 rounded-full bg-neutral-100 dark:bg-neutral-950 border border-neutral-200/60 dark:border-neutral-800/60 overflow-x-auto no-scrollbar w-fit">
+        <div className="flex items-center gap-1.5 p-1 rounded-full bg-neutral-100 dark:bg-white/[0.03] border border-neutral-200/60 dark:border-white/10 overflow-x-auto no-scrollbar w-fit">
           {[
             { id: 'all' as const, label: `Все источники (${monitoredChannels.length + monitoredWebsites.length})`, icon: Building2 },
             { id: 'telegram' as const, label: `Telegram-каналы (${monitoredChannels.length})`, icon: Send },
@@ -1063,7 +1065,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                 onClick={() => setSourceTypeFilter(tab.id)}
                 className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
                   isActive
-                    ? 'bg-white dark:bg-neutral-800 text-neutral-950 dark:text-white shadow-sm font-semibold'
+                    ? 'bg-white dark:bg-white text-neutral-950 dark:text-neutral-950 shadow-sm font-semibold'
                     : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-950 dark:hover:text-white'
                 }`}
               >
@@ -1094,8 +1096,8 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
               onClick={() => setChannelFilter(f.id)}
               className={`px-3 py-1 rounded-full text-xs transition-all ${
                 channelFilter === f.id
-                  ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 font-medium shadow-sm'
-                  : 'bg-neutral-100 dark:bg-neutral-900 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white border border-neutral-200/50 dark:border-neutral-800/50'
+                  ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 font-semibold shadow-sm'
+                  : 'bg-neutral-100 dark:bg-white/[0.04] text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white border border-neutral-200/50 dark:border-white/[0.08]'
               }`}
             >
               {f.label}
@@ -1118,14 +1120,14 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                   key={channel.id}
                   className={`p-4 rounded-2xl border transition-all ${
                     channel.status === 'scanning'
-                      ? 'border-neutral-900 dark:border-white ring-1 ring-neutral-900 dark:ring-white bg-neutral-100/90 dark:bg-neutral-800/90'
-                      : 'border-neutral-200/80 dark:border-neutral-800/80 bg-neutral-50/60 dark:bg-neutral-950/40 hover:bg-white dark:hover:bg-neutral-900/60 shadow-[0_2px_8px_rgb(0,0,0,0.02)]'
+                      ? 'border-neutral-900 dark:border-white ring-1 ring-neutral-900 dark:ring-white bg-neutral-100/90 dark:bg-white/10'
+                      : 'border-neutral-200/80 dark:border-white/10 bg-neutral-50/60 dark:bg-white/[0.035] hover:bg-white dark:hover:bg-white/[0.06] shadow-[0_2px_8px_rgb(0,0,0,0.02)]'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2 mb-2">
                     <div className="flex items-center gap-2.5 min-w-0">
                       <div
-                        className="w-8 h-8 rounded-xl bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 flex items-center justify-center font-bold text-xs shrink-0 shadow-xs border border-neutral-200/80 dark:border-neutral-700/80"
+                        className="w-8 h-8 rounded-xl bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 flex items-center justify-center font-bold text-xs shrink-0 shadow-xs border border-neutral-200/80 dark:border-white/10"
                       >
                         {channel.company.slice(0, 2).toUpperCase()}
                       </div>
@@ -1143,14 +1145,14 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                       </div>
                     </div>
 
-                    <span className="text-[10px] px-2 py-0.5 rounded-full font-mono shrink-0 bg-neutral-200/60 dark:bg-neutral-800/80 text-neutral-700 dark:text-neutral-300 border border-neutral-200/80 dark:border-neutral-700/60">
+                    <span className="text-[10px] px-2 py-0.5 rounded-full font-mono shrink-0 bg-neutral-200/60 dark:bg-white/[0.06] text-neutral-700 dark:text-neutral-300 border border-neutral-200/80 dark:border-white/10">
                       {channel.postCount} постов
                     </span>
                   </div>
 
                   <div className="text-[11px] line-clamp-1 mb-2.5 text-neutral-500 dark:text-neutral-400">{channel.category}</div>
 
-                  <div className="flex items-center justify-between pt-2 border-t border-neutral-200/60 dark:border-neutral-800/60 text-[10px]">
+                  <div className="flex items-center justify-between pt-2 border-t border-neutral-200/60 dark:border-white/[0.08] text-[10px]">
                     <span className="text-neutral-400 dark:text-neutral-500 font-mono">Проверка: {channel.lastChecked}</span>
                     <span className="flex items-center gap-1 font-medium text-emerald-600 dark:text-emerald-400">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
@@ -1178,21 +1180,21 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                   key={site.id}
                   className={`p-4 rounded-2xl border transition-all ${
                     site.status === 'scanning'
-                      ? 'border-neutral-900 dark:border-white ring-1 ring-neutral-900 dark:ring-white bg-neutral-100/90 dark:bg-neutral-800/90'
-                      : 'border-neutral-200/80 dark:border-neutral-800/80 bg-neutral-50/60 dark:bg-neutral-950/40 hover:bg-white dark:hover:bg-neutral-900/60 shadow-[0_2px_8px_rgb(0,0,0,0.02)]'
+                      ? 'border-neutral-900 dark:border-white ring-1 ring-neutral-900 dark:ring-white bg-neutral-100/90 dark:bg-white/10'
+                      : 'border-neutral-200/80 dark:border-white/10 bg-neutral-50/60 dark:bg-white/[0.035] hover:bg-white dark:hover:bg-white/[0.06] shadow-[0_2px_8px_rgb(0,0,0,0.02)]'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2 mb-2">
                     <div className="flex items-center gap-2.5 min-w-0">
                       <div
-                        className="w-8 h-8 rounded-xl bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 flex items-center justify-center font-bold text-xs shrink-0 shadow-xs border border-neutral-200/80 dark:border-neutral-700/80"
+                        className="w-8 h-8 rounded-xl bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 flex items-center justify-center font-bold text-xs shrink-0 shadow-xs border border-neutral-200/80 dark:border-white/10"
                       >
                         <Globe className="w-4 h-4 text-white dark:text-neutral-950" />
                       </div>
                       <div className="min-w-0">
                         <div className="flex items-center gap-1.5">
                           <h4 className="text-xs font-semibold truncate text-neutral-900 dark:text-white">{site.company}</h4>
-                          <span className="text-[9px] px-1.5 py-0.2 rounded-full font-semibold font-mono bg-neutral-200/70 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300">
+                          <span className="text-[9px] px-1.5 py-0.2 rounded-full font-semibold font-mono bg-neutral-200/70 dark:bg-white/[0.06] text-neutral-700 dark:text-neutral-300">
                             WEB
                           </span>
                         </div>
@@ -1208,14 +1210,14 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                       </div>
                     </div>
 
-                    <span className="text-[10px] px-2 py-0.5 rounded-full font-mono shrink-0 bg-neutral-200/60 dark:bg-neutral-800/80 text-neutral-700 dark:text-neutral-300 border border-neutral-200/80 dark:border-neutral-700/60">
+                    <span className="text-[10px] px-2 py-0.5 rounded-full font-mono shrink-0 bg-neutral-200/60 dark:bg-white/[0.06] text-neutral-700 dark:text-neutral-300 border border-neutral-200/80 dark:border-white/10">
                       {site.vacanciesCount} вак.
                     </span>
                   </div>
 
                   <div className="text-[11px] line-clamp-1 mb-2.5 text-neutral-500 dark:text-neutral-400">{site.category}</div>
 
-                  <div className="flex items-center justify-between pt-2 border-t border-neutral-200/60 dark:border-neutral-800/60 text-[10px]">
+                  <div className="flex items-center justify-between pt-2 border-t border-neutral-200/60 dark:border-white/[0.08] text-[10px]">
                     <span className="text-neutral-400 dark:text-neutral-500 font-mono">Проверка: {site.lastChecked}</span>
                     <span className="flex items-center gap-1 font-medium text-emerald-600 dark:text-emerald-400">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
@@ -1229,19 +1231,19 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
         )}
 
         {filteredChannels.length === 0 && filteredWebsites.length === 0 && (
-          <div className="p-8 text-center rounded-2xl border border-neutral-200/80 dark:border-neutral-800/80 bg-neutral-50/60 dark:bg-neutral-950/40 text-xs text-neutral-500">
+          <div className="p-8 text-center rounded-2xl border border-neutral-200/80 dark:border-white/10 bg-neutral-50/60 dark:bg-white/[0.02] text-xs text-neutral-500">
             Источники не найдены по заданным критериям фильтрации.
           </div>
         )}
 
         {/* SECTION: PARSED POSTS PREVIEW */}
-        <div className="pt-6 border-t border-neutral-200/80 dark:border-neutral-800/80 space-y-4">
+        <div className="pt-6 border-t border-neutral-200/80 dark:border-white/10 space-y-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div>
               <h4 className="text-sm font-bold flex items-center gap-2 text-neutral-950 dark:text-white">
                 <Sparkles className="w-4 h-4 text-amber-500" />
                 Предпросмотр спарсенных вакансий из каналов и сайтов
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border border-neutral-200/60 dark:border-neutral-700/60">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-neutral-100 dark:bg-white/[0.06] text-neutral-700 dark:text-neutral-300 border border-neutral-200/60 dark:border-white/10">
                   {parsedPosts.length} вакансий
                 </span>
               </h4>
@@ -1272,22 +1274,22 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                   className={`p-5 rounded-3xl border transition-all flex flex-col justify-between ${
                     isPublished
                       ? 'border-emerald-500/30 bg-emerald-50/20 dark:bg-emerald-950/20'
-                      : 'border-neutral-200/80 dark:border-neutral-800/80 bg-neutral-50/50 dark:bg-neutral-950/40 hover:bg-white dark:hover:bg-neutral-900/60 shadow-[0_2px_8px_rgb(0,0,0,0.02)]'
+                      : 'border-neutral-200/80 dark:border-white/10 bg-neutral-50/50 dark:bg-white/[0.035] hover:bg-white dark:hover:bg-white/[0.06] shadow-[0_2px_8px_rgb(0,0,0,0.02)]'
                   }`}
                 >
                   <div className="space-y-3">
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-neutral-200/60 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200">
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-neutral-200/60 dark:bg-white/[0.06] text-neutral-800 dark:text-neutral-200">
                           {post.company}
                         </span>
                         {isWeb ? (
-                          <span className="px-2.5 py-0.5 rounded-full text-[9px] font-medium flex items-center gap-1 bg-neutral-100 text-neutral-700 border border-neutral-200/70 dark:bg-neutral-800 dark:text-neutral-300 dark:border-neutral-700/70">
+                          <span className="px-2.5 py-0.5 rounded-full text-[9px] font-medium flex items-center gap-1 bg-neutral-100 text-neutral-700 border border-neutral-200/70 dark:bg-white/[0.05] dark:text-neutral-300 dark:border-white/10">
                             <Globe className="w-2.5 h-2.5 text-neutral-500 dark:text-neutral-400" />
                             Сайт
                           </span>
                         ) : (
-                          <span className="px-2.5 py-0.5 rounded-full text-[9px] font-medium flex items-center gap-1 bg-neutral-100 text-neutral-700 border border-neutral-200/70 dark:bg-neutral-800 dark:text-neutral-300 dark:border-neutral-700/70">
+                          <span className="px-2.5 py-0.5 rounded-full text-[9px] font-medium flex items-center gap-1 bg-neutral-100 text-neutral-700 border border-neutral-200/70 dark:bg-white/[0.05] dark:text-neutral-300 dark:border-white/10">
                             <Send className="w-2.5 h-2.5 text-neutral-500 dark:text-neutral-400" />
                             Telegram
                           </span>
@@ -1321,7 +1323,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                       {post.tags.slice(0, 3).map((t, idx) => (
                         <span
                           key={idx}
-                          className="px-2 py-0.5 rounded-full text-[10px] bg-neutral-200/60 dark:bg-neutral-800/80 text-neutral-600 dark:text-neutral-400"
+                          className="px-2 py-0.5 rounded-full text-[10px] bg-neutral-200/60 dark:bg-white/[0.06] text-neutral-600 dark:text-neutral-400"
                         >
                           {t}
                         </span>
@@ -1329,7 +1331,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                     </div>
                   </div>
 
-                  <div className="pt-3 mt-4 border-t border-neutral-200/60 dark:border-neutral-800/60 flex items-center justify-between gap-2">
+                  <div className="pt-3 mt-4 border-t border-neutral-200/60 dark:border-white/[0.08] flex items-center justify-between gap-2">
                     {isPublished ? (
                       <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
                         <CheckCircle2 className="w-4 h-4 text-emerald-500" />
@@ -1340,8 +1342,8 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                         type="button"
                         onClick={() => handlePublishParsedPost(post)}
                         disabled={isCurrentPublishing}
-                        className="w-full flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-full text-xs font-medium transition-all disabled:opacity-50
-                          bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white dark:hover:bg-neutral-100 dark:text-neutral-900 shadow-sm"
+                        className="w-full flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-full text-xs font-semibold transition-all disabled:opacity-50
+                          bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white dark:hover:bg-neutral-200 dark:text-neutral-950 shadow-sm"
                       >
                         <Send className={`w-3.5 h-3.5 ${isCurrentPublishing ? 'animate-spin' : ''}`} />
                         <span>
@@ -1360,10 +1362,12 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
       {/* TWO COLUMNS: BOT TOKEN & TELEGRAM SUBSCRIPTION */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* BLOCK 1: BOT TOKEN SETTINGS */}
-        <div className="glass-panel rounded-3xl p-6 sm:p-7 border border-neutral-200/80 dark:border-neutral-800/80 bg-white/80 dark:bg-neutral-900/60 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] flex flex-col justify-between">
+        <div className="glass-panel rounded-3xl p-6 sm:p-7 transition-all duration-300
+          border border-black/[0.06] shadow-[0_10px_30px_rgba(0,0,0,0.04),inset_0_1px_1px_rgba(255,255,255,0.8)]
+          dark:bg-white/[0.035] dark:backdrop-blur-2xl dark:border-white/10 dark:shadow-[0_20px_50px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.08)] flex flex-col justify-between">
           <div>
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-2xl bg-neutral-100 dark:bg-neutral-800 border border-neutral-200/60 dark:border-neutral-700/60 text-neutral-800 dark:text-neutral-200 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-2xl bg-neutral-100 dark:bg-white/[0.06] border border-neutral-200/60 dark:border-white/10 text-neutral-800 dark:text-neutral-200 flex items-center justify-center">
                 <Key className="w-5 h-5" />
               </div>
               <div>
@@ -1376,7 +1380,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-neutral-50/80 dark:bg-neutral-950/40 border border-neutral-200/60 dark:border-neutral-800/60 text-xs leading-relaxed mb-4 space-y-1.5 text-neutral-600 dark:text-neutral-400">
+            <div className="p-4 rounded-2xl bg-neutral-50/80 dark:bg-white/[0.025] border border-neutral-200/60 dark:border-white/[0.08] text-xs leading-relaxed mb-4 space-y-1.5 text-neutral-600 dark:text-neutral-400">
               <p className="flex items-center gap-1.5 text-neutral-900 dark:text-neutral-200 font-semibold">
                 <ShieldCheck className="w-4 h-4 text-emerald-500" />
                 Безопасность согласно требованиям ТЗ:
@@ -1397,7 +1401,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                     value={tokenInput}
                     onChange={(e) => setTokenInput(e.target.value)}
                     placeholder="например 123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 text-neutral-900 dark:text-white placeholder:text-neutral-400 focus:border-neutral-500 focus:outline-none text-xs font-mono"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.04] text-neutral-900 dark:text-white placeholder:text-neutral-400 focus:border-neutral-500 focus:dark:border-white/30 focus:outline-none text-xs font-mono"
                   />
                 </div>
               </div>
@@ -1412,7 +1416,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
               <div className="flex items-center gap-2">
                 <button
                   type="submit"
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white dark:hover:bg-neutral-100 dark:text-neutral-900 text-xs font-semibold transition-all shadow-sm active:scale-95"
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white dark:hover:bg-neutral-200 dark:text-neutral-950 text-xs font-semibold transition-all shadow-sm active:scale-95"
                 >
                   <Check className="w-4 h-4" />
                   <span>Сохранить токен</span>
@@ -1425,7 +1429,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                     saveBotToken('');
                     addLog('info', 'Bot Token удален из хранилища');
                   }}
-                  className="px-3.5 py-2 rounded-full border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 text-xs font-medium transition-colors"
+                  className="px-3.5 py-2 rounded-full border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.06] hover:bg-neutral-100 dark:hover:bg-white/10 text-neutral-700 dark:text-neutral-300 text-xs font-medium transition-colors"
                 >
                   Очистить
                 </button>
@@ -1435,9 +1439,11 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
         </div>
 
         {/* BLOCK 2: SUBSCRIPTION & AUTO-DETECT */}
-        <div className="glass-panel rounded-3xl p-6 sm:p-7 border border-neutral-200/80 dark:border-neutral-800/80 bg-white/80 dark:bg-neutral-900/60 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)]">
+        <div className="glass-panel rounded-3xl p-6 sm:p-7 transition-all duration-300
+          border border-black/[0.06] shadow-[0_10px_30px_rgba(0,0,0,0.04),inset_0_1px_1px_rgba(255,255,255,0.8)]
+          dark:bg-white/[0.035] dark:backdrop-blur-2xl dark:border-white/10 dark:shadow-[0_20px_50px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.08)]">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-2xl bg-neutral-100 dark:bg-neutral-800 border border-neutral-200/60 dark:border-neutral-700/60 text-neutral-800 dark:text-neutral-200 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-2xl bg-neutral-100 dark:bg-white/[0.06] border border-neutral-200/60 dark:border-white/10 text-neutral-800 dark:text-neutral-200 flex items-center justify-center">
               <Bell className="w-5 h-5" />
             </div>
             <div>
@@ -1463,7 +1469,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                 href={`${TELEGRAM_BOT_URL}?start=subscribe`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-full border border-neutral-200/80 dark:border-neutral-800/80 bg-white/60 dark:bg-neutral-800/60 hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-800 dark:text-neutral-200 text-xs font-semibold transition-colors shadow-sm"
+                className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-full border border-neutral-200/80 dark:border-white/10 bg-white/60 dark:bg-white/[0.06] hover:bg-neutral-100 dark:hover:bg-white/10 text-neutral-800 dark:text-neutral-200 text-xs font-semibold transition-colors shadow-sm"
               >
                 <span>1. Написать /start боту</span>
                 <ExternalLink className="w-3.5 h-3.5 opacity-60" />
@@ -1473,7 +1479,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                 type="button"
                 onClick={handleAutoDetect}
                 disabled={isDetectingChatId}
-                className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-full border border-neutral-200/80 dark:border-neutral-800/80 bg-white/60 dark:bg-neutral-800/60 hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-800 dark:text-neutral-200 text-xs font-semibold transition-colors disabled:opacity-50 shadow-sm"
+                className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-full border border-neutral-200/80 dark:border-white/10 bg-white/60 dark:bg-white/[0.06] hover:bg-neutral-100 dark:hover:bg-white/10 text-neutral-800 dark:text-neutral-200 text-xs font-semibold transition-colors disabled:opacity-50 shadow-sm"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${isDetectingChatId ? 'animate-spin' : ''}`} />
                 <span>2. Найти Chat ID авто</span>
@@ -1493,7 +1499,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                   onChange={(e) => setChatId(e.target.value)}
                   placeholder="ID пользователя"
                   required
-                  className="w-full px-3 py-2 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 text-neutral-900 dark:text-white placeholder:text-neutral-400 focus:border-neutral-500 focus:outline-none text-xs font-mono"
+                  className="w-full px-3 py-2 rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.04] text-neutral-900 dark:text-white placeholder:text-neutral-400 focus:border-neutral-500 focus:dark:border-white/30 focus:outline-none text-xs font-mono"
                 />
               </div>
 
@@ -1506,7 +1512,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="@username"
-                  className="w-full px-3 py-2 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 text-neutral-900 dark:text-white placeholder:text-neutral-400 focus:border-neutral-500 focus:outline-none text-xs font-mono"
+                  className="w-full px-3 py-2 rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.04] text-neutral-900 dark:text-white placeholder:text-neutral-400 focus:border-neutral-500 focus:dark:border-white/30 focus:outline-none text-xs font-mono"
                 />
               </div>
             </div>
@@ -1536,7 +1542,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                       className={`px-2.5 py-1.5 rounded-xl text-[11px] font-medium border truncate transition-all ${
                         isChecked
                           ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 border-neutral-900 dark:border-white shadow-sm'
-                          : 'bg-neutral-50 dark:bg-neutral-950 text-neutral-600 dark:text-neutral-400 border-neutral-200/60 dark:border-neutral-800/60 hover:text-neutral-900 dark:hover:text-white'
+                          : 'bg-neutral-50 dark:bg-white/[0.03] text-neutral-600 dark:text-neutral-400 border-neutral-200/60 dark:border-white/10 hover:text-neutral-900 dark:hover:text-white'
                       }`}
                     >
                       {d.title.split('-')[0]}
@@ -1547,7 +1553,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
             </div>
 
             {subStatus && (
-              <div className="p-3 rounded-xl bg-neutral-100 dark:bg-neutral-800/80 border border-neutral-200 dark:border-neutral-700 text-neutral-800 dark:text-neutral-200 text-xs">
+              <div className="p-3 rounded-xl bg-neutral-100 dark:bg-white/[0.06] border border-neutral-200 dark:border-white/10 text-neutral-800 dark:text-neutral-200 text-xs">
                 {subStatus}
               </div>
             )}
@@ -1557,7 +1563,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                 type="button"
                 onClick={handleSendTest}
                 disabled={!chatId}
-                className="w-1/2 flex items-center justify-center gap-1.5 px-3 py-2 rounded-full border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 text-xs font-semibold transition-colors disabled:opacity-50"
+                className="w-1/2 flex items-center justify-center gap-1.5 px-3 py-2 rounded-full border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.06] hover:bg-neutral-100 dark:hover:bg-white/10 text-neutral-700 dark:text-neutral-300 text-xs font-semibold transition-colors disabled:opacity-50"
               >
                 <Send className="w-3.5 h-3.5 text-neutral-500" />
                 <span>Проверить пуш</span>
@@ -1565,7 +1571,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
 
               <button
                 type="submit"
-                className="w-1/2 flex items-center justify-center gap-1.5 px-3 py-2 rounded-full bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white dark:hover:bg-neutral-100 dark:text-neutral-900 text-xs font-semibold shadow-sm transition-all active:scale-95"
+                className="w-1/2 flex items-center justify-center gap-1.5 px-3 py-2 rounded-full bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white dark:hover:bg-neutral-200 dark:text-neutral-950 text-xs font-semibold shadow-sm transition-all active:scale-95"
               >
                 <Check className="w-3.5 h-3.5" />
                 <span>Сохранить в БД</span>
@@ -1576,11 +1582,13 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
       </div>
 
       {/* SECTION: VKONTAKTE (VK) BOT & VK MINI APP */}
-      <div className="glass-panel rounded-3xl p-6 sm:p-8 space-y-6 border border-neutral-200/80 dark:border-neutral-800/80 bg-white/80 dark:bg-neutral-900/60 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)]">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-neutral-200/80 dark:border-neutral-800/80">
+      <div className="glass-panel rounded-3xl p-6 sm:p-8 space-y-6 transition-all duration-300
+        border border-black/[0.06] shadow-[0_10px_30px_rgba(0,0,0,0.04),inset_0_1px_1px_rgba(255,255,255,0.8)]
+        dark:bg-white/[0.035] dark:backdrop-blur-2xl dark:border-white/10 dark:shadow-[0_20px_50px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.08)]">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-neutral-200/80 dark:border-white/10">
           <div>
             <div className="flex items-center gap-2 mb-2 flex-wrap">
-              <span className="px-3 py-1 rounded-full text-xs font-medium bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 border border-neutral-200/60 dark:border-neutral-700/60 flex items-center gap-1.5">
+              <span className="px-3 py-1 rounded-full text-xs font-medium bg-neutral-100 dark:bg-white/[0.06] text-neutral-800 dark:text-neutral-200 border border-neutral-200/60 dark:border-white/10 flex items-center gap-1.5">
                 <MessageSquare className="w-3.5 h-3.5 text-neutral-600 dark:text-neutral-400" />
                 ВКонтакте Bot API & VK Mini App
               </span>
@@ -1606,7 +1614,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
               href={VK_BOT_DIALOG_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-neutral-900 hover:bg-black text-white dark:bg-white dark:hover:bg-neutral-100 dark:text-neutral-950 font-medium text-xs sm:text-sm transition-all shadow-sm shrink-0"
+              className="flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-neutral-900 hover:bg-black text-white dark:bg-white dark:hover:bg-neutral-200 dark:text-neutral-950 font-semibold text-xs sm:text-sm transition-all shadow-sm shrink-0"
             >
               <MessageSquare className="w-4 h-4" />
               <span>Написать боту VK</span>
@@ -1616,7 +1624,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
               href={VK_COMMUNITY_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 px-4 py-2 rounded-full border border-neutral-200/80 dark:border-neutral-800/80 bg-white/60 dark:bg-neutral-800/60 hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-800 dark:text-neutral-200 font-medium text-xs sm:text-sm transition-all shrink-0 shadow-sm"
+              className="flex items-center justify-center gap-2 px-4 py-2 rounded-full border border-neutral-200/80 dark:border-white/10 bg-white/60 dark:bg-white/[0.06] hover:bg-neutral-100 dark:hover:bg-white/10 text-neutral-800 dark:text-neutral-200 font-medium text-xs sm:text-sm transition-all shrink-0 shadow-sm"
             >
               <Globe className="w-4 h-4 text-neutral-500" />
               <span>Сообщество</span>
@@ -1625,9 +1633,9 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
         </div>
 
         {/* VK Mini App Status Banner */}
-        <div className="p-4 rounded-2xl border border-neutral-200/80 dark:border-neutral-800/80 bg-neutral-50/70 dark:bg-neutral-950/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+        <div className="p-4 rounded-2xl border border-neutral-200/80 dark:border-white/10 bg-neutral-50/70 dark:bg-white/[0.025] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
           <div className="flex items-center gap-3">
-            <div className={`w-9 h-9 rounded-2xl flex items-center justify-center ${isVkApp ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' : 'bg-neutral-200/60 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400'}`}>
+            <div className={`w-9 h-9 rounded-2xl flex items-center justify-center ${isVkApp ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' : 'bg-neutral-200/60 dark:bg-white/10 text-neutral-600 dark:text-neutral-400'}`}>
               <Smartphone className="w-4 h-4" />
             </div>
             <div>
@@ -1648,14 +1656,14 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
           </div>
           <div className="text-[11px] text-neutral-500 dark:text-neutral-400 flex items-center gap-1.5 font-mono">
             <span>Сервер:</span>
-            <code className="text-neutral-800 dark:text-neutral-200 bg-neutral-200/60 dark:bg-neutral-800 px-1.5 py-0.5 rounded font-mono">bot/vk_bot.mjs</code>
+            <code className="text-neutral-800 dark:text-neutral-200 bg-neutral-200/60 dark:bg-white/10 px-1.5 py-0.5 rounded font-mono">bot/vk_bot.mjs</code>
           </div>
         </div>
 
         {/* TWO COLUMNS: VK BOT TOKEN & VK TEST NOTIFICATION */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Card 1: VK Group Token */}
-          <div className="border border-neutral-200/80 dark:border-neutral-800/80 bg-white/60 dark:bg-neutral-950/40 rounded-2xl p-5 sm:p-6 flex flex-col justify-between space-y-4 shadow-sm">
+          <div className="border border-neutral-200/80 dark:border-white/10 bg-white/60 dark:bg-white/[0.035] rounded-2xl p-5 sm:p-6 flex flex-col justify-between space-y-4 shadow-sm">
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <Key className="w-4 h-4 text-neutral-600 dark:text-neutral-400" />
@@ -1676,7 +1684,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                   value={vkTokenInput}
                   onChange={(e) => setVkTokenInput(e.target.value)}
                   placeholder="vk1.a.ABCdefGhIjklmNoPQRstuv..."
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 text-neutral-900 dark:text-white placeholder:text-neutral-400 focus:border-neutral-500 focus:outline-none text-xs font-mono"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.04] text-neutral-900 dark:text-white placeholder:text-neutral-400 focus:border-neutral-500 focus:dark:border-white/30 focus:outline-none text-xs font-mono"
                 />
               </div>
 
@@ -1690,7 +1698,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
               <div className="flex items-center gap-2">
                 <button
                   type="submit"
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white dark:hover:bg-neutral-100 dark:text-neutral-900 text-xs font-semibold transition-all shadow-sm active:scale-95"
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white dark:hover:bg-neutral-200 dark:text-neutral-950 text-xs font-semibold transition-all shadow-sm active:scale-95"
                 >
                   <Check className="w-3.5 h-3.5" />
                   <span>Сохранить ключ VK</span>
@@ -1702,7 +1710,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                     saveVkToken('');
                     addLog('info', 'VK Bot Token удален из хранилища');
                   }}
-                  className="px-3.5 py-2 rounded-full border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 text-xs font-medium transition-colors"
+                  className="px-3.5 py-2 rounded-full border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.06] hover:bg-neutral-100 dark:hover:bg-white/10 text-neutral-700 dark:text-neutral-300 text-xs font-medium transition-colors"
                 >
                   Очистить
                 </button>
@@ -1711,7 +1719,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
           </div>
 
           {/* Card 2: Test Message to VK */}
-          <div className="border border-neutral-200/80 dark:border-neutral-800/80 bg-white/60 dark:bg-neutral-950/40 rounded-2xl p-5 sm:p-6 flex flex-col justify-between space-y-4 shadow-sm">
+          <div className="border border-neutral-200/80 dark:border-white/10 bg-white/60 dark:bg-white/[0.035] rounded-2xl p-5 sm:p-6 flex flex-col justify-between space-y-4 shadow-sm">
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <Bell className="w-4 h-4 text-neutral-600 dark:text-neutral-400" />
@@ -1733,13 +1741,13 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                     value={vkPeerId}
                     onChange={(e) => setVkPeerId(e.target.value)}
                     placeholder="например 12345678"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 text-neutral-900 dark:text-white placeholder:text-neutral-400 focus:border-neutral-500 focus:outline-none text-xs font-mono"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.04] text-neutral-900 dark:text-white placeholder:text-neutral-400 focus:border-neutral-500 focus:dark:border-white/30 focus:outline-none text-xs font-mono"
                   />
                   {vkLaunchParams.vk_user_id && (
                     <button
                       type="button"
                       onClick={() => setVkPeerId(String(vkLaunchParams.vk_user_id))}
-                      className="px-3 py-2 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 text-xs font-medium hover:bg-neutral-100 dark:hover:bg-neutral-700 shrink-0"
+                      className="px-3 py-2 rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.06] text-neutral-700 dark:text-neutral-300 text-xs font-medium hover:bg-neutral-100 dark:hover:bg-white/10 shrink-0"
                     >
                       Мой ID
                     </button>
@@ -1751,7 +1759,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                 <div className={`p-3 rounded-xl text-xs flex items-center gap-2 border ${
                   vkSendStatus.includes('успешно')
                     ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-700 dark:text-emerald-300'
-                    : 'bg-neutral-100 dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 text-neutral-800 dark:text-neutral-200'
+                    : 'bg-neutral-100 dark:bg-white/[0.06] border-neutral-200 dark:border-white/10 text-neutral-800 dark:text-neutral-200'
                 }`}>
                   <CheckCircle2 className="w-3.5 h-3.5 shrink-0 text-emerald-500" />
                   <span>{vkSendStatus}</span>
@@ -1762,7 +1770,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                 type="button"
                 onClick={handleSendVkTest}
                 disabled={isSendingVkTest}
-                className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-full bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white dark:hover:bg-neutral-100 dark:text-neutral-900 font-semibold text-xs shadow-sm transition-all disabled:opacity-50 active:scale-95"
+                className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-full bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white dark:hover:bg-neutral-200 dark:text-neutral-950 font-semibold text-xs shadow-sm transition-all disabled:opacity-50 active:scale-95"
               >
                 <Send className={`w-3.5 h-3.5 ${isSendingVkTest ? 'animate-spin' : ''}`} />
                 <span>{isSendingVkTest ? 'Отправка...' : 'Отправить тестовое уведомление в VK'}</span>
@@ -1793,8 +1801,8 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                   onClick={() => setActiveVkCommand(isSelected ? null : c.command)}
                   className={`p-3 rounded-2xl border text-left text-xs transition-all ${
                     isSelected
-                      ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 border-neutral-900 dark:border-white shadow-sm'
-                      : 'border-neutral-200/80 dark:border-neutral-800/80 bg-white/60 dark:bg-neutral-950/40 text-neutral-700 dark:text-neutral-300 hover:border-neutral-400 dark:hover:border-neutral-600'
+                      ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 border-neutral-900 dark:border-white shadow-sm font-semibold'
+                      : 'border-neutral-200/80 dark:border-white/10 bg-white/60 dark:bg-white/[0.035] text-neutral-700 dark:text-neutral-300 hover:border-neutral-400 dark:hover:border-white/30'
                   }`}
                 >
                   <span className="font-bold block font-mono text-[11px]">{c.command}</span>
@@ -1805,7 +1813,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
           </div>
 
           {activeVkCommand && (
-            <div className="p-4 rounded-2xl border border-neutral-200/80 dark:border-neutral-800/80 bg-neutral-50/70 dark:bg-neutral-950/40 text-xs space-y-1.5">
+            <div className="p-4 rounded-2xl border border-neutral-200/80 dark:border-white/10 bg-neutral-50/70 dark:bg-white/[0.025] text-xs space-y-1.5">
               {(() => {
                 const cmdInfo = vkBotCommands.find((c) => c.command === activeVkCommand);
                 if (!cmdInfo) return null;
@@ -1817,7 +1825,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                       <span className="text-neutral-700 dark:text-neutral-300">{cmdInfo.description}</span>
                     </div>
                     <div className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-1 font-mono">
-                      Пример использования: <code className="text-neutral-900 dark:text-neutral-200 bg-neutral-200/60 dark:bg-neutral-800 px-1.5 py-0.5 rounded border border-neutral-200 dark:border-neutral-700">{cmdInfo.example}</code>
+                      Пример использования: <code className="text-neutral-900 dark:text-neutral-200 bg-neutral-200/60 dark:bg-white/10 px-1.5 py-0.5 rounded border border-neutral-200 dark:border-white/10">{cmdInfo.example}</code>
                     </div>
                   </div>
                 );
@@ -1828,10 +1836,12 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
       </div>
 
       {/* BLOCK 3: SIMULATOR OF TELEGRAM CHANNEL PARSER */}
-      <div className="glass-panel rounded-3xl p-6 sm:p-8 space-y-6 border border-neutral-200/80 dark:border-neutral-800/80 bg-white/80 dark:bg-neutral-900/60 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)]">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-4 border-b border-neutral-200/80 dark:border-neutral-800/80">
+      <div className="glass-panel rounded-3xl p-6 sm:p-8 space-y-6 transition-all duration-300
+        border border-black/[0.06] shadow-[0_10px_30px_rgba(0,0,0,0.04),inset_0_1px_1px_rgba(255,255,255,0.8)]
+        dark:bg-white/[0.035] dark:backdrop-blur-2xl dark:border-white/10 dark:shadow-[0_20px_50px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.08)]">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-4 border-b border-neutral-200/80 dark:border-white/10">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-neutral-100 dark:bg-neutral-800 border border-neutral-200/60 dark:border-neutral-700/60 text-neutral-800 dark:text-neutral-200 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-2xl bg-neutral-100 dark:bg-white/[0.06] border border-neutral-200/60 dark:border-white/10 text-neutral-800 dark:text-neutral-200 flex items-center justify-center">
               <PlusCircle className="w-5 h-5" />
             </div>
             <div>
@@ -1861,7 +1871,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                   className={`p-3 rounded-2xl border text-left text-xs transition-all ${
                     presetIndex === idx
                       ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 border-neutral-900 dark:border-white shadow-sm font-semibold'
-                      : 'border-neutral-200/80 dark:border-neutral-800/80 bg-white/60 dark:bg-neutral-950/40 text-neutral-700 dark:text-neutral-300 hover:border-neutral-400 dark:hover:border-neutral-600'
+                      : 'border-neutral-200/80 dark:border-white/10 bg-white/60 dark:bg-white/[0.035] text-neutral-700 dark:text-neutral-300 hover:border-neutral-400 dark:hover:border-white/30'
                   }`}
                 >
                   <div className="flex items-center justify-between mb-1">
@@ -1882,7 +1892,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                 type="text"
                 value={customCompany}
                 onChange={(e) => setCustomCompany(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 text-neutral-900 dark:text-white placeholder:text-neutral-400 focus:border-neutral-500 focus:outline-none text-xs"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.04] text-neutral-900 dark:text-white placeholder:text-neutral-400 focus:border-neutral-500 focus:dark:border-white/30 focus:outline-none text-xs"
               />
             </div>
 
@@ -1892,7 +1902,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                 type="text"
                 value={customTitle}
                 onChange={(e) => setCustomTitle(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 text-neutral-900 dark:text-white placeholder:text-neutral-400 focus:border-neutral-500 focus:outline-none text-xs"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.04] text-neutral-900 dark:text-white placeholder:text-neutral-400 focus:border-neutral-500 focus:dark:border-white/30 focus:outline-none text-xs"
               />
             </div>
 
@@ -1902,7 +1912,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                 type="text"
                 value={customSalary}
                 onChange={(e) => setCustomSalary(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 text-neutral-900 dark:text-white placeholder:text-neutral-400 focus:border-neutral-500 focus:outline-none text-xs"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.04] text-neutral-900 dark:text-white placeholder:text-neutral-400 focus:border-neutral-500 focus:dark:border-white/30 focus:outline-none text-xs"
               />
             </div>
 
@@ -1912,7 +1922,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                 type="text"
                 value={customChannel}
                 onChange={(e) => setCustomChannel(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 text-neutral-900 dark:text-white placeholder:text-neutral-400 focus:border-neutral-500 focus:outline-none text-xs font-mono"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.04] text-neutral-900 dark:text-white placeholder:text-neutral-400 focus:border-neutral-500 focus:dark:border-white/30 focus:outline-none text-xs font-mono"
               />
             </div>
           </div>
@@ -1923,7 +1933,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
               type="button"
               onClick={handlePublishAndNotify}
               disabled={isPublishing}
-              className="w-full flex items-center justify-center gap-2.5 py-3.5 px-6 rounded-full bg-neutral-900 hover:bg-black text-white dark:bg-white dark:hover:bg-neutral-100 dark:text-neutral-900 font-semibold text-sm sm:text-base shadow-sm active:scale-98 transition-all disabled:opacity-50"
+              className="w-full flex items-center justify-center gap-2.5 py-3.5 px-6 rounded-full bg-neutral-900 hover:bg-black text-white dark:bg-white dark:hover:bg-neutral-200 dark:text-neutral-950 font-semibold text-sm sm:text-base shadow-sm active:scale-98 transition-all disabled:opacity-50"
             >
               <Send className={`w-4 h-4 ${isPublishing ? 'animate-spin' : ''}`} />
               <span>
@@ -1936,7 +1946,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
         </div>
 
         {/* Live Activity Terminal */}
-        <div className="pt-5 border-t border-neutral-200/80 dark:border-neutral-800/80">
+        <div className="pt-5 border-t border-neutral-200/80 dark:border-white/10">
           <div className="flex items-center justify-between mb-2 text-xs">
             <span className="font-semibold text-neutral-700 dark:text-neutral-300 flex items-center gap-1.5 font-mono">
               <Terminal className="w-4 h-4 text-neutral-500" />
@@ -1950,7 +1960,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
             </button>
           </div>
 
-          <div className="h-44 overflow-y-auto bg-neutral-950 text-neutral-200 border border-neutral-800/80 rounded-2xl p-4 font-mono text-[11px] space-y-1.5 custom-scroll">
+          <div className="h-44 overflow-y-auto bg-neutral-950 text-neutral-200 border border-neutral-800/80 dark:border-white/10 rounded-2xl p-4 font-mono text-[11px] space-y-1.5 custom-scroll">
             {logs.map((log) => (
               <div key={log.id} className="flex items-start gap-2">
                 <span className="text-neutral-500 shrink-0">[{log.timestamp}]</span>

@@ -358,16 +358,16 @@ export function App() {
       <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-7">
         {/* TAB 1: INTERNSHIPS FEED */}
         {activeTab === 'internships' && (
-          <div className="space-y-6">
+          <div className="relative space-y-6">
+            {/* Subtle ambient typography watermark behind cards like "Pricing" in the reference image */}
+            <div className="absolute inset-x-0 -top-6 h-96 flex items-center justify-center -z-10 pointer-events-none overflow-hidden select-none opacity-[0.04] dark:opacity-[0.08] blur-[0.5px]">
+              <span className="text-8xl sm:text-[160px] md:text-[200px] font-black tracking-tighter uppercase select-none leading-none">
+                IT-СТАРТ
+              </span>
+            </div>
+
             {/* Hero Header - Apple Liquid Glass Minimalist */}
             <div className="relative pt-2 sm:pt-6 pb-2 sm:pb-3 text-center space-y-2.5 select-none">
-              {/* Subtle ambient typography watermark behind cards like "Pricing" in the reference image */}
-              <div className="absolute inset-0 -top-6 flex items-center justify-center -z-10 pointer-events-none overflow-hidden select-none opacity-[0.035] dark:opacity-[0.06] blur-[0.5px]">
-                <span className="text-7xl sm:text-9xl md:text-[140px] font-black tracking-tight uppercase">
-                  IT-СТАРТ
-                </span>
-              </div>
-
               <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight font-sans text-neutral-900 dark:text-white">
                 Агрегатор IT-стажировок
               </h1>
@@ -599,10 +599,10 @@ export function App() {
 
               {filteredInternships.length === 0 ? (
                 <div className="p-12 text-center rounded-3xl space-y-3
-                  bg-white/80 border border-neutral-200/80 text-neutral-700 shadow-xs
-                  dark:bg-neutral-900/60 dark:border-neutral-800 dark:text-neutral-300"
+                  bg-white/80 border border-black/[0.06] text-neutral-700 shadow-sm
+                  dark:bg-white/[0.035] dark:backdrop-blur-2xl dark:border-white/10 dark:text-neutral-300"
                 >
-                  <Briefcase className="w-12 h-12 text-neutral-400 dark:text-neutral-600 mx-auto" />
+                  <Briefcase className="w-12 h-12 text-neutral-400 dark:text-neutral-500 mx-auto" />
                   <h3 className="text-base font-bold text-neutral-900 dark:text-white font-sans">
                     Стажировки по заданным фильтрам не найдены
                   </h3>
@@ -620,7 +620,7 @@ export function App() {
                     }}
                     className="px-5 py-2 rounded-full text-xs font-semibold transition-all
                       bg-neutral-900 text-white hover:bg-black
-                      dark:bg-white dark:text-neutral-950 dark:hover:bg-neutral-100 shadow-xs"
+                      dark:bg-white dark:text-neutral-950 dark:hover:bg-neutral-200 shadow-xs"
                   >
                     Сбросить все фильтры
                   </button>
@@ -698,8 +698,8 @@ export function App() {
 
       {/* Footer */}
       <footer className="w-full py-8 px-4 sm:px-6 lg:px-8 text-xs mt-12 transition-colors border-t
-        bg-white/60 border-neutral-200/80 text-neutral-500
-        dark:bg-[#09090b]/60 dark:border-neutral-800/80 dark:text-neutral-400 backdrop-blur-xl"
+        bg-white/70 border-black/[0.06] text-neutral-500
+        dark:bg-white/[0.02] dark:border-white/[0.08] dark:text-neutral-400 backdrop-blur-xl"
       >
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -743,9 +743,9 @@ export function App() {
             <span>•</span>
             <span className="text-[10px] px-2.5 py-0.5 rounded-full font-medium
               bg-neutral-100 text-neutral-600 border border-neutral-200/80
-              dark:bg-neutral-800 dark:text-neutral-400 dark:border-neutral-700"
+              dark:bg-white/[0.06] dark:text-neutral-300 dark:border-white/10"
             >
-              Liquid Bento v3.0
+              Liquid Glass v3.0
             </span>
           </div>
         </div>

@@ -266,7 +266,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
 
         {/* Row 3: Sub-tracks pills if direction chosen */}
         {selectedDirection !== 'all' && (
-          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1.5 border-t border-neutral-200/70 dark:border-neutral-800">
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1.5 border-t border-neutral-200/70 dark:border-white/10">
             <button
               onClick={() => setSelectedSubTrack('all')}
               className={`px-3 py-0.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
@@ -318,10 +318,10 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
         <div className="space-y-3">
           {filteredQuestions.length === 0 ? (
             <div className="p-8 text-center rounded-3xl transition-colors
-              bg-white/80 border border-neutral-200/80 shadow-xs
-              dark:bg-neutral-900/60 dark:border-neutral-800"
+              bg-white/80 border border-black/[0.06] shadow-xs
+              dark:bg-white/[0.035] dark:backdrop-blur-2xl dark:border-white/10"
             >
-              <SlidersHorizontal className="w-10 h-10 mx-auto mb-2 text-neutral-400 dark:text-neutral-600" />
+              <SlidersHorizontal className="w-10 h-10 mx-auto mb-2 text-neutral-400 dark:text-neutral-500" />
               <h3 className="text-base font-bold mb-1 font-sans text-neutral-900 dark:text-white">Ничего не найдено</h3>
               <p className="text-xs text-neutral-500 dark:text-neutral-400">
                 Попробуйте изменить поисковый запрос или сбросить фильтры.
@@ -368,7 +368,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                         <div className="flex items-center gap-2 flex-wrap mb-1.5">
                           <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full border
                             bg-neutral-100 text-neutral-700 border-neutral-200/70
-                            dark:bg-neutral-800 dark:text-neutral-300 dark:border-neutral-700/70"
+                            dark:bg-white/[0.06] dark:text-neutral-300 dark:border-white/[0.08]"
                           >
                             {q.category}
                           </span>
@@ -401,7 +401,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                       onClick={() => setExpandedId(isExpanded ? null : q.id)}
                       className="p-1.5 rounded-full transition-colors shrink-0
                         bg-neutral-100 hover:bg-neutral-200 text-neutral-600
-                        dark:bg-neutral-800 dark:hover:bg-neutral-750 dark:text-neutral-400"
+                        dark:bg-white/[0.06] dark:hover:bg-white/[0.12] dark:text-neutral-300 dark:hover:text-white"
                     >
                       {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                     </button>
@@ -410,12 +410,12 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                   {isExpanded && (
                     <div className="px-5 pb-5 pt-2 border-t rounded-b-3xl space-y-4 transition-colors
                       border-neutral-200/80 bg-neutral-50/50
-                      dark:border-neutral-800/80 dark:bg-neutral-950/40"
+                      dark:border-white/[0.08] dark:bg-white/[0.02]"
                     >
                       {/* Full Question text */}
                       <div className="p-3.5 rounded-2xl border text-xs leading-relaxed transition-colors
                         bg-white border-neutral-200/80 text-neutral-800
-                        dark:bg-neutral-850 dark:border-neutral-800 dark:text-neutral-200"
+                        dark:bg-white/[0.03] dark:border-white/[0.08] dark:text-neutral-200"
                       >
                         <strong className="block mb-1 text-neutral-900 dark:text-white">Вопрос интервьюера:</strong>
                         {q.question}
@@ -423,8 +423,8 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
 
                       {/* Code Snippet if present */}
                       {q.codeSnippet && (
-                        <div className="rounded-2xl overflow-hidden border border-neutral-200/80 bg-neutral-950 text-neutral-100 dark:border-neutral-800 dark:bg-black">
-                          <div className="px-3.5 py-1.5 text-xs font-mono border-b border-neutral-800 flex items-center justify-between bg-neutral-900 text-neutral-400">
+                        <div className="rounded-2xl overflow-hidden border border-neutral-200/80 bg-neutral-950 text-neutral-100 dark:border-white/10 dark:bg-black">
+                          <div className="px-3.5 py-1.5 text-xs font-mono border-b border-neutral-800 flex items-center justify-between bg-neutral-900 dark:bg-white/[0.04] text-neutral-400">
                             <span className="flex items-center gap-1.5">
                               <Code className="w-3.5 h-3.5 text-neutral-400" />
                               {q.codeLanguage || 'code'}
@@ -440,7 +440,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                       {!isChecked ? (
                         <div className="p-4 rounded-2xl border space-y-3 transition-colors
                           bg-white border-neutral-200/80
-                          dark:bg-neutral-850 dark:border-neutral-800"
+                          dark:bg-white/[0.03] dark:border-white/[0.08]"
                         >
                           <div className="flex items-center justify-between">
                             <span className="text-xs font-semibold flex items-center gap-1.5 text-neutral-800 dark:text-neutral-200">
@@ -469,7 +469,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                             placeholder="Введите ваш ответ для сверки..."
                             className="w-full px-3.5 py-2.5 rounded-xl text-xs transition-colors focus:outline-none
                               bg-neutral-50 border border-neutral-200/80 text-neutral-900 placeholder:text-neutral-400 focus:border-neutral-400
-                              dark:bg-neutral-900 dark:border-neutral-800 dark:text-neutral-100 dark:placeholder:text-neutral-600 dark:focus:border-neutral-600"
+                              dark:bg-white/[0.04] dark:border-white/10 dark:text-neutral-100 dark:placeholder:text-neutral-500 dark:focus:border-white/30"
                           />
 
                           <div className="flex justify-end">
@@ -481,7 +481,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                               }}
                               className="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold transition-all shadow-xs
                                 bg-neutral-900 text-white hover:bg-black
-                                dark:bg-white dark:text-neutral-950 dark:hover:bg-neutral-100"
+                                dark:bg-white dark:text-neutral-950 dark:hover:bg-neutral-200"
                             >
                               <Send className="w-3.5 h-3.5" />
                               <span>Сверить с эталоном</span>
@@ -493,7 +493,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                           {userAnswer.trim() && (
                             <div className="p-3.5 rounded-2xl border text-xs transition-colors
                               bg-white border-neutral-200/80
-                              dark:bg-neutral-850 dark:border-neutral-800"
+                              dark:bg-white/[0.03] dark:border-white/[0.08]"
                             >
                               <div className="flex items-center justify-between mb-1">
                                 <strong className="text-[11px] uppercase text-neutral-500 dark:text-neutral-400">Ваш ответ:</strong>
@@ -534,7 +534,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                       )}
 
                       {/* Card Action Buttons */}
-                      <div className="flex items-center justify-end gap-2 pt-2 border-t border-neutral-200/80 dark:border-neutral-800">
+                      <div className="flex items-center justify-end gap-2 pt-2 border-t border-neutral-200/80 dark:border-white/[0.08]">
                         <button
                           type="button"
                           onClick={() => {
@@ -544,7 +544,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                           className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium border transition-all ${
                             isRepeat
                               ? 'bg-amber-500/10 text-amber-700 border-amber-500/20 dark:bg-amber-500/15 dark:text-amber-300 dark:border-amber-500/30'
-                              : 'bg-neutral-100 hover:bg-neutral-200/80 text-neutral-700 border-neutral-200/70 dark:bg-neutral-850 dark:hover:bg-neutral-800 dark:text-neutral-300 dark:border-neutral-750'
+                              : 'bg-neutral-100 hover:bg-neutral-200/80 text-neutral-700 border-neutral-200/70 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] dark:text-neutral-300 dark:border-white/[0.08]'
                           }`}
                         >
                           <RotateCcw className="w-3.5 h-3.5" />

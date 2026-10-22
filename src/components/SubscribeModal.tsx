@@ -226,7 +226,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
           onClick={onClose}
           className="absolute top-5 right-5 p-2 rounded-full transition-colors
             text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100
-            dark:text-neutral-400 dark:hover:text-white dark:hover:bg-neutral-800"
+            dark:text-neutral-400 dark:hover:text-white dark:hover:bg-white/10"
         >
           <X className="w-5 h-5" />
         </button>
@@ -235,7 +235,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
         <div className="flex items-center gap-3.5 mb-5">
           <div className="w-11 h-11 rounded-2xl flex items-center justify-center font-semibold
             bg-neutral-100 border border-neutral-200/80 text-neutral-800
-            dark:bg-neutral-800 dark:border-neutral-700/80 dark:text-neutral-200"
+            dark:bg-white/[0.06] dark:border-white/10 dark:text-neutral-200"
           >
             <Bell className="w-5 h-5" />
           </div>
@@ -263,7 +263,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
         ) : (
           <div className="mb-4 p-3.5 rounded-2xl border text-xs space-y-2
             bg-neutral-50 border-neutral-200/80
-            dark:bg-neutral-850/80 dark:border-neutral-800"
+            dark:bg-white/[0.035] dark:border-white/10"
           >
             <div className="font-semibold flex items-center gap-1.5 text-neutral-800 dark:text-neutral-200">
               <Bot className="w-4 h-4 text-neutral-500" />
@@ -276,7 +276,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
                 rel="noopener noreferrer"
                 className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-full border font-medium transition-colors
                   bg-white hover:bg-neutral-50 text-neutral-800 border-neutral-200/80 shadow-xs
-                  dark:bg-neutral-800 dark:hover:bg-neutral-750 dark:text-neutral-200 dark:border-neutral-700"
+                  dark:bg-white/[0.06] dark:hover:bg-white/[0.12] dark:text-neutral-200 dark:border-white/10"
               >
                 <span>1. Написать /start боту</span>
                 <ExternalLink className="w-3.5 h-3.5" />
@@ -288,7 +288,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
                 disabled={isDetecting}
                 className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-full border font-medium transition-colors disabled:opacity-50
                   bg-neutral-100 hover:bg-neutral-200/80 text-neutral-800 border-neutral-200/80
-                  dark:bg-neutral-800 dark:hover:bg-neutral-750 dark:text-neutral-200 dark:border-neutral-700"
+                  dark:bg-white/[0.06] dark:hover:bg-white/[0.12] dark:text-neutral-200 dark:border-white/10"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${isDetecting ? 'animate-spin' : ''}`} />
                 <span>2. Определить мой Chat ID</span>
@@ -312,7 +312,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
                 required
                 className="w-full px-3.5 py-2 rounded-xl text-xs sm:text-sm transition-colors focus:outline-none
                   bg-neutral-50 border border-neutral-200/80 text-neutral-900 placeholder:text-neutral-400 focus:border-neutral-400
-                  dark:bg-neutral-850 dark:border-neutral-750 dark:text-neutral-100 dark:placeholder:text-neutral-500 dark:focus:border-neutral-500"
+                  dark:bg-white/[0.04] dark:border-white/10 dark:text-neutral-100 dark:placeholder:text-neutral-500 dark:focus:border-white/30"
               />
             </div>
 
@@ -327,7 +327,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
                 placeholder="@username (необязательно)"
                 className="w-full px-3.5 py-2 rounded-xl text-xs sm:text-sm transition-colors focus:outline-none
                   bg-neutral-50 border border-neutral-200/80 text-neutral-900 placeholder:text-neutral-400 focus:border-neutral-400
-                  dark:bg-neutral-850 dark:border-neutral-750 dark:text-neutral-100 dark:placeholder:text-neutral-500 dark:focus:border-neutral-500"
+                  dark:bg-white/[0.04] dark:border-white/10 dark:text-neutral-100 dark:placeholder:text-neutral-500 dark:focus:border-white/30"
               />
             </div>
           </div>
@@ -348,7 +348,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
                     className={`flex items-center justify-between p-2.5 rounded-xl border text-left text-xs font-medium transition-all ${
                       isSelected
                         ? 'bg-neutral-900 border-neutral-900 text-white dark:bg-white dark:border-white dark:text-neutral-950 shadow-xs'
-                        : 'bg-neutral-100/70 border-neutral-200/70 text-neutral-700 hover:bg-neutral-200/60 dark:bg-neutral-850/60 dark:border-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-800/80'
+                        : 'bg-neutral-100/70 border-neutral-200/70 text-neutral-700 hover:bg-neutral-200/60 dark:bg-white/[0.04] dark:border-white/10 dark:text-neutral-300 dark:hover:bg-white/[0.08]'
                     }`}
                   >
                     <span className="truncate">{dir.title.split('-')[0]}</span>
@@ -366,7 +366,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
             </label>
             <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-2.5 rounded-2xl border transition-colors
               bg-neutral-50/80 border-neutral-200/80
-              dark:bg-neutral-850/60 dark:border-neutral-800"
+              dark:bg-white/[0.035] dark:border-white/10"
             >
               {DIRECTIONS.filter((d) => selectedDirections.includes(d.id)).flatMap((d) =>
                 d.subTracks.map((st) => {
@@ -379,7 +379,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
                       className={`px-3 py-1 rounded-full text-xs font-medium border transition-all ${
                         isSelected
                           ? 'bg-neutral-900 text-white border-neutral-900 dark:bg-white dark:text-neutral-950 dark:border-white shadow-xs'
-                          : 'bg-white text-neutral-700 border-neutral-200/80 hover:bg-neutral-100 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-750'
+                          : 'bg-white text-neutral-700 border-neutral-200/80 hover:bg-neutral-100 dark:bg-white/[0.05] dark:border-white/10 dark:text-neutral-300 dark:hover:bg-white/10'
                       }`}
                     >
                       {st.name}
@@ -393,7 +393,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
           {/* Bot Token Configuration Block */}
           <div className="p-3.5 rounded-2xl border text-xs space-y-2 transition-colors
             bg-neutral-50/80 border-neutral-200/80
-            dark:bg-neutral-850/60 dark:border-neutral-800"
+            dark:bg-white/[0.035] dark:border-white/10"
           >
             <div className="flex items-center justify-between">
               <span className="font-medium text-neutral-700 dark:text-neutral-300">
@@ -419,7 +419,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
                   placeholder="Токен от @BotFather (сохраняется в браузере)"
                   className="w-full px-3 py-1.5 rounded-xl border text-xs transition-colors focus:outline-none
                     bg-white border-neutral-200/80 text-neutral-900
-                    dark:bg-neutral-900 dark:border-neutral-750 dark:text-neutral-100"
+                    dark:bg-white/[0.04] dark:border-white/10 dark:text-neutral-100"
                 />
                 <p className="text-[10px] text-neutral-500 dark:text-neutral-400">
                   Токен хранится только в вашем браузере и используется для реальных вызовов Bot API.
@@ -436,7 +436,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
                   ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-800 dark:bg-emerald-500/15 dark:border-emerald-500/30 dark:text-emerald-300'
                   : statusMessage.type === 'error'
                   ? 'bg-rose-500/10 border border-rose-500/20 text-rose-800 dark:bg-rose-500/15 dark:border-rose-500/30 dark:text-rose-300'
-                  : 'bg-neutral-100 border border-neutral-200/80 text-neutral-800 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-200'
+                  : 'bg-neutral-100 border border-neutral-200/80 text-neutral-800 dark:bg-white/[0.06] dark:border-white/10 dark:text-neutral-200'
               }`}
             >
               {statusMessage.type === 'success' ? (
@@ -456,7 +456,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
               disabled={isLoading || !chatId}
               className="w-full sm:w-1/2 flex items-center justify-center gap-2 px-4 py-2.5 rounded-full border text-xs sm:text-sm font-medium transition-colors disabled:opacity-50
                 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 border-neutral-200/80
-                dark:bg-neutral-800 dark:hover:bg-neutral-750 dark:text-neutral-200 dark:border-neutral-700"
+                dark:bg-white/[0.06] dark:hover:bg-white/[0.12] dark:text-neutral-200 dark:border-white/10"
             >
               <Send className="w-3.5 h-3.5 text-neutral-500" />
               <span>Проверить уведомление</span>
@@ -465,9 +465,9 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full sm:w-1/2 flex items-center justify-center gap-2 px-4 py-2.5 rounded-full text-white text-xs sm:text-sm font-medium shadow-xs transition-all active:scale-95 disabled:opacity-50
+              className="w-full sm:w-1/2 flex items-center justify-center gap-2 px-4 py-2.5 rounded-full text-white text-xs sm:text-sm font-semibold shadow-xs transition-all active:scale-95 disabled:opacity-50
                 bg-neutral-900 hover:bg-black
-                dark:bg-white dark:hover:bg-neutral-100 dark:text-neutral-950"
+                dark:bg-white dark:hover:bg-neutral-200 dark:text-neutral-950"
             >
               <Check className="w-4 h-4" />
               <span>{isLoading ? 'Сохранение...' : 'Сохранить подписку'}</span>
