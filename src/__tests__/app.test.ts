@@ -1116,7 +1116,7 @@ describe('12. VKontakte (VK) Bot & VK Mini App Integration', () => {
   });
 });
 
-describe('13. Real Employer Positions & Cyberpunk Dark/Light Theme System', () => {
+describe('13. Real Employer Positions & Liquid Glass Bento Dark/Light Theme System', () => {
   it('covers 100% of required real programs for all 9 target employers', () => {
     // 1. Т-Банк: Frontend, Backend Python, Backend Go, Backend Java, QA, Analytics
     const tbankItems = SEED_INTERNSHIPS.filter((i) => i.company.toLowerCase().includes('т-банк'));

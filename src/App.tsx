@@ -94,16 +94,19 @@ export function App() {
   // Sync theme with document element and persistence
   useEffect(() => {
     const root = document.documentElement;
+    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
     if (theme === 'dark') {
       root.classList.add('dark');
       root.classList.remove('light');
       document.body.classList.add('dark');
       document.body.classList.remove('light');
+      if (metaThemeColor) metaThemeColor.setAttribute('content', '#09090b');
     } else {
       root.classList.add('light');
       root.classList.remove('dark');
       document.body.classList.add('light');
       document.body.classList.remove('dark');
+      if (metaThemeColor) metaThemeColor.setAttribute('content', '#f4f5f7');
     }
     saveLocalTheme(theme);
   }, [theme]);

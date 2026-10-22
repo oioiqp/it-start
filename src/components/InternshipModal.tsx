@@ -232,8 +232,8 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
           {/* Section 1: Required Roadmap Steps */}
           <div>
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-bold uppercase tracking-wider flex items-center gap-2 font-mono dark:text-white light:text-slate-900">
-                <Map className="w-4 h-4 dark:text-cyan-400 light:text-sky-600" />
+              <h3 className="text-sm font-semibold uppercase tracking-wider flex items-center gap-2 font-sans text-neutral-900 dark:text-white">
+                <Map className="w-4 h-4 text-neutral-500 dark:text-neutral-400" />
                 Этапы роадмапа для вакансии ({completedTopicsCount}/{relevantTopics.length})
               </h3>
             </div>
