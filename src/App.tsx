@@ -98,13 +98,13 @@ export function App() {
       root.classList.remove('light');
       document.body.classList.add('dark');
       document.body.classList.remove('light');
-      if (metaThemeColor) metaThemeColor.setAttribute('content', '#000000');
+      if (metaThemeColor) metaThemeColor.setAttribute('content', '#0d0814');
     } else {
       root.classList.add('light');
       root.classList.remove('dark');
       document.body.classList.add('light');
       document.body.classList.remove('dark');
-      if (metaThemeColor) metaThemeColor.setAttribute('content', '#eceef2');
+      if (metaThemeColor) metaThemeColor.setAttribute('content', '#f6f1f7');
     }
     saveLocalTheme(theme);
   }, [theme]);
@@ -335,19 +335,19 @@ export function App() {
   return (
     <div className={`min-h-screen flex flex-col transition-colors duration-250 relative ${
       theme === 'dark'
-        ? 'dark bg-[#000000] text-neutral-100 liquid-ambient-dark selection:bg-white selection:text-neutral-950'
-        : 'light bg-[#eceef2] text-neutral-900 liquid-ambient-light selection:bg-neutral-900 selection:text-white'
+        ? 'dark bg-[#0d0814] text-neutral-100 liquid-ambient-dark selection:bg-white selection:text-neutral-950'
+        : 'light bg-[#f6f1f7] text-neutral-900 liquid-ambient-light selection:bg-neutral-900 selection:text-white'
     }`}>
-      {/* Ambient Mesh Gradient Orbs (Refract through Liquid Glass components) */}
+      {/* Ambient Mesh Gradient Orbs (Refract dynamically through Liquid Glass components) */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10 select-none">
-        {/* Top-Right Soft Rose / Lavender Glow Orb */}
-        <div className="absolute -top-[15%] right-[-10%] w-[550px] h-[550px] sm:w-[750px] sm:h-[750px] rounded-full bg-gradient-to-br from-pink-500/25 via-rose-500/20 to-purple-600/25 blur-[120px] dark:from-pink-600/18 dark:via-rose-600/12 dark:to-purple-700/18 animate-ambient-slow" />
-        {/* Top-Left Indigo / Violet Glow Orb */}
-        <div className="absolute top-[20%] -left-[15%] w-[500px] h-[500px] sm:w-[700px] sm:h-[700px] rounded-full bg-gradient-to-tr from-indigo-500/20 via-purple-500/18 to-pink-400/15 blur-[130px] dark:from-indigo-600/15 dark:via-purple-600/12 dark:to-pink-600/10 animate-ambient-reverse" />
-        {/* Center-Right Aquamarine / Cyan Orb */}
-        <div className="absolute top-[55%] right-[2%] w-[450px] h-[450px] sm:w-[650px] sm:h-[650px] rounded-full bg-gradient-to-tr from-cyan-400/20 via-teal-400/15 to-blue-500/18 blur-[125px] dark:from-cyan-600/12 dark:via-blue-600/10 dark:to-indigo-600/10 animate-ambient-slow" />
-        {/* Bottom-Left Warm Amber / Coral Orb */}
-        <div className="absolute bottom-[5%] left-[5%] w-[400px] h-[400px] sm:w-[600px] sm:h-[600px] rounded-full bg-gradient-to-br from-amber-400/20 via-orange-400/15 to-rose-400/15 blur-[120px] dark:from-amber-600/10 dark:via-orange-600/8 dark:to-rose-600/10 animate-ambient-reverse" />
+        {/* Top-Right Soft Rose / Orchid Glow Orb (Matches reference image warm tone) */}
+        <div className="absolute -top-[12%] right-[-10%] w-[600px] h-[600px] sm:w-[850px] sm:h-[850px] rounded-full bg-gradient-to-br from-pink-500/40 via-rose-500/35 to-purple-600/40 dark:from-pink-500/35 dark:via-rose-600/30 dark:to-purple-700/35 blur-[100px] sm:blur-[135px] animate-ambient-slow" />
+        {/* Top-Left Violet / Plum Glow Orb */}
+        <div className="absolute top-[18%] -left-[12%] w-[550px] h-[550px] sm:w-[800px] sm:h-[800px] rounded-full bg-gradient-to-tr from-violet-600/38 via-purple-500/32 to-pink-400/30 dark:from-violet-600/32 dark:via-purple-600/28 dark:to-pink-600/25 blur-[105px] sm:blur-[140px] animate-ambient-reverse" />
+        {/* Center-Right Aquamarine / Sapphire Glow Orb */}
+        <div className="absolute top-[52%] right-[1%] w-[500px] h-[500px] sm:w-[750px] sm:h-[750px] rounded-full bg-gradient-to-tr from-cyan-400/35 via-teal-400/30 to-blue-500/35 dark:from-cyan-500/25 dark:via-blue-600/25 dark:to-indigo-600/25 blur-[100px] sm:blur-[135px] animate-ambient-slow" />
+        {/* Bottom-Left Warm Coral / Orchid Glow Orb */}
+        <div className="absolute bottom-[3%] left-[3%] w-[500px] h-[500px] sm:w-[700px] sm:h-[700px] rounded-full bg-gradient-to-br from-rose-500/35 via-orange-400/30 to-purple-500/35 dark:from-rose-600/25 dark:via-purple-600/25 dark:to-indigo-800/25 blur-[100px] sm:blur-[130px] animate-ambient-reverse" />
       </div>
 
       {/* Navbar */}
@@ -389,7 +389,7 @@ export function App() {
             </div>
 
             {/* Filter and Search Panel - Liquid Glass Capsule */}
-            <div className="rounded-[28px] sm:rounded-[32px] p-4 sm:p-6 space-y-4 liquid-glass">
+            <div className="rounded-[32px] sm:rounded-[36px] p-4 sm:p-6 space-y-4 liquid-glass">
               {/* Row 1: Search & Reset */}
               <div className="flex flex-col sm:flex-row items-center gap-3">
                 <div className="relative w-full sm:flex-1">
@@ -399,7 +399,7 @@ export function App() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Поиск по названию, компании или технологиям (React, Python, Go, C#, QA)..."
-                    className="w-full pl-10 pr-4 py-2.5 rounded-full text-xs sm:text-sm transition-all focus:outline-none liquid-glass-subtle text-neutral-900 placeholder:text-neutral-500 dark:text-white dark:placeholder:text-neutral-400 focus:border-white/90 dark:focus:border-white/40"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-full text-xs sm:text-sm transition-all focus:outline-none liquid-glass-subtle text-neutral-900 placeholder:text-neutral-500 dark:text-white dark:placeholder:text-neutral-400 focus:border-white/90 dark:focus:border-white/40 border border-white/60 dark:border-white/20"
                   />
                 </div>
 

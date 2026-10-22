@@ -303,10 +303,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
       ) : (
         <div className="space-y-3">
           {filteredQuestions.length === 0 ? (
-            <div className="p-8 text-center rounded-3xl transition-colors
-              bg-white/80 border border-black/[0.06] shadow-xs
-              dark:bg-white/[0.035] dark:backdrop-blur-2xl dark:border-white/10"
-            >
+            <div className="p-8 text-center rounded-[32px] sm:rounded-[36px] transition-colors liquid-glass">
               <SlidersHorizontal className="w-10 h-10 mx-auto mb-2 text-neutral-400 dark:text-neutral-500" />
               <h3 className="text-base font-bold mb-1 font-sans text-neutral-900 dark:text-white">Ничего не найдено</h3>
               <p className="text-xs text-neutral-500 dark:text-neutral-400">

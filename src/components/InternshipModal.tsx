@@ -139,7 +139,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 dark:bg-black/80 backdrop-blur-2xl overflow-y-auto">
-      <div className="relative w-full max-w-3xl rounded-[32px] p-6 sm:p-8 my-8 max-h-[90vh] flex flex-col liquid-glass text-neutral-900 dark:text-neutral-100 overflow-hidden">
+      <div className="relative w-full max-w-3xl rounded-[32px] sm:rounded-[36px] p-6 sm:p-8 my-8 max-h-[90vh] flex flex-col liquid-glass text-neutral-900 dark:text-neutral-100 overflow-hidden">
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -153,7 +153,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
         {/* Modal Header */}
         <div className="shrink-0 pb-4 border-b pr-10 border-white/50 dark:border-white/10">
           <div className="flex items-center gap-2 mb-2 flex-wrap">
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold liquid-glass-pill text-neutral-800 dark:text-neutral-200">
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold liquid-glass-pill text-neutral-800 dark:text-neutral-200 border border-white/50 dark:border-white/20">
               {internship.company}
             </span>
             <span className="text-xs text-neutral-500 dark:text-neutral-400 flex items-center gap-1">
@@ -171,10 +171,10 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
           </h2>
 
           <div className="flex flex-wrap items-center gap-2 mt-2">
-            <span className="text-xs font-semibold px-2.5 py-1 rounded-full liquid-glass-pill text-neutral-800 dark:text-neutral-200">
+            <span className="text-xs font-semibold px-2.5 py-1 rounded-full liquid-glass-pill text-neutral-800 dark:text-neutral-200 border border-white/50 dark:border-white/20">
               {internship.salary}
             </span>
-            <span className="text-xs px-2.5 py-1 rounded-full liquid-glass-pill text-neutral-600 dark:text-neutral-400">
+            <span className="text-xs px-2.5 py-1 rounded-full liquid-glass-pill text-neutral-600 dark:text-neutral-400 border border-white/40 dark:border-white/15">
               Источник: {internship.sourceChannel}
             </span>
           </div>
@@ -183,7 +183,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
         {/* Scrollable Content */}
         <div className="overflow-y-auto py-4 space-y-6 flex-1 pr-1 custom-scroll">
           {/* Readiness Progress Bar Card */}
-          <div className="p-4 sm:p-5 rounded-2xl liquid-glass-subtle transition-colors">
+          <div className="p-4 sm:p-5 rounded-2xl liquid-glass-subtle transition-colors border border-white/40 dark:border-white/15">
             <div className="flex items-center justify-between gap-3 mb-2 flex-wrap">
               <div className="flex items-center gap-2">
                 <Trophy className="w-5 h-5 text-amber-500" />
@@ -203,9 +203,9 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
               <span className="text-2xl font-bold text-neutral-900 dark:text-white">{readinessPercent}%</span>
             </div>
 
-            <div className="w-full h-2.5 rounded-full overflow-hidden bg-neutral-200 dark:bg-white/10">
+            <div className="w-full h-2.5 rounded-full overflow-hidden bg-black/10 dark:bg-white/15 p-0.5 border border-white/20 dark:border-white/10">
               <div
-                className="h-full rounded-full transition-all duration-500 bg-neutral-900 dark:bg-white"
+                className="h-full rounded-full transition-all duration-500 bg-gradient-to-r from-emerald-500 to-teal-400 dark:from-emerald-400 dark:to-teal-300 shadow-[0_0_10px_rgba(52,211,153,0.4)]"
                 style={{ width: `${readinessPercent}%` }}
               />
             </div>
@@ -472,8 +472,8 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 px-5 py-2.5 rounded-full font-bold text-xs sm:text-sm active:scale-95 transition-all
-                  bg-neutral-900 hover:bg-black text-white shadow-md
-                  dark:bg-white dark:hover:bg-neutral-100 dark:text-neutral-950"
+                  bg-neutral-900/95 hover:bg-black text-white shadow-md
+                  dark:bg-white/95 dark:hover:bg-white dark:text-neutral-950 border border-white/30 dark:border-white/80"
                 title={`Подать заявку на официальном сайте компании ${internship.company}`}
               >
                 <span>Подать заявку на сайте {internship.company}</span>

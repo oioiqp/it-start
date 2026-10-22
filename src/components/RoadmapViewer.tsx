@@ -203,9 +203,9 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
               {completedInTrack} из {allVisibleTopics.length} ({trackProgressPercent}%)
             </span>
           </div>
-          <div className="w-full h-2 rounded-full overflow-hidden bg-neutral-900/10 dark:bg-white/15">
+          <div className="w-full h-2.5 rounded-full overflow-hidden bg-black/10 dark:bg-white/15 p-0.5 border border-white/25 dark:border-white/10">
             <div
-              className="h-full rounded-full transition-all duration-500 bg-neutral-900 dark:bg-white"
+              className="h-full rounded-full transition-all duration-500 bg-gradient-to-r from-emerald-500 to-teal-400 dark:from-emerald-400 dark:to-teal-300 shadow-[0_0_10px_rgba(52,211,153,0.4)]"
               style={{ width: `${trackProgressPercent}%` }}
             />
           </div>
