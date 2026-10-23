@@ -131,7 +131,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
   return (
     <div className="space-y-6">
       {/* Direction Tabs (6 Main Directions) */}
-      <div className="rounded-[28px] sm:rounded-[32px] p-3 sm:p-4 transition-all duration-300 liquid-glass shadow-lg">
+      <div className="rounded-[28px] sm:rounded-[32px] p-3 sm:p-4 transition-all duration-300 liquid-glass">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
           {DIRECTIONS.map((dir) => {
             const isSelected = dir.id === selectedDirectionId;
@@ -141,8 +141,8 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                 onClick={() => handleSelectDirection(dir.id)}
                 className={`flex flex-col items-center justify-center p-3 rounded-2xl text-center transition-all duration-150 active:scale-95 cursor-pointer ${
                   isSelected
-                    ? 'bg-neutral-950 text-white shadow-md border border-white/20'
-                    : 'liquid-glass-pill hover:bg-white/70 text-neutral-800 border border-white/70 shadow-xs'
+                    ? 'bg-neutral-900 text-white shadow-xs'
+                    : 'liquid-glass-pill hover:bg-white/50 text-neutral-700'
                 }`}
               >
                 <div
@@ -154,7 +154,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                 >
                   <Layers className="w-4 h-4" />
                 </div>
-                <span className="text-xs font-bold leading-tight">{dir.title.split('-')[0]}</span>
+                <span className="text-xs font-semibold leading-tight">{dir.title.split('-')[0]}</span>
               </button>
             );
           })}
@@ -178,10 +178,10 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                 <button
                   key={st.id}
                   onClick={() => handleSelectSubTrack(st.id)}
-                  className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold transition-all duration-150 active:scale-95 cursor-pointer ${
+                  className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-150 active:scale-95 cursor-pointer ${
                     isSelected
-                      ? 'bg-neutral-950 text-white shadow-md border border-white/20'
-                      : 'liquid-glass-pill hover:bg-white/70 text-neutral-800 border border-white/70 shadow-xs'
+                      ? 'bg-neutral-900 text-white shadow-xs'
+                      : 'liquid-glass-pill hover:bg-white/50 text-neutral-700'
                   }`}
                 >
                   <span>{st.name}</span>
@@ -203,9 +203,9 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
               {completedInTrack} из {allVisibleTopics.length} ({trackProgressPercent}%)
             </span>
           </div>
-          <div className="w-full h-2.5 rounded-full overflow-hidden bg-black/10 dark:bg-white/15 p-0.5 border border-white/25 dark:border-white/10">
+          <div className="w-full h-2 rounded-full overflow-hidden bg-black/5 dark:bg-white/10">
             <div
-              className="h-full rounded-full transition-all duration-500 bg-gradient-to-r from-emerald-500 to-teal-400 dark:from-emerald-400 dark:to-teal-300 shadow-[0_0_10px_rgba(52,211,153,0.4)]"
+              className="h-full rounded-full transition-all duration-500 bg-neutral-800 dark:bg-neutral-200"
               style={{ width: `${trackProgressPercent}%` }}
             />
           </div>

@@ -224,10 +224,10 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
               setSelectedDirection('all');
               setSelectedSubTrack('all');
             }}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-150 active:scale-95 ${
+            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 ${
               selectedDirection === 'all'
-                ? 'bg-neutral-950 text-white shadow-md border border-white/20'
-                : 'liquid-glass-pill hover:bg-white/70 text-neutral-800 border border-white/70 shadow-xs'
+                ? 'bg-neutral-900 text-white shadow-xs'
+                : 'liquid-glass-pill hover:bg-white/50 text-neutral-700'
             }`}
           >
             Все направления
@@ -239,10 +239,10 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                 setSelectedDirection(dir.id);
                 setSelectedSubTrack('all');
               }}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-150 active:scale-95 ${
+              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 ${
                 selectedDirection === dir.id
-                  ? 'bg-neutral-950 text-white shadow-md border border-white/20'
-                  : 'liquid-glass-pill hover:bg-white/70 text-neutral-800 border border-white/70 shadow-xs'
+                  ? 'bg-neutral-900 text-white shadow-xs'
+                  : 'liquid-glass-pill hover:bg-white/50 text-neutral-700'
               }`}
             >
               {dir.title.split('-')[0]}
@@ -252,13 +252,13 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
 
         {/* Row 3: Sub-tracks pills if direction chosen */}
         {selectedDirection !== 'all' && (
-          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1.5 border-t border-white/60">
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1.5 border-t border-black/5 dark:border-white/5">
             <button
               onClick={() => setSelectedSubTrack('all')}
-              className={`px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-150 active:scale-95 ${
+              className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 ${
                 selectedSubTrack === 'all'
-                  ? 'bg-neutral-950 text-white shadow-md border border-white/20'
-                  : 'liquid-glass-pill hover:bg-white/70 text-neutral-800 border border-white/70 shadow-xs'
+                  ? 'bg-neutral-900 text-white shadow-xs'
+                  : 'liquid-glass-pill hover:bg-white/50 text-neutral-700'
               }`}
             >
               Все ветки
@@ -267,10 +267,10 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
               <button
                 key={st.id}
                 onClick={() => setSelectedSubTrack(st.id)}
-                className={`px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-150 active:scale-95 ${
+                className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 ${
                   selectedSubTrack === st.id
-                    ? 'bg-neutral-950 text-white shadow-md border border-white/20'
-                    : 'liquid-glass-pill hover:bg-white/70 text-neutral-800 border border-white/70 shadow-xs'
+                    ? 'bg-neutral-900 text-white shadow-xs'
+                    : 'liquid-glass-pill hover:bg-white/50 text-neutral-700'
                 }`}
               >
                 {st.name}
@@ -379,23 +379,23 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                     <button
                       type="button"
                       onClick={() => setExpandedId(isExpanded ? null : q.id)}
-                      className="p-2 rounded-full transition-all duration-150 active:scale-95 shrink-0 liquid-glass-pill hover:bg-white/70 text-neutral-700 border border-white/70 shadow-xs cursor-pointer"
+                      className="p-2 rounded-full transition-all duration-150 active:scale-95 shrink-0 liquid-glass-pill hover:bg-white/50 text-neutral-700 cursor-pointer"
                     >
                       {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                     </button>
                   </div>
 
                   {isExpanded && (
-                    <div className="px-5 pb-5 pt-3 border-t rounded-b-3xl space-y-4 border-white/60 liquid-glass-subtle">
+                    <div className="px-5 pb-5 pt-3 border-t rounded-b-3xl space-y-4 border-black/5 dark:border-white/5 liquid-glass-subtle">
                       {/* Full Question text */}
-                      <div className="p-3.5 rounded-2xl border border-white/70 liquid-glass-pill text-xs leading-relaxed text-neutral-900 shadow-xs">
+                      <div className="p-3.5 rounded-2xl liquid-glass-pill text-xs leading-relaxed text-neutral-900">
                         <strong className="block mb-1 text-neutral-950 font-bold">Вопрос интервьюера:</strong>
                         {q.question}
                       </div>
 
                       {/* Code Snippet if present */}
                       {q.codeSnippet && (
-                        <div className="rounded-2xl overflow-hidden border border-white/20 bg-neutral-950 text-neutral-100 shadow-sm">
+                        <div className="rounded-2xl overflow-hidden border border-black/10 dark:border-white/10 bg-neutral-950 text-neutral-100 shadow-sm">
                           <div className="px-3.5 py-1.5 text-xs font-mono border-b border-neutral-800 flex items-center justify-between bg-neutral-900 text-neutral-400">
                             <span className="flex items-center gap-1.5">
                               <Code className="w-3.5 h-3.5 text-neutral-400" />
@@ -410,7 +410,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
 
                       {/* Interactive Self-Check Field */}
                       {!isChecked ? (
-                        <div className="p-4 rounded-2xl border border-white/70 liquid-glass-pill space-y-3 shadow-xs">
+                        <div className="p-4 rounded-2xl liquid-glass-pill space-y-3">
                           <div className="flex items-center justify-between">
                             <span className="text-xs font-bold flex items-center gap-1.5 text-neutral-900">
                               <PenTool className="w-3.5 h-3.5 text-neutral-600" />

@@ -216,19 +216,19 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
   const botToken = getSavedBotToken();
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/45 backdrop-blur-2xl overflow-y-auto">
-      <div className="relative w-full max-w-xl rounded-[32px] sm:rounded-[36px] shadow-2xl p-6 sm:p-7 my-8 animate-in fade-in zoom-in-95 duration-200 transition-all liquid-glass text-neutral-900 border border-white/70">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/40 backdrop-blur-xl overflow-y-auto">
+      <div className="relative w-full max-w-xl rounded-[28px] sm:rounded-[32px] shadow-2xl p-6 sm:p-7 my-8 animate-in fade-in zoom-in-95 duration-200 transition-all liquid-glass text-neutral-900">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 p-2 rounded-full transition-all duration-150 z-10 active:scale-95 liquid-glass-pill hover:bg-white/70 text-neutral-600 hover:text-neutral-950 border border-white/70 shadow-xs cursor-pointer"
+          className="absolute top-5 right-5 p-2 rounded-full transition-all duration-150 z-10 active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-600 hover:text-neutral-950 cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>
 
         {/* Header */}
-        <div className="flex items-center gap-3.5 mb-5 pb-4 border-b border-white/60">
-          <div className="w-11 h-11 rounded-2xl flex items-center justify-center font-bold liquid-glass-tile text-neutral-950 shadow-xs">
+        <div className="flex items-center gap-3.5 mb-5 pb-4 border-b border-black/5 dark:border-white/5">
+          <div className="w-11 h-11 rounded-2xl flex items-center justify-center font-bold liquid-glass-tile text-neutral-900">
             <Bell className="w-5 h-5" />
           </div>
           <div>
@@ -337,10 +337,10 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
                     key={dir.id}
                     type="button"
                     onClick={() => toggleDirection(dir.id)}
-                    className={`flex items-center justify-between p-2.5 rounded-xl border text-left text-xs font-bold transition-all duration-150 active:scale-95 cursor-pointer ${
+                    className={`flex items-center justify-between p-2.5 rounded-xl text-left text-xs font-semibold transition-all duration-150 active:scale-95 cursor-pointer ${
                       isSelected
-                        ? 'bg-neutral-950 border-white/20 text-white shadow-md'
-                        : 'liquid-glass-pill text-neutral-800 border-white/70 hover:bg-white/70 shadow-xs'
+                        ? 'bg-neutral-900 text-white shadow-xs'
+                        : 'liquid-glass-pill text-neutral-700 hover:bg-white/50'
                     }`}
                   >
                     <span className="truncate">{dir.title.split('-')[0]}</span>
@@ -353,10 +353,10 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
 
           {/* Sub-tracks selector */}
           <div>
-            <label className="block text-xs font-bold mb-2 text-neutral-800">
+            <label className="block text-xs font-semibold mb-2 text-neutral-800">
               Конкретные специализации и ветки ({selectedSubTracks.length}):
             </label>
-            <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-3 rounded-2xl border border-white/70 liquid-glass-subtle">
+            <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-3 rounded-2xl liquid-glass-subtle">
               {DIRECTIONS.filter((d) => selectedDirections.includes(d.id)).flatMap((d) =>
                 d.subTracks.map((st) => {
                   const isSelected = selectedSubTracks.includes(st.id);
@@ -365,10 +365,10 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
                       key={st.id}
                       type="button"
                       onClick={() => toggleSubTrack(st.id)}
-                      className={`px-3 py-1 rounded-full text-xs font-bold border transition-all duration-150 active:scale-95 cursor-pointer ${
+                      className={`px-3 py-1 rounded-full text-xs font-semibold transition-all duration-150 active:scale-95 cursor-pointer ${
                         isSelected
-                          ? 'bg-neutral-950 text-white border-white/20 shadow-md'
-                          : 'liquid-glass-pill text-neutral-800 border-white/70 hover:bg-white/70 shadow-xs'
+                          ? 'bg-neutral-900 text-white shadow-xs'
+                          : 'liquid-glass-pill text-neutral-700 hover:bg-white/50'
                       }`}
                     >
                       {st.name}
@@ -380,9 +380,9 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
           </div>
 
           {/* Bot Token Configuration Block */}
-          <div className="p-3.5 rounded-2xl border border-white/70 liquid-glass-subtle text-xs space-y-2">
+          <div className="p-3.5 rounded-2xl liquid-glass-subtle text-xs space-y-2">
             <div className="flex items-center justify-between">
-              <span className="font-bold text-neutral-800">
+              <span className="font-semibold text-neutral-800">
                 Bot Token для отправки пушей (@BotFather):
               </span>
               <button
@@ -403,7 +403,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
                     saveBotToken(e.target.value.trim());
                   }}
                   placeholder="Токен от @BotFather (сохраняется в браузере)"
-                  className="w-full px-3 py-2 rounded-xl text-xs transition-all focus:outline-none liquid-glass-pill bg-white/50 focus:bg-white/80 text-neutral-950 placeholder:text-neutral-500 border border-white/80 focus:border-white focus:ring-2 focus:ring-white/70"
+                  className="w-full px-3 py-2 rounded-xl text-xs transition-all focus:outline-none liquid-glass-pill focus:bg-white/50 text-neutral-900 placeholder:text-neutral-500"
                 />
                 <p className="text-[10px] text-neutral-600">
                   Токен хранится только в вашем браузере и используется для реальных вызовов Bot API.
@@ -420,7 +420,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
                   ? 'bg-emerald-500/15 border border-emerald-500/30 text-emerald-900'
                   : statusMessage.type === 'error'
                   ? 'bg-rose-500/15 border border-rose-500/30 text-rose-900'
-                  : 'liquid-glass-pill text-neutral-800 border-white/70'
+                  : 'liquid-glass-pill text-neutral-800'
               }`}
             >
               {statusMessage.type === 'success' ? (
@@ -438,7 +438,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
               type="button"
               onClick={handleTestNotification}
               disabled={isLoading || !chatId}
-              className="w-full sm:w-1/2 flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all active:scale-95 disabled:opacity-50 liquid-glass-pill hover:bg-white/70 text-neutral-800 border border-white/80 shadow-xs cursor-pointer"
+              className="w-full sm:w-1/2 flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-all active:scale-95 disabled:opacity-50 liquid-glass-pill hover:bg-white/50 text-neutral-800 cursor-pointer"
             >
               <Send className="w-3.5 h-3.5 text-neutral-600" />
               <span>Проверить уведомление</span>
@@ -447,7 +447,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full sm:w-1/2 flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-white text-xs sm:text-sm font-extrabold shadow-md transition-all active:scale-95 disabled:opacity-50 bg-neutral-950 hover:bg-black border border-white/20 cursor-pointer"
+              className="w-full sm:w-1/2 flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-white text-xs sm:text-sm font-semibold shadow-xs transition-all active:scale-95 disabled:opacity-50 bg-neutral-900 hover:bg-black cursor-pointer"
             >
               <Check className="w-4 h-4" />
               <span>{isLoading ? 'Сохранение...' : 'Сохранить подписку'}</span>

@@ -84,10 +84,10 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
 
   if (!currentCard || deck.length === 0) {
     return (
-      <div className="p-8 text-center rounded-[32px] transition-all liquid-glass border border-white/70 shadow-lg text-neutral-800">
-        <HelpCircle className="w-12 h-12 mx-auto mb-3 text-neutral-500" />
+      <div className="p-8 text-center rounded-[28px] sm:rounded-[32px] transition-all liquid-glass text-neutral-800">
+        <HelpCircle className="w-12 h-12 mx-auto mb-3 text-neutral-400" />
         <h3 className="text-lg font-bold mb-1 font-sans text-neutral-950">Вопросы не найдены</h3>
-        <p className="text-xs text-neutral-600">
+        <p className="text-xs text-neutral-500">
           Попробуйте сбросить фильтры направления или ветки в панели выше.
         </p>
       </div>
@@ -102,16 +102,16 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
       {/* Top Controls Bar */}
       <div className="flex items-center justify-between text-xs px-1 text-neutral-600">
         <div className="flex items-center gap-2">
-          <span className="font-bold text-sm text-neutral-950">
+          <span className="font-semibold text-sm text-neutral-950">
             Карточка {currentIndex + 1} из {deck.length}
           </span>
           {isLearned && (
-            <span className="px-2.5 py-0.5 rounded-full font-bold text-[11px] bg-emerald-500/15 text-emerald-800 border border-emerald-500/30">
+            <span className="px-2.5 py-0.5 rounded-full font-medium text-[11px] bg-emerald-500/15 text-emerald-800 border border-emerald-500/20">
               Изучено ✓
             </span>
           )}
           {isRepeat && (
-            <span className="px-2.5 py-0.5 rounded-full font-bold text-[11px] bg-amber-500/15 text-amber-800 border border-amber-500/30">
+            <span className="px-2.5 py-0.5 rounded-full font-medium text-[11px] bg-amber-500/15 text-amber-800 border border-amber-500/20">
               На повторение
             </span>
           )}
@@ -119,7 +119,7 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
 
         <button
           onClick={handleShuffle}
-          className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border transition-all active:scale-95 liquid-glass-pill hover:bg-white/70 text-neutral-800 border-white/80 shadow-xs cursor-pointer font-bold"
+          className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full transition-all active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-700 cursor-pointer font-medium"
         >
           <Shuffle className="w-3.5 h-3.5" />
           <span>Перемешать</span>
@@ -129,14 +129,14 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
       {/* Flashcard interactive body */}
       <div
         onClick={handleFlip}
-        className="relative min-h-[340px] p-6 sm:p-8 rounded-[32px] cursor-pointer select-none transition-all flex flex-col justify-between group liquid-glass liquid-glass-interactive border border-white/75 shadow-lg overflow-hidden"
+        className="relative min-h-[340px] p-6 sm:p-8 rounded-[28px] sm:rounded-[32px] cursor-pointer select-none transition-all flex flex-col justify-between group liquid-glass liquid-glass-interactive overflow-hidden"
       >
         {/* Top Badges */}
         <div className="flex items-center justify-between gap-2 mb-4">
-          <span className="px-3 py-1 rounded-full text-xs font-bold liquid-glass-pill text-neutral-800 border border-white/70">
+          <span className="px-3 py-1 rounded-full text-xs font-medium liquid-glass-pill text-neutral-700">
             {currentCard.category}
           </span>
-          <span className="text-xs font-medium text-neutral-600">
+          <span className="text-xs font-medium text-neutral-500">
             Сложность: {currentCard.difficulty}
           </span>
         </div>
@@ -145,34 +145,34 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
         <div className="my-auto">
           {!isFlipped ? (
             <div className="space-y-4 animate-in fade-in zoom-in-95 duration-200">
-              <span className="text-xs font-bold uppercase tracking-wider block text-neutral-600">
+              <span className="text-xs font-semibold uppercase tracking-wider block text-neutral-500">
                 Вопрос собеседования:
               </span>
               <h3 className="text-lg sm:text-xl font-bold leading-snug font-sans text-neutral-950">
                 {currentCard.title}
               </h3>
-              <p className="text-sm leading-relaxed text-neutral-700 font-normal">
+              <p className="text-sm leading-relaxed text-neutral-600 font-normal">
                 {currentCard.question}
               </p>
             </div>
           ) : (
             <div className="space-y-4 animate-in fade-in zoom-in-95 duration-200">
-              <span className="text-xs font-bold uppercase tracking-wider block text-emerald-800">
+              <span className="text-xs font-semibold uppercase tracking-wider block text-emerald-800">
                 Развернутый эталонный ответ:
               </span>
-              <p className="text-sm leading-relaxed p-4 rounded-2xl border border-white/70 liquid-glass-subtle text-neutral-900 shadow-xs">
+              <p className="text-sm leading-relaxed p-4 rounded-2xl liquid-glass-subtle text-neutral-900">
                 {currentCard.answer}
               </p>
 
               {currentCard.codeSnippet && (
-                <pre className="p-3.5 rounded-2xl border text-xs font-mono text-neutral-200 overflow-x-auto bg-neutral-950 border-white/20 shadow-sm">
+                <pre className="p-3.5 rounded-2xl border text-xs font-mono text-neutral-200 overflow-x-auto bg-neutral-950 border-black/10 dark:border-white/10 shadow-sm">
                   <code>{currentCard.codeSnippet}</code>
                 </pre>
               )}
 
               <div className="space-y-1">
-                <span className="text-xs font-bold block text-neutral-700">Ключевые тезисы:</span>
-                <ul className="text-xs space-y-1 text-neutral-700">
+                <span className="text-xs font-semibold block text-neutral-700">Ключевые тезисы:</span>
+                <ul className="text-xs space-y-1 text-neutral-600">
                   {currentCard.keyTakeaways.map((t, idx) => (
                     <li key={idx} className="flex items-start gap-1.5">
                       <span className="text-neutral-400">•</span>
@@ -186,12 +186,12 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
         </div>
 
         {/* Flip hint at bottom */}
-        <div className="pt-4 border-t flex items-center justify-between text-xs border-white/60 text-neutral-600">
+        <div className="pt-4 border-t flex items-center justify-between text-xs border-black/5 dark:border-white/5 text-neutral-500">
           <span className="flex items-center gap-1.5 font-medium">
             <Eye className="w-3.5 h-3.5" />
             {isFlipped ? 'Нажмите, чтобы вернуться к вопросу' : 'Нажмите, чтобы увидеть ответ'}
           </span>
-          <span className="text-[11px] hidden sm:inline opacity-80 font-medium">Клик по карточке переворачивает</span>
+          <span className="text-[11px] hidden sm:inline opacity-70 font-medium">Клик по карточке переворачивает</span>
         </div>
       </div>
 
@@ -200,7 +200,7 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
         <button
           onClick={handlePrev}
           disabled={currentIndex === 0}
-          className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-bold transition-all active:scale-95 disabled:opacity-40 liquid-glass-pill hover:bg-white/70 text-neutral-800 border border-white/80 shadow-xs cursor-pointer"
+          className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-semibold transition-all active:scale-95 disabled:opacity-40 liquid-glass-pill hover:bg-white/50 text-neutral-800 cursor-pointer"
         >
           <ChevronLeft className="w-4 h-4" />
           <span>Назад</span>
@@ -208,7 +208,7 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
 
         <button
           onClick={handleRepeat}
-          className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-bold transition-all active:scale-95 border border-amber-400/50 liquid-glass-pill hover:bg-amber-500/20 text-amber-800 shadow-xs cursor-pointer"
+          className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-semibold transition-all active:scale-95 border border-amber-400/40 liquid-glass-pill hover:bg-amber-500/15 text-amber-800 cursor-pointer"
         >
           <RotateCcw className="w-4 h-4" />
           <span>Повторить</span>
@@ -216,7 +216,7 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
 
         <button
           onClick={handleLearned}
-          className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-extrabold transition-all active:scale-95 bg-neutral-950 hover:bg-black text-white shadow-md border border-white/20 cursor-pointer"
+          className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-semibold transition-all active:scale-95 bg-neutral-900 hover:bg-black text-white shadow-xs cursor-pointer"
         >
           <CheckCircle2 className="w-4 h-4" />
           <span>Знаю отлично</span>
@@ -225,7 +225,7 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
         <button
           onClick={handleNext}
           disabled={currentIndex === deck.length - 1}
-          className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-bold transition-all active:scale-95 disabled:opacity-40 liquid-glass-pill hover:bg-white/70 text-neutral-800 border border-white/80 shadow-xs cursor-pointer"
+          className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-semibold transition-all active:scale-95 disabled:opacity-40 liquid-glass-pill hover:bg-white/50 text-neutral-800 cursor-pointer"
         >
           <span>Вперед</span>
           <ChevronRight className="w-4 h-4" />

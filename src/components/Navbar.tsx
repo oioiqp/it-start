@@ -43,7 +43,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   return (
     <header className="sticky top-2.5 sm:top-4 z-50 flex items-center justify-center px-3 sm:px-4 w-full pointer-events-none">
       <div
-        className="pointer-events-auto flex items-center justify-between gap-1 sm:gap-2 p-1.5 sm:p-2 rounded-full transition-all duration-300 max-w-5xl w-full sm:w-auto liquid-glass-nav shadow-lg"
+        className="pointer-events-auto flex items-center justify-between gap-1 sm:gap-2 p-1.5 sm:p-2 rounded-full transition-all duration-300 max-w-5xl w-full sm:w-auto liquid-glass-nav"
       >
         {/* Brand / Logo (Minimalist & Clean) */}
         <div
@@ -52,18 +52,18 @@ export const Navbar: React.FC<NavbarProps> = ({
           title="IT-Старт Главная"
         >
           <div
-            className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center font-black text-xs tracking-tight transition-transform duration-200 group-hover:scale-105 shadow-sm
-              bg-neutral-950 text-white dark:bg-white dark:text-black border border-white/20"
+            className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center font-bold text-xs tracking-tight transition-transform duration-200 group-hover:scale-105 shadow-xs
+              bg-neutral-900 text-white dark:bg-white dark:text-black"
           >
             IT
           </div>
-          <span className="text-xs sm:text-sm font-extrabold tracking-tight hidden sm:inline text-neutral-950 dark:text-white">
+          <span className="text-xs sm:text-sm font-bold tracking-tight hidden sm:inline text-neutral-900 dark:text-white">
             IT-Старт
           </span>
         </div>
 
         {/* Subtle Divider */}
-        <div className="h-4 w-px shrink-0 mx-0.5 bg-black/15 dark:bg-white/15" />
+        <div className="h-4 w-px shrink-0 mx-0.5 bg-black/10 dark:bg-white/10" />
 
         {/* Center Navigation Tabs - Uniform style, height and rounded-full pill indicator */}
         <nav className="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5 px-0.5">
@@ -74,10 +74,10 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 key={tab.id}
                 onClick={() => handleTabClick(tab.id)}
-                className={`flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-150 active:scale-95 ${
+                className={`flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 ${
                   isActive
-                    ? 'bg-neutral-950 text-white shadow-md dark:bg-white dark:text-black dark:shadow-md border border-white/20 dark:border-white/40'
-                    : 'text-neutral-800 hover:text-neutral-950 hover:bg-white/40 dark:text-neutral-300 dark:hover:text-white dark:hover:bg-white/10'
+                    ? 'bg-neutral-900 text-white shadow-xs dark:bg-white dark:text-black'
+                    : 'text-neutral-700 hover:text-neutral-950 hover:bg-white/40 dark:text-neutral-300 dark:hover:text-white dark:hover:bg-white/10'
                 }`}
               >
                 <Icon className="w-3.5 h-3.5" />
@@ -88,7 +88,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         </nav>
 
         {/* Subtle Divider */}
-        <div className="h-4 w-px shrink-0 mx-0.5 bg-black/15 dark:bg-white/15" />
+        <div className="h-4 w-px shrink-0 mx-0.5 bg-black/10 dark:bg-white/10" />
 
         {/* Right Controls: Telegram Bot / Notifications Action Capsule */}
         <div className="flex items-center gap-1.5 shrink-0 pr-1">
@@ -97,8 +97,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               triggerHaptic('medium');
               onOpenSubscribeModal();
             }}
-            className="flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full font-bold text-xs transition-all duration-150 active:scale-95 shadow-sm
-              bg-neutral-950 hover:bg-black text-white border border-white/20 dark:bg-white dark:text-neutral-950 dark:hover:bg-neutral-100"
+            className="flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full font-semibold text-xs transition-all duration-150 active:scale-95 shadow-xs
+              bg-neutral-900 hover:bg-black text-white dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-100"
             title={telegramUser ? `Telegram: ${telegramUser.username ? '@' + telegramUser.username : telegramUser.first_name || 'Подключен'}` : 'Telegram-бот и уведомления'}
           >
             <Bot className="w-3.5 h-3.5" />
