@@ -5,6 +5,7 @@ import {
   Briefcase,
   Bot,
   RefreshCw,
+  X,
 } from 'lucide-react';
 import type {
   DirectionId,
@@ -93,7 +94,7 @@ export function App() {
     root.classList.remove('dark');
     document.body.classList.add('light');
     document.body.classList.remove('dark');
-    if (metaThemeColor) metaThemeColor.setAttribute('content', '#f5f5f7');
+    if (metaThemeColor) metaThemeColor.setAttribute('content', '#dbe0ea');
     saveLocalTheme('light');
   }, []);
 
@@ -316,13 +317,17 @@ export function App() {
   });
 
   return (
-    <div className="min-h-screen flex flex-col relative light bg-[#f5f5f7] text-neutral-900 liquid-ambient selection:bg-neutral-900 selection:text-white">
-      {/* High-performance static Apple Platinum background (Zero lag, zero GPU overdraw) */}
+    <div className="min-h-screen flex flex-col relative light bg-[#dbe0ea] text-neutral-900 liquid-ambient selection:bg-neutral-950 selection:text-white">
+      {/* Atmospheric Apple Space Gray / Titanium / Smoky Pearl Canvas */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10 select-none">
-        <div className="absolute top-0 inset-x-0 h-[450px] bg-gradient-to-b from-white/90 via-white/50 to-transparent" />
-        <div className="absolute -top-[10%] right-[5%] w-[600px] h-[600px] rounded-full bg-slate-300/25 blur-[90px] transform-gpu pointer-events-none" />
-        <div className="absolute top-[35%] -left-[10%] w-[650px] h-[650px] rounded-full bg-zinc-300/20 blur-[100px] transform-gpu pointer-events-none" />
-        <div className="absolute bottom-[5%] right-[10%] w-[550px] h-[550px] rounded-full bg-slate-200/30 blur-[90px] transform-gpu pointer-events-none" />
+        {/* Top ethereal specular sheen */}
+        <div className="absolute top-0 inset-x-0 h-[480px] bg-gradient-to-b from-white/70 via-white/20 to-transparent pointer-events-none" />
+
+        {/* Smoky Pearl & Platinum Ambient Spheres for authentic glass refraction */}
+        <div className="absolute -top-[12%] -right-[8%] w-[680px] h-[680px] sm:w-[880px] sm:h-[880px] rounded-full bg-gradient-to-br from-slate-200/80 via-zinc-300/60 to-slate-400/40 blur-[110px] transform-gpu pointer-events-none" />
+        <div className="absolute top-[22%] -left-[12%] w-[640px] h-[640px] sm:w-[820px] sm:h-[820px] rounded-full bg-gradient-to-tr from-slate-400/50 via-zinc-300/50 to-blue-200/35 blur-[120px] transform-gpu pointer-events-none" />
+        <div className="absolute top-[55%] -right-[5%] w-[600px] h-[600px] sm:w-[780px] sm:h-[780px] rounded-full bg-gradient-to-bl from-zinc-300/60 via-slate-300/50 to-indigo-200/30 blur-[115px] transform-gpu pointer-events-none" />
+        <div className="absolute -bottom-[8%] left-[8%] w-[620px] h-[620px] sm:w-[820px] sm:h-[820px] rounded-full bg-gradient-to-tr from-slate-400/45 via-zinc-400/40 to-slate-200/50 blur-[120px] transform-gpu pointer-events-none" />
       </div>
 
       {/* Navbar */}
@@ -344,40 +349,49 @@ export function App() {
         {/* TAB 1: INTERNSHIPS FEED */}
         {activeTab === 'internships' && (
           <div className="relative space-y-6">
-            {/* Subtle ambient typography watermark behind cards like "Pricing" in the reference image */}
-            <div className="absolute inset-x-0 -top-6 h-96 flex items-center justify-center -z-10 pointer-events-none overflow-hidden select-none opacity-[0.04] dark:opacity-[0.08] blur-[0.5px]">
-              <span className="text-8xl sm:text-[160px] md:text-[200px] font-black tracking-tighter uppercase select-none leading-none">
+            {/* Ambient typography watermark behind cards */}
+            <div className="absolute inset-x-0 -top-6 h-96 flex items-center justify-center -z-10 pointer-events-none overflow-hidden select-none opacity-[0.06] blur-[0.5px]">
+              <span className="text-8xl sm:text-[160px] md:text-[200px] font-black tracking-tighter uppercase select-none leading-none text-slate-700">
                 IT-СТАРТ
               </span>
             </div>
 
             {/* Hero Header - Apple Liquid Glass Minimalist */}
             <div className="relative pt-2 sm:pt-6 pb-2 sm:pb-3 text-center space-y-2.5 select-none">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-[11px] font-semibold liquid-glass-pill text-neutral-800 dark:text-neutral-200 border border-white/60 dark:border-white/25 shadow-xs">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-[11px] font-bold liquid-glass-pill text-neutral-900 dark:text-neutral-200 border border-white/80 dark:border-white/25 shadow-xs">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 <span>IT Start Web • 100% реальности стажировок IT-компаний РФ</span>
               </div>
-              <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight font-sans text-neutral-900 dark:text-white">
+              <h1 className="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight font-sans text-neutral-950 dark:text-white">
                 Агрегатор IT-стажировок
               </h1>
-              <p className="text-xs sm:text-sm font-medium leading-relaxed max-w-xl mx-auto text-neutral-600 dark:text-neutral-400">
+              <p className="text-xs sm:text-sm font-semibold leading-relaxed max-w-xl mx-auto text-neutral-700 dark:text-neutral-300">
                 Интерактивная дорожная карта • Тренажёры • Подлинные позиции
               </p>
             </div>
 
             {/* Filter and Search Panel - Liquid Glass Capsule */}
-            <div className="rounded-[32px] sm:rounded-[36px] p-4 sm:p-6 space-y-4 liquid-glass">
-              {/* Row 1: Search & Reset */}
+            <div className="rounded-[32px] sm:rounded-[36px] p-5 sm:p-7 space-y-4 liquid-glass shadow-lg">
+              {/* Row 1: Search & Reset (iOS App Library Floating Search Pill) */}
               <div className="flex flex-col sm:flex-row items-center gap-3">
-                <div className="relative w-full sm:flex-1">
-                  <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-neutral-500" />
+                <div className="relative w-full sm:flex-1 group">
+                  <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-neutral-500 dark:text-neutral-400 pointer-events-none transition-colors group-focus-within:text-neutral-950 dark:group-focus-within:text-white" />
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Поиск по названию, компании или технологиям (React, Python, Go, C#, QA)..."
-                    className="w-full pl-10 pr-4 py-2.5 rounded-full text-xs sm:text-sm transition-all focus:outline-none liquid-glass-subtle text-neutral-900 placeholder:text-neutral-500 dark:text-white dark:placeholder:text-neutral-400 focus:border-white/90 dark:focus:border-white/40 border border-white/60 dark:border-white/20"
+                    className="w-full pl-11 pr-10 py-3 rounded-full text-xs sm:text-sm font-medium transition-all focus:outline-none liquid-glass-subtle bg-white/40 focus:bg-white/70 text-neutral-950 placeholder:text-neutral-600 dark:text-white dark:placeholder:text-neutral-400 border border-white/80 focus:border-white focus:ring-2 focus:ring-white/60 shadow-xs"
                   />
+                  {searchQuery && (
+                    <button
+                      onClick={() => setSearchQuery('')}
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 rounded-full text-neutral-500 hover:text-neutral-950 dark:hover:text-white transition-colors"
+                      title="Очистить поиск"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
                 </div>
 
                 <div className="flex items-center gap-2 w-full sm:w-auto shrink-0">
@@ -390,7 +404,7 @@ export function App() {
                       setSelectedFormat('all');
                       setSelectedSource('all');
                     }}
-                    className="w-full sm:w-auto px-4 py-2.5 rounded-full text-xs font-semibold transition-all duration-150 active:scale-95 liquid-glass-pill hover:bg-white/80 dark:hover:bg-white/15 text-neutral-700 dark:text-neutral-200"
+                    className="w-full sm:w-auto px-5 py-3 rounded-full text-xs font-bold transition-all duration-150 active:scale-95 liquid-glass-pill hover:bg-white/60 dark:hover:bg-white/20 text-neutral-800 dark:text-neutral-200 border border-white/80 dark:border-white/25 shadow-xs"
                   >
                     Сбросить фильтры
                   </button>
@@ -398,16 +412,16 @@ export function App() {
               </div>
 
               {/* Row 2: Company Filter */}
-              <div className="space-y-1.5 pt-1 border-t border-white/50 dark:border-white/10">
-                <div className="flex items-center justify-between text-[11px] font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
+              <div className="space-y-2 pt-2 border-t border-white/60 dark:border-white/10">
+                <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-neutral-600 dark:text-neutral-400">
                   <span className="flex items-center gap-1.5">
-                    <Building2 className="w-3.5 h-3.5 text-neutral-500 dark:text-neutral-400" />
+                    <Building2 className="w-3.5 h-3.5 text-neutral-600 dark:text-neutral-400" />
                     Работодатель (Топ IT-компании):
                   </span>
                   {selectedCompany !== 'all' && (
                     <button
                       onClick={() => setSelectedCompany('all')}
-                      className="text-xs text-neutral-700 hover:text-black dark:text-neutral-300 dark:hover:text-white normal-case font-normal underline"
+                      className="text-xs text-neutral-800 hover:text-black dark:text-neutral-300 dark:hover:text-white normal-case font-semibold underline decoration-neutral-400"
                     >
                       Показать все
                     </button>
@@ -416,10 +430,10 @@ export function App() {
                 <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
                   <button
                     onClick={() => setSelectedCompany('all')}
-                    className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 ${
+                    className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-150 active:scale-95 ${
                       selectedCompany === 'all'
-                        ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-sm'
-                        : 'liquid-glass-pill hover:bg-white/80 dark:hover:bg-white/15 text-neutral-700 dark:text-neutral-200'
+                        ? 'bg-neutral-950 text-white dark:bg-white dark:text-neutral-950 shadow-md border border-white/20'
+                        : 'liquid-glass-pill hover:bg-white/60 dark:hover:bg-white/15 text-neutral-800 dark:text-neutral-200 border border-white/60 dark:border-white/20'
                     }`}
                   >
                     Все ({internships.length})
@@ -431,18 +445,18 @@ export function App() {
                       <button
                         key={company}
                         onClick={() => setSelectedCompany(isSelected ? 'all' : company)}
-                        className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 flex items-center gap-1.5 ${
+                        className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-150 active:scale-95 flex items-center gap-1.5 ${
                           isSelected
-                            ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-sm'
-                            : 'liquid-glass-pill hover:bg-white/80 dark:hover:bg-white/15 text-neutral-700 dark:text-neutral-200'
+                            ? 'bg-neutral-950 text-white dark:bg-white dark:text-neutral-950 shadow-md border border-white/20'
+                            : 'liquid-glass-pill hover:bg-white/60 dark:hover:bg-white/15 text-neutral-800 dark:text-neutral-200 border border-white/60 dark:border-white/20'
                         }`}
                       >
                         <span>{company}</span>
                         <span
-                          className={`text-[10px] px-1.5 py-0.2 rounded-full font-medium ${
+                          className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
                             isSelected
                               ? 'bg-white/20 text-white dark:bg-black/10 dark:text-neutral-950'
-                              : 'bg-black/5 text-neutral-700 dark:bg-white/10 dark:text-neutral-300'
+                              : 'bg-black/5 text-neutral-800 dark:bg-white/10 dark:text-neutral-300'
                           }`}
                         >
                           {count}
@@ -454,8 +468,8 @@ export function App() {
               </div>
 
               {/* Row 3: Direction tabs */}
-              <div className="space-y-1.5 pt-1 border-t border-white/50 dark:border-white/10">
-                <div className="text-[11px] font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
+              <div className="space-y-2 pt-2 border-t border-white/60 dark:border-white/10">
+                <div className="text-[11px] font-bold uppercase tracking-wider text-neutral-600 dark:text-neutral-400">
                   Направление:
                 </div>
                 <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
@@ -464,10 +478,10 @@ export function App() {
                       setSelectedDirection('all');
                       setSelectedSubTrack('all');
                     }}
-                    className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 ${
+                    className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-150 active:scale-95 ${
                       selectedDirection === 'all'
-                        ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-sm'
-                        : 'liquid-glass-pill hover:bg-white/80 dark:hover:bg-white/15 text-neutral-700 dark:text-neutral-200'
+                        ? 'bg-neutral-950 text-white dark:bg-white dark:text-neutral-950 shadow-md border border-white/20'
+                        : 'liquid-glass-pill hover:bg-white/60 dark:hover:bg-white/15 text-neutral-800 dark:text-neutral-200 border border-white/60 dark:border-white/20'
                     }`}
                   >
                     Все направления ({internships.length})
@@ -479,10 +493,10 @@ export function App() {
                         setSelectedDirection(dir.id);
                         setSelectedSubTrack('all');
                       }}
-                      className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 ${
+                      className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-150 active:scale-95 ${
                         selectedDirection === dir.id
-                          ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-sm'
-                          : 'liquid-glass-pill hover:bg-white/80 dark:hover:bg-white/15 text-neutral-700 dark:text-neutral-200'
+                          ? 'bg-neutral-950 text-white dark:bg-white dark:text-neutral-950 shadow-md border border-white/20'
+                          : 'liquid-glass-pill hover:bg-white/60 dark:hover:bg-white/15 text-neutral-800 dark:text-neutral-200 border border-white/60 dark:border-white/20'
                       }`}
                     >
                       {dir.title.split('-')[0]}
@@ -493,17 +507,17 @@ export function App() {
 
               {/* Row 4: Sub-tracks */}
               {selectedDirection !== 'all' && (
-                <div className="space-y-1.5 pt-1 border-t border-white/50 dark:border-white/10">
-                  <div className="text-[11px] font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
+                <div className="space-y-2 pt-2 border-t border-white/60 dark:border-white/10">
+                  <div className="text-[11px] font-bold uppercase tracking-wider text-neutral-600 dark:text-neutral-400">
                     Специализация:
                   </div>
                   <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
                     <button
                       onClick={() => setSelectedSubTrack('all')}
-                      className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
+                      className={`px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-150 active:scale-95 ${
                         selectedSubTrack === 'all'
-                          ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-sm'
-                          : 'liquid-glass-pill text-neutral-700 dark:text-neutral-200'
+                          ? 'bg-neutral-950 text-white dark:bg-white dark:text-neutral-950 shadow-md border border-white/20'
+                          : 'liquid-glass-pill hover:bg-white/60 text-neutral-800 dark:text-neutral-200 border border-white/60'
                       }`}
                     >
                       Все ветки
@@ -512,10 +526,10 @@ export function App() {
                       <button
                         key={st.id}
                         onClick={() => setSelectedSubTrack(st.id)}
-                        className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
+                        className={`px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-150 active:scale-95 ${
                           selectedSubTrack === st.id
-                            ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-sm'
-                            : 'liquid-glass-pill hover:bg-white/80 dark:hover:bg-white/15 text-neutral-700 dark:text-neutral-200'
+                            ? 'bg-neutral-950 text-white dark:bg-white dark:text-neutral-950 shadow-md border border-white/20'
+                            : 'liquid-glass-pill hover:bg-white/60 dark:hover:bg-white/15 text-neutral-800 dark:text-neutral-200 border border-white/60 dark:border-white/20'
                         }`}
                       >
                         {st.name}
@@ -526,18 +540,18 @@ export function App() {
               )}
 
               {/* Row 5: Format & Source selectors */}
-              <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-white/50 dark:border-white/10 text-xs">
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-2.5 border-t border-white/60 dark:border-white/10 text-xs">
                 {/* Format Filter */}
                 <div className="flex items-center gap-1.5">
-                  <span className="text-neutral-500 dark:text-neutral-400 font-medium">Формат:</span>
+                  <span className="text-neutral-600 dark:text-neutral-400 font-bold">Формат:</span>
                   {(['all', 'Удаленно', 'Гибрид', 'Офис'] as const).map((fmt) => (
                     <button
                       key={fmt}
                       onClick={() => setSelectedFormat(fmt)}
-                      className={`px-3 py-1 rounded-full transition-colors font-medium ${
+                      className={`px-3 py-1 rounded-full transition-all duration-150 active:scale-95 font-bold ${
                         selectedFormat === fmt
-                          ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-sm'
-                          : 'text-neutral-600 hover:text-neutral-950 dark:text-neutral-400 dark:hover:text-white'
+                          ? 'bg-neutral-950 text-white dark:bg-white dark:text-neutral-950 shadow-sm border border-white/20'
+                          : 'liquid-glass-pill hover:bg-white/60 text-neutral-700 dark:text-neutral-300 border border-white/50'
                       }`}
                     >
                       {fmt === 'all' ? 'Все' : fmt}
@@ -547,15 +561,15 @@ export function App() {
 
                 {/* Source Filter */}
                 <div className="flex items-center gap-1.5">
-                  <span className="text-neutral-500 dark:text-neutral-400 font-medium">Источник:</span>
+                  <span className="text-neutral-600 dark:text-neutral-400 font-bold">Источник:</span>
                   {(['all', 'telegram', 'portal'] as const).map((src) => (
                     <button
                       key={src}
                       onClick={() => setSelectedSource(src)}
-                      className={`px-3 py-1 rounded-full transition-colors font-medium ${
+                      className={`px-3 py-1 rounded-full transition-all duration-150 active:scale-95 font-bold ${
                         selectedSource === src
-                          ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-sm'
-                          : 'text-neutral-600 hover:text-neutral-950 dark:text-neutral-400 dark:hover:text-white'
+                          ? 'bg-neutral-950 text-white dark:bg-white dark:text-neutral-950 shadow-sm border border-white/20'
+                          : 'liquid-glass-pill hover:bg-white/60 text-neutral-700 dark:text-neutral-300 border border-white/50'
                       }`}
                     >
                       {src === 'all' ? 'Все' : src === 'telegram' ? 'Telegram-каналы' : 'Карьерные порталы'}

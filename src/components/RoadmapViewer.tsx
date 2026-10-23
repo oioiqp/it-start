@@ -218,8 +218,8 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
         <div className="relative">
           {/* Header of Core Section */}
           <div className="flex items-center gap-3 mb-6">
-            <div className="px-3.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wider
-              bg-neutral-100 border border-neutral-200/80 text-neutral-800
+            <div className="px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider
+              liquid-glass-pill border border-white/60 text-neutral-800
               dark:bg-white/[0.06] dark:border-white/10 dark:text-neutral-200"
             >
               {currentDirection.coreTitle}
@@ -372,10 +372,10 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                     <button
                       type="button"
                       onClick={() => handleToggleTopicClick(topic)}
-                      className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-full text-xs font-semibold border transition-all ${
+                      className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-full text-xs font-bold border transition-all active:scale-95 ${
                         isDone
-                          ? 'bg-emerald-500 text-white border-emerald-500 shadow-xs'
-                          : 'bg-neutral-100 border-neutral-200/80 text-neutral-800 hover:bg-neutral-200/80 dark:bg-white/[0.05] dark:border-white/10 dark:text-neutral-200 dark:hover:bg-white/[0.1]'
+                          ? 'bg-emerald-500 text-white border-emerald-500 shadow-sm'
+                          : 'liquid-glass-pill hover:bg-white/60 text-neutral-800 border border-white/60 dark:bg-white/[0.05] dark:border-white/10 dark:text-neutral-200 dark:hover:bg-white/[0.1]'
                       }`}
                     >
                       {isDone ? (
@@ -646,10 +646,10 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                     <button
                       type="button"
                       onClick={() => handleToggleTopicClick(topic)}
-                      className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-full text-xs font-semibold border transition-all ${
+                      className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-full text-xs font-bold border transition-all active:scale-95 ${
                         isDone
-                          ? 'bg-emerald-500 text-white border-emerald-500 shadow-xs'
-                          : 'bg-neutral-100 border-neutral-200/80 text-neutral-800 hover:bg-neutral-200/80 dark:bg-white/[0.05] dark:border-white/10 dark:text-neutral-200 dark:hover:bg-white/[0.1]'
+                          ? 'bg-emerald-500 text-white border-emerald-500 shadow-sm'
+                          : 'liquid-glass-pill hover:bg-white/60 text-neutral-800 border border-white/60 dark:bg-white/[0.05] dark:border-white/10 dark:text-neutral-200 dark:hover:bg-white/[0.1]'
                       }`}
                     >
                       {isDone ? (
