@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import type { Internship, Question, RoadmapTopic, UserProgress } from '../types';
 import { triggerHaptic } from '../lib/telegram';
-import { resolveApplyUrl, resolveChannelHandle } from '../lib/vacancyUrl';
+import { resolveApplyUrl, resolveChannelHandle, getCompanyMonogram } from '../lib/vacancyUrl';
 
 interface InternshipCardProps {
   internship: Internship;
@@ -59,9 +59,9 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
         <div className="flex items-start justify-between gap-3 mb-3.5">
           <div className="flex items-center gap-3">
             {/* Minimalist Matte Glass App Squircle Tile */}
-            <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center font-bold text-base sm:text-lg shrink-0 overflow-hidden liquid-glass-tile text-neutral-800 dark:text-neutral-100 transition-transform duration-200 group-hover:scale-[1.02]">
-              <span className="relative z-10 select-none">
-                {internship.company.charAt(0)}
+            <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center font-bold text-sm sm:text-base shrink-0 overflow-hidden liquid-glass-tile text-neutral-800 dark:text-neutral-100 transition-transform duration-200 group-hover:scale-[1.02]">
+              <span className="relative z-10 select-none tracking-tight">
+                {getCompanyMonogram(internship.company)}
               </span>
             </div>
             <div>

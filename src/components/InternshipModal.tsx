@@ -18,7 +18,7 @@ import {
 import confetti from 'canvas-confetti';
 import type { Internship, Question, RoadmapTopic, UserProgress } from '../types';
 import { triggerHaptic } from '../lib/telegram';
-import { resolveApplyUrl, resolveChannelHandle } from '../lib/vacancyUrl';
+import { resolveApplyUrl, resolveChannelHandle, getCompanyMonogram } from '../lib/vacancyUrl';
 
 interface InternshipModalProps {
   internship: Internship | null;
@@ -150,23 +150,31 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
 
         {/* Modal Header */}
         <div className="shrink-0 pb-4 border-b pr-10 border-black/5 dark:border-white/5">
-          <div className="flex items-center gap-2 mb-2 flex-wrap">
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-medium liquid-glass-pill text-neutral-700 dark:text-neutral-300">
-              {internship.company}
-            </span>
-            <span className="text-xs text-neutral-500 dark:text-neutral-400 flex items-center gap-1">
-              <MapPin className="w-3.5 h-3.5" />
-              {internship.location}
-            </span>
-            <span className="text-xs text-neutral-500 dark:text-neutral-400 flex items-center gap-1">
-              <Clock className="w-3.5 h-3.5" />
-              {internship.format}
-            </span>
+          <div className="flex items-start gap-3.5 mb-2">
+            <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center font-bold text-sm sm:text-base shrink-0 overflow-hidden liquid-glass-tile text-neutral-800 dark:text-neutral-100">
+              <span className="relative z-10 select-none tracking-tight">
+                {getCompanyMonogram(internship.company)}
+              </span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1 flex-wrap">
+                <span className="font-bold text-sm text-neutral-950 dark:text-white font-sans tracking-tight">
+                  {internship.company}
+                </span>
+                <span className="text-xs text-neutral-500 dark:text-neutral-400 flex items-center gap-1 font-medium">
+                  <MapPin className="w-3.5 h-3.5 opacity-70" />
+                  {internship.location}
+                </span>
+                <span className="text-xs text-neutral-500 dark:text-neutral-400 flex items-center gap-1 font-medium">
+                  <Clock className="w-3.5 h-3.5 opacity-70" />
+                  {internship.format}
+                </span>
+              </div>
+              <h2 className="text-lg sm:text-2xl font-bold tracking-tight text-neutral-900 dark:text-white font-sans">
+                План подготовки: {internship.title}
+              </h2>
+            </div>
           </div>
-
-          <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-neutral-900 dark:text-white font-sans">
-            План подготовки: {internship.title}
-          </h2>
 
           <div className="flex flex-wrap items-center gap-2 mt-2">
             <span className="text-xs font-semibold px-2.5 py-1 rounded-full liquid-glass-pill text-neutral-800 dark:text-neutral-200">
@@ -228,11 +236,9 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                 return (
                   <div
                     key={topic.id}
-                    className={`p-4 rounded-2xl border transition-all ${
+                    className={`p-4 rounded-2xl transition-all ${
                       isDone
-                        ? 'bg-emerald-500/10 border-emerald-500/25 dark:bg-emerald-500/15 dark:border-emerald-500/35'
-                        : percent > 0
-                        ? 'liquid-glass-subtle border-white/70 dark:border-white/20'
+                        ? 'bg-emerald-500/10 border border-emerald-500/25 dark:bg-emerald-500/15 dark:border-emerald-500/35'
                         : 'liquid-glass-subtle'
                     }`}
                   >
@@ -297,7 +303,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                     </div>
 
                     {topic.subtopics && topic.subtopics.length > 0 && (
-                      <div className="pt-2 border-t border-white/50 dark:border-white/10">
+                      <div className="pt-2 border-t border-black/5 dark:border-white/5">
                         <div className="text-[11px] font-medium uppercase tracking-wider mb-2 text-neutral-500 dark:text-neutral-400">
                           Ключевые подтемы (отметьте изученные):
                         </div>
@@ -352,9 +358,9 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                 return (
                   <div
                     key={q.id}
-                    className={`rounded-2xl border transition-all ${
+                    className={`rounded-2xl transition-all ${
                       isCompleted
-                        ? 'bg-emerald-500/10 border-emerald-500/25 dark:bg-emerald-500/15 dark:border-emerald-500/35'
+                        ? 'bg-emerald-500/10 border border-emerald-500/25 dark:bg-emerald-500/15 dark:border-emerald-500/35'
                         : 'liquid-glass-subtle'
                     }`}
                   >

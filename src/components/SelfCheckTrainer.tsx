@@ -355,7 +355,7 @@ export const SelfCheckTrainer: React.FC<SelfCheckTrainerProps> = ({
                 <button
                   type="button"
                   onClick={handleRepeat}
-                  className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium liquid-glass-pill bg-amber-500/15 hover:bg-amber-500/25 border-amber-500/30 text-amber-700 dark:text-amber-300 active:scale-95 transition-all"
+                  className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium liquid-glass-pill bg-amber-500/15 hover:bg-amber-500/25 text-amber-700 dark:text-amber-300 active:scale-95 transition-all"
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
                   <span>Нужно повторить</span>

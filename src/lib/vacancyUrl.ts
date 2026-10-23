@@ -31,6 +31,35 @@ export function getCompanyKey(companyName = ''): string {
 }
 
 /**
+ * Returns a clean, recognizable monogram (1-2 uppercase letters) for matte glass squircle tiles
+ */
+export function getCompanyMonogram(companyName = ''): string {
+  const key = getCompanyKey(companyName);
+  switch (key) {
+    case 't1':
+      return 'Т1';
+    case 'vk':
+      return 'VK';
+    case 'kontur':
+      return 'К';
+    case 'tbank':
+      return 'Т';
+    case 'directum':
+      return 'D';
+    case 'yandex':
+      return 'Я';
+    case 'ozon':
+      return 'O';
+    case 'sber':
+      return 'С';
+    case 'avito':
+      return 'A';
+    default:
+      return (companyName.trim().charAt(0) || 'IT').toUpperCase();
+  }
+}
+
+/**
  * Resolves an application URL, guaranteeing it leads to a working official career portal
  * or verified direct vacancy page instead of a broken Telegram link, shortener, or root page.
  */

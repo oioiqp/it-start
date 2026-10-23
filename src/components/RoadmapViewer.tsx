@@ -218,10 +218,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
         <div className="relative">
           {/* Header of Core Section */}
           <div className="flex items-center gap-3 mb-6">
-            <div className="px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider
-              liquid-glass-pill border border-white/60 text-neutral-800
-              dark:bg-white/[0.06] dark:border-white/10 dark:text-neutral-200"
-            >
+            <div className="px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider liquid-glass-pill text-neutral-800 dark:text-neutral-200">
               {currentDirection.coreTitle}
             </div>
             <div className="h-px flex-1 bg-neutral-200 dark:bg-white/10"></div>
@@ -256,11 +253,9 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
 
                   {/* Node Card */}
                   <div
-                    className={`p-5 sm:p-6 rounded-[28px] border transition-all duration-300 ${
+                    className={`p-5 sm:p-6 rounded-[28px] transition-all duration-300 ${
                       isDone
-                        ? 'bg-emerald-500/10 border-emerald-500/25 dark:bg-emerald-500/15 dark:border-emerald-500/35 liquid-glass-interactive'
-                        : percent > 0
-                        ? 'liquid-glass border-white/90 dark:border-white/30 liquid-glass-interactive'
+                        ? 'bg-emerald-500/10 border border-emerald-500/25 dark:bg-emerald-500/15 dark:border-emerald-500/35 liquid-glass-interactive'
                         : 'liquid-glass liquid-glass-interactive'
                     }`}
                   >
@@ -372,10 +367,10 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                     <button
                       type="button"
                       onClick={() => handleToggleTopicClick(topic)}
-                      className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-full text-xs font-bold border transition-all active:scale-95 ${
+                      className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-full text-xs font-semibold transition-all active:scale-95 ${
                         isDone
-                          ? 'bg-emerald-500 text-white border-emerald-500 shadow-sm'
-                          : 'liquid-glass-pill hover:bg-white/60 text-neutral-800 border border-white/60 dark:bg-white/[0.05] dark:border-white/10 dark:text-neutral-200 dark:hover:bg-white/[0.1]'
+                          ? 'bg-neutral-900 text-white shadow-xs dark:bg-white dark:text-neutral-950'
+                          : 'liquid-glass-pill hover:bg-white/50 text-neutral-800 dark:text-neutral-200'
                       }`}
                     >
                       {isDone ? (
@@ -448,10 +443,10 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                       <button
                         key={st.id}
                         onClick={() => handleSelectSubTrack(st.id)}
-                        className={`flex items-center justify-between p-3.5 rounded-2xl border text-left transition-all duration-150 active:scale-95 cursor-pointer ${
+                        className={`flex items-center justify-between p-3.5 rounded-2xl text-left transition-all duration-150 active:scale-95 cursor-pointer ${
                           isCurrent
-                            ? 'bg-neutral-950 border-white/20 text-white shadow-md'
-                            : 'liquid-glass-subtle border-white/70 text-neutral-800 hover:bg-white/70 shadow-xs'
+                            ? 'bg-neutral-900 text-white shadow-xs dark:bg-white dark:text-neutral-950'
+                            : 'liquid-glass-subtle text-neutral-800 hover:bg-white/50 shadow-xs'
                         }`}
                       >
                         <div>
@@ -488,10 +483,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
         <div className="relative">
           {/* Header of Sub-Track Section */}
           <div className="flex items-center gap-3 mb-6">
-            <div className="px-3.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wider
-              bg-neutral-100 border border-neutral-200/80 text-neutral-800
-              dark:bg-white/[0.06] dark:border-white/10 dark:text-neutral-200"
-            >
+            <div className="px-3.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wider liquid-glass-pill text-neutral-800 dark:text-neutral-200">
               Ветка: {currentDirection.subTracks.find((s) => s.id === validSubTrack)?.name}
             </div>
             <div className="h-px flex-1 bg-neutral-200 dark:bg-white/10"></div>
@@ -527,11 +519,9 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
 
                   {/* Node Card */}
                   <div
-                    className={`p-5 sm:p-6 rounded-[28px] border transition-all duration-300 ${
+                    className={`p-5 sm:p-6 rounded-[28px] transition-all duration-300 ${
                       isDone
-                        ? 'bg-emerald-500/10 border-emerald-500/25 dark:bg-emerald-500/15 dark:border-emerald-500/35 liquid-glass-interactive'
-                        : percent > 0
-                        ? 'liquid-glass border-white/90 dark:border-white/30 liquid-glass-interactive'
+                        ? 'bg-emerald-500/10 border border-emerald-500/25 dark:bg-emerald-500/15 dark:border-emerald-500/35 liquid-glass-interactive'
                         : 'liquid-glass liquid-glass-interactive'
                     }`}
                   >
@@ -646,10 +636,10 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                     <button
                       type="button"
                       onClick={() => handleToggleTopicClick(topic)}
-                      className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-full text-xs font-bold border transition-all active:scale-95 ${
+                      className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-full text-xs font-semibold transition-all active:scale-95 ${
                         isDone
-                          ? 'bg-emerald-500 text-white border-emerald-500 shadow-sm'
-                          : 'liquid-glass-pill hover:bg-white/60 text-neutral-800 border border-white/60 dark:bg-white/[0.05] dark:border-white/10 dark:text-neutral-200 dark:hover:bg-white/[0.1]'
+                          ? 'bg-neutral-900 text-white shadow-xs dark:bg-white dark:text-neutral-950'
+                          : 'liquid-glass-pill hover:bg-white/50 text-neutral-800 dark:text-neutral-200'
                       }`}
                     >
                       {isDone ? (

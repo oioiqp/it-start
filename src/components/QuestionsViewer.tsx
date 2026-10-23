@@ -177,7 +177,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Поиск по вопросу, ключевому слову или коду..."
-              className="w-full pl-9 pr-4 py-2 rounded-full text-xs sm:text-sm transition-all focus:outline-none liquid-glass-subtle text-neutral-900 placeholder:text-neutral-500 dark:text-white dark:placeholder:text-neutral-400 focus:border-white/90 dark:focus:border-white/40"
+              className="w-full pl-9 pr-4 py-2 rounded-full text-xs sm:text-sm transition-all focus:outline-none liquid-glass-subtle focus:bg-white/50 text-neutral-900 placeholder:text-neutral-500 dark:text-white dark:placeholder:text-neutral-400"
             />
           </div>
 
@@ -436,7 +436,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                             }}
                             rows={2}
                             placeholder="Введите ваш ответ для сверки..."
-                            className="w-full px-3.5 py-2.5 rounded-xl text-xs transition-all focus:outline-none liquid-glass-subtle bg-white/50 focus:bg-white/80 text-neutral-950 placeholder:text-neutral-500 border border-white/80 focus:border-white focus:ring-2 focus:ring-white/70 shadow-xs"
+                            className="w-full px-3.5 py-2.5 rounded-xl text-xs transition-all focus:outline-none liquid-glass-subtle bg-white/40 focus:bg-white/70 text-neutral-950 placeholder:text-neutral-500 shadow-xs"
                           />
 
                           <div className="flex justify-end">
@@ -446,7 +446,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                                 triggerHaptic('medium');
                                 setInlineChecked((prev) => ({ ...prev, [q.id]: true }));
                               }}
-                              className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold transition-all active:scale-95 shadow-md bg-neutral-950 text-white hover:bg-black border border-white/20 cursor-pointer"
+                              className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold transition-all active:scale-95 shadow-xs bg-neutral-900 text-white hover:bg-black cursor-pointer"
                             >
                               <Send className="w-3.5 h-3.5" />
                               <span>Сверить с эталоном</span>
@@ -456,7 +456,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                       ) : (
                         <div className="space-y-3">
                           {userAnswer.trim() && (
-                            <div className="p-3.5 rounded-2xl border border-white/70 liquid-glass-pill text-xs shadow-xs">
+                            <div className="p-3.5 rounded-2xl liquid-glass-pill text-xs shadow-xs">
                               <div className="flex items-center justify-between mb-1">
                                 <strong className="text-[11px] uppercase tracking-wider text-neutral-600 font-bold">Ваш ответ:</strong>
                                 <button
@@ -493,17 +493,17 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                       )}
 
                       {/* Card Action Buttons */}
-                      <div className="flex items-center justify-end gap-2 pt-2 border-t border-white/60">
+                      <div className="flex items-center justify-end gap-2 pt-2 border-t border-black/5 dark:border-white/5">
                         <button
                           type="button"
                           onClick={() => {
                             triggerHaptic('medium');
                             onMarkRepeat(q.id);
                           }}
-                          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all active:scale-95 shadow-xs cursor-pointer ${
+                          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all active:scale-95 shadow-xs cursor-pointer ${
                             isRepeat
                               ? 'bg-amber-500 text-white'
-                              : 'liquid-glass-pill text-amber-800 hover:bg-amber-500/20 border border-amber-400/50'
+                              : 'liquid-glass-pill text-amber-800 hover:bg-amber-500/15'
                           }`}
                         >
                           <RotateCcw className="w-3 h-3" />
@@ -513,10 +513,10 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                         <button
                           type="button"
                           onClick={() => handleToggle(q.id)}
-                          className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold transition-all active:scale-95 shadow-xs cursor-pointer ${
+                          className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold transition-all active:scale-95 shadow-xs cursor-pointer ${
                             isCompleted
-                              ? 'bg-emerald-600 text-white shadow-md'
-                              : 'liquid-glass-pill text-emerald-800 hover:bg-emerald-500/20 border border-emerald-400/50'
+                              ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950'
+                              : 'liquid-glass-pill text-neutral-800 hover:bg-white/50 dark:text-neutral-200'
                           }`}
                         >
                           <CheckCircle2 className="w-3.5 h-3.5" />
