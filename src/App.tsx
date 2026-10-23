@@ -380,6 +380,10 @@ export function App() {
 
             {/* Hero Header - Apple Liquid Glass Minimalist */}
             <div className="relative pt-2 sm:pt-6 pb-2 sm:pb-3 text-center space-y-2.5 select-none">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-[11px] font-semibold liquid-glass-pill text-neutral-800 dark:text-neutral-200 border border-white/60 dark:border-white/25 shadow-xs">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span>IT Start Web • 100% реальности стажировок IT-компаний РФ</span>
+              </div>
               <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight font-sans text-neutral-900 dark:text-white">
                 Агрегатор IT-стажировок
               </h1>
