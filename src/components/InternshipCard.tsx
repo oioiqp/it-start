@@ -20,6 +20,79 @@ interface InternshipCardProps {
   onOpenPlan: (internship: Internship) => void;
 }
 
+// Brand accents for authentic Apple App Library Squircle Tiles
+const getCompanyTileStyle = (companyName: string) => {
+  const c = companyName.toLowerCase();
+  if (c.includes('т-банк') || c.includes('тиньк') || c.includes('tbank')) {
+    return {
+      bg: 'from-amber-400/30 via-yellow-300/20 to-amber-500/10',
+      text: 'text-amber-950',
+      glow: 'shadow-[0_0_16px_rgba(251,191,36,0.22)]',
+    };
+  }
+  if (c.includes('т1') || c.includes('t1')) {
+    return {
+      bg: 'from-indigo-500/30 via-blue-400/20 to-indigo-600/10',
+      text: 'text-indigo-950',
+      glow: 'shadow-[0_0_16px_rgba(99,102,241,0.22)]',
+    };
+  }
+  if (c.includes('контур') || c.includes('kontur')) {
+    return {
+      bg: 'from-purple-500/30 via-fuchsia-400/20 to-purple-600/10',
+      text: 'text-purple-950',
+      glow: 'shadow-[0_0_16px_rgba(168,85,247,0.22)]',
+    };
+  }
+  if (c.includes('directum') || c.includes('директ')) {
+    return {
+      bg: 'from-teal-500/30 via-cyan-400/20 to-emerald-500/10',
+      text: 'text-teal-950',
+      glow: 'shadow-[0_0_16px_rgba(20,184,166,0.22)]',
+    };
+  }
+  if (c.includes('яндекс') || c.includes('yandex')) {
+    return {
+      bg: 'from-rose-500/30 via-red-400/20 to-orange-500/10',
+      text: 'text-rose-950',
+      glow: 'shadow-[0_0_16px_rgba(244,63,94,0.22)]',
+    };
+  }
+  if (c.includes('ozon') || c.includes('озон')) {
+    return {
+      bg: 'from-blue-600/30 via-cyan-400/20 to-sky-500/10',
+      text: 'text-blue-950',
+      glow: 'shadow-[0_0_16px_rgba(37,99,235,0.22)]',
+    };
+  }
+  if (c.includes('сбер') || c.includes('sber')) {
+    return {
+      bg: 'from-emerald-500/30 via-green-400/20 to-teal-500/10',
+      text: 'text-emerald-950',
+      glow: 'shadow-[0_0_16px_rgba(16,185,129,0.22)]',
+    };
+  }
+  if (c.includes('авито') || c.includes('avito')) {
+    return {
+      bg: 'from-violet-500/30 via-purple-400/20 to-pink-500/10',
+      text: 'text-violet-950',
+      glow: 'shadow-[0_0_16px_rgba(139,92,246,0.22)]',
+    };
+  }
+  if (c.includes('vk') || c.includes('вк')) {
+    return {
+      bg: 'from-sky-500/30 via-blue-400/20 to-indigo-500/10',
+      text: 'text-sky-950',
+      glow: 'shadow-[0_0_16px_rgba(14,165,233,0.22)]',
+    };
+  }
+  return {
+    bg: 'from-slate-400/25 via-zinc-300/20 to-slate-500/10',
+    text: 'text-neutral-950',
+    glow: 'shadow-xs',
+  };
+};
+
 export const InternshipCard: React.FC<InternshipCardProps> = ({
   internship,
   userProgress,
@@ -52,16 +125,19 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
     onOpenPlan(internship);
   };
 
+  const tileStyle = getCompanyTileStyle(internship.company);
+
   return (
-    <div className="group relative rounded-[32px] sm:rounded-[36px] p-5 sm:p-6 flex flex-col justify-between liquid-glass liquid-glass-interactive overflow-hidden">
+    <div className="group relative rounded-[32px] sm:rounded-[36px] p-5 sm:p-6 flex flex-col justify-between liquid-glass liquid-glass-interactive overflow-hidden shadow-lg">
       {/* Top row */}
       <div>
         <div className="flex items-start justify-between gap-3 mb-3.5">
           <div className="flex items-center gap-3">
             {/* Apple Squircle Glass App Tile (matches App Library folders in reference image) */}
-            <div className="w-12 h-12 rounded-2xl flex items-center justify-center font-black text-lg shrink-0 overflow-hidden liquid-glass-tile text-neutral-950 dark:text-white transition-all duration-300 group-hover:scale-105 group-hover:rotate-1">
-              <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/30 to-white/60 pointer-events-none" />
-              <span className="relative z-10 drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)] dark:drop-shadow-none">
+            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-lg shrink-0 overflow-hidden liquid-glass-tile ${tileStyle.text} ${tileStyle.glow} transition-all duration-300 group-hover:scale-105 group-hover:rotate-1`}>
+              <div className={`absolute inset-0 bg-gradient-to-br ${tileStyle.bg} pointer-events-none`} />
+              <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/35 to-white/70 pointer-events-none" />
+              <span className="relative z-10 drop-shadow-[0_1px_1px_rgba(255,255,255,0.9)]">
                 {internship.company.charAt(0)}
               </span>
             </div>

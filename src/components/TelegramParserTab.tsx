@@ -1043,7 +1043,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
         )}
 
         {/* Source Type Filter Tabs */}
-        <div className="flex items-center gap-1.5 p-1 rounded-full bg-neutral-100 dark:bg-white/[0.03] border border-neutral-200/60 dark:border-white/10 overflow-x-auto no-scrollbar w-fit">
+        <div className="flex items-center gap-1.5 p-1 rounded-full liquid-glass-subtle overflow-x-auto no-scrollbar w-fit">
           {[
             { id: 'all' as const, label: `Все источники (${monitoredChannels.length + monitoredWebsites.length})`, icon: Building2 },
             { id: 'telegram' as const, label: `Telegram-каналы (${monitoredChannels.length})`, icon: Send },
@@ -1059,8 +1059,8 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                 onClick={() => setSourceTypeFilter(tab.id)}
                 className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
                   isActive
-                    ? 'bg-white dark:bg-white text-neutral-950 dark:text-neutral-950 shadow-sm font-semibold'
-                    : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-950 dark:hover:text-white'
+                    ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-sm font-semibold'
+                    : 'liquid-glass-pill hover:bg-white/80 dark:hover:bg-white/15 text-neutral-600 dark:text-neutral-300'
                 }`}
               >
                 <Icon className="w-3.5 h-3.5" />
@@ -1072,7 +1072,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
 
         {/* Channel / Company Filter Chips */}
         <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 text-xs">
-          <span className="text-neutral-400 dark:text-neutral-500 font-medium shrink-0 mr-1">Компания:</span>
+          <span className="text-neutral-500 dark:text-neutral-400 font-medium shrink-0 mr-1">Компания:</span>
           {[
             { id: 'all', label: 'Все компании' },
             { id: 'directum', label: 'Directum (Ижевск)' },
@@ -1088,10 +1088,10 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
             <button
               key={f.id}
               onClick={() => setChannelFilter(f.id)}
-              className={`px-3 py-1 rounded-full text-xs transition-all ${
+              className={`px-3 py-1 rounded-full text-xs transition-all active:scale-95 ${
                 channelFilter === f.id
                   ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 font-semibold shadow-sm'
-                  : 'bg-neutral-100 dark:bg-white/[0.04] text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white border border-neutral-200/50 dark:border-white/[0.08]'
+                  : 'liquid-glass-pill hover:bg-white/80 dark:hover:bg-white/15 text-neutral-600 dark:text-neutral-300'
               }`}
             >
               {f.label}
@@ -1115,7 +1115,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                   className={`p-4 rounded-2xl border transition-all ${
                     channel.status === 'scanning'
                       ? 'border-neutral-900 dark:border-white ring-1 ring-neutral-900 dark:ring-white bg-neutral-100/90 dark:bg-white/10'
-                      : 'border-neutral-200/80 dark:border-white/10 bg-neutral-50/60 dark:bg-white/[0.035] hover:bg-white dark:hover:bg-white/[0.06] shadow-[0_2px_8px_rgb(0,0,0,0.02)]'
+                      : 'liquid-glass-subtle liquid-glass-interactive'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2 mb-2">
@@ -1175,7 +1175,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                   className={`p-4 rounded-2xl border transition-all ${
                     site.status === 'scanning'
                       ? 'border-neutral-900 dark:border-white ring-1 ring-neutral-900 dark:ring-white bg-neutral-100/90 dark:bg-white/10'
-                      : 'border-neutral-200/80 dark:border-white/10 bg-neutral-50/60 dark:bg-white/[0.035] hover:bg-white dark:hover:bg-white/[0.06] shadow-[0_2px_8px_rgb(0,0,0,0.02)]'
+                      : 'liquid-glass-subtle liquid-glass-interactive'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2 mb-2">
@@ -1267,8 +1267,8 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                   key={post.id}
                   className={`p-5 rounded-3xl border transition-all flex flex-col justify-between ${
                     isPublished
-                      ? 'border-emerald-500/30 bg-emerald-50/20 dark:bg-emerald-950/20'
-                      : 'border-neutral-200/80 dark:border-white/10 bg-neutral-50/50 dark:bg-white/[0.035] hover:bg-white dark:hover:bg-white/[0.06] shadow-[0_2px_8px_rgb(0,0,0,0.02)]'
+                      ? 'border-emerald-500/30 bg-emerald-50/20 dark:bg-emerald-950/20 backdrop-blur-xl'
+                      : 'liquid-glass-subtle liquid-glass-interactive'
                   }`}
                 >
                   <div className="space-y-3">
@@ -1651,7 +1651,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
         {/* TWO COLUMNS: VK BOT TOKEN & VK TEST NOTIFICATION */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Card 1: VK Group Token */}
-          <div className="border border-neutral-200/80 dark:border-white/10 bg-white/60 dark:bg-white/[0.035] rounded-2xl p-5 sm:p-6 flex flex-col justify-between space-y-4 shadow-sm">
+          <div className="liquid-glass-subtle rounded-2xl p-5 sm:p-6 flex flex-col justify-between space-y-4 shadow-sm">
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <Key className="w-4 h-4 text-neutral-600 dark:text-neutral-400" />
@@ -1698,7 +1698,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                     saveVkToken('');
                     addLog('info', 'VK Bot Token удален из хранилища');
                   }}
-                  className="px-3.5 py-2 rounded-full border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.06] hover:bg-neutral-100 dark:hover:bg-white/10 text-neutral-700 dark:text-neutral-300 text-xs font-medium transition-colors"
+                  className="px-3.5 py-2 rounded-full liquid-glass-pill hover:bg-white/80 dark:hover:bg-white/10 text-neutral-700 dark:text-neutral-300 text-xs font-medium transition-colors"
                 >
                   Очистить
                 </button>
@@ -1707,7 +1707,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
           </div>
 
           {/* Card 2: Test Message to VK */}
-          <div className="border border-neutral-200/80 dark:border-white/10 bg-white/60 dark:bg-white/[0.035] rounded-2xl p-5 sm:p-6 flex flex-col justify-between space-y-4 shadow-sm">
+          <div className="liquid-glass-subtle rounded-2xl p-5 sm:p-6 flex flex-col justify-between space-y-4 shadow-sm">
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <Bell className="w-4 h-4 text-neutral-600 dark:text-neutral-400" />
@@ -1787,10 +1787,10 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                   key={c.command}
                   type="button"
                   onClick={() => setActiveVkCommand(isSelected ? null : c.command)}
-                  className={`p-3 rounded-2xl border text-left text-xs transition-all ${
+                  className={`p-3 rounded-2xl border text-left text-xs transition-all active:scale-95 ${
                     isSelected
                       ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 border-neutral-900 dark:border-white shadow-sm font-semibold'
-                      : 'border-neutral-200/80 dark:border-white/10 bg-white/60 dark:bg-white/[0.035] text-neutral-700 dark:text-neutral-300 hover:border-neutral-400 dark:hover:border-white/30'
+                      : 'liquid-glass-subtle hover:bg-white/80 dark:hover:bg-white/15 text-neutral-700 dark:text-neutral-300'
                   }`}
                 >
                   <span className="font-bold block font-mono text-[11px]">{c.command}</span>
@@ -1854,10 +1854,10 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                   key={idx}
                   type="button"
                   onClick={() => handleSelectPreset(idx)}
-                  className={`p-3 rounded-2xl border text-left text-xs transition-all ${
+                  className={`p-3 rounded-2xl border text-left text-xs transition-all active:scale-95 ${
                     presetIndex === idx
                       ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 border-neutral-900 dark:border-white shadow-sm font-semibold'
-                      : 'border-neutral-200/80 dark:border-white/10 bg-white/60 dark:bg-white/[0.035] text-neutral-700 dark:text-neutral-300 hover:border-neutral-400 dark:hover:border-white/30'
+                      : 'liquid-glass-subtle hover:bg-white/80 dark:hover:bg-white/15 text-neutral-700 dark:text-neutral-300'
                   }`}
                 >
                   <div className="flex items-center justify-between mb-1">

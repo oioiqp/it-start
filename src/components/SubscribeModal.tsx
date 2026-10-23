@@ -216,35 +216,27 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
   const botToken = getSavedBotToken();
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-xl overflow-y-auto">
-      <div className="relative w-full max-w-xl rounded-3xl shadow-2xl p-6 sm:p-7 my-8 animate-in fade-in zoom-in-95 duration-200 transition-all duration-300
-        bg-white/90 border border-black/[0.08] shadow-[0_25px_60px_rgba(0,0,0,0.08),inset_0_1px_1px_rgba(255,255,255,0.9)] text-neutral-900
-        dark:bg-[#0a0a0c]/90 dark:backdrop-blur-2xl dark:border-white/10 dark:shadow-[0_25px_60px_rgba(0,0,0,0.9),inset_0_1px_1px_rgba(255,255,255,0.12)] dark:text-neutral-100"
-      >
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/45 backdrop-blur-2xl overflow-y-auto">
+      <div className="relative w-full max-w-xl rounded-[32px] sm:rounded-[36px] shadow-2xl p-6 sm:p-7 my-8 animate-in fade-in zoom-in-95 duration-200 transition-all liquid-glass text-neutral-900 border border-white/70">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 p-2 rounded-full transition-colors
-            text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100
-            dark:text-neutral-400 dark:hover:text-white dark:hover:bg-white/10"
+          className="absolute top-5 right-5 p-2 rounded-full transition-all duration-150 z-10 active:scale-95 liquid-glass-pill hover:bg-white/70 text-neutral-600 hover:text-neutral-950 border border-white/70 shadow-xs cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>
 
         {/* Header */}
-        <div className="flex items-center gap-3.5 mb-5">
-          <div className="w-11 h-11 rounded-2xl flex items-center justify-center font-semibold
-            bg-neutral-100 border border-neutral-200/80 text-neutral-800
-            dark:bg-white/[0.06] dark:border-white/10 dark:text-neutral-200"
-          >
+        <div className="flex items-center gap-3.5 mb-5 pb-4 border-b border-white/60">
+          <div className="w-11 h-11 rounded-2xl flex items-center justify-center font-bold liquid-glass-tile text-neutral-950 shadow-xs">
             <Bell className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="text-lg font-bold font-sans text-neutral-900 dark:text-white">
+            <h2 className="text-lg font-bold font-sans text-neutral-950">
               Уведомления в Telegram
             </h2>
-            <p className="text-xs text-neutral-500 dark:text-neutral-400">
-              Пуши о новых стажировках от бота @{TELEGRAM_BOT_USERNAME}
+            <p className="text-xs text-neutral-600">
+              Мгновенные пуши о новых стажировках от бота @{TELEGRAM_BOT_USERNAME}
             </p>
           </div>
         </div>
@@ -345,10 +337,10 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
                     key={dir.id}
                     type="button"
                     onClick={() => toggleDirection(dir.id)}
-                    className={`flex items-center justify-between p-2.5 rounded-xl border text-left text-xs font-medium transition-all ${
+                    className={`flex items-center justify-between p-2.5 rounded-xl border text-left text-xs font-bold transition-all duration-150 active:scale-95 cursor-pointer ${
                       isSelected
-                        ? 'bg-neutral-900 border-neutral-900 text-white dark:bg-white dark:border-white dark:text-neutral-950 shadow-xs'
-                        : 'bg-neutral-100/70 border-neutral-200/70 text-neutral-700 hover:bg-neutral-200/60 dark:bg-white/[0.04] dark:border-white/10 dark:text-neutral-300 dark:hover:bg-white/[0.08]'
+                        ? 'bg-neutral-950 border-white/20 text-white shadow-md'
+                        : 'liquid-glass-pill text-neutral-800 border-white/70 hover:bg-white/70 shadow-xs'
                     }`}
                   >
                     <span className="truncate">{dir.title.split('-')[0]}</span>
@@ -361,13 +353,10 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
 
           {/* Sub-tracks selector */}
           <div>
-            <label className="block text-xs font-semibold mb-2 text-neutral-800 dark:text-neutral-200">
+            <label className="block text-xs font-bold mb-2 text-neutral-800">
               Конкретные специализации и ветки ({selectedSubTracks.length}):
             </label>
-            <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-2.5 rounded-2xl border transition-colors
-              bg-neutral-50/80 border-neutral-200/80
-              dark:bg-white/[0.035] dark:border-white/10"
-            >
+            <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-3 rounded-2xl border border-white/70 liquid-glass-subtle">
               {DIRECTIONS.filter((d) => selectedDirections.includes(d.id)).flatMap((d) =>
                 d.subTracks.map((st) => {
                   const isSelected = selectedSubTracks.includes(st.id);
@@ -376,10 +365,10 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
                       key={st.id}
                       type="button"
                       onClick={() => toggleSubTrack(st.id)}
-                      className={`px-3 py-1 rounded-full text-xs font-medium border transition-all ${
+                      className={`px-3 py-1 rounded-full text-xs font-bold border transition-all duration-150 active:scale-95 cursor-pointer ${
                         isSelected
-                          ? 'bg-neutral-900 text-white border-neutral-900 dark:bg-white dark:text-neutral-950 dark:border-white shadow-xs'
-                          : 'bg-white text-neutral-700 border-neutral-200/80 hover:bg-neutral-100 dark:bg-white/[0.05] dark:border-white/10 dark:text-neutral-300 dark:hover:bg-white/10'
+                          ? 'bg-neutral-950 text-white border-white/20 shadow-md'
+                          : 'liquid-glass-pill text-neutral-800 border-white/70 hover:bg-white/70 shadow-xs'
                       }`}
                     >
                       {st.name}
@@ -391,18 +380,15 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
           </div>
 
           {/* Bot Token Configuration Block */}
-          <div className="p-3.5 rounded-2xl border text-xs space-y-2 transition-colors
-            bg-neutral-50/80 border-neutral-200/80
-            dark:bg-white/[0.035] dark:border-white/10"
-          >
+          <div className="p-3.5 rounded-2xl border border-white/70 liquid-glass-subtle text-xs space-y-2">
             <div className="flex items-center justify-between">
-              <span className="font-medium text-neutral-700 dark:text-neutral-300">
+              <span className="font-bold text-neutral-800">
                 Bot Token для отправки пушей (@BotFather):
               </span>
               <button
                 type="button"
                 onClick={() => setShowTokenInput((v) => !v)}
-                className="text-[11px] text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white underline"
+                className="text-[11px] font-semibold text-neutral-600 hover:text-black underline cursor-pointer"
               >
                 {showTokenInput ? 'Скрыть поле' : 'Настроить токен'}
               </button>
@@ -417,11 +403,9 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
                     saveBotToken(e.target.value.trim());
                   }}
                   placeholder="Токен от @BotFather (сохраняется в браузере)"
-                  className="w-full px-3 py-1.5 rounded-xl border text-xs transition-colors focus:outline-none
-                    bg-white border-neutral-200/80 text-neutral-900
-                    dark:bg-white/[0.04] dark:border-white/10 dark:text-neutral-100"
+                  className="w-full px-3 py-2 rounded-xl text-xs transition-all focus:outline-none liquid-glass-pill bg-white/50 focus:bg-white/80 text-neutral-950 placeholder:text-neutral-500 border border-white/80 focus:border-white focus:ring-2 focus:ring-white/70"
                 />
-                <p className="text-[10px] text-neutral-500 dark:text-neutral-400">
+                <p className="text-[10px] text-neutral-600">
                   Токен хранится только в вашем браузере и используется для реальных вызовов Bot API.
                 </p>
               </div>
@@ -433,18 +417,18 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
             <div
               className={`p-3 rounded-2xl text-xs flex items-start gap-2 ${
                 statusMessage.type === 'success'
-                  ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-800 dark:bg-emerald-500/15 dark:border-emerald-500/30 dark:text-emerald-300'
+                  ? 'bg-emerald-500/15 border border-emerald-500/30 text-emerald-900'
                   : statusMessage.type === 'error'
-                  ? 'bg-rose-500/10 border border-rose-500/20 text-rose-800 dark:bg-rose-500/15 dark:border-rose-500/30 dark:text-rose-300'
-                  : 'bg-neutral-100 border border-neutral-200/80 text-neutral-800 dark:bg-white/[0.06] dark:border-white/10 dark:text-neutral-200'
+                  ? 'bg-rose-500/15 border border-rose-500/30 text-rose-900'
+                  : 'liquid-glass-pill text-neutral-800 border-white/70'
               }`}
             >
               {statusMessage.type === 'success' ? (
-                <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
               ) : (
-                <AlertCircle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
+                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
               )}
-              <span>{statusMessage.text}</span>
+              <span className="font-medium">{statusMessage.text}</span>
             </div>
           )}
 
@@ -454,20 +438,16 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
               type="button"
               onClick={handleTestNotification}
               disabled={isLoading || !chatId}
-              className="w-full sm:w-1/2 flex items-center justify-center gap-2 px-4 py-2.5 rounded-full border text-xs sm:text-sm font-medium transition-colors disabled:opacity-50
-                bg-neutral-100 hover:bg-neutral-200 text-neutral-800 border-neutral-200/80
-                dark:bg-white/[0.06] dark:hover:bg-white/[0.12] dark:text-neutral-200 dark:border-white/10"
+              className="w-full sm:w-1/2 flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all active:scale-95 disabled:opacity-50 liquid-glass-pill hover:bg-white/70 text-neutral-800 border border-white/80 shadow-xs cursor-pointer"
             >
-              <Send className="w-3.5 h-3.5 text-neutral-500" />
+              <Send className="w-3.5 h-3.5 text-neutral-600" />
               <span>Проверить уведомление</span>
             </button>
 
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full sm:w-1/2 flex items-center justify-center gap-2 px-4 py-2.5 rounded-full text-white text-xs sm:text-sm font-semibold shadow-xs transition-all active:scale-95 disabled:opacity-50
-                bg-neutral-900 hover:bg-black
-                dark:bg-white dark:hover:bg-neutral-200 dark:text-neutral-950"
+              className="w-full sm:w-1/2 flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-white text-xs sm:text-sm font-extrabold shadow-md transition-all active:scale-95 disabled:opacity-50 bg-neutral-950 hover:bg-black border border-white/20 cursor-pointer"
             >
               <Check className="w-4 h-4" />
               <span>{isLoading ? 'Сохранение...' : 'Сохранить подписку'}</span>
@@ -475,7 +455,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
           </div>
 
           {!botToken && (
-            <p className="text-[11px] text-center text-neutral-500 dark:text-neutral-400">
+            <p className="text-[11px] text-center text-neutral-600 font-medium">
               * Для реальной отправки сообщений укажите Bot Token во вкладке «Telegram & Парсер»
             </p>
           )}

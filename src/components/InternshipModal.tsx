@@ -138,14 +138,12 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
   const statusBadge = getStatusBadge();
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 dark:bg-black/80 backdrop-blur-2xl overflow-y-auto">
-      <div className="relative w-full max-w-3xl rounded-[32px] sm:rounded-[36px] p-6 sm:p-8 my-8 max-h-[90vh] flex flex-col liquid-glass text-neutral-900 dark:text-neutral-100 overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/45 backdrop-blur-2xl overflow-y-auto">
+      <div className="relative w-full max-w-3xl rounded-[32px] sm:rounded-[36px] p-6 sm:p-8 my-8 max-h-[90vh] flex flex-col liquid-glass text-neutral-900 overflow-hidden shadow-2xl">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 p-2 rounded-full transition-colors z-10
-            text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100
-            dark:text-neutral-400 dark:hover:text-white dark:hover:bg-white/10"
+          className="absolute top-5 right-5 p-2 rounded-full transition-all duration-150 z-10 active:scale-95 liquid-glass-pill hover:bg-white/70 text-neutral-600 hover:text-neutral-950 border border-white/80 shadow-xs cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>
@@ -389,23 +387,21 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                       <button
                         type="button"
                         onClick={() => setExpandedQuestionId(isExpanded ? null : q.id)}
-                        className="p-1.5 rounded-full transition-colors
-                          bg-neutral-100 hover:bg-neutral-200 text-neutral-600
-                          dark:bg-white/[0.06] dark:hover:bg-white/[0.12] dark:text-neutral-400"
+                        className="p-2 rounded-full transition-all duration-150 active:scale-95 liquid-glass-pill hover:bg-white/70 text-neutral-700 border border-white/70 shadow-xs cursor-pointer"
                       >
                         {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                       </button>
                     </div>
 
                     {isExpanded && (
-                      <div className="px-4 pb-4 pt-1 border-t space-y-3 border-neutral-200/60 dark:border-white/[0.08] bg-neutral-50/50 dark:bg-white/[0.02] rounded-b-2xl">
-                        <div className="text-xs leading-relaxed p-3 rounded-xl border bg-white border-neutral-200/80 text-neutral-800 dark:bg-white/[0.04] dark:border-white/10 dark:text-neutral-200">
-                          <span className="font-semibold text-emerald-600 dark:text-emerald-400 block mb-1">Ответ:</span>
+                      <div className="px-4 pb-4 pt-2 border-t space-y-3 border-white/50 liquid-glass-subtle rounded-b-2xl">
+                        <div className="text-xs leading-relaxed p-3.5 rounded-xl border border-white/70 liquid-glass-pill text-neutral-900 shadow-xs">
+                          <span className="font-bold text-emerald-700 block mb-1">Эталонный ответ:</span>
                           {q.answer}
                         </div>
 
                         {q.codeSnippet && (
-                          <div className="rounded-xl overflow-hidden border border-neutral-200/80 bg-neutral-950 text-neutral-100 dark:border-white/10 dark:bg-black">
+                          <div className="rounded-xl overflow-hidden border border-white/20 bg-neutral-950 text-neutral-100 shadow-sm">
                             <div className="px-3 py-1 text-[11px] font-mono text-neutral-400 border-b border-neutral-800 bg-neutral-900">
                               {q.codeLanguage || 'code'}
                             </div>
@@ -416,8 +412,8 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                         )}
 
                         <div className="space-y-1">
-                          <span className="text-[11px] font-medium text-neutral-500 dark:text-neutral-400 block">Главные тезисы:</span>
-                          <ul className="list-disc list-inside text-xs space-y-1 text-neutral-600 dark:text-neutral-400">
+                          <span className="text-[11px] font-bold text-neutral-700 block">Главные тезисы:</span>
+                          <ul className="list-disc list-inside text-xs space-y-1 text-neutral-700">
                             {q.keyTakeaways.map((point, idx) => (
                               <li key={idx}>{point}</li>
                             ))}
@@ -433,13 +429,11 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
         </div>
 
         {/* Modal Footer */}
-        <div className="shrink-0 pt-4 border-t flex flex-wrap items-center justify-between gap-3 border-neutral-200/80 dark:border-white/10">
+        <div className="shrink-0 pt-4 border-t flex flex-wrap items-center justify-between gap-3 border-white/60">
           <div className="flex items-center gap-2">
             <button
               onClick={onClose}
-              className="px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-colors
-                bg-neutral-100 hover:bg-neutral-200 text-neutral-700 border border-neutral-200/80
-                dark:bg-white/[0.06] dark:hover:bg-white/[0.12] dark:text-neutral-300 dark:border-white/10"
+              className="px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all active:scale-95 liquid-glass-pill hover:bg-white/70 text-neutral-800 border border-white/80 shadow-xs cursor-pointer"
             >
               Закрыть
             </button>
@@ -453,10 +447,10 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                   href={`https://t.me/${cleanChannel}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs transition-colors liquid-glass-pill hover:bg-white/80 dark:hover:bg-white/15 text-neutral-700 dark:text-neutral-200"
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold transition-all active:scale-95 liquid-glass-pill hover:bg-white/70 text-neutral-800 border border-white/70 shadow-xs"
                   title={`Открыть проверенный Telegram-канал ${verifiedChannel}`}
                 >
-                  <Bot className="w-3.5 h-3.5 text-neutral-500" />
+                  <Bot className="w-3.5 h-3.5 text-neutral-600" />
                   <span>Канал {verifiedChannel}</span>
                   <ExternalLink className="w-3 h-3" />
                 </a>
@@ -471,9 +465,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                 href={verifiedApplyUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 px-5 py-2.5 rounded-full font-bold text-xs sm:text-sm active:scale-95 transition-all
-                  bg-neutral-900/95 hover:bg-black text-white shadow-md
-                  dark:bg-white/95 dark:hover:bg-white dark:text-neutral-950 border border-white/30 dark:border-white/80"
+                className="flex items-center gap-2 px-6 py-2.5 rounded-full font-extrabold text-xs sm:text-sm active:scale-95 transition-all bg-neutral-950 hover:bg-black text-white shadow-md border border-white/30 cursor-pointer"
                 title={`Подать заявку на официальном сайте компании ${internship.company}`}
               >
                 <span>Подать заявку на сайте {internship.company}</span>

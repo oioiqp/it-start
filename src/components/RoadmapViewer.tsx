@@ -131,7 +131,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
   return (
     <div className="space-y-6">
       {/* Direction Tabs (6 Main Directions) */}
-      <div className="rounded-[28px] sm:rounded-[32px] p-3 sm:p-4 transition-all duration-300 liquid-glass">
+      <div className="rounded-[28px] sm:rounded-[32px] p-3 sm:p-4 transition-all duration-300 liquid-glass shadow-lg">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
           {DIRECTIONS.map((dir) => {
             const isSelected = dir.id === selectedDirectionId;
@@ -139,17 +139,17 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
               <button
                 key={dir.id}
                 onClick={() => handleSelectDirection(dir.id)}
-                className={`flex flex-col items-center justify-center p-3 rounded-2xl border text-center transition-all duration-150 active:scale-95 ${
+                className={`flex flex-col items-center justify-center p-3 rounded-2xl text-center transition-all duration-150 active:scale-95 cursor-pointer ${
                   isSelected
-                    ? 'bg-neutral-900 text-white border-neutral-900 dark:bg-white dark:text-neutral-950 dark:border-white shadow-sm'
-                    : 'liquid-glass-pill hover:bg-white/80 dark:hover:bg-white/15 text-neutral-700 dark:text-neutral-200'
+                    ? 'bg-neutral-950 text-white shadow-md border border-white/20'
+                    : 'liquid-glass-pill hover:bg-white/70 text-neutral-800 border border-white/70 shadow-xs'
                 }`}
               >
                 <div
                   className={`w-8 h-8 rounded-xl flex items-center justify-center mb-1.5 transition-transform ${
                     isSelected
-                      ? 'bg-white/20 text-white dark:bg-black/10 dark:text-neutral-950'
-                      : 'bg-black/5 text-neutral-700 dark:bg-white/10 dark:text-neutral-300'
+                      ? 'bg-white/20 text-white'
+                      : 'bg-black/5 text-neutral-700'
                   }`}
                 >
                   <Layers className="w-4 h-4" />
@@ -178,10 +178,10 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                 <button
                   key={st.id}
                   onClick={() => handleSelectSubTrack(st.id)}
-                  className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-150 active:scale-95 ${
+                  className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold transition-all duration-150 active:scale-95 cursor-pointer ${
                     isSelected
-                      ? 'bg-neutral-900 text-white shadow-sm dark:bg-white dark:text-neutral-950'
-                      : 'liquid-glass-pill hover:bg-white/80 dark:hover:bg-white/15 text-neutral-700 dark:text-neutral-200'
+                      ? 'bg-neutral-950 text-white shadow-md border border-white/20'
+                      : 'liquid-glass-pill hover:bg-white/70 text-neutral-800 border border-white/70 shadow-xs'
                   }`}
                 >
                   <span>{st.name}</span>
@@ -448,10 +448,10 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                       <button
                         key={st.id}
                         onClick={() => handleSelectSubTrack(st.id)}
-                        className={`flex items-center justify-between p-3.5 rounded-2xl border text-left transition-all ${
+                        className={`flex items-center justify-between p-3.5 rounded-2xl border text-left transition-all duration-150 active:scale-95 cursor-pointer ${
                           isCurrent
-                            ? 'bg-neutral-900 border-neutral-900 text-white dark:bg-white dark:border-white dark:text-neutral-950 shadow-xs'
-                            : 'bg-neutral-100/70 border-neutral-200/70 text-neutral-700 hover:bg-neutral-200/60 dark:bg-white/[0.03] dark:border-white/[0.08] dark:text-neutral-300 dark:hover:bg-white/[0.07]'
+                            ? 'bg-neutral-950 border-white/20 text-white shadow-md'
+                            : 'liquid-glass-subtle border-white/70 text-neutral-800 hover:bg-white/70 shadow-xs'
                         }`}
                       >
                         <div>

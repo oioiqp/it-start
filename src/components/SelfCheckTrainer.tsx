@@ -127,10 +127,7 @@ export const SelfCheckTrainer: React.FC<SelfCheckTrainerProps> = ({
 
   if (!currentCard || deck.length === 0) {
     return (
-      <div className="p-8 text-center rounded-3xl transition-colors
-        bg-white/80 border border-black/[0.06] shadow-xs
-        dark:bg-white/[0.035] dark:backdrop-blur-2xl dark:border-white/10"
-      >
+      <div className="p-8 text-center rounded-[32px] transition-colors liquid-glass">
         <HelpCircle className="w-12 h-12 mx-auto mb-3 text-neutral-400 dark:text-neutral-500" />
         <h3 className="text-base font-bold mb-1 font-sans text-neutral-900 dark:text-white">Вопросы не найдены</h3>
         <p className="text-xs text-neutral-500 dark:text-neutral-400">
@@ -246,7 +243,7 @@ export const SelfCheckTrainer: React.FC<SelfCheckTrainerProps> = ({
 
         {/* Self-check input area (Active when not submitted) */}
         {!isSubmitted ? (
-          <div className="space-y-3 pt-2 border-t border-neutral-200/80 dark:border-white/[0.08]">
+          <div className="space-y-3 pt-2 border-t border-black/[0.08] dark:border-white/[0.08]">
             <div className="flex items-center justify-between">
               <label className="text-xs font-medium flex items-center gap-1.5 text-neutral-700 dark:text-neutral-300">
                 <span>Ваш ответ:</span>
@@ -257,7 +254,7 @@ export const SelfCheckTrainer: React.FC<SelfCheckTrainerProps> = ({
               <button
                 type="button"
                 onClick={handleSubmit}
-                className="text-[11px] flex items-center gap-1 text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white"
+                className="text-[11px] flex items-center gap-1 text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
               >
                 <Eye className="w-3 h-3" />
                 <span>Сверить сразу</span>
@@ -278,22 +275,21 @@ export const SelfCheckTrainer: React.FC<SelfCheckTrainerProps> = ({
               }}
               rows={3}
               placeholder="Введите ваш ответ (например: 1, 4, 3, 2 или тезисное решение)..."
-              className="w-full px-4 py-3 rounded-2xl text-xs sm:text-sm transition-colors focus:outline-none resize-y
-                bg-neutral-50 border border-neutral-200/80 text-neutral-900 placeholder:text-neutral-400 focus:border-neutral-400
-                dark:bg-white/[0.04] dark:border-white/10 dark:text-neutral-100 dark:placeholder:text-neutral-500 dark:focus:border-white/30"
+              className="w-full px-4 py-3 rounded-2xl text-xs sm:text-sm transition-all focus:outline-none resize-y
+                liquid-glass-subtle border border-black/[0.08] dark:border-white/10 text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-neutral-500 dark:focus:border-white/40 focus:ring-2 focus:ring-neutral-400/20"
             />
 
             <div className="flex items-center justify-between gap-3 pt-1">
               <span className="text-[11px] hidden sm:inline text-neutral-500 dark:text-neutral-400">
-                Подсказка: нажмите <kbd className="px-1.5 py-0.5 rounded-md bg-neutral-200 dark:bg-white/10 text-neutral-800 dark:text-neutral-200">Enter</kbd> для проверки (<kbd className="px-1.5 py-0.5 rounded-md bg-neutral-200 dark:bg-white/10 text-neutral-800 dark:text-neutral-200">Shift</kbd> + <kbd className="px-1.5 py-0.5 rounded-md bg-neutral-200 dark:bg-white/10 text-neutral-800 dark:text-neutral-200">Enter</kbd> новая строка)
+                Подсказка: нажмите <kbd className="px-1.5 py-0.5 rounded-md liquid-glass-pill text-neutral-800 dark:text-neutral-200">Enter</kbd> для проверки (<kbd className="px-1.5 py-0.5 rounded-md liquid-glass-pill text-neutral-800 dark:text-neutral-200">Shift</kbd> + <kbd className="px-1.5 py-0.5 rounded-md liquid-glass-pill text-neutral-800 dark:text-neutral-200">Enter</kbd> новая строка)
               </span>
 
               <button
                 type="button"
                 onClick={handleSubmit}
-                className="ml-auto flex items-center gap-2 px-5 py-2 rounded-full font-medium text-xs active:scale-95 transition-all
-                  bg-neutral-900 hover:bg-black text-white shadow-xs
-                  dark:bg-white dark:hover:bg-neutral-200 dark:text-neutral-950"
+                className="ml-auto flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-xs active:scale-95 transition-all
+                  bg-neutral-900 hover:bg-black text-white shadow-md
+                  dark:bg-white dark:hover:bg-neutral-100 dark:text-neutral-950"
               >
                 <Send className="w-3.5 h-3.5" />
                 <span>Проверить ответ</span>
@@ -302,13 +298,10 @@ export const SelfCheckTrainer: React.FC<SelfCheckTrainerProps> = ({
           </div>
         ) : (
           /* Submitted State: Answer Comparison & Self-Evaluation */
-          <div className="space-y-4 pt-2 border-t border-neutral-200/80 dark:border-white/[0.08]">
+          <div className="space-y-4 pt-2 border-t border-black/[0.08] dark:border-white/[0.08]">
             {/* User's typed answer */}
             {currentAnswer.trim() ? (
-              <div className="p-4 rounded-2xl border space-y-1 transition-colors
-                bg-neutral-50/90 border-neutral-200/80
-                dark:bg-white/[0.03] dark:border-white/[0.08]"
-              >
+              <div className="p-4 rounded-2xl space-y-1 transition-colors liquid-glass-subtle">
                 <span className="text-[11px] font-semibold block uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                   Ваш ответ:
                 </span>
@@ -317,19 +310,13 @@ export const SelfCheckTrainer: React.FC<SelfCheckTrainerProps> = ({
                 </p>
               </div>
             ) : (
-              <div className="p-3 rounded-2xl border text-xs italic transition-colors
-                bg-neutral-50 border-neutral-200/80 text-neutral-400
-                dark:bg-white/[0.02] dark:border-white/[0.06] dark:text-neutral-500"
-              >
+              <div className="p-3.5 rounded-2xl text-xs italic transition-colors liquid-glass-subtle text-neutral-400 dark:text-neutral-500">
                 Вы не ввели свой ответ перед сверкой.
               </div>
             )}
 
             {/* Reference Official Answer */}
-            <div className="p-4 sm:p-5 rounded-2xl border space-y-1.5 transition-colors
-              bg-emerald-500/5 border-emerald-500/25 text-neutral-800
-              dark:bg-emerald-500/10 dark:border-emerald-500/30 dark:text-neutral-200"
-            >
+            <div className="p-4 sm:p-5 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 dark:bg-emerald-500/15 backdrop-blur-xl shadow-xs space-y-1.5 transition-colors">
               <span className="text-[11px] font-semibold flex items-center gap-1.5 uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
                 <Sparkles className="w-3.5 h-3.5" />
                 Эталонный ответ:
@@ -340,10 +327,7 @@ export const SelfCheckTrainer: React.FC<SelfCheckTrainerProps> = ({
             </div>
 
             {/* Key Takeaways */}
-            <div className="p-4 rounded-2xl border space-y-1.5 transition-colors
-              bg-neutral-50/90 border-neutral-200/80
-              dark:bg-white/[0.03] dark:border-white/[0.08]"
-            >
+            <div className="p-4 rounded-2xl space-y-1.5 transition-colors liquid-glass-subtle">
               <span className="text-[11px] font-semibold uppercase tracking-wider block text-neutral-500 dark:text-neutral-400">
                 Ключевые тезисы для проверки:
               </span>
@@ -357,13 +341,11 @@ export const SelfCheckTrainer: React.FC<SelfCheckTrainerProps> = ({
             </div>
 
             {/* Assessment Buttons */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 border-t border-neutral-200/80 dark:border-white/[0.08]">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 border-t border-black/[0.08] dark:border-white/[0.08]">
               <button
                 type="button"
                 onClick={handleResetCurrent}
-                className="w-full sm:w-auto flex items-center justify-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium transition-colors
-                  bg-neutral-100 hover:bg-neutral-200 text-neutral-700 border border-neutral-200/80
-                  dark:bg-white/[0.06] dark:hover:bg-white/[0.12] dark:text-neutral-300 dark:border-white/10"
+                className="w-full sm:w-auto flex items-center justify-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium liquid-glass-pill hover:bg-white/80 dark:hover:bg-white/15 text-neutral-700 dark:text-neutral-200 active:scale-95 transition-all"
               >
                 <RefreshCw className="w-3.5 h-3.5" />
                 <span>Попробовать снова</span>
@@ -373,9 +355,7 @@ export const SelfCheckTrainer: React.FC<SelfCheckTrainerProps> = ({
                 <button
                   type="button"
                   onClick={handleRepeat}
-                  className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium transition-colors border
-                    bg-amber-500/10 hover:bg-amber-500/20 border-amber-500/25 text-amber-700
-                    dark:bg-amber-500/15 dark:hover:bg-amber-500/25 dark:border-amber-500/30 dark:text-amber-300"
+                  className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium liquid-glass-pill bg-amber-500/15 hover:bg-amber-500/25 border-amber-500/30 text-amber-700 dark:text-amber-300 active:scale-95 transition-all"
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
                   <span>Нужно повторить</span>
@@ -384,9 +364,9 @@ export const SelfCheckTrainer: React.FC<SelfCheckTrainerProps> = ({
                 <button
                   type="button"
                   onClick={handleLearned}
-                  className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-5 py-2 rounded-full text-xs font-semibold active:scale-95 transition-all
-                    bg-neutral-900 hover:bg-black text-white shadow-xs
-                    dark:bg-white dark:hover:bg-neutral-200 dark:text-neutral-950"
+                  className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-full text-xs font-semibold active:scale-95 transition-all
+                    bg-neutral-900 hover:bg-black text-white shadow-md
+                    dark:bg-white dark:hover:bg-neutral-100 dark:text-neutral-950"
                 >
                   <CheckCircle2 className="w-4 h-4" />
                   <span>Ответил верно</span>

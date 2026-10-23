@@ -224,10 +224,10 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
               setSelectedDirection('all');
               setSelectedSubTrack('all');
             }}
-            className={`px-3.5 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${
+            className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-150 active:scale-95 ${
               selectedDirection === 'all'
-                ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-sm'
-                : 'bg-neutral-100/90 text-neutral-600 hover:text-neutral-950 hover:bg-neutral-200/80 dark:bg-white/[0.04] dark:text-neutral-400 dark:hover:text-white dark:hover:bg-white/[0.08]'
+                ? 'bg-neutral-950 text-white shadow-md border border-white/20'
+                : 'liquid-glass-pill hover:bg-white/70 text-neutral-800 border border-white/70 shadow-xs'
             }`}
           >
             Все направления
@@ -239,10 +239,10 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                 setSelectedDirection(dir.id);
                 setSelectedSubTrack('all');
               }}
-              className={`px-3.5 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${
+              className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-150 active:scale-95 ${
                 selectedDirection === dir.id
-                  ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-sm'
-                  : 'bg-neutral-100/90 text-neutral-600 hover:text-neutral-950 hover:bg-neutral-200/80 dark:bg-white/[0.04] dark:text-neutral-400 dark:hover:text-white dark:hover:bg-white/[0.08]'
+                  ? 'bg-neutral-950 text-white shadow-md border border-white/20'
+                  : 'liquid-glass-pill hover:bg-white/70 text-neutral-800 border border-white/70 shadow-xs'
               }`}
             >
               {dir.title.split('-')[0]}
@@ -252,13 +252,13 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
 
         {/* Row 3: Sub-tracks pills if direction chosen */}
         {selectedDirection !== 'all' && (
-          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1.5 border-t border-neutral-200/70 dark:border-white/10">
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1.5 border-t border-white/60">
             <button
               onClick={() => setSelectedSubTrack('all')}
-              className={`px-3 py-0.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
+              className={`px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-150 active:scale-95 ${
                 selectedSubTrack === 'all'
-                  ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-xs'
-                  : 'text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white'
+                  ? 'bg-neutral-950 text-white shadow-md border border-white/20'
+                  : 'liquid-glass-pill hover:bg-white/70 text-neutral-800 border border-white/70 shadow-xs'
               }`}
             >
               Все ветки
@@ -267,10 +267,10 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
               <button
                 key={st.id}
                 onClick={() => setSelectedSubTrack(st.id)}
-                className={`px-3 py-0.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
+                className={`px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-150 active:scale-95 ${
                   selectedSubTrack === st.id
-                    ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-xs'
-                    : 'text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white'
+                    ? 'bg-neutral-950 text-white shadow-md border border-white/20'
+                    : 'liquid-glass-pill hover:bg-white/70 text-neutral-800 border border-white/70 shadow-xs'
                 }`}
               >
                 {st.name}
@@ -379,32 +379,24 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                     <button
                       type="button"
                       onClick={() => setExpandedId(isExpanded ? null : q.id)}
-                      className="p-1.5 rounded-full transition-colors shrink-0
-                        bg-neutral-100 hover:bg-neutral-200 text-neutral-600
-                        dark:bg-white/[0.06] dark:hover:bg-white/[0.12] dark:text-neutral-300 dark:hover:text-white"
+                      className="p-2 rounded-full transition-all duration-150 active:scale-95 shrink-0 liquid-glass-pill hover:bg-white/70 text-neutral-700 border border-white/70 shadow-xs cursor-pointer"
                     >
                       {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                     </button>
                   </div>
 
                   {isExpanded && (
-                    <div className="px-5 pb-5 pt-2 border-t rounded-b-3xl space-y-4 transition-colors
-                      border-neutral-200/80 bg-neutral-50/50
-                      dark:border-white/[0.08] dark:bg-white/[0.02]"
-                    >
+                    <div className="px-5 pb-5 pt-3 border-t rounded-b-3xl space-y-4 border-white/60 liquid-glass-subtle">
                       {/* Full Question text */}
-                      <div className="p-3.5 rounded-2xl border text-xs leading-relaxed transition-colors
-                        bg-white border-neutral-200/80 text-neutral-800
-                        dark:bg-white/[0.03] dark:border-white/[0.08] dark:text-neutral-200"
-                      >
-                        <strong className="block mb-1 text-neutral-900 dark:text-white">Вопрос интервьюера:</strong>
+                      <div className="p-3.5 rounded-2xl border border-white/70 liquid-glass-pill text-xs leading-relaxed text-neutral-900 shadow-xs">
+                        <strong className="block mb-1 text-neutral-950 font-bold">Вопрос интервьюера:</strong>
                         {q.question}
                       </div>
 
                       {/* Code Snippet if present */}
                       {q.codeSnippet && (
-                        <div className="rounded-2xl overflow-hidden border border-neutral-200/80 bg-neutral-950 text-neutral-100 dark:border-white/10 dark:bg-black">
-                          <div className="px-3.5 py-1.5 text-xs font-mono border-b border-neutral-800 flex items-center justify-between bg-neutral-900 dark:bg-white/[0.04] text-neutral-400">
+                        <div className="rounded-2xl overflow-hidden border border-white/20 bg-neutral-950 text-neutral-100 shadow-sm">
+                          <div className="px-3.5 py-1.5 text-xs font-mono border-b border-neutral-800 flex items-center justify-between bg-neutral-900 text-neutral-400">
                             <span className="flex items-center gap-1.5">
                               <Code className="w-3.5 h-3.5 text-neutral-400" />
                               {q.codeLanguage || 'code'}
@@ -418,13 +410,10 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
 
                       {/* Interactive Self-Check Field */}
                       {!isChecked ? (
-                        <div className="p-4 rounded-2xl border space-y-3 transition-colors
-                          bg-white border-neutral-200/80
-                          dark:bg-white/[0.03] dark:border-white/[0.08]"
-                        >
+                        <div className="p-4 rounded-2xl border border-white/70 liquid-glass-pill space-y-3 shadow-xs">
                           <div className="flex items-center justify-between">
-                            <span className="text-xs font-semibold flex items-center gap-1.5 text-neutral-800 dark:text-neutral-200">
-                              <PenTool className="w-3.5 h-3.5 text-neutral-500" />
+                            <span className="text-xs font-bold flex items-center gap-1.5 text-neutral-900">
+                              <PenTool className="w-3.5 h-3.5 text-neutral-600" />
                               Самопроверка: попробуйте ответить самостоятельно
                             </span>
                             <button
@@ -432,7 +421,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                               onClick={() => {
                                 setInlineChecked((prev) => ({ ...prev, [q.id]: true }));
                               }}
-                              className="text-[11px] flex items-center gap-1 text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white"
+                              className="text-[11px] font-semibold flex items-center gap-1 text-neutral-600 hover:text-neutral-950 transition-colors"
                             >
                               <Eye className="w-3 h-3" />
                               <span>Показать ответ сразу</span>
@@ -447,9 +436,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                             }}
                             rows={2}
                             placeholder="Введите ваш ответ для сверки..."
-                            className="w-full px-3.5 py-2.5 rounded-xl text-xs transition-colors focus:outline-none
-                              bg-neutral-50 border border-neutral-200/80 text-neutral-900 placeholder:text-neutral-400 focus:border-neutral-400
-                              dark:bg-white/[0.04] dark:border-white/10 dark:text-neutral-100 dark:placeholder:text-neutral-500 dark:focus:border-white/30"
+                            className="w-full px-3.5 py-2.5 rounded-xl text-xs transition-all focus:outline-none liquid-glass-subtle bg-white/50 focus:bg-white/80 text-neutral-950 placeholder:text-neutral-500 border border-white/80 focus:border-white focus:ring-2 focus:ring-white/70 shadow-xs"
                           />
 
                           <div className="flex justify-end">
@@ -459,9 +446,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                                 triggerHaptic('medium');
                                 setInlineChecked((prev) => ({ ...prev, [q.id]: true }));
                               }}
-                              className="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold transition-all shadow-xs
-                                bg-neutral-900 text-white hover:bg-black
-                                dark:bg-white dark:text-neutral-950 dark:hover:bg-neutral-200"
+                              className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold transition-all active:scale-95 shadow-md bg-neutral-950 text-white hover:bg-black border border-white/20 cursor-pointer"
                             >
                               <Send className="w-3.5 h-3.5" />
                               <span>Сверить с эталоном</span>
@@ -471,40 +456,34 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                       ) : (
                         <div className="space-y-3">
                           {userAnswer.trim() && (
-                            <div className="p-3.5 rounded-2xl border text-xs transition-colors
-                              bg-white border-neutral-200/80
-                              dark:bg-white/[0.03] dark:border-white/[0.08]"
-                            >
+                            <div className="p-3.5 rounded-2xl border border-white/70 liquid-glass-pill text-xs shadow-xs">
                               <div className="flex items-center justify-between mb-1">
-                                <strong className="text-[11px] uppercase text-neutral-500 dark:text-neutral-400">Ваш ответ:</strong>
+                                <strong className="text-[11px] uppercase tracking-wider text-neutral-600 font-bold">Ваш ответ:</strong>
                                 <button
                                   type="button"
                                   onClick={() => setInlineChecked((prev) => ({ ...prev, [q.id]: false }))}
-                                  className="text-[10px] flex items-center gap-1 text-neutral-500 hover:text-neutral-900 dark:hover:text-white"
+                                  className="text-[10px] font-bold flex items-center gap-1 text-neutral-600 hover:text-black transition-colors"
                                 >
                                   <RefreshCw className="w-3 h-3" />
                                   Изменить
                                 </button>
                               </div>
-                              <p className="whitespace-pre-wrap text-neutral-800 dark:text-neutral-200">{userAnswer}</p>
+                              <p className="whitespace-pre-wrap text-neutral-900 font-medium">{userAnswer}</p>
                             </div>
                           )}
 
                           {/* Detailed Answer */}
-                          <div className="p-4 rounded-2xl border text-xs sm:text-sm leading-relaxed transition-colors
-                            bg-emerald-500/5 border-emerald-500/25 text-neutral-800
-                            dark:bg-emerald-500/10 dark:border-emerald-500/30 dark:text-neutral-200"
-                          >
-                            <strong className="block mb-1.5 font-semibold text-emerald-700 dark:text-emerald-400">Развернутый ответ:</strong>
+                          <div className="p-4 rounded-2xl border border-emerald-500/25 bg-emerald-500/10 text-neutral-900 text-xs sm:text-sm leading-relaxed shadow-xs">
+                            <strong className="block mb-1.5 font-bold text-emerald-800">Развернутый эталонный ответ:</strong>
                             {q.answer}
                           </div>
 
                           {/* Key Takeaways */}
                           <div className="space-y-1.5">
-                            <span className="text-xs font-semibold uppercase tracking-wider block text-neutral-500 dark:text-neutral-400">
+                            <span className="text-xs font-bold uppercase tracking-wider block text-neutral-700">
                               Что важно запомнить:
                             </span>
-                            <ul className="text-xs space-y-1 list-disc list-inside text-neutral-600 dark:text-neutral-400">
+                            <ul className="text-xs space-y-1 list-disc list-inside text-neutral-700">
                               {q.keyTakeaways.map((point, idx) => (
                                 <li key={idx}>{point}</li>
                               ))}
@@ -514,34 +493,34 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                       )}
 
                       {/* Card Action Buttons */}
-                      <div className="flex items-center justify-end gap-2 pt-2 border-t border-neutral-200/80 dark:border-white/[0.08]">
+                      <div className="flex items-center justify-end gap-2 pt-2 border-t border-white/60">
                         <button
                           type="button"
                           onClick={() => {
                             triggerHaptic('medium');
                             onMarkRepeat(q.id);
                           }}
-                          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium border transition-all ${
+                          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all active:scale-95 shadow-xs cursor-pointer ${
                             isRepeat
-                              ? 'bg-amber-500/10 text-amber-700 border-amber-500/20 dark:bg-amber-500/15 dark:text-amber-300 dark:border-amber-500/30'
-                              : 'bg-neutral-100 hover:bg-neutral-200/80 text-neutral-700 border-neutral-200/70 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] dark:text-neutral-300 dark:border-white/[0.08]'
+                              ? 'bg-amber-500 text-white'
+                              : 'liquid-glass-pill text-amber-800 hover:bg-amber-500/20 border border-amber-400/50'
                           }`}
                         >
-                          <RotateCcw className="w-3.5 h-3.5" />
-                          <span>{isRepeat ? 'В повторении' : 'Отправить на повторение'}</span>
+                          <RotateCcw className="w-3 h-3" />
+                          <span>{isRepeat ? 'В повторении' : 'Повторить позже'}</span>
                         </button>
 
                         <button
                           type="button"
                           onClick={() => handleToggle(q.id)}
-                          className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+                          className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold transition-all active:scale-95 shadow-xs cursor-pointer ${
                             isCompleted
-                              ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
-                              : 'bg-neutral-900 text-white border-neutral-900 dark:bg-white dark:text-neutral-950 dark:border-white shadow-xs'
+                              ? 'bg-emerald-600 text-white shadow-md'
+                              : 'liquid-glass-pill text-emerald-800 hover:bg-emerald-500/20 border border-emerald-400/50'
                           }`}
                         >
                           <CheckCircle2 className="w-3.5 h-3.5" />
-                          <span>{isCompleted ? 'Изучено' : 'Отметить изученным'}</span>
+                          <span>{isCompleted ? 'Изучено ✓' : 'Отметить изученным'}</span>
                         </button>
                       </div>
                     </div>

@@ -94,7 +94,7 @@ export function App() {
     root.classList.remove('dark');
     document.body.classList.add('light');
     document.body.classList.remove('dark');
-    if (metaThemeColor) metaThemeColor.setAttribute('content', '#dbe0ea');
+    if (metaThemeColor) metaThemeColor.setAttribute('content', '#ccd3e0');
     saveLocalTheme('light');
   }, []);
 
@@ -317,21 +317,23 @@ export function App() {
   });
 
   return (
-    <div className="min-h-screen flex flex-col relative light bg-[#dbe0ea] text-neutral-900 liquid-ambient selection:bg-neutral-950 selection:text-white">
+    <div className="min-h-screen flex flex-col relative light bg-[#ccd3e0] text-neutral-900 liquid-ambient selection:bg-neutral-950 selection:text-white">
       {/* Atmospheric Apple Space Gray / Titanium / Smoky Pearl Canvas */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10 select-none">
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0 select-none">
         {/* Top ethereal specular sheen */}
-        <div className="absolute top-0 inset-x-0 h-[480px] bg-gradient-to-b from-white/70 via-white/20 to-transparent pointer-events-none" />
+        <div className="absolute top-0 inset-x-0 h-[480px] bg-gradient-to-b from-white/90 via-white/40 to-transparent pointer-events-none" />
 
-        {/* Smoky Pearl & Platinum Ambient Spheres for authentic glass refraction */}
-        <div className="absolute -top-[12%] -right-[8%] w-[680px] h-[680px] sm:w-[880px] sm:h-[880px] rounded-full bg-gradient-to-br from-slate-200/80 via-zinc-300/60 to-slate-400/40 blur-[110px] transform-gpu pointer-events-none" />
-        <div className="absolute top-[22%] -left-[12%] w-[640px] h-[640px] sm:w-[820px] sm:h-[820px] rounded-full bg-gradient-to-tr from-slate-400/50 via-zinc-300/50 to-blue-200/35 blur-[120px] transform-gpu pointer-events-none" />
-        <div className="absolute top-[55%] -right-[5%] w-[600px] h-[600px] sm:w-[780px] sm:h-[780px] rounded-full bg-gradient-to-bl from-zinc-300/60 via-slate-300/50 to-indigo-200/30 blur-[115px] transform-gpu pointer-events-none" />
-        <div className="absolute -bottom-[8%] left-[8%] w-[620px] h-[620px] sm:w-[820px] sm:h-[820px] rounded-full bg-gradient-to-tr from-slate-400/45 via-zinc-400/40 to-slate-200/50 blur-[120px] transform-gpu pointer-events-none" />
+        {/* Atmospheric Platinum & Titanium Ambient Spheres for authentic glass refraction */}
+        <div className="absolute -top-[10%] -right-[5%] w-[680px] h-[680px] sm:w-[900px] sm:h-[900px] rounded-full bg-gradient-to-br from-white/85 via-slate-300/65 to-indigo-300/45 blur-[75px] transform-gpu pointer-events-none" />
+        <div className="absolute top-[18%] -left-[10%] w-[640px] h-[640px] sm:w-[850px] sm:h-[850px] rounded-full bg-gradient-to-tr from-slate-400/55 via-zinc-300/55 to-sky-200/50 blur-[80px] transform-gpu pointer-events-none" />
+        <div className="absolute top-[50%] -right-[6%] w-[600px] h-[600px] sm:w-[800px] sm:h-[800px] rounded-full bg-gradient-to-bl from-zinc-200/75 via-slate-300/65 to-violet-300/40 blur-[80px] transform-gpu pointer-events-none" />
+        <div className="absolute -bottom-[8%] left-[8%] w-[620px] h-[620px] sm:w-[850px] sm:h-[850px] rounded-full bg-gradient-to-tr from-slate-400/50 via-zinc-300/50 to-teal-200/45 blur-[80px] transform-gpu pointer-events-none" />
       </div>
 
-      {/* Navbar */}
-      <Navbar
+      {/* Content Layer floating on top of ambient canvas */}
+      <div className="relative z-10 flex flex-col min-h-screen">
+        {/* Navbar */}
+        <Navbar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         telegramUser={telegramUser}
@@ -738,7 +740,8 @@ export function App() {
         </div>
       </footer>
     </div>
-  );
+  </div>
+);
 }
 
 export default App;
