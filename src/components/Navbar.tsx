@@ -5,8 +5,6 @@ import {
   HelpCircle,
   Send,
   Bot,
-  Sun,
-  Moon,
 } from 'lucide-react';
 import type { TelegramUser, UserProgress } from '../types';
 import { triggerHaptic } from '../lib/telegram';
@@ -19,8 +17,8 @@ interface NavbarProps {
   totalTopicsCount?: number;
   totalQuestionsCount?: number;
   onOpenSubscribeModal: () => void;
-  theme: 'dark' | 'light';
-  onToggleTheme: () => void;
+  theme?: 'dark' | 'light';
+  onToggleTheme?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -28,8 +26,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   setActiveTab,
   telegramUser,
   onOpenSubscribeModal,
-  theme,
-  onToggleTheme,
 }) => {
   const handleTabClick = (tab: 'internships' | 'roadmaps' | 'questions' | 'telegram') => {
     triggerHaptic('selection');
@@ -94,33 +90,15 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Subtle Divider */}
         <div className="h-4 w-px shrink-0 mx-0.5 bg-black/10 dark:bg-white/10" />
 
-        {/* Right Controls: Theme Switcher + Telegram Bot / Notifications Pill */}
-        <div className="flex items-center gap-1 sm:gap-1.5 shrink-0 pr-1">
-          {/* Apple Minimalist Theme Switcher */}
-          <button
-            onClick={onToggleTheme}
-            className="w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 active:scale-90
-              text-neutral-600 hover:text-neutral-900 hover:bg-neutral-200/60
-              dark:text-neutral-300 dark:hover:text-white dark:hover:bg-white/[0.1]"
-            title={theme === 'dark' ? 'Переключить на светлую тему' : 'Переключить на тёмную тему'}
-            aria-label="Переключить тему"
-          >
-            {theme === 'dark' ? (
-              <Moon className="w-4 h-4 text-white" />
-            ) : (
-              <Sun className="w-4 h-4 text-neutral-800" />
-            )}
-          </button>
-
-          {/* Solid Pill Action Button (Matches Reference Image "Download" Button) */}
+        {/* Right Controls: Telegram Bot / Notifications Action Capsule */}
+        <div className="flex items-center gap-1.5 shrink-0 pr-1">
           <button
             onClick={() => {
               triggerHaptic('medium');
               onOpenSubscribeModal();
             }}
-            className="flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full font-semibold text-xs transition-all duration-200 active:scale-95 shadow-md
-              bg-neutral-900 hover:bg-black text-white
-              dark:bg-white dark:text-black dark:hover:bg-neutral-200"
+            className="flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full font-semibold text-xs transition-all duration-150 active:scale-95 shadow-sm
+              bg-neutral-900 hover:bg-black text-white"
             title={telegramUser ? `Telegram: ${telegramUser.username ? '@' + telegramUser.username : telegramUser.first_name || 'Подключен'}` : 'Telegram-бот и уведомления'}
           >
             <Bot className="w-3.5 h-3.5" />

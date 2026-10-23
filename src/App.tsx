@@ -38,7 +38,6 @@ import {
   getCachedInternships,
   getLocalProgress,
   getLocalSubscription,
-  getLocalTheme,
   saveCachedInternships,
   saveLocalProgress,
   saveLocalTheme,
@@ -47,9 +46,6 @@ import { initTelegramWebApp, triggerHaptic } from './lib/telegram';
 import { initVkBridge } from './lib/vkBridge';
 
 export function App() {
-  // Theme state: 'dark' (Liquid Obsidian) vs 'light' (Liquid Glass Canvas)
-  const [theme, setTheme] = useState<'dark' | 'light'>(() => getLocalTheme());
-
   // Navigation
   const [activeTab, setActiveTab] = useState<'internships' | 'roadmaps' | 'questions' | 'telegram'>('internships');
 
@@ -89,30 +85,17 @@ export function App() {
     'VK',
   ];
 
-  // Sync theme with document element and persistence
+  // Enforce pure serene light mode (Apple Platinum Minimalist)
   useEffect(() => {
     const root = document.documentElement;
     const metaThemeColor = document.querySelector('meta[name="theme-color"]');
-    if (theme === 'dark') {
-      root.classList.add('dark');
-      root.classList.remove('light');
-      document.body.classList.add('dark');
-      document.body.classList.remove('light');
-      if (metaThemeColor) metaThemeColor.setAttribute('content', '#0d0814');
-    } else {
-      root.classList.add('light');
-      root.classList.remove('dark');
-      document.body.classList.add('light');
-      document.body.classList.remove('dark');
-      if (metaThemeColor) metaThemeColor.setAttribute('content', '#f6f1f7');
-    }
-    saveLocalTheme(theme);
-  }, [theme]);
-
-  const handleToggleTheme = () => {
-    triggerHaptic('selection');
-    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
-  };
+    root.classList.add('light');
+    root.classList.remove('dark');
+    document.body.classList.add('light');
+    document.body.classList.remove('dark');
+    if (metaThemeColor) metaThemeColor.setAttribute('content', '#f5f5f7');
+    saveLocalTheme('light');
+  }, []);
 
   // Initialize Telegram WebApp & Supabase
   useEffect(() => {
@@ -333,21 +316,13 @@ export function App() {
   });
 
   return (
-    <div className={`min-h-screen flex flex-col transition-colors duration-250 relative ${
-      theme === 'dark'
-        ? 'dark bg-[#0d0814] text-neutral-100 liquid-ambient-dark selection:bg-white selection:text-neutral-950'
-        : 'light bg-[#f6f1f7] text-neutral-900 liquid-ambient-light selection:bg-neutral-900 selection:text-white'
-    }`}>
-      {/* Ambient Mesh Gradient Orbs (Refract dynamically through Liquid Glass components) */}
+    <div className="min-h-screen flex flex-col relative light bg-[#f5f5f7] text-neutral-900 liquid-ambient selection:bg-neutral-900 selection:text-white">
+      {/* High-performance static Apple Platinum background (Zero lag, zero GPU overdraw) */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10 select-none">
-        {/* Top-Right Soft Rose / Orchid Glow Orb (Matches reference image warm tone) */}
-        <div className="absolute -top-[12%] right-[-10%] w-[600px] h-[600px] sm:w-[850px] sm:h-[850px] rounded-full bg-gradient-to-br from-pink-500/40 via-rose-500/35 to-purple-600/40 dark:from-pink-500/35 dark:via-rose-600/30 dark:to-purple-700/35 blur-[100px] sm:blur-[135px] animate-ambient-slow" />
-        {/* Top-Left Violet / Plum Glow Orb */}
-        <div className="absolute top-[18%] -left-[12%] w-[550px] h-[550px] sm:w-[800px] sm:h-[800px] rounded-full bg-gradient-to-tr from-violet-600/38 via-purple-500/32 to-pink-400/30 dark:from-violet-600/32 dark:via-purple-600/28 dark:to-pink-600/25 blur-[105px] sm:blur-[140px] animate-ambient-reverse" />
-        {/* Center-Right Aquamarine / Sapphire Glow Orb */}
-        <div className="absolute top-[52%] right-[1%] w-[500px] h-[500px] sm:w-[750px] sm:h-[750px] rounded-full bg-gradient-to-tr from-cyan-400/35 via-teal-400/30 to-blue-500/35 dark:from-cyan-500/25 dark:via-blue-600/25 dark:to-indigo-600/25 blur-[100px] sm:blur-[135px] animate-ambient-slow" />
-        {/* Bottom-Left Warm Coral / Orchid Glow Orb */}
-        <div className="absolute bottom-[3%] left-[3%] w-[500px] h-[500px] sm:w-[700px] sm:h-[700px] rounded-full bg-gradient-to-br from-rose-500/35 via-orange-400/30 to-purple-500/35 dark:from-rose-600/25 dark:via-purple-600/25 dark:to-indigo-800/25 blur-[100px] sm:blur-[130px] animate-ambient-reverse" />
+        <div className="absolute top-0 inset-x-0 h-[450px] bg-gradient-to-b from-white/90 via-white/50 to-transparent" />
+        <div className="absolute -top-[10%] right-[5%] w-[600px] h-[600px] rounded-full bg-slate-300/25 blur-[90px] transform-gpu pointer-events-none" />
+        <div className="absolute top-[35%] -left-[10%] w-[650px] h-[650px] rounded-full bg-zinc-300/20 blur-[100px] transform-gpu pointer-events-none" />
+        <div className="absolute bottom-[5%] right-[10%] w-[550px] h-[550px] rounded-full bg-slate-200/30 blur-[90px] transform-gpu pointer-events-none" />
       </div>
 
       {/* Navbar */}
@@ -358,8 +333,6 @@ export function App() {
         userProgress={userProgress}
         totalTopicsCount={ROADMAP_TOPICS.length}
         totalQuestionsCount={QUESTIONS.length}
-        theme={theme}
-        onToggleTheme={handleToggleTheme}
         onOpenSubscribeModal={() => {
           triggerHaptic('medium');
           setIsSubscribeModalOpen(true);
