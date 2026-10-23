@@ -11,8 +11,12 @@ export const TELEGRAM_BOT_URL = `https://t.me/${TELEGRAM_BOT_USERNAME}`;
 export const GITHUB_PAGES_URL = 'https://oioiqp.github.io/it-start/';
 
 const quickFetch: typeof fetch = (input, init) => {
-  const signal = init?.signal ?? AbortSignal.timeout(1200);
-  return fetch(input, { ...init, signal });
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 1200);
+  if (init?.signal) {
+    init.signal.addEventListener('abort', () => controller.abort(), { once: true });
+  }
+  return fetch(input, { ...init, signal: controller.signal }).finally(() => clearTimeout(timer));
 };
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
@@ -21,7 +25,10 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 });
 
 // In-memory fallback stores when Supabase is unreachable (offline / DNS issues / local vitest environment)
-let isSupabaseOffline = false;
+const isTestEnv =
+  typeof globalThis !== 'undefined' &&
+  Boolean((globalThis as any).process?.env?.VITEST || (globalThis as any).process?.env?.NODE_ENV === 'test');
+let isSupabaseOffline = isTestEnv;
 const inMemoryInternships: Map<string, Internship> = new Map();
 const inMemorySubscriptions: Map<string, TelegramSubscription> = new Map();
 const inMemoryUserProgress: Map<string, UserProgress> = new Map();
