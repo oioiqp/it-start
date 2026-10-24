@@ -367,7 +367,7 @@ export function App() {
               <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight font-sans text-neutral-900 dark:text-white">
                 Агрегатор IT-стажировок
               </h1>
-              <p className="text-xs sm:text-sm font-medium leading-relaxed max-w-xl mx-auto text-neutral-700 dark:text-neutral-200">
+              <p className="text-xs sm:text-sm font-medium leading-relaxed max-w-xl mx-auto text-neutral-800 dark:text-neutral-200">
                 Интерактивная дорожная карта • Тренажёры • Проверенные позиции
               </p>
             </div>
@@ -692,7 +692,7 @@ export function App() {
       />
 
       {/* Footer */}
-      <footer className="w-full py-8 px-4 sm:px-6 lg:px-8 text-xs mt-12 transition-colors border-t border-black/5 dark:border-white/5 liquid-glass-subtle text-neutral-600 dark:text-neutral-400">
+      <footer className="w-full py-8 px-4 sm:px-6 lg:px-8 text-xs mt-12 transition-colors border-t border-black/5 dark:border-white/5 liquid-glass-subtle text-neutral-800 dark:text-neutral-300">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs tracking-tight shadow-xs
@@ -702,7 +702,7 @@ export function App() {
             </div>
             <div>
               <span className="font-bold text-neutral-900 dark:text-neutral-100 font-sans">IT-Старт © 2026</span>
-              <p className="text-[11px] text-neutral-500 dark:text-neutral-400">
+              <p className="text-[11px] text-neutral-600 dark:text-neutral-400">
                 100% реальные IT-стажировки • Роадмапы • Telegram & VK Боты
               </p>
             </div>
@@ -713,7 +713,7 @@ export function App() {
               href={TELEGRAM_BOT_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-neutral-700 hover:text-black dark:text-neutral-300 dark:hover:text-white flex items-center gap-1 transition-colors"
+              className="text-neutral-800 hover:text-black dark:text-neutral-200 dark:hover:text-white flex items-center gap-1 transition-colors"
             >
               <Bot className="w-3.5 h-3.5" />
               <span>TG: @{TELEGRAM_BOT_USERNAME}</span>
@@ -723,17 +723,17 @@ export function App() {
               href={GITHUB_PAGES_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-neutral-700 hover:text-black dark:text-neutral-300 dark:hover:text-white transition-colors"
+              className="text-neutral-800 hover:text-black dark:text-neutral-200 dark:hover:text-white transition-colors"
             >
               GitHub Pages
             </a>
             <span>•</span>
-            <span className="flex items-center gap-1.5 text-neutral-700 dark:text-neutral-300">
+            <span className="flex items-center gap-1.5 text-neutral-800 dark:text-neutral-200">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
               Supabase Connected
             </span>
             <span>•</span>
-            <span className="text-[10px] px-2.5 py-0.5 rounded-full font-medium liquid-glass-pill text-neutral-700 dark:text-neutral-200">
+            <span className="text-[10px] px-2.5 py-0.5 rounded-full font-semibold liquid-glass-pill text-neutral-800 dark:text-neutral-200">
               Liquid Glass iOS
             </span>
           </div>

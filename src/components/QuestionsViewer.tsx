@@ -127,7 +127,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full font-semibold transition-all duration-150 active:scale-95 ${
               viewMode === 'self_check'
                 ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-sm'
-                : 'text-neutral-700 dark:text-neutral-300 hover:text-neutral-950 dark:hover:text-white'
+                : 'text-neutral-800 dark:text-neutral-200 hover:text-neutral-950 dark:hover:text-white'
             }`}
           >
             <PenTool className="w-3.5 h-3.5" />
@@ -142,7 +142,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full font-semibold transition-all duration-150 active:scale-95 ${
               viewMode === 'accordion'
                 ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-sm'
-                : 'text-neutral-700 dark:text-neutral-300 hover:text-neutral-950 dark:hover:text-white'
+                : 'text-neutral-800 dark:text-neutral-200 hover:text-neutral-950 dark:hover:text-white'
             }`}
           >
             <LayoutList className="w-3.5 h-3.5" />
@@ -157,7 +157,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full font-semibold transition-all duration-150 active:scale-95 ${
               viewMode === 'flashcards'
                 ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-sm'
-                : 'text-neutral-700 dark:text-neutral-300 hover:text-neutral-950 dark:hover:text-white'
+                : 'text-neutral-800 dark:text-neutral-200 hover:text-neutral-950 dark:hover:text-white'
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
@@ -480,10 +480,10 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
 
                           {/* Key Takeaways */}
                           <div className="space-y-1.5">
-                            <span className="text-xs font-bold uppercase tracking-wider block text-neutral-700">
+                            <span className="text-xs font-bold uppercase tracking-wider block text-neutral-800 dark:text-neutral-200">
                               Что важно запомнить:
                             </span>
-                            <ul className="text-xs space-y-1 list-disc list-inside text-neutral-700">
+                            <ul className="text-xs space-y-1 list-disc list-inside text-neutral-800 dark:text-neutral-200">
                               {q.keyTakeaways.map((point, idx) => (
                                 <li key={idx}>{point}</li>
                               ))}

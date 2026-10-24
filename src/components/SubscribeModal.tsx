@@ -217,7 +217,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/40 backdrop-blur-xl overflow-y-auto">
-      <div className="relative w-full max-w-xl rounded-[28px] sm:rounded-[32px] shadow-2xl p-6 sm:p-7 my-8 animate-in fade-in zoom-in-95 duration-200 transition-all liquid-glass text-neutral-900">
+      <div className="relative w-full max-w-xl rounded-[28px] sm:rounded-[32px] shadow-2xl p-6 sm:p-7 my-8 animate-in fade-in zoom-in-95 duration-200 transition-all liquid-glass liquid-glass-modal text-neutral-900">
         {/* Close Button */}
         <button
           onClick={onClose}

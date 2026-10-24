@@ -145,11 +145,11 @@ export const SelfCheckTrainer: React.FC<SelfCheckTrainerProps> = ({
       {/* Top Header & Navigation */}
       <div className="rounded-[28px] sm:rounded-[32px] p-3.5 sm:p-4 flex items-center justify-between gap-3 transition-colors liquid-glass">
         <div className="flex items-center gap-2 text-xs">
-          <span className="text-neutral-700 dark:text-neutral-300">
+          <span className="text-neutral-800 dark:text-neutral-200">
             Вопрос <strong className="text-neutral-950 dark:text-white">{currentIndex + 1}</strong> из {deck.length}
           </span>
           <span className="text-neutral-400 dark:text-neutral-600">•</span>
-          <span className="text-[11px] font-semibold text-neutral-700 dark:text-neutral-300">
+          <span className="text-[11px] font-semibold text-neutral-800 dark:text-neutral-200">
             {deck.filter((q) => userProgress.completedQuestions.includes(q.id)).length} изучено
           </span>
         </div>
@@ -220,7 +220,7 @@ export const SelfCheckTrainer: React.FC<SelfCheckTrainerProps> = ({
           <h3 className="text-base sm:text-lg font-bold mb-2 leading-snug font-sans text-neutral-950 dark:text-white">
             {currentCard.title}
           </h3>
-          <p className="text-xs sm:text-sm leading-relaxed text-neutral-700 dark:text-neutral-200 font-normal">
+          <p className="text-xs sm:text-sm leading-relaxed text-neutral-800 dark:text-neutral-200 font-normal">
             {currentCard.question}
           </p>
         </div>
@@ -245,7 +245,7 @@ export const SelfCheckTrainer: React.FC<SelfCheckTrainerProps> = ({
         {!isSubmitted ? (
           <div className="space-y-3 pt-2 border-t border-black/[0.08] dark:border-white/[0.08]">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-medium flex items-center gap-1.5 text-neutral-700 dark:text-neutral-300">
+              <label className="text-xs font-medium flex items-center gap-1.5 text-neutral-800 dark:text-neutral-200">
                 <span>Ваш ответ:</span>
                 <span className="text-[11px] text-neutral-500">
                   (напишите порядок вывода или объясните суть)

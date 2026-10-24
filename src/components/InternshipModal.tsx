@@ -139,7 +139,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/40 backdrop-blur-xl overflow-y-auto">
-      <div className="relative w-full max-w-3xl rounded-[28px] sm:rounded-[32px] p-6 sm:p-8 my-8 max-h-[90vh] flex flex-col liquid-glass text-neutral-900 overflow-hidden shadow-2xl">
+      <div className="relative w-full max-w-3xl rounded-[28px] sm:rounded-[32px] p-6 sm:p-8 my-8 max-h-[90vh] flex flex-col liquid-glass liquid-glass-modal text-neutral-900 overflow-hidden shadow-2xl">
         {/* Close Button */}
         <button
           onClick={onClose}

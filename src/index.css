@@ -9,9 +9,9 @@
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
   }
 
-  /* Apple Minimalist Titanium / Slate Grey Canvas */
+  /* Apple Serene Titanium / Smoky Pearl Canvas */
   html, body {
-    background-color: #b8c1ce;
+    background-color: #ccd3e0;
     color: #0f172a;
   }
 
@@ -23,7 +23,7 @@
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background-color: #b8c1ce;
+    background-color: #ccd3e0;
   }
 
   /* Apple Fluid micro-interactions (WWDC Fluid Interfaces) */
@@ -32,30 +32,30 @@
   }
 }
 
-/* Atmospheric Minimalist Titanium-Gray Ambient Canvas */
+/* Atmospheric Serene Pearl-Gray Ambient Canvas */
 .liquid-ambient-light,
 .liquid-ambient-dark,
 .liquid-ambient {
-  background-color: #b8c1ce;
+  background-color: #ccd3e0;
   background-image: 
-    radial-gradient(ellipse 90% 60% at 50% -5%, rgba(255, 255, 255, 0.60) 0%, transparent 65%),
-    radial-gradient(ellipse 70% 50% at 90% 20%, rgba(175, 186, 204, 0.50) 0%, transparent 60%),
-    radial-gradient(ellipse 70% 50% at 10% 50%, rgba(168, 180, 198, 0.45) 0%, transparent 60%),
-    radial-gradient(circle at 50% 100%, rgba(200, 212, 228, 0.55) 0%, transparent 70%);
+    radial-gradient(ellipse 90% 60% at 50% -5%, rgba(255, 255, 255, 0.75) 0%, transparent 65%),
+    radial-gradient(ellipse 70% 50% at 90% 20%, rgba(195, 206, 222, 0.50) 0%, transparent 60%),
+    radial-gradient(ellipse 70% 50% at 10% 50%, rgba(200, 210, 225, 0.45) 0%, transparent 60%),
+    radial-gradient(circle at 50% 100%, rgba(220, 229, 240, 0.60) 0%, transparent 70%);
   background-attachment: fixed;
 }
 
-/* Minimalist Liquid Matte Frosted Glass Main Surface */
+/* Minimalist Liquid Matte Frosted Glass Main Surface (Dense milky backing for superior readability) */
 .liquid-glass {
   position: relative;
   backdrop-filter: blur(36px) saturate(140%);
   -webkit-backdrop-filter: blur(36px) saturate(140%);
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0.52) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.55);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.86) 0%, rgba(246, 249, 253, 0.76) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.70);
   box-shadow: 
     0 12px 32px -8px rgba(15, 23, 42, 0.08),
     0 2px 8px -2px rgba(15, 23, 42, 0.04),
-    inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.9);
+    inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.95);
 }
 
 .liquid-glass-interactive {
@@ -65,19 +65,19 @@
 
 .liquid-glass-interactive:hover {
   transform: translateY(-2px);
-  border-color: rgba(255, 255, 255, 0.75);
+  border-color: rgba(255, 255, 255, 0.85);
   box-shadow: 
     0 16px 36px -8px rgba(15, 23, 42, 0.12),
     0 4px 12px -2px rgba(15, 23, 42, 0.05),
-    inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.95);
+    inset 0 1px 1.5px 0 rgba(255, 255, 255, 1);
 }
 
 /* Liquid Matte Glass Subtle Surface (Inner cards, steps, widgets) */
 .liquid-glass-subtle {
   backdrop-filter: blur(28px) saturate(130%);
   -webkit-backdrop-filter: blur(28px) saturate(130%);
-  background: rgba(255, 255, 255, 0.48);
-  border: 1px solid rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.60);
   box-shadow: 0 2px 8px -2px rgba(15, 23, 42, 0.03);
 }
 
@@ -85,22 +85,34 @@
 .liquid-glass-pill {
   backdrop-filter: blur(24px) saturate(130%);
   -webkit-backdrop-filter: blur(24px) saturate(130%);
-  background: rgba(255, 255, 255, 0.58);
-  border: 1px solid rgba(255, 255, 255, 0.50);
-  box-shadow: 0 1px 4px -1px rgba(15, 23, 42, 0.04), inset 0 1px 1px 0 rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow: 0 1px 4px -1px rgba(15, 23, 42, 0.04), inset 0 1px 1px 0 rgba(255, 255, 255, 0.90);
 }
 
-/* Floating Navigation Glass Bar */
+/* Floating Navigation Glass Bar - Dense Milky Frosted Surface (Opaque to prevent scrolling content clashes) */
 .liquid-glass-nav {
   position: relative;
   backdrop-filter: blur(28px) saturate(180%);
   -webkit-backdrop-filter: blur(28px) saturate(180%);
-  background: rgba(236, 241, 248, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.70);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.92) 0%, rgba(242, 246, 252, 0.88) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.80);
   box-shadow: 
-    0 12px 32px -6px rgba(15, 23, 42, 0.12),
-    0 4px 12px -2px rgba(15, 23, 42, 0.05),
+    0 12px 32px -6px rgba(15, 23, 42, 0.10),
+    0 4px 12px -2px rgba(15, 23, 42, 0.04),
     inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.95);
+}
+
+/* Liquid Matte Glass Modal Surface (High opacity for reading long descriptions) */
+.liquid-glass-modal {
+  backdrop-filter: blur(36px) saturate(140%);
+  -webkit-backdrop-filter: blur(36px) saturate(140%);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.96) 0%, rgba(246, 249, 253, 0.92) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 
+    0 24px 60px -12px rgba(15, 23, 42, 0.20),
+    0 8px 20px -4px rgba(15, 23, 42, 0.08),
+    inset 0 1px 2px 0 rgba(255, 255, 255, 0.98);
 }
 
 /* App Squircle Tile (Soft matte frosted monochrome squircle) */
@@ -108,11 +120,11 @@
   position: relative;
   backdrop-filter: blur(30px) saturate(130%);
   -webkit-backdrop-filter: blur(30px) saturate(130%);
-  background: rgba(255, 255, 255, 0.65);
-  border: 1px solid rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.80);
+  border: 1px solid rgba(255, 255, 255, 0.70);
   box-shadow: 
     0 4px 14px -3px rgba(15, 23, 42, 0.06),
-    inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.9);
+    inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.95);
 }
 
 /* Dark mode glass adaptations */
@@ -135,9 +147,15 @@
 }
 
 .dark .liquid-glass-nav {
-  background: rgba(18, 22, 31, 0.85);
+  background: rgba(18, 22, 31, 0.90);
   border: 1px solid rgba(255, 255, 255, 0.14);
   box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.60);
+}
+
+.dark .liquid-glass-modal {
+  background: rgba(18, 22, 31, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.65);
 }
 
 .dark .liquid-glass-tile {
@@ -160,6 +178,9 @@
   .liquid-glass-nav {
     background: rgba(240, 244, 250, 0.97);
   }
+  .liquid-glass-modal {
+    background: rgba(248, 250, 253, 0.98);
+  }
   .liquid-glass-tile {
     background: rgba(245, 248, 252, 0.96);
   }
@@ -167,6 +188,7 @@
   .dark .liquid-glass-subtle,
   .dark .liquid-glass-pill,
   .dark .liquid-glass-nav,
+  .dark .liquid-glass-modal,
   .dark .liquid-glass-tile {
     background: #181d26;
   }

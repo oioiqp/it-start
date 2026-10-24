@@ -100,7 +100,7 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
   return (
     <div className="max-w-2xl mx-auto space-y-4">
       {/* Top Controls Bar */}
-      <div className="flex items-center justify-between text-xs px-1 text-neutral-700 dark:text-neutral-300">
+      <div className="flex items-center justify-between text-xs px-1 text-neutral-800 dark:text-neutral-200">
         <div className="flex items-center gap-2">
           <span className="font-semibold text-sm text-neutral-950 dark:text-white">
             Карточка {currentIndex + 1} из {deck.length}
@@ -136,7 +136,7 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
           <span className="px-3 py-1 rounded-full text-xs font-semibold liquid-glass-pill text-neutral-800 dark:text-neutral-200">
             {currentCard.category}
           </span>
-          <span className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+          <span className="text-xs font-semibold text-neutral-800 dark:text-neutral-200">
             Сложность: {currentCard.difficulty}
           </span>
         </div>
@@ -145,13 +145,13 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
         <div className="my-auto">
           {!isFlipped ? (
             <div className="space-y-4 animate-in fade-in zoom-in-95 duration-200">
-              <span className="text-xs font-bold uppercase tracking-wider block text-neutral-700 dark:text-neutral-300">
+              <span className="text-xs font-bold uppercase tracking-wider block text-neutral-800 dark:text-neutral-200">
                 Вопрос собеседования:
               </span>
               <h3 className="text-lg sm:text-xl font-bold leading-snug font-sans text-neutral-950 dark:text-white">
                 {currentCard.title}
               </h3>
-              <p className="text-sm leading-relaxed text-neutral-700 dark:text-neutral-200 font-medium">
+              <p className="text-sm leading-relaxed text-neutral-800 dark:text-neutral-200 font-medium">
                 {currentCard.question}
               </p>
             </div>
@@ -172,7 +172,7 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
 
               <div className="space-y-1">
                 <span className="text-xs font-bold block text-neutral-800 dark:text-neutral-200">Ключевые тезисы:</span>
-                <ul className="text-xs space-y-1 text-neutral-700 dark:text-neutral-300">
+                <ul className="text-xs space-y-1 text-neutral-800 dark:text-neutral-200">
                   {currentCard.keyTakeaways.map((t, idx) => (
                     <li key={idx} className="flex items-start gap-1.5">
                       <span className="text-neutral-400">•</span>
@@ -186,7 +186,7 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
         </div>
 
         {/* Flip hint at bottom */}
-        <div className="pt-4 border-t flex items-center justify-between text-xs border-black/5 dark:border-white/5 text-neutral-700 dark:text-neutral-300">
+        <div className="pt-4 border-t flex items-center justify-between text-xs border-black/5 dark:border-white/5 text-neutral-800 dark:text-neutral-200">
           <span className="flex items-center gap-1.5 font-semibold">
             <Eye className="w-3.5 h-3.5" />
             {isFlipped ? 'Нажмите, чтобы вернуться к вопросу' : 'Нажмите, чтобы увидеть ответ'}

@@ -222,7 +222,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
               {currentDirection.coreTitle}
             </div>
             <div className="h-px flex-1 bg-neutral-200 dark:bg-white/10"></div>
-            <span className="text-xs text-neutral-700 dark:text-neutral-300 font-medium">Базовый фундамент (Обязательно для всех)</span>
+            <span className="text-xs text-neutral-800 dark:text-neutral-200 font-medium">Базовый фундамент (Обязательно для всех)</span>
           </div>
 
           {/* Core Nodes Spine */}
@@ -262,7 +262,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                     {/* Header: Title, Order & Doc Link */}
                     <div className="flex items-start justify-between gap-3 mb-2">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-xs font-bold text-neutral-700 dark:text-neutral-300">
+                        <span className="text-xs font-bold text-neutral-800 dark:text-neutral-200">
                           Узел #{idx + 1}
                         </span>
                         <h4 className="text-sm sm:text-base font-bold text-neutral-900 dark:text-white transition-colors font-sans">
@@ -286,12 +286,12 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                       </div>
                     </div>
 
-                    <p className="text-xs text-neutral-700 dark:text-neutral-200 mb-3.5 leading-relaxed font-normal">{topic.description}</p>
+                    <p className="text-xs text-neutral-800 dark:text-neutral-200 mb-3.5 leading-relaxed font-normal">{topic.description}</p>
 
                     {/* Section Progress Bar */}
                     <div className="rounded-2xl p-2.5 mb-3.5 transition-colors liquid-glass-subtle">
                       <div className="flex items-center justify-between text-[11px] mb-1">
-                        <span className="text-neutral-700 dark:text-neutral-300 font-semibold">
+                        <span className="text-neutral-800 dark:text-neutral-200 font-semibold">
                           Прогресс темы:
                         </span>
                         <span
@@ -316,7 +316,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
 
                     {/* Interactive Subtopics Checklist */}
                     <div className="space-y-2 mb-3.5">
-                      <span className="text-[11px] font-bold uppercase tracking-wider block text-neutral-700 dark:text-neutral-300">
+                      <span className="text-[11px] font-bold uppercase tracking-wider block text-neutral-800 dark:text-neutral-200">
                         Ключевые темы (отметьте галочками):
                       </span>
                       <div className="grid grid-cols-1 gap-1.5">
@@ -360,7 +360,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                         <HelpCircle className="w-3.5 h-3.5" />
                         На что смотрят на собеседовании:
                       </span>
-                      <p className="text-neutral-700 dark:text-neutral-300 leading-relaxed">{topic.interviewTip}</p>
+                      <p className="text-neutral-800 dark:text-neutral-200 leading-relaxed">{topic.interviewTip}</p>
                     </div>
 
                     {/* Section Mark Button */}
@@ -417,7 +417,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                   <GitFork className="w-3.5 h-3.5" />
                   Развилка специализации
                 </span>
-                <span className="text-xs text-neutral-700 dark:text-neutral-300 font-medium">
+                <span className="text-xs text-neutral-800 dark:text-neutral-200 font-medium">
                   Общая база (Узлы 1..{coreTopics.length}) завершена • Выберите целевой стек
                 </span>
               </div>
@@ -426,14 +426,14 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                 <h3 className="text-base sm:text-lg font-bold mb-1 text-neutral-900 dark:text-white font-sans">
                   Переход к углубленной специализации: <span>{currentDirection.subTracks.find((s) => s.id === validSubTrack)?.name}</span>
                 </h3>
-                <p className="text-xs leading-relaxed text-neutral-700 dark:text-neutral-200">
+                <p className="text-xs leading-relaxed text-neutral-800 dark:text-neutral-200">
                   После освоения фундамента направления выберите профильный стек. Все последующие узлы роадмапа и практические темы автоматически адаптируются под выбранную технологию.
                 </p>
               </div>
 
               {/* Interactive Branch Switcher Buttons */}
               <div className="space-y-2 pt-2 border-t border-neutral-200/80 dark:border-white/[0.08]">
-                <span className="text-xs font-bold block text-neutral-700 dark:text-neutral-300">
+                <span className="text-xs font-bold block text-neutral-800 dark:text-neutral-200">
                   Ветки направления «{currentDirection.title}»:
                 </span>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
@@ -471,7 +471,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 text-xs pt-1 text-neutral-700 dark:text-neutral-300 font-medium">
+              <div className="flex items-center gap-2 text-xs pt-1 text-neutral-800 dark:text-neutral-200 font-medium">
                 <ArrowDown className="w-3.5 h-3.5 animate-bounce" />
                 <span>Ниже отображаются профильные темы для «{currentDirection.subTracks.find((s) => s.id === validSubTrack)?.name}» (Узлы #{coreTopics.length + 1}..#{coreTopics.length + subTrackTopics.length})</span>
               </div>
@@ -487,7 +487,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
               Ветка: {currentDirection.subTracks.find((s) => s.id === validSubTrack)?.name}
             </div>
             <div className="h-px flex-1 bg-neutral-200 dark:bg-white/10"></div>
-            <span className="text-xs text-neutral-700 dark:text-neutral-300 font-medium">Профильные требования к стажёрам</span>
+            <span className="text-xs text-neutral-800 dark:text-neutral-200 font-medium">Профильные требования к стажёрам</span>
           </div>
 
           {/* Sub-track Nodes Spine */}
@@ -528,7 +528,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                     {/* Header: Title, Order & Doc Link */}
                     <div className="flex items-start justify-between gap-3 mb-2">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-xs font-bold text-neutral-700 dark:text-neutral-300">
+                        <span className="text-xs font-bold text-neutral-800 dark:text-neutral-200">
                           Узел #{nodeNumber}
                         </span>
                         <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold liquid-glass-pill text-neutral-800 dark:text-neutral-200">
@@ -555,12 +555,12 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                       </div>
                     </div>
 
-                    <p className="text-xs text-neutral-700 dark:text-neutral-200 mb-3.5 leading-relaxed font-normal">{topic.description}</p>
+                    <p className="text-xs text-neutral-800 dark:text-neutral-200 mb-3.5 leading-relaxed font-normal">{topic.description}</p>
 
                     {/* Section Progress Bar */}
                     <div className="rounded-2xl p-2.5 mb-3.5 transition-colors liquid-glass-subtle">
                       <div className="flex items-center justify-between text-[11px] mb-1">
-                        <span className="text-neutral-700 dark:text-neutral-300 font-semibold">
+                        <span className="text-neutral-800 dark:text-neutral-200 font-semibold">
                           Прогресс темы:
                         </span>
                         <span
@@ -585,7 +585,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
 
                     {/* Interactive Subtopics Checklist */}
                     <div className="space-y-2 mb-3.5">
-                      <span className="text-[11px] font-bold uppercase tracking-wider block text-neutral-700 dark:text-neutral-300">
+                      <span className="text-[11px] font-bold uppercase tracking-wider block text-neutral-800 dark:text-neutral-200">
                         Ключевые темы специализации (отметьте галочками):
                       </span>
                       <div className="grid grid-cols-1 gap-1.5">
