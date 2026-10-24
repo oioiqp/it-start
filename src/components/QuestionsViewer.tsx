@@ -112,7 +112,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
               {questions.length} вопросов
             </span>
           </div>
-          <p className="text-xs leading-relaxed text-neutral-600 dark:text-neutral-300">
+          <p className="text-xs leading-relaxed text-neutral-800 dark:text-neutral-200">
             Реальные вопросы с интервью стажёров: пишите ответ, сверяйте с эталоном и тренируйте насмотренность.
           </p>
         </div>
@@ -413,7 +413,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                         <div className="p-4 rounded-2xl liquid-glass-pill space-y-3">
                           <div className="flex items-center justify-between">
                             <span className="text-xs font-bold flex items-center gap-1.5 text-neutral-900">
-                              <PenTool className="w-3.5 h-3.5 text-neutral-600" />
+                              <PenTool className="w-3.5 h-3.5 text-neutral-700" />
                               Самопроверка: попробуйте ответить самостоятельно
                             </span>
                             <button
@@ -421,7 +421,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                               onClick={() => {
                                 setInlineChecked((prev) => ({ ...prev, [q.id]: true }));
                               }}
-                              className="text-[11px] font-semibold flex items-center gap-1 text-neutral-600 hover:text-neutral-950 transition-colors"
+                              className="text-[11px] font-semibold flex items-center gap-1 text-neutral-800 hover:text-neutral-950 transition-colors"
                             >
                               <Eye className="w-3 h-3" />
                               <span>Показать ответ сразу</span>
@@ -458,11 +458,11 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                           {userAnswer.trim() && (
                             <div className="p-3.5 rounded-2xl liquid-glass-pill text-xs shadow-xs">
                               <div className="flex items-center justify-between mb-1">
-                                <strong className="text-[11px] uppercase tracking-wider text-neutral-600 font-bold">Ваш ответ:</strong>
+                                <strong className="text-[11px] uppercase tracking-wider text-neutral-800 font-bold">Ваш ответ:</strong>
                                 <button
                                   type="button"
                                   onClick={() => setInlineChecked((prev) => ({ ...prev, [q.id]: false }))}
-                                  className="text-[10px] font-bold flex items-center gap-1 text-neutral-600 hover:text-black transition-colors"
+                                  className="text-[10px] font-bold flex items-center gap-1 text-neutral-800 hover:text-black transition-colors"
                                 >
                                   <RefreshCw className="w-3 h-3" />
                                   Изменить

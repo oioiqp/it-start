@@ -287,7 +287,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                     {/* Topic Progress Bar */}
                     <div className="rounded-xl p-2.5 my-3 liquid-glass-pill">
                       <div className="flex items-center justify-between text-[11px] mb-1">
-                        <span className="text-neutral-700 dark:text-neutral-300 font-semibold">Прогресс раздела:</span>
+                        <span className="text-neutral-800 dark:text-neutral-200 font-semibold">Прогресс раздела:</span>
                         <span className={`font-semibold ${isDone ? 'text-emerald-600 dark:text-emerald-400' : 'text-neutral-950 dark:text-white'}`}>
                           {percent}% ({checked} из {total} подтем)
                         </span>
@@ -304,7 +304,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
 
                     {topic.subtopics && topic.subtopics.length > 0 && (
                       <div className="pt-2 border-t border-black/5 dark:border-white/5">
-                        <div className="text-[11px] font-bold uppercase tracking-wider mb-2 text-neutral-700 dark:text-neutral-300">
+                        <div className="text-[11px] font-bold uppercase tracking-wider mb-2 text-neutral-800 dark:text-neutral-200">
                           Ключевые подтемы (отметьте изученные):
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
@@ -456,7 +456,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                   className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold transition-all active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-800"
                   title={`Открыть проверенный Telegram-канал ${verifiedChannel}`}
                 >
-                  <Bot className="w-3.5 h-3.5 text-neutral-600" />
+                  <Bot className="w-3.5 h-3.5 text-neutral-700" />
                   <span>Канал {verifiedChannel}</span>
                   <ExternalLink className="w-3 h-3" />
                 </a>

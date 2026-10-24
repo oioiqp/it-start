@@ -94,7 +94,7 @@ export function App() {
     root.classList.remove('dark');
     document.body.classList.add('light');
     document.body.classList.remove('dark');
-    if (metaThemeColor) metaThemeColor.setAttribute('content', '#b8c1ce');
+    if (metaThemeColor) metaThemeColor.setAttribute('content', '#ccd3e0');
     saveLocalTheme('light');
   }, []);
 
@@ -317,7 +317,7 @@ export function App() {
   });
 
   return (
-    <div className="min-h-screen flex flex-col relative light bg-[#b8c1ce] text-neutral-900 liquid-ambient selection:bg-neutral-950 selection:text-white">
+    <div className="min-h-screen flex flex-col relative light bg-[#ccd3e0] text-neutral-900 liquid-ambient selection:bg-neutral-950 selection:text-white">
       {/* Soft atmospheric diffused ambient light for frosted glass */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0 select-none">
         {/* Top subtle sheen */}
@@ -702,7 +702,7 @@ export function App() {
             </div>
             <div>
               <span className="font-bold text-neutral-900 dark:text-neutral-100 font-sans">IT-Старт © 2026</span>
-              <p className="text-[11px] text-neutral-600 dark:text-neutral-400">
+              <p className="text-[11px] text-neutral-700 dark:text-neutral-300">
                 100% реальные IT-стажировки • Роадмапы • Telegram & VK Боты
               </p>
             </div>

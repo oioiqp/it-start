@@ -942,7 +942,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
             <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-neutral-950 dark:text-white">
               Интеграция с Telegram & ВКонтакте, Трекер каналов и Сервер ботов
             </h2>
-            <p className="text-xs sm:text-sm mt-1.5 max-w-3xl leading-relaxed text-neutral-600 dark:text-neutral-400">
+            <p className="text-xs sm:text-sm mt-1.5 max-w-3xl leading-relaxed text-neutral-800 dark:text-neutral-200">
               Автоматический мониторинг вакансий Т1, Контур, Т-Банк, Directum, Яндекс, Ozon, Сбер, Авито, VK и карьерных сайтов. Мгновенная рассылка пуш-уведомлений подписчикам в Telegram и VK.
             </p>
           </div>
@@ -977,7 +977,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
             <Terminal className="w-4 h-4 text-neutral-500" />
             <span>Архитектура 24/7 ботов и фонового парсинга:</span>
           </div>
-          <p className="leading-relaxed text-neutral-600 dark:text-neutral-400">
+          <p className="leading-relaxed text-neutral-800 dark:text-neutral-200">
             Автономные серверные боты на Node.js развернуты в файлах <code className="text-neutral-900 dark:text-neutral-200 bg-neutral-200/60 dark:bg-white/10 px-1.5 py-0.5 rounded font-mono">bot/bot.mjs</code> (Telegram) и <code className="text-neutral-900 dark:text-neutral-200 bg-neutral-200/60 dark:bg-white/10 px-1.5 py-0.5 rounded font-mono">bot/vk_bot.mjs</code> (ВКонтакте) и работают на Render.com. Они непрерывно сканируют каналы и сайты, записывают свежие вакансии в Supabase и рассылают персонализированные пуши. Запуск: <code className="text-neutral-900 dark:text-neutral-200 bg-neutral-200/60 dark:bg-white/10 px-1.5 py-0.5 rounded font-mono">npm run bot:all</code>.
           </p>
         </div>
@@ -996,7 +996,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                 Live мониторинг источников
               </span>
               <span className="text-xs text-neutral-400 dark:text-neutral-500">•</span>
-              <span className="text-xs text-neutral-500 dark:text-neutral-400">
+              <span className="text-xs text-neutral-700 dark:text-neutral-300">
                 {monitoredChannels.length + monitoredWebsites.length} источников ({monitoredChannels.length} каналов + {monitoredWebsites.length} сайтов)
               </span>
             </div>
@@ -1004,7 +1004,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
               <Building2 className="w-5 h-5 text-neutral-700 dark:text-neutral-300" />
               Монитор Telegram-каналов & Карьерных сайтов работодателей
             </h3>
-            <p className="text-xs mt-0.5 text-neutral-500 dark:text-neutral-400">
+            <p className="text-xs mt-0.5 text-neutral-800 dark:text-neutral-200 font-medium">
               Парсинг вакансий Т-Банк, Контур, Directum (Ижевск), Т1, Яндекс, Ozon, Сбер, Авито и карьерных сайтов в режиме реального времени
             </p>
           </div>
@@ -1060,7 +1060,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                 className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
                   isActive
                     ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-sm font-semibold'
-                    : 'liquid-glass-pill hover:bg-white/80 dark:hover:bg-white/15 text-neutral-600 dark:text-neutral-300'
+                    : 'liquid-glass-pill hover:bg-white/80 dark:hover:bg-white/15 text-neutral-800 dark:text-neutral-200'
                 }`}
               >
                 <Icon className="w-3.5 h-3.5" />
@@ -1072,7 +1072,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
 
         {/* Channel / Company Filter Chips */}
         <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 text-xs">
-          <span className="text-neutral-500 dark:text-neutral-400 font-medium shrink-0 mr-1">Компания:</span>
+          <span className="text-neutral-700 dark:text-neutral-300 font-semibold shrink-0 mr-1">Компания:</span>
           {[
             { id: 'all', label: 'Все компании' },
             { id: 'directum', label: 'Directum (Ижевск)' },
@@ -1091,7 +1091,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
               className={`px-3 py-1 rounded-full text-xs transition-all active:scale-95 ${
                 channelFilter === f.id
                   ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 font-semibold shadow-sm'
-                  : 'liquid-glass-pill hover:bg-white/80 dark:hover:bg-white/15 text-neutral-600 dark:text-neutral-300'
+                  : 'liquid-glass-pill hover:bg-white/80 dark:hover:bg-white/15 text-neutral-800 dark:text-neutral-200'
               }`}
             >
               {f.label}
@@ -1241,7 +1241,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                   {parsedPosts.length} вакансий
                 </span>
               </h4>
-              <p className="text-xs mt-0.5 text-neutral-500 dark:text-neutral-400">
+              <p className="text-xs mt-0.5 text-neutral-800 dark:text-neutral-200">
                 Свежие вакансии и стажировки, распознанные в целевых каналах и на сайтах компаний. Добавление в ленту и пуш-рассылка в 1 клик.
               </p>
             </div>
@@ -1293,7 +1293,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                         href={resolveApplyUrl(post.url, post.company)}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[11px] font-mono flex items-center gap-1 text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200"
+                        className="text-[11px] font-mono flex items-center gap-1 text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-200"
                       >
                         <span>{post.channelHandle}</span>
                         <ExternalLink className="w-2.5 h-2.5" />
@@ -1302,7 +1302,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
 
                     <div>
                       <h5 className="text-xs sm:text-sm font-bold line-clamp-1 text-neutral-950 dark:text-white">{post.title}</h5>
-                      <div className="flex items-center gap-2 text-xs mt-1 text-neutral-500 dark:text-neutral-400">
+                      <div className="flex items-center gap-2 text-xs mt-1 text-neutral-700 dark:text-neutral-300 font-medium">
                         <span className="font-semibold text-emerald-600 dark:text-emerald-400">{post.salary}</span>
                         <span>•</span>
                         <span>{post.format}</span>
@@ -1311,13 +1311,13 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                       </div>
                     </div>
 
-                    <p className="text-[11px] line-clamp-2 leading-relaxed text-neutral-600 dark:text-neutral-400">{post.snippet}</p>
+                    <p className="text-[11px] line-clamp-2 leading-relaxed text-neutral-800 dark:text-neutral-200">{post.snippet}</p>
 
                     <div className="flex flex-wrap gap-1">
                       {post.tags.slice(0, 3).map((t, idx) => (
                         <span
                           key={idx}
-                          className="px-2 py-0.5 rounded-full text-[10px] bg-neutral-200/60 dark:bg-white/[0.06] text-neutral-600 dark:text-neutral-400"
+                          className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-neutral-200/70 dark:bg-white/[0.08] text-neutral-800 dark:text-neutral-200"
                         >
                           {t}
                         </span>
@@ -1480,7 +1480,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
           <form onSubmit={handleSaveSubscription} className="space-y-3">
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="block text-[11px] font-medium text-neutral-600 dark:text-neutral-400 mb-1">
+                <label className="block text-[11px] font-medium text-neutral-800 dark:text-neutral-200 mb-1">
                   Telegram Chat ID:
                 </label>
                 <input
@@ -1494,7 +1494,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
               </div>
 
               <div>
-                <label className="block text-[11px] font-medium text-neutral-600 dark:text-neutral-400 mb-1">
+                <label className="block text-[11px] font-medium text-neutral-800 dark:text-neutral-200 mb-1">
                   Username в Telegram:
                 </label>
                 <input
@@ -1508,7 +1508,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-[11px] font-medium text-neutral-600 dark:text-neutral-400">
+              <label className="block text-[11px] font-semibold text-neutral-800 dark:text-neutral-200">
                 Направления для получения уведомлений:
               </label>
               <div className="grid grid-cols-3 gap-1.5">
@@ -1532,7 +1532,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                       className={`px-2.5 py-1.5 rounded-xl text-[11px] font-medium border truncate transition-all ${
                         isChecked
                           ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 border-neutral-900 dark:border-white shadow-sm'
-                          : 'bg-neutral-50 dark:bg-white/[0.03] text-neutral-600 dark:text-neutral-400 border-neutral-200/60 dark:border-white/10 hover:text-neutral-900 dark:hover:text-white'
+                          : 'bg-neutral-50 dark:bg-white/[0.03] text-neutral-800 dark:text-neutral-200 border-neutral-200/60 dark:border-white/10 hover:text-neutral-900 dark:hover:text-white'
                       }`}
                     >
                       {d.title.split('-')[0]}
@@ -1592,7 +1592,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
               <MessageSquare className="w-5 h-5 text-neutral-700 dark:text-neutral-300" />
               ВКонтакте Бот & VK Mini App интеграция
             </h3>
-            <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+            <p className="text-xs sm:text-sm text-neutral-800 dark:text-neutral-200 mt-1">
               Официальный бот для сообщества ВКонтакте на Bots Long Poll API. Единый каталог вакансий, мгновенные ответы и пуш-уведомления подписчикам.
             </p>
           </div>
@@ -1635,14 +1635,14 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                   </span>
                 )}
               </div>
-              <p className="text-neutral-500 dark:text-neutral-400 text-[11px] mt-0.5">
+              <p className="text-neutral-700 dark:text-neutral-300 text-[11px] mt-0.5">
                 {isVkApp
                   ? `Платформа: ${vkLaunchParams.vk_platform || 'mobile_web'} | User ID: ${vkLaunchParams.vk_user_id || 'определен'}`
                   : 'Поддерживается как открытие в обычном браузере, так и прямо внутри мобильного клиента ВКонтакте'}
               </p>
             </div>
           </div>
-          <div className="text-[11px] text-neutral-500 dark:text-neutral-400 flex items-center gap-1.5 font-mono">
+          <div className="text-[11px] text-neutral-700 dark:text-neutral-300 flex items-center gap-1.5 font-mono">
             <span>Сервер:</span>
             <code className="text-neutral-800 dark:text-neutral-200 bg-neutral-200/60 dark:bg-white/10 px-1.5 py-0.5 rounded font-mono">bot/vk_bot.mjs</code>
           </div>
@@ -1657,14 +1657,14 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                 <Key className="w-4 h-4 text-neutral-600 dark:text-neutral-400" />
                 <h4 className="text-sm font-bold text-neutral-950 dark:text-white">Ключ доступа сообщества VK (VK_BOT_TOKEN)</h4>
               </div>
-              <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
+              <p className="text-xs text-neutral-800 dark:text-neutral-200 leading-relaxed font-normal">
                 Ключ создается в: <b>Управление сообществом → Работа с API → Создать ключ доступа</b> (с правами «Сообщения сообщества»). Сохраняется локально в localStorage для безопасности.
               </p>
             </div>
 
             <form onSubmit={handleSaveVkToken} className="space-y-3">
               <div>
-                <label className="block text-[11px] font-medium text-neutral-700 dark:text-neutral-300 mb-1">
+                <label className="block text-[11px] font-medium text-neutral-800 dark:text-neutral-200 mb-1">
                   VK Group Access Token:
                 </label>
                 <input
@@ -1698,7 +1698,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                     saveVkToken('');
                     addLog('info', 'VK Bot Token удален из хранилища');
                   }}
-                  className="px-3.5 py-2 rounded-full liquid-glass-pill hover:bg-white/80 dark:hover:bg-white/10 text-neutral-700 dark:text-neutral-300 text-xs font-medium transition-colors"
+                  className="px-3.5 py-2 rounded-full liquid-glass-pill hover:bg-white/80 dark:hover:bg-white/10 text-neutral-800 dark:text-neutral-200 text-xs font-medium transition-colors"
                 >
                   Очистить
                 </button>
@@ -1713,14 +1713,14 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                 <Bell className="w-4 h-4 text-neutral-600 dark:text-neutral-400" />
                 <h4 className="text-sm font-bold text-neutral-950 dark:text-white">Тестовое уведомление подписчику в VK</h4>
               </div>
-              <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
+              <p className="text-xs text-neutral-800 dark:text-neutral-200 leading-relaxed font-normal">
                 Укажите ваш Peer ID (числовой ID пользователя или беседы в VK). Бот пришлет тестовый пуш с подтверждением синхронизации.
               </p>
             </div>
 
             <div className="space-y-3">
               <div>
-                <label className="block text-[11px] font-medium text-neutral-700 dark:text-neutral-300 mb-1">
+                <label className="block text-[11px] font-medium text-neutral-800 dark:text-neutral-200 mb-1">
                   VK Peer ID (User ID):
                 </label>
                 <div className="flex items-center gap-2">
@@ -1835,7 +1835,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                 Симулятор парсера вакансий & Пуш-рассылка
                 <Flame className="w-4 h-4 text-amber-500" />
               </h3>
-              <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 mt-0.5">
+              <p className="text-xs sm:text-sm text-neutral-800 dark:text-neutral-200 mt-0.5">
                 Добавление вакансии в Supabase + мгновенная отправка пуша в Telegram подходящим подписчикам
               </p>
             </div>
@@ -1845,7 +1845,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
         {/* Presets selector */}
         <div className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-2">
+            <label className="block text-xs font-semibold text-neutral-800 dark:text-neutral-200 mb-2">
               Выберите готовый пресет из реального Telegram-канала:
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2.5">
@@ -1857,14 +1857,14 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                   className={`p-3 rounded-2xl border text-left text-xs transition-all active:scale-95 ${
                     presetIndex === idx
                       ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 border-neutral-900 dark:border-white shadow-sm font-semibold'
-                      : 'liquid-glass-subtle hover:bg-white/80 dark:hover:bg-white/15 text-neutral-700 dark:text-neutral-300'
+                      : 'liquid-glass-subtle hover:bg-white/80 dark:hover:bg-white/15 text-neutral-800 dark:text-neutral-200'
                   }`}
                 >
                   <div className="flex items-center justify-between mb-1">
                     <span className="font-bold truncate">{p.company}</span>
-                    <span className={`text-[10px] font-mono truncate ${presetIndex === idx ? 'text-neutral-300 dark:text-neutral-700' : 'text-neutral-400 dark:text-neutral-500'}`}>{p.sourceChannel}</span>
+                    <span className={`text-[10px] font-mono truncate ${presetIndex === idx ? 'text-neutral-300 dark:text-neutral-700' : 'text-neutral-600 dark:text-neutral-400'}`}>{p.sourceChannel}</span>
                   </div>
-                  <span className={`text-[11px] truncate block ${presetIndex === idx ? 'text-neutral-200 dark:text-neutral-800' : 'text-neutral-500 dark:text-neutral-400'}`}>{p.title}</span>
+                  <span className={`text-[11px] truncate block ${presetIndex === idx ? 'text-neutral-200 dark:text-neutral-800' : 'text-neutral-700 dark:text-neutral-300 font-medium'}`}>{p.title}</span>
                 </button>
               ))}
             </div>
@@ -1873,7 +1873,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
           {/* Form fields */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
             <div>
-              <label className="block text-[11px] font-medium text-neutral-600 dark:text-neutral-400 mb-1">Компания:</label>
+              <label className="block text-[11px] font-medium text-neutral-800 dark:text-neutral-200 mb-1">Компания:</label>
               <input
                 type="text"
                 value={customCompany}
@@ -1883,7 +1883,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
             </div>
 
             <div>
-              <label className="block text-[11px] font-medium text-neutral-600 dark:text-neutral-400 mb-1">Должность:</label>
+              <label className="block text-[11px] font-medium text-neutral-800 dark:text-neutral-200 mb-1">Должность:</label>
               <input
                 type="text"
                 value={customTitle}
@@ -1893,7 +1893,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
             </div>
 
             <div>
-              <label className="block text-[11px] font-medium text-neutral-600 dark:text-neutral-400 mb-1">Зарплата / Оплата:</label>
+              <label className="block text-[11px] font-medium text-neutral-800 dark:text-neutral-200 mb-1">Зарплата / Оплата:</label>
               <input
                 type="text"
                 value={customSalary}
@@ -1903,7 +1903,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
             </div>
 
             <div>
-              <label className="block text-[11px] font-medium text-neutral-600 dark:text-neutral-400 mb-1">Telegram-канал источник:</label>
+              <label className="block text-[11px] font-medium text-neutral-800 dark:text-neutral-200 mb-1">Telegram-канал источник:</label>
               <input
                 type="text"
                 value={customChannel}

@@ -195,7 +195,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
         {/* Track Progress Indicator */}
         <div className="rounded-2xl p-3.5 shrink-0 min-w-[220px] transition-colors liquid-glass-subtle">
           <div className="flex items-center justify-between text-xs mb-1.5">
-            <span className="text-neutral-700 dark:text-neutral-300 font-semibold flex items-center gap-1.5">
+            <span className="text-neutral-800 dark:text-neutral-200 font-semibold flex items-center gap-1.5">
               <Trophy className="w-4 h-4 text-amber-500" />
               Прогресс роадмапа:
             </span>
@@ -242,7 +242,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                         ? 'bg-neutral-900 border-neutral-900 text-white dark:bg-white dark:border-white dark:text-neutral-950 shadow-xs'
                         : percent > 0
                         ? 'bg-white border-neutral-900 text-neutral-900 dark:bg-white/20 dark:border-white/60 dark:text-white shadow-xs'
-                        : 'bg-white border-neutral-300 text-neutral-700 dark:bg-black dark:border-white/20 dark:text-neutral-300'
+                        : 'bg-white border-neutral-300 text-neutral-800 dark:bg-black dark:border-white/20 dark:text-neutral-200'
                     }`}
                   >
                     {idx + 1}
@@ -508,7 +508,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                         ? 'bg-neutral-900 border-neutral-900 text-white dark:bg-white dark:border-white dark:text-neutral-950 shadow-xs'
                         : percent > 0
                         ? 'bg-white border-neutral-900 text-neutral-900 dark:bg-white/20 dark:border-white/60 dark:text-white shadow-xs'
-                        : 'bg-white border-neutral-300 text-neutral-700 dark:bg-black dark:border-white/20 dark:text-neutral-300'
+                        : 'bg-white border-neutral-300 text-neutral-800 dark:bg-black dark:border-white/20 dark:text-neutral-200'
                     }`}
                   >
                     {nodeNumber}

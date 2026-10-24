@@ -50,8 +50,8 @@
   position: relative;
   backdrop-filter: blur(36px) saturate(140%);
   -webkit-backdrop-filter: blur(36px) saturate(140%);
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.86) 0%, rgba(246, 249, 253, 0.76) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.70);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.88) 0%, rgba(246, 249, 253, 0.80) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.75);
   box-shadow: 
     0 12px 32px -8px rgba(15, 23, 42, 0.08),
     0 2px 8px -2px rgba(15, 23, 42, 0.04),
@@ -76,8 +76,8 @@
 .liquid-glass-subtle {
   backdrop-filter: blur(28px) saturate(130%);
   -webkit-backdrop-filter: blur(28px) saturate(130%);
-  background: rgba(255, 255, 255, 0.65);
-  border: 1px solid rgba(255, 255, 255, 0.60);
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.65);
   box-shadow: 0 2px 8px -2px rgba(15, 23, 42, 0.03);
 }
 
@@ -85,9 +85,9 @@
 .liquid-glass-pill {
   backdrop-filter: blur(24px) saturate(130%);
   -webkit-backdrop-filter: blur(24px) saturate(130%);
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(255, 255, 255, 0.65);
-  box-shadow: 0 1px 4px -1px rgba(15, 23, 42, 0.04), inset 0 1px 1px 0 rgba(255, 255, 255, 0.90);
+  background: rgba(255, 255, 255, 0.80);
+  border: 1px solid rgba(255, 255, 255, 0.70);
+  box-shadow: 0 1px 4px -1px rgba(15, 23, 42, 0.04), inset 0 1px 1px 0 rgba(255, 255, 255, 0.95);
 }
 
 /* Floating Navigation Glass Bar - Dense Milky Frosted Surface (Opaque to prevent scrolling content clashes) */
@@ -95,8 +95,8 @@
   position: relative;
   backdrop-filter: blur(28px) saturate(180%);
   -webkit-backdrop-filter: blur(28px) saturate(180%);
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.92) 0%, rgba(242, 246, 252, 0.88) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.80);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.94) 0%, rgba(242, 246, 252, 0.90) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.85);
   box-shadow: 
     0 12px 32px -6px rgba(15, 23, 42, 0.10),
     0 4px 12px -2px rgba(15, 23, 42, 0.04),
@@ -107,7 +107,7 @@
 .liquid-glass-modal {
   backdrop-filter: blur(36px) saturate(140%);
   -webkit-backdrop-filter: blur(36px) saturate(140%);
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.96) 0%, rgba(246, 249, 253, 0.92) 100%);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.97) 0%, rgba(246, 249, 253, 0.94) 100%);
   border: 1px solid rgba(255, 255, 255, 0.85);
   box-shadow: 
     0 24px 60px -12px rgba(15, 23, 42, 0.20),
@@ -120,8 +120,8 @@
   position: relative;
   backdrop-filter: blur(30px) saturate(130%);
   -webkit-backdrop-filter: blur(30px) saturate(130%);
-  background: rgba(255, 255, 255, 0.80);
-  border: 1px solid rgba(255, 255, 255, 0.70);
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.75);
   box-shadow: 
     0 4px 14px -3px rgba(15, 23, 42, 0.06),
     inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.95);
@@ -147,13 +147,13 @@
 }
 
 .dark .liquid-glass-nav {
-  background: rgba(18, 22, 31, 0.90);
+  background: rgba(18, 22, 31, 0.92);
   border: 1px solid rgba(255, 255, 255, 0.14);
   box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.60);
 }
 
 .dark .liquid-glass-modal {
-  background: rgba(18, 22, 31, 0.95);
+  background: rgba(18, 22, 31, 0.96);
   border: 1px solid rgba(255, 255, 255, 0.16);
   box-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.65);
 }

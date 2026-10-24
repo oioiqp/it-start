@@ -75,7 +75,7 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
                     HOT
                   </span>
                 )}
-                <span className="text-[10px] px-2.5 py-0.5 rounded-full font-semibold liquid-glass-pill text-neutral-700 dark:text-neutral-200">
+                <span className="text-[10px] px-2.5 py-0.5 rounded-full font-semibold liquid-glass-pill text-neutral-800 dark:text-neutral-200">
                   Верифицировано
                 </span>
               </div>
@@ -98,7 +98,7 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
             <span className="px-3 py-1 rounded-full text-xs sm:text-sm font-bold block liquid-glass-pill text-neutral-950 dark:text-white tracking-tight">
               {internship.salary}
             </span>
-            <span className="text-[10px] font-semibold text-neutral-700 dark:text-neutral-300 block mt-0.5 pr-1">
+            <span className="text-[10px] font-semibold text-neutral-800 dark:text-neutral-200 block mt-0.5 pr-1">
               оплата
             </span>
           </div>
@@ -125,7 +125,7 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
             </span>
           ))}
           {internship.tags.length > 4 && (
-            <span className="px-2 py-1 rounded-full text-[10px] font-semibold liquid-glass-pill text-neutral-700 dark:text-neutral-200">
+            <span className="px-2 py-1 rounded-full text-[10px] font-semibold liquid-glass-pill text-neutral-800 dark:text-neutral-200">
               +{internship.tags.length - 4}
             </span>
           )}
@@ -165,16 +165,16 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
                     href={`https://t.me/${cleanChannel}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-1 text-[11px] font-semibold truncate text-neutral-700 hover:text-neutral-950 dark:text-neutral-300 dark:hover:text-white transition-colors"
+                    className="flex items-center gap-1 text-[11px] font-semibold truncate text-neutral-800 hover:text-black dark:text-neutral-200 dark:hover:text-white transition-colors"
                     title={`Открыть проверенный Telegram-канал ${verifiedChannel}`}
                   >
-                    <Bot className="w-3.5 h-3.5 shrink-0 text-neutral-500 dark:text-neutral-400" />
+                    <Bot className="w-3.5 h-3.5 shrink-0 text-neutral-600 dark:text-neutral-400" />
                     <span className="truncate underline decoration-neutral-300 dark:decoration-neutral-700">
                       {verifiedChannel}
                     </span>
                   </a>
                 ) : (
-                  <div className="flex items-center gap-1 text-[11px] text-neutral-700 dark:text-neutral-300 font-medium truncate">
+                  <div className="flex items-center gap-1 text-[11px] text-neutral-800 dark:text-neutral-200 font-medium truncate">
                     <Bot className="w-3.5 h-3.5 shrink-0 opacity-70" />
                     <span className="truncate">{verifiedChannel}</span>
                   </div>

@@ -43,7 +43,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   return (
     <header className="sticky top-0 z-50 flex items-center justify-center px-3 sm:px-4 w-full pt-2.5 sm:pt-3.5 pb-2.5 sm:pb-3 pointer-events-none">
       {/* Top ambient gradient strip that smoothly dissolves scrolling content as it approaches top margin */}
-      <div className="absolute inset-x-0 top-0 h-full bg-gradient-to-b from-[#ccd3e0]/95 via-[#ccd3e0]/60 to-transparent pointer-events-none -z-10" />
+      <div className="absolute inset-x-0 top-0 h-full bg-gradient-to-b from-[#ccd3e0]/95 via-[#ccd3e0]/60 to-transparent dark:from-[#12161f]/95 dark:via-[#12161f]/60 pointer-events-none -z-10" />
 
       <div
         className="pointer-events-auto flex items-center justify-between gap-1 sm:gap-2 p-1.5 sm:p-2 rounded-full transition-shadow duration-200 max-w-5xl w-full sm:w-auto liquid-glass-nav"
