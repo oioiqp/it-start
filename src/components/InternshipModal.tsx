@@ -139,7 +139,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/40 backdrop-blur-xl overflow-y-auto">
-      <div className="relative w-full max-w-3xl rounded-[28px] sm:rounded-[32px] p-6 sm:p-8 my-8 max-h-[90vh] flex flex-col liquid-glass liquid-glass-modal text-neutral-900 overflow-hidden shadow-2xl">
+      <div className="relative w-full max-w-3xl rounded-[28px] sm:rounded-[32px] p-6 sm:p-8 my-8 max-h-[90vh] flex flex-col liquid-glass text-neutral-900 overflow-hidden shadow-2xl">
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -161,26 +161,26 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                 <span className="font-bold text-sm text-neutral-950 dark:text-white font-sans tracking-tight">
                   {internship.company}
                 </span>
-                <span className="text-xs text-neutral-700 dark:text-neutral-300 flex items-center gap-1 font-semibold">
-                  <MapPin className="w-3.5 h-3.5 opacity-80" />
+                <span className="text-xs text-neutral-500 dark:text-neutral-400 flex items-center gap-1 font-medium">
+                  <MapPin className="w-3.5 h-3.5 opacity-70" />
                   {internship.location}
                 </span>
-                <span className="text-xs text-neutral-700 dark:text-neutral-300 flex items-center gap-1 font-semibold">
-                  <Clock className="w-3.5 h-3.5 opacity-80" />
+                <span className="text-xs text-neutral-500 dark:text-neutral-400 flex items-center gap-1 font-medium">
+                  <Clock className="w-3.5 h-3.5 opacity-70" />
                   {internship.format}
                 </span>
               </div>
-              <h2 className="text-lg sm:text-2xl font-bold tracking-tight text-neutral-950 dark:text-white font-sans">
+              <h2 className="text-lg sm:text-2xl font-bold tracking-tight text-neutral-900 dark:text-white font-sans">
                 План подготовки: {internship.title}
               </h2>
             </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-2 mt-2">
-            <span className="text-xs font-bold px-2.5 py-1 rounded-full liquid-glass-pill text-neutral-950 dark:text-neutral-100">
+            <span className="text-xs font-semibold px-2.5 py-1 rounded-full liquid-glass-pill text-neutral-800 dark:text-neutral-200">
               {internship.salary}
             </span>
-            <span className="text-xs font-semibold px-2.5 py-1 rounded-full liquid-glass-pill text-neutral-800 dark:text-neutral-200">
+            <span className="text-xs px-2.5 py-1 rounded-full liquid-glass-pill text-neutral-600 dark:text-neutral-400">
               Источник: {internship.sourceChannel}
             </span>
           </div>
@@ -193,7 +193,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
             <div className="flex items-center justify-between gap-3 mb-2 flex-wrap">
               <div className="flex items-center gap-2">
                 <Trophy className="w-5 h-5 text-amber-500" />
-                <span className="text-sm font-bold text-neutral-950 dark:text-white font-sans">
+                <span className="text-sm font-semibold text-neutral-900 dark:text-white font-sans">
                   Ваша готовность к этой стажировке:
                 </span>
               </div>
@@ -203,10 +203,10 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
             </div>
 
             <div className="flex items-baseline justify-between mb-1.5">
-              <span className="text-xs font-semibold text-neutral-800 dark:text-neutral-200">
+              <span className="text-xs text-neutral-600 dark:text-neutral-400">
                 Изучено {totalCompleted} из {totalItems} тем и профильных вопросов
               </span>
-              <span className="text-2xl font-bold text-neutral-950 dark:text-white">{readinessPercent}%</span>
+              <span className="text-2xl font-bold text-neutral-900 dark:text-white">{readinessPercent}%</span>
             </div>
 
             <div className="w-full h-2 rounded-full overflow-hidden bg-black/5 dark:bg-white/10">
@@ -216,7 +216,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
               />
             </div>
 
-            <p className="text-xs mt-2 text-neutral-800 dark:text-neutral-200 font-medium">
+            <p className="text-xs mt-2 text-neutral-500 dark:text-neutral-400">
               💡 Отмечайте изученные разделы и вопросы прямо в этом окне — ваш прогресс сохраняется синхронно в базе данных!
             </p>
           </div>
@@ -258,16 +258,16 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                         </button>
                         <div>
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-sm font-bold text-neutral-950 dark:text-white font-sans">{topic.title}</span>
-                            <span className="text-[10px] uppercase font-semibold px-2 py-0.5 rounded-full liquid-glass-pill text-neutral-800 dark:text-neutral-200">
+                            <span className="text-sm font-semibold text-neutral-900 dark:text-white font-sans">{topic.title}</span>
+                            <span className="text-[10px] uppercase font-semibold px-2 py-0.5 rounded-full liquid-glass-pill text-neutral-700 dark:text-neutral-200">
                               {topic.category === 'core' ? 'База' : 'Стек'}
                             </span>
-                            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full liquid-glass-pill text-neutral-800 dark:text-neutral-200">
+                            <span className="text-[10px] px-2 py-0.5 rounded-full liquid-glass-pill text-neutral-700 dark:text-neutral-200">
                               {topic.difficulty}
                             </span>
                           </div>
-                          <p className="text-xs text-neutral-800 dark:text-neutral-200 mt-1 font-normal leading-relaxed">{topic.description}</p>
-                          <div className="mt-2 text-[11px] p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-900 dark:text-amber-300">
+                          <p className="text-xs text-neutral-600 dark:text-neutral-300 mt-1">{topic.description}</p>
+                          <div className="mt-2 text-[11px] p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-800 dark:text-amber-300">
                             <strong>Совет для интервью:</strong> {topic.interviewTip}
                           </div>
                         </div>
@@ -277,7 +277,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                         href={topic.externalDocUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="p-1.5 rounded-full transition-colors shrink-0 liquid-glass-pill hover:bg-white/80 dark:hover:bg-white/15 text-neutral-800 dark:text-neutral-200"
+                        className="p-1.5 rounded-full transition-colors shrink-0 liquid-glass-pill hover:bg-white/80 dark:hover:bg-white/15 text-neutral-700 dark:text-neutral-200"
                         title="Открыть документацию"
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
@@ -287,8 +287,8 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                     {/* Topic Progress Bar */}
                     <div className="rounded-xl p-2.5 my-3 liquid-glass-pill">
                       <div className="flex items-center justify-between text-[11px] mb-1">
-                        <span className="text-neutral-800 dark:text-neutral-200 font-semibold">Прогресс раздела:</span>
-                        <span className={`font-semibold ${isDone ? 'text-emerald-600 dark:text-emerald-400' : 'text-neutral-950 dark:text-white'}`}>
+                        <span className="text-neutral-600 dark:text-neutral-400">Прогресс раздела:</span>
+                        <span className={`font-semibold ${isDone ? 'text-emerald-600 dark:text-emerald-400' : 'text-neutral-900 dark:text-white'}`}>
                           {percent}% ({checked} из {total} подтем)
                         </span>
                       </div>
@@ -304,7 +304,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
 
                     {topic.subtopics && topic.subtopics.length > 0 && (
                       <div className="pt-2 border-t border-black/5 dark:border-white/5">
-                        <div className="text-[11px] font-bold uppercase tracking-wider mb-2 text-neutral-800 dark:text-neutral-200">
+                        <div className="text-[11px] font-medium uppercase tracking-wider mb-2 text-neutral-500 dark:text-neutral-400">
                           Ключевые подтемы (отметьте изученные):
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
@@ -318,7 +318,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                                 className={`flex items-start gap-2 p-2 rounded-xl text-left text-xs transition-colors select-none ${
                                   isSubDone
                                     ? 'bg-emerald-500/15 text-emerald-800 border border-emerald-500/25 dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-500/35'
-                                    : 'liquid-glass-pill text-neutral-800 hover:bg-white/90 dark:text-neutral-200 dark:hover:bg-white/15'
+                                    : 'liquid-glass-pill text-neutral-700 hover:bg-white/80 dark:text-neutral-300 dark:hover:bg-white/15'
                                 }`}
                               >
                                 {isSubDone ? (
@@ -380,20 +380,20 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
 
                         <div className="cursor-pointer flex-1" onClick={() => setExpandedQuestionId(isExpanded ? null : q.id)}>
                           <div className="flex items-center gap-2 flex-wrap mb-1 text-[11px]">
-                            <span className="font-semibold px-2 py-0.5 rounded-full bg-neutral-100 text-neutral-800 dark:bg-white/[0.08] dark:text-neutral-200">
+                            <span className="font-semibold px-2 py-0.5 rounded-full bg-neutral-100 text-neutral-700 dark:bg-white/[0.06] dark:text-neutral-300">
                               {q.category}
                             </span>
-                            <span className="text-neutral-700 dark:text-neutral-300 font-medium">{q.difficulty}</span>
+                            <span className="text-neutral-500 dark:text-neutral-400">{q.difficulty}</span>
                           </div>
-                          <h4 className="text-sm font-bold text-neutral-950 dark:text-white font-sans">{q.title}</h4>
-                          <p className="text-xs text-neutral-800 dark:text-neutral-200 mt-1 font-normal leading-relaxed">{q.question}</p>
+                          <h4 className="text-sm font-semibold text-neutral-900 dark:text-white font-sans">{q.title}</h4>
+                          <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">{q.question}</p>
                         </div>
                       </div>
 
                       <button
                         type="button"
                         onClick={() => setExpandedQuestionId(isExpanded ? null : q.id)}
-                        className="p-2 rounded-full transition-all duration-150 active:scale-95 liquid-glass-pill hover:bg-white/70 text-neutral-800 cursor-pointer"
+                        className="p-2 rounded-full transition-all duration-150 active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-700 cursor-pointer"
                       >
                         {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                       </button>
@@ -401,8 +401,8 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
 
                     {isExpanded && (
                       <div className="px-4 pb-4 pt-2 border-t space-y-3 border-black/5 dark:border-white/5 liquid-glass-subtle rounded-b-2xl">
-                        <div className="text-xs leading-relaxed p-3.5 rounded-xl liquid-glass-pill text-neutral-950 dark:text-neutral-100">
-                          <span className="font-bold text-emerald-800 dark:text-emerald-300 block mb-1">Эталонный ответ:</span>
+                        <div className="text-xs leading-relaxed p-3.5 rounded-xl liquid-glass-pill text-neutral-900">
+                          <span className="font-bold text-emerald-700 block mb-1">Эталонный ответ:</span>
                           {q.answer}
                         </div>
 
@@ -418,8 +418,8 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                         )}
 
                         <div className="space-y-1">
-                          <span className="text-[11px] font-bold text-neutral-800 dark:text-neutral-200 block">Главные тезисы:</span>
-                          <ul className="list-disc list-inside text-xs space-y-1 text-neutral-800 dark:text-neutral-200">
+                          <span className="text-[11px] font-bold text-neutral-700 block">Главные тезисы:</span>
+                          <ul className="list-disc list-inside text-xs space-y-1 text-neutral-700">
                             {q.keyTakeaways.map((point, idx) => (
                               <li key={idx}>{point}</li>
                             ))}
@@ -456,7 +456,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                   className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold transition-all active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-800"
                   title={`Открыть проверенный Telegram-канал ${verifiedChannel}`}
                 >
-                  <Bot className="w-3.5 h-3.5 text-neutral-700" />
+                  <Bot className="w-3.5 h-3.5 text-neutral-600" />
                   <span>Канал {verifiedChannel}</span>
                   <ExternalLink className="w-3 h-3" />
                 </a>

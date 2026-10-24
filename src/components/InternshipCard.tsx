@@ -75,18 +75,18 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
                     HOT
                   </span>
                 )}
-                <span className="text-[10px] px-2.5 py-0.5 rounded-full font-semibold liquid-glass-pill text-neutral-800 dark:text-neutral-200">
+                <span className="text-[10px] px-2.5 py-0.5 rounded-full font-medium liquid-glass-pill text-neutral-600 dark:text-neutral-300">
                   Верифицировано
                 </span>
               </div>
-              <div className="flex items-center gap-2 text-xs text-neutral-800 dark:text-neutral-200 mt-1 flex-wrap font-medium">
+              <div className="flex items-center gap-2 text-xs text-neutral-600 dark:text-neutral-400 mt-1 flex-wrap font-medium">
                 <span className="flex items-center gap-1">
-                  <MapPin className="w-3 h-3 opacity-80" />
+                  <MapPin className="w-3 h-3 opacity-70" />
                   {internship.location}
                 </span>
                 <span>•</span>
                 <span className="flex items-center gap-1">
-                  <Clock className="w-3 h-3 opacity-80" />
+                  <Clock className="w-3 h-3 opacity-70" />
                   {internship.format}
                 </span>
               </div>
@@ -95,10 +95,10 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
 
           {/* Salary Glass Pill */}
           <div className="text-right shrink-0">
-            <span className="px-3 py-1 rounded-full text-xs sm:text-sm font-bold block liquid-glass-pill text-neutral-950 dark:text-white tracking-tight">
+            <span className="px-3 py-1 rounded-full text-xs sm:text-sm font-bold block liquid-glass-pill text-neutral-900 dark:text-white tracking-tight">
               {internship.salary}
             </span>
-            <span className="text-[10px] font-semibold text-neutral-800 dark:text-neutral-200 block mt-0.5 pr-1">
+            <span className="text-[10px] font-medium text-neutral-500 dark:text-neutral-400 block mt-0.5 pr-1">
               оплата
             </span>
           </div>
@@ -110,7 +110,7 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
         </h3>
 
         {/* Description snippet */}
-        <p className="text-xs line-clamp-2 mb-3.5 leading-relaxed text-neutral-800 dark:text-neutral-200 font-normal">
+        <p className="text-xs line-clamp-2 mb-3.5 leading-relaxed text-neutral-600 dark:text-neutral-300 font-normal">
           {internship.description}
         </p>
 
@@ -119,13 +119,13 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
           {internship.tags.slice(0, 4).map((tag, idx) => (
             <span
               key={idx}
-              className="px-2.5 py-1 rounded-full text-[11px] font-semibold transition-colors liquid-glass-pill text-neutral-800 dark:text-neutral-200 hover:bg-white/70 cursor-default"
+              className="px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors liquid-glass-pill text-neutral-700 dark:text-neutral-300 hover:bg-white/50 cursor-default"
             >
               {tag}
             </span>
           ))}
           {internship.tags.length > 4 && (
-            <span className="px-2 py-1 rounded-full text-[10px] font-semibold liquid-glass-pill text-neutral-800 dark:text-neutral-200">
+            <span className="px-2 py-1 rounded-full text-[10px] font-medium liquid-glass-pill text-neutral-500 dark:text-neutral-400">
               +{internship.tags.length - 4}
             </span>
           )}
@@ -137,7 +137,7 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
         {/* Readiness Bar */}
         <div className="rounded-2xl p-3 liquid-glass-subtle">
           <div className="flex items-center justify-between text-[11px] mb-1.5">
-            <span className="flex items-center gap-1.5 text-neutral-800 dark:text-neutral-200 font-medium">
+            <span className="flex items-center gap-1.5 text-neutral-600 dark:text-neutral-400 font-medium">
               <Sparkles className="w-3 h-3 text-neutral-400 dark:text-neutral-500" />
               Готовность к стеку:
             </span>
@@ -165,16 +165,16 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
                     href={`https://t.me/${cleanChannel}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-1 text-[11px] font-semibold truncate text-neutral-800 hover:text-black dark:text-neutral-200 dark:hover:text-white transition-colors"
+                    className="flex items-center gap-1 text-[11px] font-semibold truncate text-neutral-600 hover:text-black dark:text-neutral-400 dark:hover:text-white transition-colors"
                     title={`Открыть проверенный Telegram-канал ${verifiedChannel}`}
                   >
-                    <Bot className="w-3.5 h-3.5 shrink-0 text-neutral-600 dark:text-neutral-400" />
+                    <Bot className="w-3.5 h-3.5 shrink-0 text-neutral-500 dark:text-neutral-400" />
                     <span className="truncate underline decoration-neutral-300 dark:decoration-neutral-700">
                       {verifiedChannel}
                     </span>
                   </a>
                 ) : (
-                  <div className="flex items-center gap-1 text-[11px] text-neutral-800 dark:text-neutral-200 font-medium truncate">
+                  <div className="flex items-center gap-1 text-[11px] text-neutral-600 dark:text-neutral-400 font-medium truncate">
                     <Bot className="w-3.5 h-3.5 shrink-0 opacity-70" />
                     <span className="truncate">{verifiedChannel}</span>
                   </div>

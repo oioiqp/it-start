@@ -217,11 +217,11 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/40 backdrop-blur-xl overflow-y-auto">
-      <div className="relative w-full max-w-xl rounded-[28px] sm:rounded-[32px] shadow-2xl p-6 sm:p-7 my-8 animate-in fade-in zoom-in-95 duration-200 transition-all liquid-glass liquid-glass-modal text-neutral-900">
+      <div className="relative w-full max-w-xl rounded-[28px] sm:rounded-[32px] shadow-2xl p-6 sm:p-7 my-8 animate-in fade-in zoom-in-95 duration-200 transition-all liquid-glass text-neutral-900">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 p-2 rounded-full transition-all duration-150 z-10 active:scale-95 liquid-glass-pill hover:bg-white/70 text-neutral-800 hover:text-black cursor-pointer"
+          className="absolute top-5 right-5 p-2 rounded-full transition-all duration-150 z-10 active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-600 hover:text-neutral-950 cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>
@@ -235,7 +235,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
             <h2 className="text-lg font-bold font-sans text-neutral-950">
               Уведомления в Telegram
             </h2>
-            <p className="text-xs text-neutral-800 font-medium">
+            <p className="text-xs text-neutral-600">
               Мгновенные пуши о новых стажировках от бота @{TELEGRAM_BOT_USERNAME}
             </p>
           </div>
@@ -293,7 +293,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
           {/* Chat ID & User Info */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium mb-1 text-neutral-800 dark:text-neutral-200">
+              <label className="block text-xs font-medium mb-1 text-neutral-700 dark:text-neutral-300">
                 Ваш Telegram Chat ID <span className="text-red-500">*</span>
               </label>
               <input
@@ -309,7 +309,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-medium mb-1 text-neutral-800 dark:text-neutral-200">
+              <label className="block text-xs font-medium mb-1 text-neutral-700 dark:text-neutral-300">
                 Username в Telegram
               </label>
               <input
@@ -340,7 +340,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
                     className={`flex items-center justify-between p-2.5 rounded-xl text-left text-xs font-semibold transition-all duration-150 active:scale-95 cursor-pointer ${
                       isSelected
                         ? 'bg-neutral-900 text-white shadow-xs'
-                        : 'liquid-glass-pill text-neutral-800 hover:bg-white/50'
+                        : 'liquid-glass-pill text-neutral-700 hover:bg-white/50'
                     }`}
                   >
                     <span className="truncate">{dir.title.split('-')[0]}</span>
@@ -388,7 +388,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
               <button
                 type="button"
                 onClick={() => setShowTokenInput((v) => !v)}
-                className="text-[11px] font-semibold text-neutral-800 hover:text-black underline cursor-pointer"
+                className="text-[11px] font-semibold text-neutral-600 hover:text-black underline cursor-pointer"
               >
                 {showTokenInput ? 'Скрыть поле' : 'Настроить токен'}
               </button>
@@ -405,7 +405,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
                   placeholder="Токен от @BotFather (сохраняется в браузере)"
                   className="w-full px-3 py-2 rounded-xl text-xs transition-all focus:outline-none liquid-glass-pill focus:bg-white/50 text-neutral-900 placeholder:text-neutral-500"
                 />
-                <p className="text-[10px] text-neutral-800">
+                <p className="text-[10px] text-neutral-600">
                   Токен хранится только в вашем браузере и используется для реальных вызовов Bot API.
                 </p>
               </div>
@@ -440,7 +440,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
               disabled={isLoading || !chatId}
               className="w-full sm:w-1/2 flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-all active:scale-95 disabled:opacity-50 liquid-glass-pill hover:bg-white/50 text-neutral-800 cursor-pointer"
             >
-              <Send className="w-3.5 h-3.5 text-neutral-700" />
+              <Send className="w-3.5 h-3.5 text-neutral-600" />
               <span>Проверить уведомление</span>
             </button>
 
@@ -455,7 +455,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
           </div>
 
           {!botToken && (
-            <p className="text-[11px] text-center text-neutral-800 font-medium">
+            <p className="text-[11px] text-center text-neutral-600 font-medium">
               * Для реальной отправки сообщений укажите Bot Token во вкладке «Telegram & Парсер»
             </p>
           )}
