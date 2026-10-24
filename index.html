@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ru" class="light">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/it-start/favicon.svg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/it-start/apple-touch-icon.png" />
+    <link rel="manifest" href="/it-start/manifest.webmanifest" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#ccd3e0" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="IT-Старт" />
+    <meta name="description" content="IT-Старт: агрегатор стажировок и Junior-вакансий с интерактивными роадмапами, базой вопросов и уведомлениями в Telegram и ВКонтакте" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <title>IT-Старт | Стажировки, Роадмапы, Telegram & VK Боты</title>
+    <!-- Inline Light Mode Initialization -->
+    <script>
+      (function() {
+        try {
+          document.documentElement.classList.add('light');
+          document.documentElement.classList.remove('dark');
+          localStorage.setItem('it_start_theme', 'light');
+        } catch (e) {}
+      })();
+    </script>
+    <!-- Telegram Mini App Script -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- VK Mini App Bridge Script -->
+    <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
+    <script type="module" crossorigin src="/it-start/assets/index-CC3Rdzjx.js"></script>
+    <link rel="stylesheet" crossorigin href="/it-start/assets/index-5tpqPcvy.css">
+  </head>
+  <body class="antialiased selection:bg-neutral-900 selection:text-white">
+    <div id="root"></div>
+  </body>
+</html>
