@@ -161,12 +161,12 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                 <span className="font-bold text-sm text-neutral-950 dark:text-white font-sans tracking-tight">
                   {internship.company}
                 </span>
-                <span className="text-xs text-neutral-500 dark:text-neutral-400 flex items-center gap-1 font-medium">
-                  <MapPin className="w-3.5 h-3.5 opacity-70" />
+                <span className="text-xs text-neutral-600 dark:text-neutral-300 flex items-center gap-1 font-medium">
+                  <MapPin className="w-3.5 h-3.5 opacity-80" />
                   {internship.location}
                 </span>
-                <span className="text-xs text-neutral-500 dark:text-neutral-400 flex items-center gap-1 font-medium">
-                  <Clock className="w-3.5 h-3.5 opacity-70" />
+                <span className="text-xs text-neutral-600 dark:text-neutral-300 flex items-center gap-1 font-medium">
+                  <Clock className="w-3.5 h-3.5 opacity-80" />
                   {internship.format}
                 </span>
               </div>
@@ -177,10 +177,10 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
           </div>
 
           <div className="flex flex-wrap items-center gap-2 mt-2">
-            <span className="text-xs font-semibold px-2.5 py-1 rounded-full liquid-glass-pill text-neutral-800 dark:text-neutral-200">
+            <span className="text-xs font-semibold px-2.5 py-1 rounded-full liquid-glass-pill text-neutral-900 dark:text-neutral-100">
               {internship.salary}
             </span>
-            <span className="text-xs px-2.5 py-1 rounded-full liquid-glass-pill text-neutral-600 dark:text-neutral-400">
+            <span className="text-xs font-medium px-2.5 py-1 rounded-full liquid-glass-pill text-neutral-700 dark:text-neutral-300">
               Источник: {internship.sourceChannel}
             </span>
           </div>
@@ -203,7 +203,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
             </div>
 
             <div className="flex items-baseline justify-between mb-1.5">
-              <span className="text-xs text-neutral-600 dark:text-neutral-400">
+              <span className="text-xs font-medium text-neutral-700 dark:text-neutral-300">
                 Изучено {totalCompleted} из {totalItems} тем и профильных вопросов
               </span>
               <span className="text-2xl font-bold text-neutral-900 dark:text-white">{readinessPercent}%</span>
@@ -216,7 +216,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
               />
             </div>
 
-            <p className="text-xs mt-2 text-neutral-500 dark:text-neutral-400">
+            <p className="text-xs mt-2 text-neutral-600 dark:text-neutral-300 font-medium">
               💡 Отмечайте изученные разделы и вопросы прямо в этом окне — ваш прогресс сохраняется синхронно в базе данных!
             </p>
           </div>
