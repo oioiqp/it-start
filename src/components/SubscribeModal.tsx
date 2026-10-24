@@ -221,7 +221,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 p-2 rounded-full transition-all duration-150 z-10 active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-600 hover:text-neutral-950 cursor-pointer"
+          className="absolute top-5 right-5 p-2 rounded-full transition-all duration-150 z-10 active:scale-95 liquid-glass-pill hover:bg-white/70 text-neutral-800 hover:text-black cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>
@@ -235,7 +235,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
             <h2 className="text-lg font-bold font-sans text-neutral-950">
               Уведомления в Telegram
             </h2>
-            <p className="text-xs text-neutral-600">
+            <p className="text-xs text-neutral-700 font-medium">
               Мгновенные пуши о новых стажировках от бота @{TELEGRAM_BOT_USERNAME}
             </p>
           </div>

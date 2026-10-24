@@ -321,7 +321,7 @@ export function App() {
       {/* Soft atmospheric diffused ambient light for frosted glass */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0 select-none">
         {/* Top subtle sheen */}
-        <div className="absolute top-0 inset-x-0 h-[360px] bg-gradient-to-b from-white/50 via-white/15 to-transparent pointer-events-none" />
+        <div className="absolute top-0 inset-x-0 h-[360px] bg-gradient-to-b from-white/20 via-white/5 to-transparent pointer-events-none" />
 
         {/* Ambient diffusion spheres */}
         <div className="absolute -top-[10%] -right-[5%] w-[680px] h-[680px] sm:w-[900px] sm:h-[900px] rounded-full bg-gradient-to-br from-white/40 via-slate-300/30 to-slate-400/20 blur-[90px] transform-gpu pointer-events-none" />

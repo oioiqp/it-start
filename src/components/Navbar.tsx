@@ -41,9 +41,9 @@ export const Navbar: React.FC<NavbarProps> = ({
   ];
 
   return (
-    <header className="sticky top-0 z-50 flex items-center justify-center px-3 sm:px-4 w-full pt-2.5 sm:pt-3.5 pb-2.5 sm:pb-3 pointer-events-none transition-all">
-      {/* Top ambient frosted blur strip that softens scrolling content entering the viewport */}
-      <div className="absolute inset-x-0 top-0 h-full backdrop-blur-md bg-gradient-to-b from-[#b8c1ce]/90 via-[#b8c1ce]/45 to-transparent pointer-events-none -z-10" />
+    <header className="sticky top-0 z-50 flex items-center justify-center px-3 sm:px-4 w-full pt-2.5 sm:pt-3.5 pb-2.5 sm:pb-3 pointer-events-none">
+      {/* Top ambient gradient strip that smoothly dissolves scrolling content as it approaches top margin */}
+      <div className="absolute inset-x-0 top-0 h-full bg-gradient-to-b from-[#b8c1ce]/95 via-[#b8c1ce]/60 to-transparent pointer-events-none -z-10" />
 
       <div
         className="pointer-events-auto flex items-center justify-between gap-1 sm:gap-2 p-1.5 sm:p-2 rounded-full transition-shadow duration-200 max-w-5xl w-full sm:w-auto liquid-glass-nav"

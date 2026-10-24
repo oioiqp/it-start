@@ -1366,14 +1366,14 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                 <h3 className="text-base font-bold text-neutral-950 dark:text-white">
                   Настройка Bot Token от @BotFather
                 </h3>
-                <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                <p className="text-xs text-neutral-700 dark:text-neutral-300">
                   Сохраняется только локально в вашем браузере (localStorage)
                 </p>
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-neutral-50/80 dark:bg-white/[0.025] border border-neutral-200/60 dark:border-white/[0.08] text-xs leading-relaxed mb-4 space-y-1.5 text-neutral-600 dark:text-neutral-400">
-              <p className="flex items-center gap-1.5 text-neutral-900 dark:text-neutral-200 font-semibold">
+            <div className="p-4 rounded-2xl bg-neutral-50/80 dark:bg-white/[0.025] border border-neutral-200/60 dark:border-white/[0.08] text-xs leading-relaxed mb-4 space-y-1.5 text-neutral-700 dark:text-neutral-300">
+              <p className="flex items-center gap-1.5 text-neutral-950 dark:text-white font-semibold">
                 <ShieldCheck className="w-4 h-4 text-emerald-500" />
                 Безопасность согласно требованиям ТЗ:
               </p>
@@ -1440,7 +1440,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
               <h3 className="text-base font-bold text-neutral-950 dark:text-white">
                 Подписка на уведомления в Telegram
               </h3>
-              <p className="text-xs text-neutral-500 dark:text-neutral-400">
+              <p className="text-xs text-neutral-700 dark:text-neutral-300">
                 Синхронизация с таблицей public.tg_subscriptions в Supabase
               </p>
             </div>

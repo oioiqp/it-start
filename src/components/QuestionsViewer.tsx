@@ -127,7 +127,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full font-semibold transition-all duration-150 active:scale-95 ${
               viewMode === 'self_check'
                 ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-sm'
-                : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-950 dark:hover:text-white'
+                : 'text-neutral-700 dark:text-neutral-300 hover:text-neutral-950 dark:hover:text-white'
             }`}
           >
             <PenTool className="w-3.5 h-3.5" />
@@ -142,7 +142,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full font-semibold transition-all duration-150 active:scale-95 ${
               viewMode === 'accordion'
                 ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-sm'
-                : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-950 dark:hover:text-white'
+                : 'text-neutral-700 dark:text-neutral-300 hover:text-neutral-950 dark:hover:text-white'
             }`}
           >
             <LayoutList className="w-3.5 h-3.5" />
@@ -157,7 +157,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full font-semibold transition-all duration-150 active:scale-95 ${
               viewMode === 'flashcards'
                 ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-sm'
-                : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-950 dark:hover:text-white'
+                : 'text-neutral-700 dark:text-neutral-300 hover:text-neutral-950 dark:hover:text-white'
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
@@ -171,13 +171,13 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
         {/* Row 1: Search + Status tabs */}
         <div className="flex flex-col sm:flex-row items-center gap-3">
           <div className="relative w-full sm:flex-1">
-            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-neutral-500" />
+            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-500 dark:text-neutral-400" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Поиск по вопросу, ключевому слову или коду..."
-              className="w-full pl-9 pr-4 py-2 rounded-full text-xs sm:text-sm transition-all focus:outline-none liquid-glass-subtle focus:bg-white/50 text-neutral-900 placeholder:text-neutral-500 dark:text-white dark:placeholder:text-neutral-400"
+              className="w-full pl-9 pr-4 py-2 rounded-full text-xs sm:text-sm transition-all focus:outline-none liquid-glass-subtle focus:bg-white/60 text-neutral-950 placeholder:text-neutral-600 dark:text-white dark:placeholder:text-neutral-400"
             />
           </div>
 
@@ -187,7 +187,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
               className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 ${
                 statusFilter === 'all'
                   ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-sm'
-                  : 'liquid-glass-pill hover:bg-white/80 dark:hover:bg-white/15 text-neutral-700 dark:text-neutral-200'
+                  : 'liquid-glass-pill hover:bg-white/80 dark:hover:bg-white/15 text-neutral-800 dark:text-neutral-200'
               }`}
             >
               Все ({questions.length})
@@ -197,7 +197,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 ${
                 statusFilter === 'repeat'
                   ? 'bg-amber-500 text-white shadow-sm'
-                  : 'liquid-glass-pill hover:bg-white/80 dark:hover:bg-white/15 text-amber-700 dark:text-amber-400'
+                  : 'liquid-glass-pill hover:bg-white/80 dark:hover:bg-white/15 text-amber-800 dark:text-amber-300'
               }`}
             >
               <RotateCcw className="w-3 h-3" />
@@ -208,7 +208,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 ${
                 statusFilter === 'completed'
                   ? 'bg-emerald-600 text-white shadow-sm'
-                  : 'liquid-glass-pill hover:bg-white/80 dark:hover:bg-white/15 text-emerald-700 dark:text-emerald-400'
+                  : 'liquid-glass-pill hover:bg-white/80 dark:hover:bg-white/15 text-emerald-800 dark:text-emerald-300'
               }`}
             >
               <CheckCircle2 className="w-3.5 h-3.5" />
@@ -227,7 +227,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
             className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 ${
               selectedDirection === 'all'
                 ? 'bg-neutral-900 text-white shadow-xs'
-                : 'liquid-glass-pill hover:bg-white/50 text-neutral-700'
+                : 'liquid-glass-pill hover:bg-white/70 text-neutral-800 dark:text-neutral-200'
             }`}
           >
             Все направления
@@ -242,7 +242,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
               className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 ${
                 selectedDirection === dir.id
                   ? 'bg-neutral-900 text-white shadow-xs'
-                  : 'liquid-glass-pill hover:bg-white/50 text-neutral-700'
+                  : 'liquid-glass-pill hover:bg-white/70 text-neutral-800 dark:text-neutral-200'
               }`}
             >
               {dir.title.split('-')[0]}
@@ -258,7 +258,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
               className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 ${
                 selectedSubTrack === 'all'
                   ? 'bg-neutral-900 text-white shadow-xs'
-                  : 'liquid-glass-pill hover:bg-white/50 text-neutral-700'
+                  : 'liquid-glass-pill hover:bg-white/70 text-neutral-800 dark:text-neutral-200'
               }`}
             >
               Все ветки
@@ -270,7 +270,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                 className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 ${
                   selectedSubTrack === st.id
                     ? 'bg-neutral-900 text-white shadow-xs'
-                    : 'liquid-glass-pill hover:bg-white/50 text-neutral-700'
+                    : 'liquid-glass-pill hover:bg-white/70 text-neutral-800 dark:text-neutral-200'
                 }`}
               >
                 {st.name}
@@ -349,13 +349,13 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                         onClick={() => setExpandedId(isExpanded ? null : q.id)}
                       >
                         <div className="flex items-center gap-2 flex-wrap mb-1.5">
-                          <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full liquid-glass-pill text-neutral-700 dark:text-neutral-200">
+                          <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full liquid-glass-pill text-neutral-800 dark:text-neutral-200">
                             {q.category}
                           </span>
-                          <span className="text-[11px] text-neutral-500 dark:text-neutral-400">{q.difficulty}</span>
+                          <span className="text-[11px] font-medium text-neutral-700 dark:text-neutral-300">{q.difficulty}</span>
                           {isRepeat && (
-                            <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full border
-                              bg-amber-500/15 text-amber-700 border-amber-500/30
+                            <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full border
+                              bg-amber-500/15 text-amber-800 border-amber-500/30
                               dark:bg-amber-500/20 dark:text-amber-300 dark:border-amber-500/40"
                             >
                               В повторении
@@ -363,14 +363,14 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                           )}
                         </div>
 
-                        <h3 className="text-sm sm:text-base font-semibold transition-colors font-sans
-                          text-neutral-900 group-hover:text-neutral-700
-                          dark:text-white dark:group-hover:text-neutral-200"
+                        <h3 className="text-sm sm:text-base font-bold transition-colors font-sans
+                          text-neutral-950 group-hover:text-black
+                          dark:text-white dark:group-hover:text-neutral-100"
                         >
                           {q.title}
                         </h3>
 
-                        <p className="text-xs mt-1.5 line-clamp-2 text-neutral-600 dark:text-neutral-400">
+                        <p className="text-xs mt-1.5 line-clamp-2 text-neutral-700 dark:text-neutral-300 font-normal">
                           {q.question}
                         </p>
                       </div>
@@ -379,7 +379,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                     <button
                       type="button"
                       onClick={() => setExpandedId(isExpanded ? null : q.id)}
-                      className="p-2 rounded-full transition-all duration-150 active:scale-95 shrink-0 liquid-glass-pill hover:bg-white/50 text-neutral-700 cursor-pointer"
+                      className="p-2 rounded-full transition-all duration-150 active:scale-95 shrink-0 liquid-glass-pill hover:bg-white/70 text-neutral-800 cursor-pointer"
                     >
                       {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                     </button>

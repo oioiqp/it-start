@@ -100,18 +100,18 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
   return (
     <div className="max-w-2xl mx-auto space-y-4">
       {/* Top Controls Bar */}
-      <div className="flex items-center justify-between text-xs px-1 text-neutral-600">
+      <div className="flex items-center justify-between text-xs px-1 text-neutral-700 dark:text-neutral-300">
         <div className="flex items-center gap-2">
-          <span className="font-semibold text-sm text-neutral-950">
+          <span className="font-semibold text-sm text-neutral-950 dark:text-white">
             Карточка {currentIndex + 1} из {deck.length}
           </span>
           {isLearned && (
-            <span className="px-2.5 py-0.5 rounded-full font-medium text-[11px] bg-emerald-500/15 text-emerald-800 border border-emerald-500/20">
+            <span className="px-2.5 py-0.5 rounded-full font-semibold text-[11px] bg-emerald-500/15 text-emerald-800 border border-emerald-500/20">
               Изучено ✓
             </span>
           )}
           {isRepeat && (
-            <span className="px-2.5 py-0.5 rounded-full font-medium text-[11px] bg-amber-500/15 text-amber-800 border border-amber-500/20">
+            <span className="px-2.5 py-0.5 rounded-full font-semibold text-[11px] bg-amber-500/15 text-amber-800 border border-amber-500/20">
               На повторение
             </span>
           )}
@@ -119,7 +119,7 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
 
         <button
           onClick={handleShuffle}
-          className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full transition-all active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-700 cursor-pointer font-medium"
+          className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full transition-all active:scale-95 liquid-glass-pill hover:bg-white/70 text-neutral-800 dark:text-neutral-200 cursor-pointer font-semibold"
         >
           <Shuffle className="w-3.5 h-3.5" />
           <span>Перемешать</span>
@@ -133,10 +133,10 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
       >
         {/* Top Badges */}
         <div className="flex items-center justify-between gap-2 mb-4">
-          <span className="px-3 py-1 rounded-full text-xs font-medium liquid-glass-pill text-neutral-700">
+          <span className="px-3 py-1 rounded-full text-xs font-semibold liquid-glass-pill text-neutral-800 dark:text-neutral-200">
             {currentCard.category}
           </span>
-          <span className="text-xs font-medium text-neutral-500">
+          <span className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
             Сложность: {currentCard.difficulty}
           </span>
         </div>
@@ -145,22 +145,22 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
         <div className="my-auto">
           {!isFlipped ? (
             <div className="space-y-4 animate-in fade-in zoom-in-95 duration-200">
-              <span className="text-xs font-semibold uppercase tracking-wider block text-neutral-500">
+              <span className="text-xs font-bold uppercase tracking-wider block text-neutral-700 dark:text-neutral-300">
                 Вопрос собеседования:
               </span>
-              <h3 className="text-lg sm:text-xl font-bold leading-snug font-sans text-neutral-950">
+              <h3 className="text-lg sm:text-xl font-bold leading-snug font-sans text-neutral-950 dark:text-white">
                 {currentCard.title}
               </h3>
-              <p className="text-sm leading-relaxed text-neutral-600 font-normal">
+              <p className="text-sm leading-relaxed text-neutral-700 dark:text-neutral-200 font-medium">
                 {currentCard.question}
               </p>
             </div>
           ) : (
             <div className="space-y-4 animate-in fade-in zoom-in-95 duration-200">
-              <span className="text-xs font-semibold uppercase tracking-wider block text-emerald-800">
+              <span className="text-xs font-bold uppercase tracking-wider block text-emerald-800 dark:text-emerald-300">
                 Развернутый эталонный ответ:
               </span>
-              <p className="text-sm leading-relaxed p-4 rounded-2xl liquid-glass-subtle text-neutral-900">
+              <p className="text-sm leading-relaxed p-4 rounded-2xl liquid-glass-subtle text-neutral-950 dark:text-neutral-100 font-normal">
                 {currentCard.answer}
               </p>
 
@@ -171,8 +171,8 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
               )}
 
               <div className="space-y-1">
-                <span className="text-xs font-semibold block text-neutral-700">Ключевые тезисы:</span>
-                <ul className="text-xs space-y-1 text-neutral-600">
+                <span className="text-xs font-bold block text-neutral-800 dark:text-neutral-200">Ключевые тезисы:</span>
+                <ul className="text-xs space-y-1 text-neutral-700 dark:text-neutral-300">
                   {currentCard.keyTakeaways.map((t, idx) => (
                     <li key={idx} className="flex items-start gap-1.5">
                       <span className="text-neutral-400">•</span>
@@ -186,12 +186,12 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
         </div>
 
         {/* Flip hint at bottom */}
-        <div className="pt-4 border-t flex items-center justify-between text-xs border-black/5 dark:border-white/5 text-neutral-500">
-          <span className="flex items-center gap-1.5 font-medium">
+        <div className="pt-4 border-t flex items-center justify-between text-xs border-black/5 dark:border-white/5 text-neutral-700 dark:text-neutral-300">
+          <span className="flex items-center gap-1.5 font-semibold">
             <Eye className="w-3.5 h-3.5" />
             {isFlipped ? 'Нажмите, чтобы вернуться к вопросу' : 'Нажмите, чтобы увидеть ответ'}
           </span>
-          <span className="text-[11px] hidden sm:inline opacity-70 font-medium">Клик по карточке переворачивает</span>
+          <span className="text-[11px] hidden sm:inline opacity-80 font-medium">Клик по карточке переворачивает</span>
         </div>
       </div>
 
