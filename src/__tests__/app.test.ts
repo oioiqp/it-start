@@ -926,6 +926,10 @@ describe('12. VKontakte (VK) Bot & VK Mini App Integration', () => {
 
     const mainKbParsed = JSON.parse(vkBotModule.MAIN_VK_KEYBOARD);
     expect(mainKbParsed.buttons.length).toBeGreaterThanOrEqual(3);
+    // Standard chat keyboard (inline: false) must use text buttons and avoid open_link
+    mainKbParsed.buttons.flat().forEach((btn: any) => {
+      expect(btn.action.type).not.toBe('open_link');
+    });
 
     const vacKbParsed = JSON.parse(vkBotModule.VACANCIES_VK_KEYBOARD);
     const vacTotalButtons = vacKbParsed.buttons.flat().length;
@@ -1099,23 +1103,71 @@ describe('12. VKontakte (VK) Bot & VK Mini App Integration', () => {
     expect(stickerRes.ok).toBe(true);
     expect(stickerRes.type).toBe('start');
 
-    // 19. Numeric shortcuts («1» -> vacancies, «2» -> companies, «3» -> roadmaps)
+    // 19. Numeric shortcuts on main menu («1» -> vacancies, «2» -> companies, «6» -> site)
     const num1Res = await vkBotModule.handleVkMessage({ peer_id: 1009, text: '1' });
     expect(num1Res.ok).toBe(true);
     expect(num1Res.type).toBe('vacancies');
 
-    const num2Res = await vkBotModule.handleVkMessage({ peer_id: 1009, text: '2' });
+    const num2Res = await vkBotModule.handleVkMessage({ peer_id: 1010, text: '2' });
     expect(num2Res.ok).toBe(true);
     expect(num2Res.type).toBe('companies');
 
-    // 20. keyboardToTextMenu helper converts keyboard into readable list
+    const num6Res = await vkBotModule.handleVkMessage({ peer_id: 1011, text: '6' });
+    expect(num6Res.ok).toBe(true);
+    expect(num6Res.type).toBe('site');
+    expect(num6Res.reply.message).toContain('https://oioiqp.github.io/it-start/');
+
+    // 20. Direct «сайт» / /site command
+    const siteRes = await vkBotModule.handleVkMessage({ peer_id: 1012, text: 'сайт' });
+    expect(siteRes.ok).toBe(true);
+    expect(siteRes.type).toBe('site');
+    expect(siteRes.reply.message).toContain('IT-Старт');
+
+    // 21. Contextual numeric navigation in vacancies menu (1 -> frontend, 2 -> backend)
+    await vkBotModule.handleVkMessage({ peer_id: 1013, text: 'Стажировки' });
+    const ctxVac1 = await vkBotModule.handleVkMessage({ peer_id: 1013, text: '1' });
+    expect(ctxVac1.ok).toBe(true);
+    expect(ctxVac1.type).toBe('direction');
+    expect(ctxVac1.directionId).toBe('frontend');
+
+    const ctxVac2 = await vkBotModule.handleVkMessage({ peer_id: 1013, text: '2' });
+    expect(ctxVac2.ok).toBe(true);
+    expect(ctxVac2.type).toBe('direction');
+    expect(ctxVac2.directionId).toBe('backend');
+
+    // 22. Contextual numeric navigation in companies menu (4 -> directum, 1 -> t1)
+    await vkBotModule.handleVkMessage({ peer_id: 1014, text: 'Компании' });
+    const ctxComp4 = await vkBotModule.handleVkMessage({ peer_id: 1014, text: '4' });
+    expect(ctxComp4.ok).toBe(true);
+    expect(ctxComp4.type).toBe('company_details');
+    expect(ctxComp4.company).toBe('directum');
+
+    const ctxComp1 = await vkBotModule.handleVkMessage({ peer_id: 1014, text: '1' });
+    expect(ctxComp1.ok).toBe(true);
+    expect(ctxComp1.type).toBe('company_details');
+    expect(ctxComp1.company).toBe('t1');
+
+    // 23. message_event handling with event_id
+    const eventRes = await vkBotModule.handleVkMessage({
+      type: 'message_event',
+      object: {
+        peer_id: 1015,
+        user_id: 1015,
+        event_id: 'evt_12345',
+        payload: { cmd: 'vacancies' },
+      },
+    });
+    expect(eventRes.ok).toBe(true);
+    expect(eventRes.type).toBe('vacancies');
+
+    // 24. keyboardToTextMenu helper converts keyboard into readable list
     expect(typeof vkBotModule.keyboardToTextMenu).toBe('function');
     const textMenu = vkBotModule.keyboardToTextMenu(vkBotModule.MAIN_VK_KEYBOARD);
     expect(textMenu).toContain('Меню команд');
     expect(textMenu).toContain('Стажировки');
     expect(textMenu).toContain('Компании');
 
-    // 21. Unknown command fallback
+    // 25. Unknown command fallback
     const unknownRes = await vkBotModule.handleVkMessage({ peer_id: 1001, text: 'абракадабра123' });
     expect(unknownRes.ok).toBe(true);
     expect(unknownRes.type).toBe('unknown');

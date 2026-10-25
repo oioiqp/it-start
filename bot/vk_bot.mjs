@@ -109,6 +109,13 @@ export const VK_BOT_CONFIG = {
 // In-memory subscribers store for VK push notifications
 export const vkSubscribers = new Map();
 
+// In-memory user menu tracking for contextual numbered commands (main, vacancies, companies)
+export const userMenuState = new Map();
+
+export function clearUserMenuState() {
+  userMenuState.clear();
+}
+
 // Helper: strip HTML tags & entities for VK messages
 export function cleanHtmlForVk(html = '') {
   return String(html)
@@ -202,7 +209,7 @@ export const MAIN_VK_KEYBOARD = createVkKeyboard({
     ],
     [
       { label: '🔔 Подписка', payload: { cmd: 'subscribe' }, color: 'positive' },
-      { label: '🚀 Открыть IT-Старт', link: GITHUB_PAGES_URL },
+      { label: '🚀 Открыть сайт', payload: { cmd: 'site' }, color: 'secondary' },
     ],
   ],
 });
@@ -361,16 +368,21 @@ export async function callVk(method, params = {}, token = VK_BOT_TOKEN) {
     const data = await res.json();
 
     if (data.error) {
-      // Automatic fallback for VK API Error 912: "This is a chat bot feature, change this status in settings: Chat bot feature"
-      // Happens when "Возможности ботов" (Bots capabilities) is disabled in VK community web settings.
+      // Automatic fallback for VK API keyboard errors (code 912, 100, 911, etc.)
+      // Happens when "Возможности ботов" (Bots capabilities) is disabled or keyboard format is unsupported.
       // Retries the message as clean text with buttons converted to a numeric menu without losing delivery!
-      if (
-        method === 'messages.send' &&
-        data.error.error_code === 912 &&
-        params.keyboard
-      ) {
+      const errCode = data.error.error_code;
+      const errMsg = String(data.error.error_msg || '').toLowerCase();
+      const isKeyboardError =
+        errCode === 912 ||
+        errCode === 911 ||
+        (errCode === 100 && errMsg.includes('keyboard')) ||
+        errMsg.includes('keyboard') ||
+        errMsg.includes('chat bot feature');
+
+      if (method === 'messages.send' && params.keyboard && isKeyboardError) {
         console.warn(
-          `[VK Bot] ⚠️ Внимание: В настройках группы VK отключены «Возможности ботов» (VK error 912). ` +
+          `[VK Bot] ⚠️ Внимание: Ошибка клавиатуры VK API (${errCode}: ${data.error.error_msg}). ` +
           `Автоматически отправляем ответ в текстовом режиме без кнопок. ` +
           `Для включения кнопок: Сообщество -> Управление -> Сообщения -> Настройки для бота -> Возможности ботов: Включены.`
         );
@@ -525,6 +537,13 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
 
   if (!peerId) return { ok: false, error: 'Missing peer_id' };
 
+  // Acknowledge inline callback button event to dismiss loading spinner in VK app
+  if ((message.event_id || rawInput.event_id) && token) {
+    const eventId = message.event_id || rawInput.event_id;
+    const userId = message.user_id || rawInput.user_id || peerId;
+    callVk('messages.sendMessageEventAnswer', { event_id: eventId, user_id: userId, peer_id: peerId }, token).catch(() => {});
+  }
+
   // Strip VK group/user mention prefix: [club12345|@name] or [public12345|Name] or @name
   const textRaw = (message.text || rawInput.text || '')
     .replace(/^\[(?:club|public|id)\d+\|[^\]]+\]\s*/i, '')
@@ -561,15 +580,43 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
 
   let cmd = payload?.cmd || payload?.command || payload?.button || '';
 
-  // Support numeric command shortcuts
-  if (!cmd) {
-    if (textClean === '1' || textClean === '[1]' || textClean === '1.') cmd = 'vacancies';
-    else if (textClean === '2' || textClean === '[2]' || textClean === '2.') cmd = 'companies';
-    else if (textClean === '3' || textClean === '[3]' || textClean === '3.') cmd = 'roadmaps';
-    else if (textClean === '4' || textClean === '[4]' || textClean === '4.') cmd = 'questions';
-    else if (textClean === '5' || textClean === '[5]' || textClean === '5.') cmd = 'subscribe';
-    else if (textClean === '6' || textClean === '[6]' || textClean === '6.') cmd = 'status';
-    else if (textClean === '7' || textClean === '[7]' || textClean === '7.') cmd = 'help';
+  // Support contextual numeric command shortcuts based on active menu screen
+  const numMatch = textClean.match(/^(?:\[(\d+)\]|(\d+)\.?)$/);
+  const num = numMatch ? parseInt(numMatch[1] || numMatch[2], 10) : null;
+
+  if (!cmd && num !== null && num >= 1 && num <= 10) {
+    const currentMenu = userMenuState.get(String(peerId)) || 'main';
+
+    if (currentMenu === 'vacancies') {
+      const dirs = ['frontend', 'backend', 'mobile', 'data_science', 'qa', 'devops'];
+      if (num >= 1 && num <= 6) {
+        payload = { cmd: 'direction', id: dirs[num - 1] };
+        cmd = 'direction';
+      } else if (num === 7) {
+        cmd = 'companies';
+      } else if (num === 8) {
+        cmd = 'site';
+      }
+    } else if (currentMenu === 'companies') {
+      const compIds = ['t1', 'kontur', 'tbank', 'directum', 'yandex', 'ozon', 'sber', 'avito', 'vk'];
+      if (num >= 1 && num <= 9) {
+        payload = { cmd: 'company', id: compIds[num - 1] };
+        cmd = 'company';
+      } else if (num === 10) {
+        cmd = 'vacancies';
+      }
+    } else {
+      // Main menu shortcuts:
+      // [1] Стажировки, [2] Компании, [3] Роадмапы, [4] Вопросы, [5] Подписка, [6] Открыть сайт, [7] Статус, [8] Помощь
+      if (num === 1) cmd = 'vacancies';
+      else if (num === 2) cmd = 'companies';
+      else if (num === 3) cmd = 'roadmaps';
+      else if (num === 4) cmd = 'questions';
+      else if (num === 5) cmd = 'subscribe';
+      else if (num === 6) cmd = 'site';
+      else if (num === 7) cmd = 'status';
+      else if (num === 8) cmd = 'help';
+    }
   }
 
   const strippedText = textLower.replace(/^[\p{Extended_Pictographic}\p{Emoji}\p{Symbol}\s_.-]+/u, '').trim();
@@ -631,6 +678,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
     if (token) {
       await callVk('messages.send', reply, token);
     }
+    userMenuState.set(String(peerId), 'main');
     return { ok: true, type: 'start', reply };
   }
 
@@ -680,6 +728,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
     if (token) {
       await callVk('messages.send', reply, token);
     }
+    userMenuState.set(String(peerId), 'vacancies');
     return { ok: true, type: 'vacancies', reply, count: filtered.length };
   }
 
@@ -736,6 +785,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
     if (token) {
       await callVk('messages.send', reply, token);
     }
+    userMenuState.set(String(peerId), 'vacancies');
     return { ok: true, type: 'direction', directionId: dirId, reply };
   }
 
@@ -762,6 +812,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
     if (token) {
       await callVk('messages.send', reply, token);
     }
+    userMenuState.set(String(peerId), 'companies');
     return { ok: true, type: 'companies', reply };
   }
 
@@ -816,6 +867,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
     if (token) {
       await callVk('messages.send', reply, token);
     }
+    userMenuState.set(String(peerId), 'companies');
     return { ok: true, type: 'company_details', company: targetCompany.id, reply };
   }
 
@@ -851,6 +903,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
     if (token) {
       await callVk('messages.send', reply, token);
     }
+    userMenuState.set(String(peerId), 'main');
     return { ok: true, type: 'roadmaps', reply };
   }
 
@@ -885,6 +938,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
     if (token) {
       await callVk('messages.send', reply, token);
     }
+    userMenuState.set(String(peerId), 'main');
     return { ok: true, type: 'questions', reply };
   }
 
@@ -907,6 +961,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
     if (token) {
       await callVk('messages.send', reply, token);
     }
+    userMenuState.set(String(peerId), 'main');
     return { ok: true, type: 'subscribed', reply };
   }
 
@@ -926,6 +981,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
     if (token) {
       await callVk('messages.send', reply, token);
     }
+    userMenuState.set(String(peerId), 'main');
     return { ok: true, type: 'unsubscribed', reply };
   }
 
@@ -960,6 +1016,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
     if (token) {
       await callVk('messages.send', reply, token);
     }
+    userMenuState.set(String(peerId), 'main');
     return { ok: true, type: 'status', reply };
   }
 
@@ -973,6 +1030,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
       `• Роадмапы / /roadmaps — Карты развития по 6 стекам\n` +
       `• Вопросы / /questions — База 55+ вопросов к собеседованию\n` +
       `• Подписка / /subscribe — Подписаться на пуш-уведомления о новых вакансиях\n` +
+      `• Сайт / /site — Ссылка на веб-платформу IT-Старт\n` +
       `• Статус / /status — Состояние парсера и источников\n\n` +
       `💡 Быстрый поиск: отправьте боту название компании (например, «директум», «контур», «т1», «яндекс»), и бот покажет её вакансии!`;
 
@@ -986,7 +1044,52 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
     if (token) {
       await callVk('messages.send', reply, token);
     }
+    userMenuState.set(String(peerId), 'main');
     return { ok: true, type: 'help', reply };
+  }
+
+  // 12. «Сайт» / «Открыть сайт» / «WebApp» / /site
+  if (
+    cmd === 'site' ||
+    textClean === 'сайт' ||
+    textClean === 'веб' ||
+    textClean === 'webapp' ||
+    textClean === 'приложение' ||
+    textClean === '/site' ||
+    textClean === '/web' ||
+    textClean === '/app' ||
+    textClean.includes('открыть сайт') ||
+    textClean.includes('открыть it-старт')
+  ) {
+    const text =
+      `🚀 Платформа «IT-Старт» доступна в браузере и как Telegram Mini App:\n\n` +
+      `🌐 Веб-сайт: ${GITHUB_PAGES_URL}\n` +
+      `✈️ Telegram-бот: https://t.me/IT_start_izh_bot\n\n` +
+      `В интерактивном веб-приложении вас ждут:\n` +
+      `• Интерактивные роадмапы со шкалой готовности в %\n` +
+      `• Тренажёр 55+ вопросов к собеседованию с режимом скрытия ответов\n` +
+      `• Полный каталог стажировок с детальными фильтрами по технологиям!`;
+
+    const keyboard = createVkKeyboard({
+      inline: true,
+      buttons: [
+        [{ label: '🚀 Перейти на сайт IT-Старт', link: GITHUB_PAGES_URL }],
+        [{ label: '💼 Каталог вакансий', payload: { cmd: 'vacancies' }, color: 'primary' }],
+      ],
+    });
+
+    const reply = {
+      peer_id: peerId,
+      random_id: Math.floor(Math.random() * 2147483647),
+      message: text,
+      keyboard,
+    };
+
+    if (token) {
+      await callVk('messages.send', reply, token);
+    }
+    userMenuState.set(String(peerId), 'main');
+    return { ok: true, type: 'site', reply };
   }
 
   // Default Fallback
@@ -1004,6 +1107,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
   if (token) {
     await callVk('messages.send', reply, token);
   }
+  userMenuState.set(String(peerId), 'main');
   return { ok: true, type: 'unknown', reply };
 }
 
@@ -1089,17 +1193,14 @@ export async function startVkBot(token = VK_BOT_TOKEN, options = {}) {
     let ts = '';
 
     const getLongPollServer = async () => {
+      // Ensure Bots Long Poll settings are activated with message_new and message_event
+      await callVk(
+        'groups.setLongPollSettings',
+        { group_id: groupId, enabled: 1, message_new: 1, message_event: 1, message_reply: 1, api_version: '5.199' },
+        tokenToUse
+      ).catch(() => {});
+
       let res = await callVk('groups.getLongPollServer', { group_id: groupId }, tokenToUse);
-      const errMsg = String(res.error?.error_msg || res.error || '');
-      if (!res.ok && (errMsg.includes('not enabled') || errMsg.includes('longpoll'))) {
-        console.log('[VK Bot] Автоматически включаем Bots Long Poll API для группы в VK...');
-        await callVk(
-          'groups.setLongPollSettings',
-          { group_id: groupId, enabled: 1, message_new: 1, api_version: '5.199' },
-          tokenToUse
-        );
-        res = await callVk('groups.getLongPollServer', { group_id: groupId }, tokenToUse);
-      }
       if (res.ok && res.result) {
         server = res.result.server;
         key = res.result.key;
@@ -1108,6 +1209,7 @@ export async function startVkBot(token = VK_BOT_TOKEN, options = {}) {
         return true;
       }
       if (!res.ok) {
+        const errMsg = String(res.error?.error_msg || res.error || '');
         console.warn('[VK Bot] Не удалось получить сервер Long Poll:', errMsg || JSON.stringify(res.error));
       }
       return false;
@@ -1138,6 +1240,12 @@ export async function startVkBot(token = VK_BOT_TOKEN, options = {}) {
             for (const upd of data.updates) {
               if (upd.type === 'message_new' || upd.type === 'message_event') {
                 const msg = upd.object?.message || upd.object || upd;
+                if (upd.type === 'message_event' && (upd.object?.event_id || msg.event_id)) {
+                  const eventId = upd.object?.event_id || msg.event_id;
+                  const userId = upd.object?.user_id || msg.user_id;
+                  const peerId = upd.object?.peer_id || msg.peer_id || userId;
+                  callVk('messages.sendMessageEventAnswer', { event_id: eventId, user_id: userId, peer_id: peerId }, tokenToUse).catch(() => {});
+                }
                 if (msg) {
                   await handleVkMessage(msg, tokenToUse);
                 }

@@ -3015,8 +3015,18 @@ const isDirectRun =
   !process.argv[1].includes('vk_bot') &&
   (process.argv[1].endsWith('bot.mjs') || process.argv[1].endsWith('bot.js'));
 
-if (isDirectRun && BOT_TOKEN && process.env.NODE_ENV !== 'test') {
-  pollUpdates();
+if (isDirectRun && process.env.NODE_ENV !== 'test') {
+  if (BOT_TOKEN) {
+    pollUpdates();
+  } else {
+    // When running without Telegram token, still schedule background vacancy monitoring
+    setTimeout(() => {
+      scanChannelsAndSyncSupabase(false).catch((e) => console.warn('[Startup Sync]', e.message));
+    }, 3000);
+    setInterval(() => {
+      scanChannelsAndSyncSupabase(true).catch((e) => console.warn('[Periodic Sync]', e.message));
+    }, 30 * 60 * 1000);
+  }
 }
 
 // Start VK bot concurrently when --all is passed or VK token is provided in bot.mjs
