@@ -130,6 +130,43 @@ export function getVkLaunchParams(): VkLaunchParams {
   return parseVkLaunchParams();
 }
 
+export interface VkViewSettings {
+  statusBarStyle?: 'light' | 'dark';
+  actionBarColor?: string;
+  navigationBarColor?: string;
+}
+
+let cachedVkUser: VkUser | null = null;
+
+export function getCachedVkUser(): VkUser | null {
+  return cachedVkUser;
+}
+
+export function setCachedVkUser(user: VkUser | null): void {
+  cachedVkUser = user;
+}
+
+/**
+ * Configure VK Mini App View Settings (Status Bar and Action Bar colors)
+ */
+export async function setVkViewSettings(settings?: VkViewSettings): Promise<boolean> {
+  if (typeof window === 'undefined' || !window.vkBridge || typeof window.vkBridge.send !== 'function') {
+    return false;
+  }
+
+  try {
+    await window.vkBridge.send('VKWebAppSetViewSettings', {
+      status_bar_style: settings?.statusBarStyle || 'dark',
+      action_bar_color: settings?.actionBarColor || '#ffffff',
+      navigation_bar_color: settings?.navigationBarColor || '#ffffff',
+    });
+    return true;
+  } catch {
+    // Unsupported on some desktop/web contexts
+    return false;
+  }
+}
+
 /**
  * Initialize VK Bridge connection
  */
@@ -139,56 +176,85 @@ export async function initVkBridge(): Promise<{
   launchParams: VkLaunchParams;
 }> {
   const launchParams = getVkLaunchParams();
-  let user: VkUser | null = null;
+  let user: VkUser | null = cachedVkUser;
 
   if (typeof window === 'undefined') {
     return { success: false, user: null, launchParams };
   }
 
-  // 1. If vk_user_id is present in launch params, initialize minimal user
-  if (launchParams.vk_user_id) {
+  // 1. If vk_user_id is present in launch params, initialize minimal user fallback
+  if (!user && launchParams.vk_user_id) {
     user = {
       id: launchParams.vk_user_id,
       first_name: 'Пользователь VK',
     };
   }
 
-  // 2. Call VKWebAppInit if bridge is available
+  // 2. Call VKWebAppInit & SetViewSettings if bridge is available
   if (window.vkBridge && typeof window.vkBridge.send === 'function') {
     try {
       await window.vkBridge.send('VKWebAppInit');
+      await setVkViewSettings({
+        statusBarStyle: 'dark',
+        actionBarColor: '#ffffff',
+        navigationBarColor: '#ffffff',
+      });
 
       try {
         const userInfo = await window.vkBridge.send('VKWebAppGetUserInfo');
         if (userInfo && userInfo.id) {
-          user = userInfo;
+          user = {
+            ...(user || {}),
+            ...userInfo,
+          };
         }
       } catch {
         // User info may require permissions; fallback to launchParams
       }
 
+      cachedVkUser = user;
       return { success: true, user, launchParams };
     } catch (e) {
       console.warn('[VK Bridge] Ошибка вызова VKWebAppInit:', e);
     }
   }
 
+  cachedVkUser = user;
   return { success: isVkMiniApp(), user, launchParams };
 }
 
 /**
+ * Direct request for current VK User profile
+ */
+export async function getVkUserProfile(): Promise<VkUser | null> {
+  if (cachedVkUser) return cachedVkUser;
+  const res = await initVkBridge();
+  return res.user;
+}
+
+export type VkHapticImpactStyle = 'light' | 'medium' | 'heavy';
+export type VkHapticNotificationType = 'success' | 'warning' | 'error';
+
+/**
  * Trigger haptic/taptic feedback in VK Mini App
  */
-export function triggerVkHaptic(type: 'impact' | 'notification' | 'selection' = 'impact') {
-  if (typeof window === 'undefined' || !window.vkBridge) return;
+export function triggerVkHaptic(
+  type: 'impact' | 'notification' | 'selection' = 'impact',
+  styleOrResult?: VkHapticImpactStyle | VkHapticNotificationType | string
+) {
+  if (typeof window === 'undefined' || !window.vkBridge || typeof window.vkBridge.send !== 'function') return;
 
   try {
     if (type === 'notification') {
-      window.vkBridge.send('VKWebAppTapticNotificationOccurred', { result_type: 'success' }).catch(() => {});
+      const resType =
+        styleOrResult === 'warning' || styleOrResult === 'error' ? styleOrResult : 'success';
+      window.vkBridge.send('VKWebAppTapticNotificationOccurred', { result_type: resType }).catch(() => {});
     } else if (type === 'selection') {
       window.vkBridge.send('VKWebAppTapticSelectionChanged', {}).catch(() => {});
     } else {
-      window.vkBridge.send('VKWebAppTapticImpactOccurred', { style: 'light' }).catch(() => {});
+      const style =
+        styleOrResult === 'medium' || styleOrResult === 'heavy' ? styleOrResult : 'light';
+      window.vkBridge.send('VKWebAppTapticImpactOccurred', { style }).catch(() => {});
     }
   } catch {
     // Ignore haptic errors on unsupported platforms

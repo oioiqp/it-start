@@ -93,6 +93,7 @@ export const VK_BOT_TOKEN =
   (process.argv[2] && !process.argv[2].startsWith('-') ? process.argv[2] : '');
 
 export const VK_GROUP_ID = process.env.VK_GROUP_ID || '242573933';
+export const VK_APP_ID = process.env.VK_APP_ID || '';
 export const VK_API_VERSION = '5.199';
 export const VK_API_BASE = 'https://api.vk.com/method';
 export const GITHUB_PAGES_URL = 'https://oioiqp.github.io/it-start/';
@@ -103,6 +104,7 @@ export const VK_BOT_CONFIG = {
   apiBase: VK_API_BASE,
   defaultUrl: GITHUB_PAGES_URL,
   communityUrl: VK_COMMUNITY_URL,
+  appId: VK_APP_ID,
   botName: 'IT-Старт VK Бот',
 };
 
@@ -162,17 +164,35 @@ export function createVkKeyboard(options = {}) {
 
       // 2. VK Mini App button
       if (btn.app_id) {
+        const appAction = {
+          type: 'open_app',
+          app_id: Number(btn.app_id),
+          label: String(btn.label).slice(0, 40),
+          hash: btn.hash || '',
+        };
+        if (btn.owner_id) {
+          appAction.owner_id = Number(btn.owner_id);
+        }
         return {
-          action: {
-            type: 'open_app',
-            app_id: Number(btn.app_id),
-            label: String(btn.label).slice(0, 40),
-            hash: btn.hash || '',
-          },
+          action: appAction,
         };
       }
 
-      // 3. Regular text button
+      // 3. Callback button
+      if (btn.type === 'callback') {
+        const payloadString =
+          typeof btn.payload === 'object' ? JSON.stringify(btn.payload) : String(btn.payload || '{}');
+        return {
+          action: {
+            type: 'callback',
+            label: String(btn.label).slice(0, 40),
+            payload: payloadString,
+          },
+          color: btn.color || 'secondary',
+        };
+      }
+
+      // 4. Regular text button
       const payloadString =
         typeof btn.payload === 'object' ? JSON.stringify(btn.payload) : String(btn.payload || '{}');
 
@@ -315,7 +335,10 @@ export function keyboardToTextMenu(keyboard) {
       const action = btn.action || btn;
       const label = action.label || '';
       const link = action.link || '';
-      if (link) {
+      const appId = action.app_id || '';
+      if (appId) {
+        lines.push(`[${idx + 1}] ${label}: https://vk.com/app${appId}`);
+      } else if (link) {
         lines.push(`[${idx + 1}] ${label}: ${link}`);
       } else if (label) {
         lines.push(`[${idx + 1}] ${label}`);
@@ -538,11 +561,19 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
   if (!peerId) return { ok: false, error: 'Missing peer_id' };
 
   // Acknowledge inline callback button event to dismiss loading spinner in VK app
-  if ((message.event_id || rawInput.event_id) && token) {
-    const eventId = message.event_id || rawInput.event_id;
-    const userId = message.user_id || rawInput.user_id || peerId;
+  const eventId = message.event_id || rawInput.event_id || rawInput.object?.event_id;
+  if (eventId) {
+    const userId = message.user_id || rawInput.user_id || rawInput.object?.user_id || peerId;
     callVk('messages.sendMessageEventAnswer', { event_id: eventId, user_id: userId, peer_id: peerId }, token).catch(() => {});
   }
+
+  const finish = (obj) => {
+    if (eventId && obj && typeof obj === 'object') {
+      obj.event_id = eventId;
+      obj.eventAcknowledged = true;
+    }
+    return obj;
+  };
 
   // Strip VK group/user mention prefix: [club12345|@name] or [public12345|Name] or @name
   const textRaw = (message.text || rawInput.text || '')
@@ -679,7 +710,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
       await callVk('messages.send', reply, token);
     }
     userMenuState.set(String(peerId), 'main');
-    return { ok: true, type: 'start', reply };
+    return finish({ ok: true, type: 'start', reply });
   }
 
   // 2. «Стажировки» / /vacancies / Вакансии
@@ -729,7 +760,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
       await callVk('messages.send', reply, token);
     }
     userMenuState.set(String(peerId), 'vacancies');
-    return { ok: true, type: 'vacancies', reply, count: filtered.length };
+    return finish({ ok: true, type: 'vacancies', reply, count: filtered.length });
   }
 
   // Direction aliases dictionary for Russian & English commands
@@ -786,7 +817,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
       await callVk('messages.send', reply, token);
     }
     userMenuState.set(String(peerId), 'vacancies');
-    return { ok: true, type: 'direction', directionId: dirId, reply };
+    return finish({ ok: true, type: 'direction', directionId: dirId, reply });
   }
 
   // 4. «Компании» / /companies
@@ -813,7 +844,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
       await callVk('messages.send', reply, token);
     }
     userMenuState.set(String(peerId), 'companies');
-    return { ok: true, type: 'companies', reply };
+    return finish({ ok: true, type: 'companies', reply });
   }
 
   // 5. Specific company lookup (payload cmd: company or /company_<id> or company query)
@@ -868,7 +899,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
       await callVk('messages.send', reply, token);
     }
     userMenuState.set(String(peerId), 'companies');
-    return { ok: true, type: 'company_details', company: targetCompany.id, reply };
+    return finish({ ok: true, type: 'company_details', company: targetCompany.id, reply });
   }
 
   // 6. «Роадмапы» / /roadmaps
@@ -904,7 +935,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
       await callVk('messages.send', reply, token);
     }
     userMenuState.set(String(peerId), 'main');
-    return { ok: true, type: 'roadmaps', reply };
+    return finish({ ok: true, type: 'roadmaps', reply });
   }
 
   // 7. «Вопросы» / /questions
@@ -939,7 +970,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
       await callVk('messages.send', reply, token);
     }
     userMenuState.set(String(peerId), 'main');
-    return { ok: true, type: 'questions', reply };
+    return finish({ ok: true, type: 'questions', reply });
   }
 
   // 8. «Подписка» / /subscribe
@@ -962,7 +993,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
       await callVk('messages.send', reply, token);
     }
     userMenuState.set(String(peerId), 'main');
-    return { ok: true, type: 'subscribed', reply };
+    return finish({ ok: true, type: 'subscribed', reply });
   }
 
   // 9. «Отписаться» / /unsubscribe
@@ -982,7 +1013,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
       await callVk('messages.send', reply, token);
     }
     userMenuState.set(String(peerId), 'main');
-    return { ok: true, type: 'unsubscribed', reply };
+    return finish({ ok: true, type: 'unsubscribed', reply });
   }
 
   // 10. «Статус» / /status / /scan / /sync
@@ -1017,7 +1048,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
       await callVk('messages.send', reply, token);
     }
     userMenuState.set(String(peerId), 'main');
-    return { ok: true, type: 'status', reply };
+    return finish({ ok: true, type: 'status', reply });
   }
 
   // 11. «Помощь» / /help
@@ -1045,7 +1076,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
       await callVk('messages.send', reply, token);
     }
     userMenuState.set(String(peerId), 'main');
-    return { ok: true, type: 'help', reply };
+    return finish({ ok: true, type: 'help', reply });
   }
 
   // 12. «Сайт» / «Открыть сайт» / «WebApp» / /site
@@ -1062,19 +1093,35 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
     textClean.includes('открыть it-старт')
   ) {
     const text =
-      `🚀 Платформа «IT-Старт» доступна в браузере и как Telegram Mini App:\n\n` +
+      `🚀 Платформа «IT-Старт» доступна как VK Mini App, Telegram Mini App и веб-сервис:\n\n` +
+      `📱 VK Mini App: запускается прямо в клиенте ВКонтакте с авто-подстановкой профиля\n` +
       `🌐 Веб-сайт: ${GITHUB_PAGES_URL}\n` +
       `✈️ Telegram-бот: https://t.me/IT_start_izh_bot\n\n` +
-      `В интерактивном веб-приложении вас ждут:\n` +
+      `В интерактивном приложении вас ждут:\n` +
       `• Интерактивные роадмапы со шкалой готовности в %\n` +
       `• Тренажёр 55+ вопросов к собеседованию с режимом скрытия ответов\n` +
       `• Полный каталог стажировок с детальными фильтрами по технологиям!`;
 
+    const appRow = [];
+    if (VK_APP_ID) {
+      appRow.push({
+        label: '📱 Запустить VK Mini App',
+        app_id: Number(VK_APP_ID),
+      });
+    }
+    appRow.push({
+      label: '🚀 Перейти на сайт IT-Старт',
+      link: GITHUB_PAGES_URL,
+    });
+
     const keyboard = createVkKeyboard({
       inline: true,
       buttons: [
-        [{ label: '🚀 Перейти на сайт IT-Старт', link: GITHUB_PAGES_URL }],
-        [{ label: '💼 Каталог вакансий', payload: { cmd: 'vacancies' }, color: 'primary' }],
+        appRow,
+        [
+          { label: '💼 Каталог вакансий', payload: { cmd: 'vacancies' }, color: 'primary' },
+          { label: '🏢 Компании', payload: { cmd: 'companies' }, color: 'secondary' },
+        ],
       ],
     });
 
@@ -1089,7 +1136,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
       await callVk('messages.send', reply, token);
     }
     userMenuState.set(String(peerId), 'main');
-    return { ok: true, type: 'site', reply };
+    return finish({ ok: true, type: 'site', reply });
   }
 
   // Default Fallback
@@ -1108,7 +1155,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
     await callVk('messages.send', reply, token);
   }
   userMenuState.set(String(peerId), 'main');
-  return { ok: true, type: 'unknown', reply };
+  return finish({ ok: true, type: 'unknown', reply });
 }
 
 /**

@@ -44,7 +44,7 @@ import {
   saveLocalTheme,
 } from './lib/storage';
 import { initTelegramWebApp, triggerHaptic } from './lib/telegram';
-import { initVkBridge } from './lib/vkBridge';
+import { initVkBridge, isVkMiniApp, type VkUser, type VkLaunchParams } from './lib/vkBridge';
 
 export function App() {
   // Navigation
@@ -54,6 +54,11 @@ export function App() {
   const [telegramUser, setTelegramUser] = useState<TelegramUser | null>(null);
   const [currentSubscription, setCurrentSubscription] = useState<TelegramSubscription | null>(null);
   const [isSubscribeModalOpen, setIsSubscribeModalOpen] = useState<boolean>(false);
+
+  // VK Mini App User & Params
+  const [vkUser, setVkUser] = useState<VkUser | null>(null);
+  const [vkLaunchParams, setVkLaunchParams] = useState<VkLaunchParams>({});
+  const [isVk, setIsVk] = useState<boolean>(false);
 
   // User Progress
   const [userProgress, setUserProgress] = useState<UserProgress>(() => getLocalProgress());
@@ -98,16 +103,26 @@ export function App() {
     saveLocalTheme('light');
   }, []);
 
-  // Initialize Telegram WebApp & Supabase
+  // Initialize Telegram WebApp, VK Mini App & Supabase
   useEffect(() => {
-    // 1. Detect Telegram WebApp or VK Mini App
+    // 1. Detect Telegram WebApp
     const user = initTelegramWebApp();
     if (user) {
       setTelegramUser(user);
     }
-    initVkBridge().catch(() => {});
 
-    // 2. Load cached subscription
+    // 2. Detect and initialize VK Mini App
+    initVkBridge()
+      .then((res) => {
+        if (res.user) {
+          setVkUser(res.user);
+        }
+        setVkLaunchParams(res.launchParams);
+        setIsVk(isVkMiniApp());
+      })
+      .catch(() => {});
+
+    // 3. Load cached subscription
     const localSub = getLocalSubscription();
     if (localSub) {
       setCurrentSubscription(localSub);
@@ -143,7 +158,7 @@ export function App() {
       const next = updater(prev);
       saveLocalProgress(next);
 
-      const userId = telegramUser?.id || currentSubscription?.chat_id || 'anonymous';
+      const userId = telegramUser?.id || vkUser?.id || currentSubscription?.chat_id || 'anonymous';
       saveUserProgressToSupabase(userId, next);
 
       return next;
@@ -334,23 +349,75 @@ export function App() {
       <div className="relative z-10 flex flex-col min-h-screen">
         {/* Navbar */}
         <Navbar
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        telegramUser={telegramUser}
-        userProgress={userProgress}
-        totalTopicsCount={ROADMAP_TOPICS.length}
-        totalQuestionsCount={QUESTIONS.length}
-        onOpenSubscribeModal={() => {
-          triggerHaptic('medium');
-          setIsSubscribeModalOpen(true);
-        }}
-      />
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          telegramUser={telegramUser}
+          vkUser={vkUser}
+          userProgress={userProgress}
+          totalTopicsCount={ROADMAP_TOPICS.length}
+          totalQuestionsCount={QUESTIONS.length}
+          onOpenSubscribeModal={() => {
+            triggerHaptic('medium');
+            setIsSubscribeModalOpen(true);
+          }}
+        />
 
       {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-7">
         {/* TAB 1: INTERNSHIPS FEED */}
         {activeTab === 'internships' && (
           <div className="relative space-y-6">
+            {/* VK Mini App Profile Card (When opened inside VK) */}
+            {vkUser && (
+              <div className="relative p-4 sm:p-5 rounded-3xl liquid-glass border border-blue-500/20 bg-gradient-to-r from-blue-500/10 via-sky-500/5 to-transparent shadow-xs transition-all duration-300">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div className="flex items-center gap-3.5">
+                    {vkUser.photo_100 || vkUser.photo_200 ? (
+                      <img
+                        src={vkUser.photo_100 || vkUser.photo_200}
+                        alt={vkUser.first_name || 'VK'}
+                        className="w-12 h-12 rounded-2xl object-cover border-2 border-blue-500/30 shadow-xs"
+                      />
+                    ) : (
+                      <div className="w-12 h-12 rounded-2xl bg-blue-600 text-white font-bold text-lg flex items-center justify-center shadow-xs">
+                        VK
+                      </div>
+                    )}
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h2 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white">
+                          {vkUser.first_name} {vkUser.last_name || ''}
+                        </h2>
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-600 border border-blue-500/20">
+                          VK Mini App
+                        </span>
+                        {vkUser.city?.title && (
+                          <span className="text-[11px] text-neutral-500">
+                            • {vkUser.city.title}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-0.5">
+                        VK ID: <span className="font-mono font-medium">{vkUser.id}</span>
+                        {vkLaunchParams.vk_platform && <span> • {vkLaunchParams.vk_platform}</span>}
+                        <span> • Прогресс: {userProgress.completedTopics.length} тем • {userProgress.completedQuestions.length} вопросов</span>
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => {
+                      triggerHaptic('medium');
+                      setIsSubscribeModalOpen(true);
+                    }}
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-all active:scale-95 shrink-0"
+                  >
+                    <Bot className="w-3.5 h-3.5" />
+                    <span>Уведомления VK</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Ambient typography watermark behind cards */}
             <div className="absolute inset-x-0 -top-6 h-96 flex items-center justify-center -z-10 pointer-events-none overflow-hidden select-none opacity-[0.03] blur-[0.5px]">
               <span className="text-8xl sm:text-[160px] md:text-[200px] font-black tracking-tighter uppercase select-none leading-none text-slate-700">
@@ -682,11 +749,12 @@ export function App() {
         onToggleQuestion={handleToggleQuestion}
       />
 
-      {/* Subscribe to Telegram Modal */}
+      {/* Subscribe to Telegram & VK Modal */}
       <SubscribeModal
         isOpen={isSubscribeModalOpen}
         onClose={() => setIsSubscribeModalOpen(false)}
         telegramUser={telegramUser}
+        vkUser={vkUser}
         currentSubscription={currentSubscription}
         onSubscriptionSaved={(sub) => setCurrentSubscription(sub)}
       />
@@ -736,6 +804,14 @@ export function App() {
             <span className="text-[10px] px-2.5 py-0.5 rounded-full font-medium liquid-glass-pill text-neutral-700 dark:text-neutral-200">
               Liquid Glass iOS
             </span>
+            {isVk && (
+              <>
+                <span>•</span>
+                <span className="text-[10px] px-2.5 py-0.5 rounded-full font-medium bg-blue-500/10 text-blue-600 border border-blue-500/20">
+                  VK Mini App Active
+                </span>
+              </>
+            )}
           </div>
         </div>
       </footer>

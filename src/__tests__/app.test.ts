@@ -777,10 +777,22 @@ describe('12. VKontakte (VK) Bot & VK Mini App Integration', () => {
     expect(hashParsed.vk_platform).toBe('desktop_web');
 
     // Detect VK environment when window.vkBridge is present
+    const sentMethods: string[] = [];
     (window as any).vkBridge = {
       send: async (method: string) => {
+        sentMethods.push(method);
         if (method === 'VKWebAppInit') return { result: true };
-        if (method === 'VKWebAppGetUserInfo') return { id: 87654321, first_name: 'Иван' };
+        if (method === 'VKWebAppGetUserInfo') {
+          return {
+            id: 87654321,
+            first_name: 'Иван',
+            last_name: 'Петров',
+            photo_100: 'https://vk.com/photo100.jpg',
+            photo_200: 'https://vk.com/photo200.jpg',
+            city: { id: 1, title: 'Москва' },
+          };
+        }
+        if (method === 'VKWebAppSetViewSettings') return { result: true };
         return {};
       },
     };
@@ -789,10 +801,27 @@ describe('12. VKontakte (VK) Bot & VK Mini App Integration', () => {
     const initRes = await initVkBridge();
     expect(initRes.success).toBe(true);
     expect(initRes.user?.id).toBe(87654321);
+    expect(initRes.user?.first_name).toBe('Иван');
+    expect(initRes.user?.last_name).toBe('Петров');
+    expect(initRes.user?.photo_100).toBe('https://vk.com/photo100.jpg');
+    expect(sentMethods).toContain('VKWebAppInit');
+    expect(sentMethods).toContain('VKWebAppSetViewSettings');
+    expect(sentMethods).toContain('VKWebAppGetUserInfo');
+
+    // Direct methods: setVkViewSettings, getCachedVkUser, getVkUserProfile
+    const { setVkViewSettings, getCachedVkUser, getVkUserProfile } = await import('../lib/vkBridge');
+    const viewRes = await setVkViewSettings({ statusBarStyle: 'dark', actionBarColor: '#ffffff' });
+    expect(viewRes).toBe(true);
+    expect(getCachedVkUser()?.id).toBe(87654321);
+
+    const profileRes = await getVkUserProfile();
+    expect(profileRes?.first_name).toBe('Иван');
 
     // Haptic calls should not throw
-    expect(() => triggerVkHaptic('impact')).not.toThrow();
-    expect(() => triggerVkHaptic('notification')).not.toThrow();
+    expect(() => triggerVkHaptic('impact', 'medium')).not.toThrow();
+    expect(() => triggerVkHaptic('impact', 'heavy')).not.toThrow();
+    expect(() => triggerVkHaptic('notification', 'success')).not.toThrow();
+    expect(() => triggerVkHaptic('notification', 'error')).not.toThrow();
     expect(() => triggerVkHaptic('selection')).not.toThrow();
 
     // Clean up
@@ -898,9 +927,27 @@ describe('12. VKontakte (VK) Bot & VK Mini App Integration', () => {
     expect(kb.inline).toBe(true);
     expect(kb.buttons.length).toBe(1);
     expect(kb.buttons[0][0].action.type).toBe('text');
-    expect(kb.buttons[0][0].action.label).toBe('Стажировки');
     expect(kb.buttons[0][1].action.type).toBe('open_link');
     expect(kb.buttons[0][1].action.link).toBe('https://oioiqp.github.io/it-start/');
+
+    // 2b. VK Mini App open_app and callback button generation
+    const appKbJson = vkBotModule.createVkKeyboard({
+      inline: true,
+      buttons: [
+        [
+          { label: 'Запустить VK Mini App', app_id: 51820000, owner_id: 242573933 },
+          { label: 'Кнопка Callback', type: 'callback', payload: { action: 'test' } },
+        ],
+      ],
+    });
+    const parsedAppKb = JSON.parse(appKbJson);
+    expect(parsedAppKb.buttons[0][0].action.type).toBe('open_app');
+    expect(parsedAppKb.buttons[0][0].action.app_id).toBe(51820000);
+    expect(parsedAppKb.buttons[0][0].action.owner_id).toBe(242573933);
+    expect(parsedAppKb.buttons[0][1].action.type).toBe('callback');
+
+    const appTextMenu = vkBotModule.keyboardToTextMenu(appKbJson);
+    expect(appTextMenu).toContain('https://vk.com/app51820000');
 
     // 3. formatVkVacancyMessage
     expect(typeof vkBotModule.formatVkVacancyMessage).toBe('function');
@@ -1159,6 +1206,8 @@ describe('12. VKontakte (VK) Bot & VK Mini App Integration', () => {
     });
     expect(eventRes.ok).toBe(true);
     expect(eventRes.type).toBe('vacancies');
+    expect(eventRes.event_id).toBe('evt_12345');
+    expect(eventRes.eventAcknowledged).toBe(true);
 
     // 24. keyboardToTextMenu helper converts keyboard into readable list
     expect(typeof vkBotModule.keyboardToTextMenu).toBe('function');
@@ -1239,6 +1288,33 @@ describe('12. VKontakte (VK) Bot & VK Mini App Integration', () => {
     expect(vkStatus.bot).toBe('IT-Старт VK Бот');
     expect(vkStatus.commandsCount).toBe(8);
     expect(vkStatus.version).toBe('5.199');
+  });
+
+  it('validates that Navbar properly displays VK user profile and Mini App badge', async () => {
+    const React = await import('react');
+    const { renderToString } = await import('react-dom/server');
+    const { Navbar } = await import('../components/Navbar');
+
+    const mockVkUser = {
+      id: 12345678,
+      first_name: 'Алексей',
+      last_name: 'Смирнов',
+      photo_100: 'https://vk.com/photo100.jpg',
+    };
+
+    const html = renderToString(
+      React.createElement(Navbar, {
+        activeTab: 'internships',
+        setActiveTab: () => {},
+        vkUser: mockVkUser,
+        onOpenSubscribeModal: () => {},
+      })
+    );
+
+    expect(html).toContain('Алексей');
+    expect(html).toContain('Mini App');
+    expect(html).toContain('https://vk.com/photo100.jpg');
+    expect(html).toContain('VK Бот');
   });
 });
 

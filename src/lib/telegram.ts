@@ -61,19 +61,49 @@ export function initTelegramWebApp(): TelegramUser | null {
 }
 
 export function triggerHaptic(type: 'light' | 'medium' | 'heavy' | 'success' | 'selection' = 'light') {
-  const webApp = getTelegramWebApp();
-  if (!webApp?.HapticFeedback) return;
+  if (typeof window === 'undefined') return;
 
-  try {
-    if (type === 'success') {
-      webApp.HapticFeedback.notificationOccurred('success');
-    } else if (type === 'selection') {
-      webApp.HapticFeedback.selectionChanged();
-    } else {
-      webApp.HapticFeedback.impactOccurred(type);
+  // 1. Telegram WebApp Haptic
+  const webApp = getTelegramWebApp();
+  if (webApp?.HapticFeedback) {
+    try {
+      if (type === 'success') {
+        webApp.HapticFeedback.notificationOccurred('success');
+      } else if (type === 'selection') {
+        webApp.HapticFeedback.selectionChanged();
+      } else {
+        webApp.HapticFeedback.impactOccurred(type);
+      }
+      return;
+    } catch {
+      // Ignore haptic errors
     }
-  } catch {
-    // Ignore haptic errors
+  }
+
+  // 2. VK Mini App Taptic (VK Bridge)
+  if (window.vkBridge && typeof window.vkBridge.send === 'function') {
+    try {
+      if (type === 'success') {
+        window.vkBridge.send('VKWebAppTapticNotificationOccurred', { result_type: 'success' }).catch(() => {});
+      } else if (type === 'selection') {
+        window.vkBridge.send('VKWebAppTapticSelectionChanged', {}).catch(() => {});
+      } else {
+        const style = type === 'medium' || type === 'heavy' ? type : 'light';
+        window.vkBridge.send('VKWebAppTapticImpactOccurred', { style }).catch(() => {});
+      }
+      return;
+    } catch {
+      // Ignore haptic errors
+    }
+  }
+
+  // 3. Fallback to standard Navigator Vibration API if supported
+  if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+    try {
+      navigator.vibrate(type === 'selection' ? 10 : 25);
+    } catch {
+      // Ignore vibration errors
+    }
   }
 }
 

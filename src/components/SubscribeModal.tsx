@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import type { DirectionId, SubTrackId, TelegramSubscription, TelegramUser } from '../types';
+import type { VkUser } from '../lib/vkBridge';
 import { DIRECTIONS } from '../data/directions';
 import { saveSubscriptionToSupabase, TELEGRAM_BOT_USERNAME, TELEGRAM_BOT_URL } from '../lib/supabase';
 import {
@@ -26,6 +27,7 @@ interface SubscribeModalProps {
   isOpen: boolean;
   onClose: () => void;
   telegramUser: TelegramUser | null;
+  vkUser?: VkUser | null;
   currentSubscription: TelegramSubscription | null;
   onSubscriptionSaved: (sub: TelegramSubscription) => void;
 }
@@ -34,6 +36,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
   isOpen,
   onClose,
   telegramUser,
+  vkUser,
   currentSubscription,
   onSubscriptionSaved,
 }) => {
@@ -49,7 +52,12 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
 
   useEffect(() => {
-    if (telegramUser) {
+    if (vkUser) {
+      setChatId(String(vkUser.id));
+      if (vkUser.first_name) setFirstName(vkUser.first_name);
+      const fullName = `${vkUser.first_name || ''} ${vkUser.last_name || ''}`.trim();
+      if (fullName) setUsername(fullName);
+    } else if (telegramUser) {
       setChatId(String(telegramUser.id));
       if (telegramUser.username) setUsername(telegramUser.username);
       if (telegramUser.first_name) setFirstName(telegramUser.first_name);
@@ -60,7 +68,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
       setSelectedDirections(currentSubscription.directions);
       setSelectedSubTracks(currentSubscription.sub_tracks);
     }
-  }, [telegramUser, currentSubscription, isOpen]);
+  }, [vkUser, telegramUser, currentSubscription, isOpen]);
 
   if (!isOpen) return null;
 
@@ -241,8 +249,18 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
           </div>
         </div>
 
-        {/* Telegram WebApp Auto-Detected Notice */}
-        {telegramUser ? (
+        {/* VK Mini App or Telegram WebApp Auto-Detected Notice */}
+        {vkUser ? (
+          <div className="mb-4 p-3.5 rounded-2xl border text-xs flex items-center gap-2.5
+            bg-blue-500/10 border-blue-500/20 text-blue-800
+            dark:bg-blue-500/15 dark:border-blue-500/30 dark:text-blue-300"
+          >
+            <div className="w-2 h-2 rounded-full bg-blue-500 animate-ping shrink-0"></div>
+            <div>
+              <span className="font-semibold">VK Mini App обнаружен:</span> Вы открыли приложение во ВКонтакте. VK ID (<span className="font-mono font-bold">{vkUser.id}</span>) подставлен автоматически!
+            </div>
+          </div>
+        ) : telegramUser ? (
           <div className="mb-4 p-3.5 rounded-2xl border text-xs flex items-center gap-2.5
             bg-emerald-500/10 border-emerald-500/20 text-emerald-800
             dark:bg-emerald-500/15 dark:border-emerald-500/30 dark:text-emerald-300"
