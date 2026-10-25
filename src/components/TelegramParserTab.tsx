@@ -1275,7 +1275,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                   key={post.id}
                   className={`p-5 rounded-3xl border transition-all flex flex-col justify-between ${
                     isPublished
-                      ? 'border-emerald-500/30 bg-emerald-50/20 dark:bg-emerald-950/20 backdrop-blur-xl'
+                      ? 'border-emerald-500/30 bg-emerald-50/20 dark:bg-emerald-950/20 backdrop-blur-sm sm:backdrop-blur-xl'
                       : 'liquid-glass-subtle liquid-glass-interactive'
                   }`}
                 >

@@ -19,6 +19,7 @@ import confetti from 'canvas-confetti';
 import type { Internship, Question, RoadmapTopic, UserProgress } from '../types';
 import { triggerHaptic } from '../lib/telegram';
 import { resolveApplyUrl, resolveChannelHandle, getCompanyMonogram } from '../lib/vacancyUrl';
+import { useScrollLock } from '../lib/useScrollLock';
 
 interface InternshipModalProps {
   internship: Internship | null;
@@ -42,6 +43,19 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
   onToggleQuestion,
 }) => {
   const [expandedQuestionId, setExpandedQuestionId] = React.useState<string | null>(null);
+
+  // Lock background scroll on mobile and desktop while modal is open
+  useScrollLock(Boolean(internship));
+
+  // Close on Escape key press
+  React.useEffect(() => {
+    if (!internship) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [internship, onClose]);
 
   if (!internship) return null;
 
@@ -138,12 +152,21 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
   const statusBadge = getStatusBadge();
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/40 backdrop-blur-xl overflow-y-auto">
-      <div className="relative w-full max-w-3xl rounded-[28px] sm:rounded-[32px] p-6 sm:p-8 my-8 max-h-[90vh] flex flex-col liquid-glass text-neutral-900 overflow-hidden shadow-2xl">
+    <div
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 liquid-modal-overlay overflow-y-auto overscroll-contain modal-overlay-animation"
+    >
+      <div
+        className="relative w-full max-w-3xl rounded-[24px] sm:rounded-[32px] p-4 sm:p-8 my-auto sm:my-8 max-h-[92vh] sm:max-h-[90vh] flex flex-col modal-enter-animation liquid-glass-modal text-neutral-900 dark:text-neutral-100 overflow-hidden shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 p-2 rounded-full transition-all duration-150 z-10 active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-600 hover:text-neutral-950 cursor-pointer"
+          aria-label="Закрыть"
+          className="absolute top-4 right-4 sm:top-5 sm:right-5 min-w-[36px] min-h-[36px] p-2 rounded-full transition-transform duration-150 z-10 active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-600 hover:text-neutral-950 dark:text-neutral-300 dark:hover:text-white cursor-pointer flex items-center justify-center"
         >
           <X className="w-5 h-5" />
         </button>
@@ -236,7 +259,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                 return (
                   <div
                     key={topic.id}
-                    className={`p-4 rounded-2xl transition-all ${
+                    className={`p-3.5 sm:p-4 rounded-2xl transition-colors duration-150 ${
                       isDone
                         ? 'bg-emerald-500/10 border border-emerald-500/25 dark:bg-emerald-500/15 dark:border-emerald-500/35'
                         : 'liquid-glass-subtle'
@@ -358,7 +381,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                 return (
                   <div
                     key={q.id}
-                    className={`rounded-2xl transition-all ${
+                    className={`rounded-2xl transition-colors duration-150 ${
                       isCompleted
                         ? 'bg-emerald-500/10 border border-emerald-500/25 dark:bg-emerald-500/15 dark:border-emerald-500/35'
                         : 'liquid-glass-subtle'
@@ -393,7 +416,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                       <button
                         type="button"
                         onClick={() => setExpandedQuestionId(isExpanded ? null : q.id)}
-                        className="p-2 rounded-full transition-all duration-150 active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-700 cursor-pointer"
+                        className="p-2 rounded-full transition-transform duration-150 active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-700 cursor-pointer"
                       >
                         {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                       </button>
@@ -435,11 +458,11 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
         </div>
 
         {/* Modal Footer */}
-        <div className="shrink-0 pt-4 border-t flex flex-wrap items-center justify-between gap-3 border-black/5 dark:border-white/5">
+        <div className="shrink-0 pt-3 sm:pt-4 pb-[max(0.25rem,env(safe-area-inset-bottom))] border-t flex flex-wrap items-center justify-between gap-2.5 sm:gap-3 border-black/5 dark:border-white/5">
           <div className="flex items-center gap-2">
             <button
               onClick={onClose}
-              className="px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-all active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-800 cursor-pointer"
+              className="min-h-[44px] px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-transform duration-150 active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-800 cursor-pointer"
             >
               Закрыть
             </button>
@@ -453,7 +476,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                   href={`https://t.me/${cleanChannel}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold transition-all active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-800"
+                  className="min-h-[44px] flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold transition-transform duration-150 active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-800"
                   title={`Открыть проверенный Telegram-канал ${verifiedChannel}`}
                 >
                   <Bot className="w-3.5 h-3.5 text-neutral-600" />
@@ -471,7 +494,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                 href={verifiedApplyUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 px-6 py-2.5 rounded-full font-semibold text-xs sm:text-sm active:scale-95 transition-all bg-neutral-900 hover:bg-black text-white shadow-xs cursor-pointer"
+                className="min-h-[44px] flex items-center gap-2 px-6 py-2.5 rounded-full font-semibold text-xs sm:text-sm active:scale-95 transition-transform duration-150 bg-neutral-900 hover:bg-black text-white shadow-xs cursor-pointer"
                 title={`Подать заявку на официальном сайте компании ${internship.company}`}
               >
                 <span>Подать заявку на сайте {internship.company}</span>

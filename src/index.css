@@ -13,11 +13,12 @@
   html, body {
     background-color: #ccd3e0;
     color: #1d1d1f;
+    overscroll-behavior-y: none;
   }
 
   body {
     font-family: var(--font-sans);
-    min-height: 100vh;
+    min-height: 100dvh;
     margin: 0;
     padding: 0;
     overflow-x: hidden;
@@ -26,9 +27,17 @@
     background-color: #ccd3e0;
   }
 
-  /* Apple Fluid micro-interactions (WWDC Fluid Interfaces) */
-  button, a {
+  /* Apple Fluid micro-interactions & touch optimization */
+  button, a, [role="button"] {
     -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  /* Prevent automatic iOS Safari zoom when focusing inputs */
+  @media (max-width: 768px), (pointer: coarse) {
+    input, textarea, select {
+      font-size: 16px;
+    }
   }
 }
 
@@ -43,6 +52,69 @@
     radial-gradient(ellipse 70% 50% at 10% 50%, rgba(220, 226, 238, 0.5) 0%, transparent 60%),
     radial-gradient(circle at 50% 100%, rgba(245, 248, 255, 0.75) 0%, transparent 70%);
   background-attachment: fixed;
+}
+
+/* Hardware-accelerated modal scale & fade animations (composite-only properties) */
+@keyframes modalScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateZ(0);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateZ(0);
+  }
+}
+
+@keyframes overlayFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-enter-animation {
+  animation: modalScaleIn 180ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  transform-origin: center center;
+}
+
+.modal-overlay-animation {
+  animation: overlayFadeIn 180ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: opacity;
+}
+
+/* Modal Dimming Overlay (desktop: subtle blur, mobile: lightweight solid overlay) */
+.liquid-modal-overlay {
+  background-color: rgba(2, 6, 23, 0.45);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  overscroll-behavior: contain;
+  isolation: isolate;
+}
+
+/* Modal Dialog Window Surface */
+.liquid-glass-modal {
+  position: relative;
+  backdrop-filter: blur(36px) saturate(130%);
+  -webkit-backdrop-filter: blur(36px) saturate(130%);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.88) 0%, rgba(246, 248, 252, 0.82) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.50);
+  box-shadow: 
+    0 25px 50px -12px rgba(15, 23, 42, 0.18),
+    0 4px 12px -2px rgba(15, 23, 42, 0.04);
+  transform: translateZ(0);
+}
+
+.dark .liquid-glass-modal {
+  background: linear-gradient(145deg, rgba(24, 28, 38, 0.90) 0%, rgba(18, 22, 30, 0.86) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.60),
+    0 4px 12px -2px rgba(0, 0, 0, 0.30);
 }
 
 /* Minimalist Liquid Matte Frosted Glass Main Surface */
@@ -63,12 +135,18 @@
   will-change: transform;
 }
 
-.liquid-glass-interactive:hover {
-  transform: translateY(-2px);
-  border-color: rgba(255, 255, 255, 0.40);
-  box-shadow: 
-    0 14px 34px -8px rgba(0, 0, 0, 0.07),
-    0 4px 12px -2px rgba(0, 0, 0, 0.03);
+@media (hover: hover) and (pointer: fine) {
+  .liquid-glass-interactive:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.40);
+    box-shadow: 
+      0 14px 34px -8px rgba(0, 0, 0, 0.07),
+      0 4px 12px -2px rgba(0, 0, 0, 0.03);
+  }
+}
+
+.liquid-glass-interactive:active {
+  transform: scale(0.99);
 }
 
 /* Liquid Matte Glass Subtle Surface (Inner cards, steps, widgets) */
@@ -152,6 +230,82 @@
 .glass-pill {
   backdrop-filter: blur(24px) saturate(125%);
   -webkit-backdrop-filter: blur(24px) saturate(125%);
+}
+
+/* ==========================================================================
+   Mobile Performance Optimizations (Zero nested blur overdraw, lightweight GPU compositor)
+   Relieves mobile WebKit / Android Chrome GPU from 3-4 nested gaussian blur passes
+   ========================================================================== */
+@media (max-width: 768px), (hover: none) and (pointer: coarse) {
+  /* Remove heavy backdrop-blur on modal overlays completely to avoid nested GPU blur shaders */
+  .liquid-modal-overlay {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background-color: rgba(15, 23, 42, 0.60) !important;
+  }
+
+  /* Gentle 8px-12px blur with denser 0.92-0.96 surface opacity to maintain frosted matte aesthetics */
+  .liquid-glass-modal {
+    backdrop-filter: blur(10px) saturate(120%);
+    -webkit-backdrop-filter: blur(10px) saturate(120%);
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(255, 255, 255, 0.70);
+  }
+
+  .dark .liquid-glass-modal {
+    background: rgba(20, 24, 34, 0.95);
+    border-color: rgba(255, 255, 255, 0.16);
+  }
+
+  .liquid-glass {
+    backdrop-filter: blur(10px) saturate(120%);
+    -webkit-backdrop-filter: blur(10px) saturate(120%);
+    background: rgba(255, 255, 255, 0.92);
+  }
+
+  .dark .liquid-glass {
+    background: rgba(22, 26, 36, 0.92);
+  }
+
+  .liquid-glass-subtle {
+    backdrop-filter: blur(8px) saturate(115%);
+    -webkit-backdrop-filter: blur(8px) saturate(115%);
+    background: rgba(255, 255, 255, 0.90);
+  }
+
+  .dark .liquid-glass-subtle {
+    background: rgba(20, 24, 32, 0.90);
+  }
+
+  .liquid-glass-pill {
+    backdrop-filter: blur(6px) saturate(115%);
+    -webkit-backdrop-filter: blur(6px) saturate(115%);
+    background: rgba(255, 255, 255, 0.88);
+  }
+
+  .dark .liquid-glass-pill {
+    background: rgba(24, 28, 38, 0.88);
+  }
+
+  .liquid-glass-nav {
+    backdrop-filter: blur(12px) saturate(125%);
+    -webkit-backdrop-filter: blur(12px) saturate(125%);
+    background: rgba(255, 255, 255, 0.95);
+  }
+
+  .dark .liquid-glass-nav {
+    background: rgba(18, 22, 30, 0.95);
+  }
+
+  .liquid-glass-tile {
+    backdrop-filter: blur(8px) saturate(115%);
+    -webkit-backdrop-filter: blur(8px) saturate(115%);
+    background: rgba(255, 255, 255, 0.88);
+  }
+
+  .dark .liquid-glass-tile {
+    background: rgba(24, 28, 38, 0.88);
+  }
 }
 
 /* Custom Minimalist Apple-Style Scrollbars */

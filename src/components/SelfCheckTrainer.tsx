@@ -316,7 +316,7 @@ export const SelfCheckTrainer: React.FC<SelfCheckTrainerProps> = ({
             )}
 
             {/* Reference Official Answer */}
-            <div className="p-4 sm:p-5 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 dark:bg-emerald-500/15 backdrop-blur-xl shadow-xs space-y-1.5 transition-colors">
+            <div className="p-4 sm:p-5 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 dark:bg-emerald-500/15 backdrop-blur-sm sm:backdrop-blur-xl shadow-xs space-y-1.5 transition-colors">
               <span className="text-[11px] font-semibold flex items-center gap-1.5 uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
                 <Sparkles className="w-3.5 h-3.5" />
                 Эталонный ответ:

@@ -23,6 +23,7 @@ import {
 } from '../lib/telegram';
 import { saveLocalSubscription } from '../lib/storage';
 import { getSavedVkToken, sendVkMessage, getVkBotDialogUrl } from '../lib/vk';
+import { useScrollLock } from '../lib/useScrollLock';
 
 interface SubscribeModalProps {
   isOpen: boolean;
@@ -51,6 +52,19 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isDetecting, setIsDetecting] = useState<boolean>(false);
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
+
+  // Lock background scroll on mobile and desktop while modal is open
+  useScrollLock(isOpen);
+
+  // Close on Escape key press
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   useEffect(() => {
     if (vkUser) {
@@ -258,12 +272,21 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
   const botToken = getSavedBotToken();
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/40 backdrop-blur-xl overflow-y-auto">
-      <div className="relative w-full max-w-xl rounded-[28px] sm:rounded-[32px] shadow-2xl p-6 sm:p-7 my-8 animate-in fade-in zoom-in-95 duration-200 transition-all liquid-glass text-neutral-900">
+    <div
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 liquid-modal-overlay overflow-y-auto overscroll-contain modal-overlay-animation"
+    >
+      <div
+        className="relative w-full max-w-xl rounded-[24px] sm:rounded-[32px] shadow-2xl p-4 sm:p-7 my-auto sm:my-8 modal-enter-animation liquid-glass-modal text-neutral-900 dark:text-neutral-100"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 p-2 rounded-full transition-all duration-150 z-10 active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-600 hover:text-neutral-950 cursor-pointer"
+          aria-label="Закрыть"
+          className="absolute top-4 right-4 sm:top-5 sm:right-5 min-w-[36px] min-h-[36px] p-2 rounded-full transition-transform duration-150 z-10 active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-600 hover:text-neutral-950 dark:text-neutral-300 dark:hover:text-white cursor-pointer flex items-center justify-center"
         >
           <X className="w-5 h-5" />
         </button>
@@ -356,7 +379,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
                 onChange={(e) => setChatId(e.target.value)}
                 placeholder={vkUser ? 'например 123456789' : 'например 123456789'}
                 required
-                className="w-full px-3.5 py-2 rounded-xl text-xs sm:text-sm transition-colors focus:outline-none
+                className="w-full px-3.5 py-2.5 rounded-xl text-base sm:text-sm transition-colors focus:outline-none
                   bg-neutral-50 border border-neutral-200/80 text-neutral-900 placeholder:text-neutral-400 focus:border-neutral-400
                   dark:bg-white/[0.04] dark:border-white/10 dark:text-neutral-100 dark:placeholder:text-neutral-500 dark:focus:border-white/30"
               />
@@ -371,7 +394,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder={vkUser ? 'Имя Фамилия' : '@username (необязательно)'}
-                className="w-full px-3.5 py-2 rounded-xl text-xs sm:text-sm transition-colors focus:outline-none
+                className="w-full px-3.5 py-2.5 rounded-xl text-base sm:text-sm transition-colors focus:outline-none
                   bg-neutral-50 border border-neutral-200/80 text-neutral-900 placeholder:text-neutral-400 focus:border-neutral-400
                   dark:bg-white/[0.04] dark:border-white/10 dark:text-neutral-100 dark:placeholder:text-neutral-500 dark:focus:border-white/30"
               />
@@ -391,7 +414,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
                     key={dir.id}
                     type="button"
                     onClick={() => toggleDirection(dir.id)}
-                    className={`flex items-center justify-between p-2.5 rounded-xl text-left text-xs font-semibold transition-all duration-150 active:scale-95 cursor-pointer ${
+                    className={`flex items-center justify-between p-2.5 rounded-xl text-left text-xs font-semibold transition-transform duration-150 active:scale-95 cursor-pointer ${
                       isSelected
                         ? 'bg-neutral-900 text-white shadow-xs'
                         : 'liquid-glass-pill text-neutral-700 hover:bg-white/50'
@@ -419,7 +442,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
                       key={st.id}
                       type="button"
                       onClick={() => toggleSubTrack(st.id)}
-                      className={`px-3 py-1 rounded-full text-xs font-semibold transition-all duration-150 active:scale-95 cursor-pointer ${
+                      className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-transform duration-150 active:scale-95 cursor-pointer ${
                         isSelected
                           ? 'bg-neutral-900 text-white shadow-xs'
                           : 'liquid-glass-pill text-neutral-700 hover:bg-white/50'
@@ -480,7 +503,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
                       saveBotToken(e.target.value.trim());
                     }}
                     placeholder="Токен от @BotFather (сохраняется в браузере)"
-                    className="w-full px-3 py-2 rounded-xl text-xs transition-all focus:outline-none liquid-glass-pill focus:bg-white/50 text-neutral-900 placeholder:text-neutral-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl text-base sm:text-sm transition-colors focus:outline-none liquid-glass-pill focus:bg-white/50 text-neutral-900 placeholder:text-neutral-500"
                   />
                   <p className="text-[10px] text-neutral-600">
                     Токен хранится только в вашем браузере и используется для реальных вызовов Bot API.
@@ -511,12 +534,12 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
           )}
 
           {/* Action buttons */}
-          <div className="flex flex-col sm:flex-row items-center gap-2 pt-2">
+          <div className="flex flex-col sm:flex-row items-center gap-2.5 pt-2">
             <button
               type="button"
               onClick={handleTestNotification}
               disabled={isLoading || !chatId}
-              className="w-full sm:w-1/2 flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-all active:scale-95 disabled:opacity-50 liquid-glass-pill hover:bg-white/50 text-neutral-800 cursor-pointer"
+              className="w-full sm:w-1/2 min-h-[44px] flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-transform duration-150 active:scale-95 disabled:opacity-50 liquid-glass-pill hover:bg-white/50 text-neutral-800 cursor-pointer"
             >
               <Send className="w-3.5 h-3.5 text-neutral-600" />
               <span>Проверить уведомление</span>
@@ -525,7 +548,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full sm:w-1/2 flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-white text-xs sm:text-sm font-semibold shadow-xs transition-all active:scale-95 disabled:opacity-50 bg-neutral-900 hover:bg-black cursor-pointer"
+              className="w-full sm:w-1/2 min-h-[44px] flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-white text-xs sm:text-sm font-semibold shadow-xs transition-transform duration-150 active:scale-95 disabled:opacity-50 bg-neutral-900 hover:bg-black cursor-pointer"
             >
               <Check className="w-4 h-4" />
               <span>{isLoading ? 'Сохранение...' : 'Сохранить подписку'}</span>

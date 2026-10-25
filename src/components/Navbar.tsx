@@ -46,7 +46,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   return (
     <header className="sticky top-2.5 sm:top-4 z-50 flex items-center justify-center px-3 sm:px-4 w-full pointer-events-none">
       <div
-        className="pointer-events-auto flex items-center justify-between gap-1 sm:gap-2 p-1.5 sm:p-2 rounded-full transition-all duration-300 max-w-5xl w-full sm:w-auto liquid-glass-nav"
+        className="pointer-events-auto flex items-center justify-between gap-1 sm:gap-2 p-1.5 sm:p-2 rounded-full transition-transform duration-300 max-w-5xl w-full sm:w-auto liquid-glass-nav"
       >
         {/* Brand / Logo (Minimalist & Clean) */}
         <div
@@ -77,7 +77,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 key={tab.id}
                 onClick={() => handleTabClick(tab.id)}
-                className={`flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 ${
+                className={`flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-transform duration-150 active:scale-95 ${
                   isActive
                     ? 'bg-neutral-900 text-white shadow-xs dark:bg-white dark:text-black'
                     : 'text-neutral-700 hover:text-neutral-950 hover:bg-white/40 dark:text-neutral-300 dark:hover:text-white dark:hover:bg-white/10'
@@ -137,7 +137,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               triggerHaptic('medium');
               onOpenSubscribeModal();
             }}
-            className="flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full font-semibold text-xs transition-all duration-150 active:scale-95 shadow-xs
+            className="flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full font-semibold text-xs transition-transform duration-150 active:scale-95 shadow-xs
               bg-neutral-900 hover:bg-black text-white dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-100"
             title={
               vkUser
