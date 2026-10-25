@@ -183,7 +183,7 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
                 <div className="flex items-center gap-2 shrink-0">
                   <button
                     onClick={handleOpenPlan}
-                    className="flex items-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-full text-xs font-semibold transition-all active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-800 dark:text-neutral-200"
+                    className="flex items-center gap-1.5 px-3.5 sm:px-4 py-2 min-h-[38px] rounded-full text-xs font-semibold transition-transform duration-150 active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-800 dark:text-neutral-200"
                   >
                     <GraduationCap className="w-3.5 h-3.5 text-neutral-600 dark:text-neutral-400" />
                     <span>План</span>
@@ -193,7 +193,7 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
                     href={verifiedApplyUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 px-4 sm:px-5 py-2 rounded-full text-xs font-semibold transition-all active:scale-95 bg-neutral-900 hover:bg-black text-white dark:bg-white dark:hover:bg-neutral-100 dark:text-neutral-900 shadow-xs"
+                    className="flex items-center gap-1.5 px-4 sm:px-5 py-2 min-h-[38px] rounded-full text-xs font-semibold transition-transform duration-150 active:scale-95 bg-neutral-900 hover:bg-black text-white dark:bg-white dark:hover:bg-neutral-100 dark:text-neutral-900 shadow-xs"
                     title={`Подать заявку на официальном сайте ${internship.company}`}
                   >
                     <span>Отклик</span>

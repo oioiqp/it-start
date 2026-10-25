@@ -156,7 +156,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 liquid-modal-overlay overflow-y-auto overscroll-contain modal-overlay-animation"
+      className="fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-[max(0.75rem,env(safe-area-inset-bottom))] liquid-modal-overlay overflow-y-auto overscroll-contain touch-pan-y modal-overlay-animation"
     >
       <div
         className="relative w-full max-w-3xl rounded-[24px] sm:rounded-[32px] p-4 sm:p-8 my-auto sm:my-8 max-h-[92vh] sm:max-h-[90vh] flex flex-col modal-enter-animation liquid-glass-modal text-neutral-900 dark:text-neutral-100 overflow-hidden shadow-2xl"
@@ -166,7 +166,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
         <button
           onClick={onClose}
           aria-label="Закрыть"
-          className="absolute top-4 right-4 sm:top-5 sm:right-5 min-w-[36px] min-h-[36px] p-2 rounded-full transition-transform duration-150 z-10 active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-600 hover:text-neutral-950 dark:text-neutral-300 dark:hover:text-white cursor-pointer flex items-center justify-center"
+          className="absolute top-3.5 right-3.5 sm:top-5 sm:right-5 min-w-[44px] min-h-[44px] p-2.5 rounded-full transition-transform duration-150 z-10 active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-600 hover:text-neutral-950 dark:text-neutral-300 dark:hover:text-white cursor-pointer flex items-center justify-center"
         >
           <X className="w-5 h-5" />
         </button>
@@ -210,7 +210,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
         </div>
 
         {/* Scrollable Content */}
-        <div className="overflow-y-auto py-4 space-y-6 flex-1 pr-1 custom-scroll">
+        <div className="overflow-y-auto py-4 space-y-6 flex-1 pr-1 custom-scroll touch-pan-y overscroll-contain">
           {/* Readiness Progress Bar Card */}
           <div className="p-4 sm:p-5 rounded-2xl liquid-glass-subtle transition-colors">
             <div className="flex items-center justify-between gap-3 mb-2 flex-wrap">
@@ -392,7 +392,8 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                         <button
                           type="button"
                           onClick={() => handleToggleQuestion(q.id)}
-                          className="mt-0.5 text-neutral-400 hover:text-emerald-500 transition-colors shrink-0"
+                          aria-label={isCompleted ? 'Отметить как неизученный' : 'Отметить как изученный'}
+                          className="min-w-[40px] min-h-[40px] -ml-2 -mt-1.5 flex items-center justify-center text-neutral-400 hover:text-emerald-500 transition-colors shrink-0"
                         >
                           {isCompleted ? (
                             <CheckCircle2 className="w-5 h-5 text-emerald-500" />
@@ -416,7 +417,8 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                       <button
                         type="button"
                         onClick={() => setExpandedQuestionId(isExpanded ? null : q.id)}
-                        className="p-2 rounded-full transition-transform duration-150 active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-700 cursor-pointer"
+                        aria-label={isExpanded ? 'Свернуть' : 'Развернуть'}
+                        className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-full transition-transform duration-150 active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-700 cursor-pointer"
                       >
                         {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                       </button>

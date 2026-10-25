@@ -339,11 +339,11 @@ export function App() {
         {/* Top subtle sheen */}
         <div className="absolute top-0 inset-x-0 h-[360px] bg-gradient-to-b from-white/70 via-white/20 to-transparent pointer-events-none" />
 
-        {/* Ambient diffusion spheres */}
-        <div className="absolute -top-[10%] -right-[5%] w-[680px] h-[680px] sm:w-[900px] sm:h-[900px] rounded-full bg-gradient-to-br from-white/60 via-slate-200/40 to-slate-300/25 blur-[90px] transform-gpu pointer-events-none" />
-        <div className="absolute top-[20%] -left-[10%] w-[640px] h-[640px] sm:w-[850px] sm:h-[850px] rounded-full bg-gradient-to-tr from-slate-300/35 via-zinc-200/25 to-slate-200/30 blur-[90px] transform-gpu pointer-events-none" />
-        <div className="absolute top-[50%] -right-[6%] w-[600px] h-[600px] sm:w-[800px] sm:h-[800px] rounded-full bg-gradient-to-bl from-zinc-200/40 via-slate-200/25 to-slate-300/25 blur-[90px] transform-gpu pointer-events-none" />
-        <div className="absolute -bottom-[8%] left-[8%] w-[620px] h-[620px] sm:w-[850px] sm:h-[850px] rounded-full bg-gradient-to-tr from-slate-300/30 via-zinc-200/25 to-slate-200/25 blur-[90px] transform-gpu pointer-events-none" />
+        {/* Ambient diffusion spheres - hidden on mobile to avoid 4x full-screen 90px blur shaders */}
+        <div className="hidden sm:block absolute -top-[10%] -right-[5%] w-[680px] h-[680px] sm:w-[900px] sm:h-[900px] rounded-full bg-gradient-to-br from-white/60 via-slate-200/40 to-slate-300/25 blur-[90px] transform-gpu pointer-events-none" />
+        <div className="hidden sm:block absolute top-[20%] -left-[10%] w-[640px] h-[640px] sm:w-[850px] sm:h-[850px] rounded-full bg-gradient-to-tr from-slate-300/35 via-zinc-200/25 to-slate-200/30 blur-[90px] transform-gpu pointer-events-none" />
+        <div className="hidden sm:block absolute top-[50%] -right-[6%] w-[600px] h-[600px] sm:w-[800px] sm:h-[800px] rounded-full bg-gradient-to-bl from-zinc-200/40 via-slate-200/25 to-slate-300/25 blur-[90px] transform-gpu pointer-events-none" />
+        <div className="hidden sm:block absolute -bottom-[8%] left-[8%] w-[620px] h-[620px] sm:w-[850px] sm:h-[850px] rounded-full bg-gradient-to-tr from-slate-300/30 via-zinc-200/25 to-slate-200/25 blur-[90px] transform-gpu pointer-events-none" />
       </div>
 
       {/* Content Layer floating on top of ambient canvas */}

@@ -276,7 +276,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 liquid-modal-overlay overflow-y-auto overscroll-contain modal-overlay-animation"
+      className="fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-[max(0.75rem,env(safe-area-inset-bottom))] liquid-modal-overlay overflow-y-auto overscroll-contain touch-pan-y modal-overlay-animation"
     >
       <div
         className="relative w-full max-w-xl rounded-[24px] sm:rounded-[32px] shadow-2xl p-4 sm:p-7 my-auto sm:my-8 modal-enter-animation liquid-glass-modal text-neutral-900 dark:text-neutral-100"
@@ -286,7 +286,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
         <button
           onClick={onClose}
           aria-label="Закрыть"
-          className="absolute top-4 right-4 sm:top-5 sm:right-5 min-w-[36px] min-h-[36px] p-2 rounded-full transition-transform duration-150 z-10 active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-600 hover:text-neutral-950 dark:text-neutral-300 dark:hover:text-white cursor-pointer flex items-center justify-center"
+          className="absolute top-3.5 right-3.5 sm:top-5 sm:right-5 min-w-[44px] min-h-[44px] p-2.5 rounded-full transition-transform duration-150 z-10 active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-600 hover:text-neutral-950 dark:text-neutral-300 dark:hover:text-white cursor-pointer flex items-center justify-center"
         >
           <X className="w-5 h-5" />
         </button>
@@ -414,7 +414,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
                     key={dir.id}
                     type="button"
                     onClick={() => toggleDirection(dir.id)}
-                    className={`flex items-center justify-between p-2.5 rounded-xl text-left text-xs font-semibold transition-transform duration-150 active:scale-95 cursor-pointer ${
+                    className={`flex items-center justify-between p-2.5 sm:p-3 min-h-[44px] rounded-xl text-left text-xs font-semibold transition-transform duration-150 active:scale-95 cursor-pointer ${
                       isSelected
                         ? 'bg-neutral-900 text-white shadow-xs'
                         : 'liquid-glass-pill text-neutral-700 hover:bg-white/50'
@@ -433,7 +433,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
             <label className="block text-xs font-semibold mb-2 text-neutral-800">
               Конкретные специализации и ветки ({selectedSubTracks.length}):
             </label>
-            <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-3 rounded-2xl liquid-glass-subtle">
+            <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-3 rounded-2xl liquid-glass-subtle touch-pan-y overscroll-contain">
               {DIRECTIONS.filter((d) => selectedDirections.includes(d.id)).flatMap((d) =>
                 d.subTracks.map((st) => {
                   const isSelected = selectedSubTracks.includes(st.id);
@@ -442,7 +442,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
                       key={st.id}
                       type="button"
                       onClick={() => toggleSubTrack(st.id)}
-                      className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-transform duration-150 active:scale-95 cursor-pointer ${
+                      className={`px-3 py-1.5 min-h-[36px] flex items-center rounded-full text-xs font-semibold transition-transform duration-150 active:scale-95 cursor-pointer ${
                         isSelected
                           ? 'bg-neutral-900 text-white shadow-xs'
                           : 'liquid-glass-pill text-neutral-700 hover:bg-white/50'

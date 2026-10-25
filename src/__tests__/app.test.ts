@@ -1385,6 +1385,9 @@ describe('12. VKontakte (VK) Bot & VK Mini App Integration', () => {
     expect(html).toContain('99887766');
     expect(html).toContain('Официальный VK-бот IT-Старт');
     expect(html).toContain('Открыть диалог с VK-ботом');
+    expect(html).toContain('liquid-modal-overlay');
+    expect(html).toContain('liquid-glass-modal');
+    expect(html).toContain('touch-pan-y');
   });
 });
 
