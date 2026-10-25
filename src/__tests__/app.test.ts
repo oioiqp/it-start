@@ -835,6 +835,12 @@ describe('12. VKontakte (VK) Bot & VK Mini App Integration', () => {
     expect(getSavedVkGroupId()).toBe('987654321');
     expect(getVkBotDialogUrl()).toContain('sel=-987654321');
     expect(getVkCommunityUrl()).toContain('club987654321');
+
+    saveVkGroupId('club987654321');
+    expect(getSavedVkGroupId()).toBe('club987654321');
+    expect(getVkBotDialogUrl()).toContain('sel=-987654321');
+    expect(getVkCommunityUrl()).toContain('club987654321');
+
     saveVkGroupId('');
     expect(getSavedVkGroupId()).toBe('');
 

@@ -938,14 +938,15 @@ export async function startVkBot(token = VK_BOT_TOKEN, options = {}) {
   console.log(`🚀 Запуск VK-бота IT-Старт в режиме Bots Long Poll...`);
 
   // Detect Group ID
-  let groupId = options.groupId || VK_GROUP_ID;
+  let rawGroupId = options.groupId || VK_GROUP_ID;
+  let groupId = rawGroupId ? String(rawGroupId).replace(/[^0-9]/g, '') : '';
   if (!groupId) {
     try {
-      const gRes = await callVk('groups.getById', {}, tokenToUse);
+      const gRes = await callVk('groups.getById', rawGroupId ? { group_id: rawGroupId } : {}, tokenToUse);
       if (gRes.ok && gRes.result) {
         const groups = gRes.result.groups || gRes.result;
         if (Array.isArray(groups) && groups.length > 0) {
-          groupId = groups[0].id;
+          groupId = String(groups[0].id);
           console.log(`[VK Bot] Сообщество определено: ID ${groupId} («${groups[0].name}»)`);
         }
       }
@@ -983,6 +984,9 @@ export async function startVkBot(token = VK_BOT_TOKEN, options = {}) {
         ts = res.result.ts;
         console.log(`[VK Bot] Сервер Bots Long Poll подключен (${server}), ожидание сообщений...`);
         return true;
+      }
+      if (!res.ok) {
+        console.warn('[VK Bot] Не удалось получить сервер Long Poll:', errMsg || JSON.stringify(res.error));
       }
       return false;
     };
