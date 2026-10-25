@@ -294,6 +294,34 @@ export function formatVkVacanciesList(items = [], title = 'Актуальные 
 }
 
 /**
+ * Convert VK keyboard object/string into clean text menu lines for environments
+ * where keyboards are temporarily disabled or restricted (VK error 912 fallback)
+ */
+export function keyboardToTextMenu(keyboard) {
+  if (!keyboard) return '';
+  try {
+    const kb = typeof keyboard === 'string' ? JSON.parse(keyboard) : keyboard;
+    const buttons = kb.buttons || [];
+    const flat = buttons.flat();
+    const lines = [];
+    flat.forEach((btn, idx) => {
+      const action = btn.action || btn;
+      const label = action.label || '';
+      const link = action.link || '';
+      if (link) {
+        lines.push(`[${idx + 1}] ${label}: ${link}`);
+      } else if (label) {
+        lines.push(`[${idx + 1}] ${label}`);
+      }
+    });
+    if (lines.length === 0) return '';
+    return '\n\n📌 Меню команд (отправьте цифру или слово):\n' + lines.join('\n');
+  } catch {
+    return '';
+  }
+}
+
+/**
  * Send request to VK API
  */
 export async function callVk(method, params = {}, token = VK_BOT_TOKEN) {
@@ -333,6 +361,28 @@ export async function callVk(method, params = {}, token = VK_BOT_TOKEN) {
     const data = await res.json();
 
     if (data.error) {
+      // Automatic fallback for VK API Error 912: "This is a chat bot feature, change this status in settings: Chat bot feature"
+      // Happens when "Возможности ботов" (Bots capabilities) is disabled in VK community web settings.
+      // Retries the message as clean text with buttons converted to a numeric menu without losing delivery!
+      if (
+        method === 'messages.send' &&
+        data.error.error_code === 912 &&
+        params.keyboard
+      ) {
+        console.warn(
+          `[VK Bot] ⚠️ Внимание: В настройках группы VK отключены «Возможности ботов» (VK error 912). ` +
+          `Автоматически отправляем ответ в текстовом режиме без кнопок. ` +
+          `Для включения кнопок: Сообщество -> Управление -> Сообщения -> Настройки для бота -> Возможности ботов: Включены.`
+        );
+        const fallbackParams = { ...params };
+        const textMenu = keyboardToTextMenu(fallbackParams.keyboard);
+        delete fallbackParams.keyboard;
+        if (textMenu && !String(fallbackParams.message || '').includes('Меню команд')) {
+          fallbackParams.message = `${fallbackParams.message || ''}${textMenu}`;
+        }
+        return callVk(method, fallbackParams, token);
+      }
+
       console.warn(`[VK API Error] ${method}:`, data.error.error_msg || data.error);
       return { ok: false, error: data.error };
     }
@@ -449,32 +499,102 @@ export async function notifyVkSubscribers(vacancies = [], token = VK_BOT_TOKEN) 
 
 /**
  * Handle incoming VK message and produce reply payload
+ * Supports both VK API v5.199 formats:
+ * - Update object: { type: 'message_new', object: { message: {...}, client_info: {...} } }
+ * - Direct object: { message: {...}, client_info: {...} }
+ * - Flat message: { peer_id: 123, text: '...', payload: '...' }
  */
-export async function handleVkMessage(message, token = VK_BOT_TOKEN) {
-  if (!message) return { ok: false, error: 'Empty message' };
-  const peerId = message.peer_id || message.from_id;
+export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
+  if (!rawInput) return { ok: false, error: 'Empty message' };
+
+  const message =
+    rawInput.object?.message ||
+    rawInput.message ||
+    rawInput.object ||
+    rawInput;
+
+  const peerId =
+    message.peer_id ||
+    message.from_id ||
+    message.user_id ||
+    rawInput.peer_id ||
+    rawInput.from_id ||
+    rawInput.user_id ||
+    rawInput.object?.peer_id ||
+    rawInput.object?.user_id;
+
   if (!peerId) return { ok: false, error: 'Missing peer_id' };
 
   // Strip VK group/user mention prefix: [club12345|@name] or [public12345|Name] or @name
-  const textRaw = (message.text || '')
+  const textRaw = (message.text || rawInput.text || '')
     .replace(/^\[(?:club|public|id)\d+\|[^\]]+\]\s*/i, '')
     .replace(/^@[\w.\-_]+\s*/i, '')
     .trim();
   const textLower = textRaw.toLowerCase();
   const textClean = textLower.replace(/[!.,?]+$/g, '').trim();
 
+  // Extract and parse payload from both message and event object formats
+  const rawPayload =
+    message.payload ??
+    rawInput.payload ??
+    rawInput.object?.payload ??
+    rawInput.object?.message?.payload;
+
   let payload = null;
-  if (message.payload) {
-    try {
-      payload = typeof message.payload === 'string' ? JSON.parse(message.payload) : message.payload;
-    } catch {
-      payload = null;
+  if (rawPayload) {
+    if (typeof rawPayload === 'object') {
+      payload = rawPayload;
+    } else if (typeof rawPayload === 'string') {
+      try {
+        payload = JSON.parse(rawPayload);
+        // Handle double-encoded JSON strings from VK
+        if (typeof payload === 'string') {
+          try {
+            payload = JSON.parse(payload);
+          } catch {}
+        }
+      } catch {
+        payload = null;
+      }
     }
   }
 
-  const cmd = payload?.cmd || '';
+  let cmd = payload?.cmd || payload?.command || payload?.button || '';
 
-  // 1. «Начать» / /start / Привет / Меню / Старт
+  // Support numeric command shortcuts
+  if (!cmd) {
+    if (textClean === '1' || textClean === '[1]' || textClean === '1.') cmd = 'vacancies';
+    else if (textClean === '2' || textClean === '[2]' || textClean === '2.') cmd = 'companies';
+    else if (textClean === '3' || textClean === '[3]' || textClean === '3.') cmd = 'roadmaps';
+    else if (textClean === '4' || textClean === '[4]' || textClean === '4.') cmd = 'questions';
+    else if (textClean === '5' || textClean === '[5]' || textClean === '5.') cmd = 'subscribe';
+    else if (textClean === '6' || textClean === '[6]' || textClean === '6.') cmd = 'status';
+    else if (textClean === '7' || textClean === '[7]' || textClean === '7.') cmd = 'help';
+  }
+
+  const strippedText = textLower.replace(/^[\p{Extended_Pictographic}\p{Emoji}\p{Symbol}\s_.-]+/u, '').trim();
+
+  const isGreeting =
+    strippedText === 'здравствуйте' ||
+    strippedText === 'здравствуй' ||
+    strippedText === 'добрый день' ||
+    strippedText === 'добрый вечер' ||
+    strippedText === 'доброе утро' ||
+    strippedText === 'приветствую' ||
+    strippedText === 'салют' ||
+    strippedText === 'хай' ||
+    strippedText === 'ку' ||
+    strippedText.startsWith('здравствуй') ||
+    strippedText.startsWith('добрый день') ||
+    strippedText.startsWith('добрый вечер') ||
+    strippedText.startsWith('доброе утро') ||
+    strippedText.startsWith('приветствую');
+
+  const hasAttachmentsNoText =
+    (!textClean || textClean.length === 0) &&
+    (Boolean(message.attachments?.length) || Boolean(rawInput.attachments?.length) || !cmd);
+
+  // 1. «Начать» / /start / Привет / Меню / Старт / Здравствуйте / Стикеры
   if (
     cmd === 'start' ||
     textClean === 'начать' ||
@@ -483,7 +603,9 @@ export async function handleVkMessage(message, token = VK_BOT_TOKEN) {
     textClean === 'start' ||
     textClean === 'привет' ||
     textClean === 'меню' ||
-    textClean === 'hello'
+    textClean === 'hello' ||
+    isGreeting ||
+    hasAttachmentsNoText
   ) {
     // Auto-register user as subscriber on /start
     await registerVkSubscriber(peerId, { first_name: 'Студент' });
@@ -1014,8 +1136,8 @@ export async function startVkBot(token = VK_BOT_TOKEN, options = {}) {
           ts = data.ts;
           if (Array.isArray(data.updates)) {
             for (const upd of data.updates) {
-              if (upd.type === 'message_new') {
-                const msg = upd.object?.message || upd.object;
+              if (upd.type === 'message_new' || upd.type === 'message_event') {
+                const msg = upd.object?.message || upd.object || upd;
                 if (msg) {
                   await handleVkMessage(msg, tokenToUse);
                 }

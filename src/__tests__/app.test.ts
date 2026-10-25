@@ -1059,7 +1059,63 @@ describe('12. VKontakte (VK) Bot & VK Mini App Integration', () => {
     expect((await vkBotModule.handleVkMessage(null)).ok).toBe(false);
     expect((await vkBotModule.handleVkMessage({})).ok).toBe(false);
 
-    // 15. Unknown command fallback
+    // 15. VK API v5.199 nested update structure: { type: 'message_new', object: { message: {...} } }
+    const nestedUpdateRes = await vkBotModule.handleVkMessage({
+      type: 'message_new',
+      object: {
+        message: {
+          peer_id: 1005,
+          text: 'вакансии',
+          payload: JSON.stringify({ cmd: 'vacancies' }),
+        },
+      },
+    });
+    expect(nestedUpdateRes.ok).toBe(true);
+    expect(nestedUpdateRes.type).toBe('vacancies');
+
+    // 16. Double-encoded payload string handling
+    const doubleEncodedRes = await vkBotModule.handleVkMessage({
+      peer_id: 1006,
+      payload: JSON.stringify(JSON.stringify({ cmd: 'roadmaps' })),
+    });
+    expect(doubleEncodedRes.ok).toBe(true);
+    expect(doubleEncodedRes.type).toBe('roadmaps');
+
+    // 17. Greetings support («Здравствуйте», «Добрый день»)
+    const zdrasvtuyteRes = await vkBotModule.handleVkMessage({
+      peer_id: 1007,
+      text: '🌱 Здравствуйте.\n✔️ Администратор на связи?',
+    });
+    expect(zdrasvtuyteRes.ok).toBe(true);
+    expect(zdrasvtuyteRes.type).toBe('start');
+    expect(zdrasvtuyteRes.reply.message).toContain('Привет');
+
+    // 18. Sticker / empty text greeting
+    const stickerRes = await vkBotModule.handleVkMessage({
+      peer_id: 1008,
+      text: '',
+      attachments: [{ type: 'sticker' }],
+    });
+    expect(stickerRes.ok).toBe(true);
+    expect(stickerRes.type).toBe('start');
+
+    // 19. Numeric shortcuts («1» -> vacancies, «2» -> companies, «3» -> roadmaps)
+    const num1Res = await vkBotModule.handleVkMessage({ peer_id: 1009, text: '1' });
+    expect(num1Res.ok).toBe(true);
+    expect(num1Res.type).toBe('vacancies');
+
+    const num2Res = await vkBotModule.handleVkMessage({ peer_id: 1009, text: '2' });
+    expect(num2Res.ok).toBe(true);
+    expect(num2Res.type).toBe('companies');
+
+    // 20. keyboardToTextMenu helper converts keyboard into readable list
+    expect(typeof vkBotModule.keyboardToTextMenu).toBe('function');
+    const textMenu = vkBotModule.keyboardToTextMenu(vkBotModule.MAIN_VK_KEYBOARD);
+    expect(textMenu).toContain('Меню команд');
+    expect(textMenu).toContain('Стажировки');
+    expect(textMenu).toContain('Компании');
+
+    // 21. Unknown command fallback
     const unknownRes = await vkBotModule.handleVkMessage({ peer_id: 1001, text: 'абракадабра123' });
     expect(unknownRes.ok).toBe(true);
     expect(unknownRes.type).toBe('unknown');
