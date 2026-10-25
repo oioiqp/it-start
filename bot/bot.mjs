@@ -17,7 +17,62 @@
 
 import http from 'node:http';
 import dns from 'node:dns';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { createClient } from '@supabase/supabase-js';
+
+// Auto-load .env configuration if present
+function autoLoadEnv() {
+  try {
+    const currentDir = path.dirname(fileURLToPath(import.meta.url));
+    const candidateEnvPaths = [
+      path.resolve(currentDir, '.env'),
+      path.resolve(currentDir, '..', '.env'),
+      path.resolve(process.cwd(), '.env'),
+      path.resolve(process.cwd(), 'bot', '.env'),
+    ];
+
+    for (const envPath of candidateEnvPaths) {
+      if (fs.existsSync(envPath)) {
+        if (typeof process.loadEnvFile === 'function') {
+          try {
+            process.loadEnvFile(envPath);
+          } catch {
+            parseEnvFile(envPath);
+          }
+        } else {
+          parseEnvFile(envPath);
+        }
+      }
+    }
+  } catch {}
+}
+
+function parseEnvFile(filePath) {
+  try {
+    const content = fs.readFileSync(filePath, 'utf-8');
+    for (const rawLine of content.split(/\r?\n/)) {
+      const line = rawLine.trim();
+      if (!line || line.startsWith('#')) continue;
+      const eqIdx = line.indexOf('=');
+      if (eqIdx > 0) {
+        const key = line.slice(0, eqIdx).trim();
+        let val = line.slice(eqIdx + 1).trim();
+        if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+          val = val.slice(1, -1);
+        }
+        if (!process.env[key]) {
+          process.env[key] = val;
+        }
+      }
+    }
+  } catch {}
+}
+
+if (process.env.NODE_ENV !== 'test') {
+  autoLoadEnv();
+}
 
 // Prefer IPv4 to avoid IPv6 connect timeouts on public Telegram web gateways
 if (dns.setDefaultResultOrder) {
@@ -2487,8 +2542,8 @@ async function handleMessage(msg) {
         `📱 <b>IT-Старт во ВКонтакте:</b>\n\n` +
         `• <b>VK Бот:</b> Наш официальный бот сообщества ВКонтакте работает 24/7 на Bots Long Poll API!\n` +
         `• <b>VK Mini App:</b> Платформа IT-Старт оптимизирована для запуска внутри мобильного приложения VK.\n\n` +
-        `🔗 <b>Диалог с ботом VK:</b> https://vk.com/im?sel=-225890000\n` +
-        `👥 <b>Группа ВКонтакте:</b> https://vk.com/it_start_platform\n` +
+        `🔗 <b>Диалог с ботом VK:</b> https://vk.com/im?sel=-242573933\n` +
+        `👥 <b>Группа ВКонтакте:</b> https://vk.com/club242573933\n` +
         `🌐 <b>Сайт платформы:</b> ${GITHUB_PAGES_URL}`,
       parse_mode: 'HTML',
     });

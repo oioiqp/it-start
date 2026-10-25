@@ -17,6 +17,9 @@
  */
 
 import http from 'node:http';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
   COMPANIES_DATA,
   findCompanyByQuery,
@@ -31,17 +34,69 @@ import {
 
 export { ALL_INTERNSHIPS, SEED_INTERNSHIPS, PORTAL_FALLBACK_VACANCIES };
 
+// Auto-load .env configuration if present
+function autoLoadEnv() {
+  try {
+    const currentDir = path.dirname(fileURLToPath(import.meta.url));
+    const candidateEnvPaths = [
+      path.resolve(currentDir, '.env'),
+      path.resolve(currentDir, '..', '.env'),
+      path.resolve(process.cwd(), '.env'),
+      path.resolve(process.cwd(), 'bot', '.env'),
+    ];
+
+    for (const envPath of candidateEnvPaths) {
+      if (fs.existsSync(envPath)) {
+        if (typeof process.loadEnvFile === 'function') {
+          try {
+            process.loadEnvFile(envPath);
+          } catch {
+            parseEnvFile(envPath);
+          }
+        } else {
+          parseEnvFile(envPath);
+        }
+      }
+    }
+  } catch {}
+}
+
+function parseEnvFile(filePath) {
+  try {
+    const content = fs.readFileSync(filePath, 'utf-8');
+    for (const rawLine of content.split(/\r?\n/)) {
+      const line = rawLine.trim();
+      if (!line || line.startsWith('#')) continue;
+      const eqIdx = line.indexOf('=');
+      if (eqIdx > 0) {
+        const key = line.slice(0, eqIdx).trim();
+        let val = line.slice(eqIdx + 1).trim();
+        if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+          val = val.slice(1, -1);
+        }
+        if (!process.env[key]) {
+          process.env[key] = val;
+        }
+      }
+    }
+  } catch {}
+}
+
+if (process.env.NODE_ENV !== 'test') {
+  autoLoadEnv();
+}
+
 // Configuration
 export const VK_BOT_TOKEN =
   process.env.VK_BOT_TOKEN ||
   process.env.VK_GROUP_TOKEN ||
   (process.argv[2] && !process.argv[2].startsWith('-') ? process.argv[2] : '');
 
-export const VK_GROUP_ID = process.env.VK_GROUP_ID || '';
+export const VK_GROUP_ID = process.env.VK_GROUP_ID || '242573933';
 export const VK_API_VERSION = '5.199';
 export const VK_API_BASE = 'https://api.vk.com/method';
 export const GITHUB_PAGES_URL = 'https://oioiqp.github.io/it-start/';
-export const VK_COMMUNITY_URL = process.env.VK_COMMUNITY_URL || 'https://vk.com/it_start_platform';
+export const VK_COMMUNITY_URL = process.env.VK_COMMUNITY_URL || 'https://vk.com/club242573933';
 
 export const VK_BOT_CONFIG = {
   version: VK_API_VERSION,
@@ -855,7 +910,7 @@ let pollingAbortController = null;
  * Start the VK Bot (Long Poll or Fallback mode)
  */
 export async function startVkBot(token = VK_BOT_TOKEN, options = {}) {
-  const tokenToUse = token || VK_BOT_TOKEN;
+  const tokenToUse = token !== undefined ? token : VK_BOT_TOKEN;
 
   if (!tokenToUse) {
     console.log('='.repeat(70));
@@ -911,11 +966,22 @@ export async function startVkBot(token = VK_BOT_TOKEN, options = {}) {
     let ts = '';
 
     const getLongPollServer = async () => {
-      const res = await callVk('groups.getLongPollServer', { group_id: groupId }, tokenToUse);
+      let res = await callVk('groups.getLongPollServer', { group_id: groupId }, tokenToUse);
+      const errMsg = String(res.error?.error_msg || res.error || '');
+      if (!res.ok && (errMsg.includes('not enabled') || errMsg.includes('longpoll'))) {
+        console.log('[VK Bot] Автоматически включаем Bots Long Poll API для группы в VK...');
+        await callVk(
+          'groups.setLongPollSettings',
+          { group_id: groupId, enabled: 1, message_new: 1, api_version: '5.199' },
+          tokenToUse
+        );
+        res = await callVk('groups.getLongPollServer', { group_id: groupId }, tokenToUse);
+      }
       if (res.ok && res.result) {
         server = res.result.server;
         key = res.result.key;
         ts = res.result.ts;
+        console.log(`[VK Bot] Сервер Bots Long Poll подключен (${server}), ожидание сообщений...`);
         return true;
       }
       return false;

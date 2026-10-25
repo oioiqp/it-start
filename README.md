@@ -9,7 +9,7 @@
 Приложение сразу готово к работе без обязательного создания `.env` файлов (все дефолтные параметры вшиты в исходный код):
 - **Сайт, Telegram & VK Mini App (GitHub Pages):** [https://oioiqp.github.io/it-start/](https://oioiqp.github.io/it-start/)
 - **Telegram-бот:** [@IT_start_izh_bot](https://t.me/IT_start_izh_bot)
-- **VK-бот сообщества:** [IT-Старт VK Бот](https://vk.com/it_start_platform)
+- **VK-бот сообщества:** [IT-Старт VK Бот (club242573933)](https://vk.com/club242573933) (диалог: [vk.com/im?sel=-242573933](https://vk.com/im?sel=-242573933))
 - **Supabase Project URL:** `https://pmgsymacvhzsixbpndsn.supabase.co`
 - **Базовый путь Vite:** `base: '/it-start/'` (в `vite.config.ts`)
 

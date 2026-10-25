@@ -1679,7 +1679,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                   type="text"
                   value={vkGroupIdInput}
                   onChange={(e) => setVkGroupIdInput(e.target.value)}
-                  placeholder="Например: 225890000 или club225890000"
+                  placeholder="Например: 242573933 или club242573933"
                   className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.04] text-neutral-900 dark:text-white placeholder:text-neutral-400 focus:border-neutral-500 focus:dark:border-white/30 focus:outline-none text-xs font-mono"
                 />
                 <span className="text-[10px] text-neutral-500 dark:text-neutral-400 mt-1 block">
