@@ -8,5 +8,5 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
-  base: '/it-start/',
+  base: process.env.VITE_BASE_PATH || (process.env.VERCEL ? '/' : '/it-start/'),
 })
