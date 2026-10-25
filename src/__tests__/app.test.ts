@@ -776,9 +776,13 @@ describe('12. VKontakte (VK) Bot & VK Mini App Integration', () => {
     expect(hashParsed.vk_app_id).toBe(51800000);
     expect(hashParsed.vk_platform).toBe('desktop_web');
 
-    // Detect VK environment when window.vkBridge is present
+    // In standard browser environment without VK launch params or isWebView:
+    expect(isVkMiniApp()).toBe(false);
+
+    // Detect VK environment when window.vkBridge is present with isWebView
     const sentMethods: string[] = [];
     (window as any).vkBridge = {
+      isWebView: () => true,
       send: async (method: string) => {
         sentMethods.push(method);
         if (method === 'VKWebAppInit') return { result: true };
@@ -809,7 +813,7 @@ describe('12. VKontakte (VK) Bot & VK Mini App Integration', () => {
     expect(sentMethods).toContain('VKWebAppGetUserInfo');
 
     // Direct methods: setVkViewSettings, getCachedVkUser, getVkUserProfile
-    const { setVkViewSettings, getCachedVkUser, getVkUserProfile } = await import('../lib/vkBridge');
+    const { setVkViewSettings, getCachedVkUser, getVkUserProfile, setCachedVkUser } = await import('../lib/vkBridge');
     const viewRes = await setVkViewSettings({ statusBarStyle: 'dark', actionBarColor: '#ffffff' });
     expect(viewRes).toBe(true);
     expect(getCachedVkUser()?.id).toBe(87654321);
@@ -826,6 +830,19 @@ describe('12. VKontakte (VK) Bot & VK Mini App Integration', () => {
 
     // Clean up
     delete (window as any).vkBridge;
+    setCachedVkUser(null);
+    expect(isVkMiniApp()).toBe(false);
+
+    // Haptic vibration fallback in regular browser
+    const vibrateCalls: number[] = [];
+    (navigator as any).vibrate = (ms: number) => {
+      vibrateCalls.push(ms);
+      return true;
+    };
+    const { triggerHaptic } = await import('../lib/telegram');
+    triggerHaptic('selection');
+    expect(vibrateCalls.length).toBe(1);
+    expect(vibrateCalls[0]).toBe(10);
   });
 
   it('validates VK client storage and bot commands helpers in lib/vk.ts', async () => {
@@ -1215,8 +1232,32 @@ describe('12. VKontakte (VK) Bot & VK Mini App Integration', () => {
     expect(textMenu).toContain('Меню команд');
     expect(textMenu).toContain('Стажировки');
     expect(textMenu).toContain('Компании');
+    expect(textMenu).toContain('Главное меню');
 
-    // 25. Unknown command fallback
+    // 25. /vacancies with direction alias («/vacancies фронтенд», «/vacancies бэкенд»)
+    const vacFrontRes = await vkBotModule.handleVkMessage({ peer_id: 1018, text: '/vacancies фронтенд' });
+    expect(vacFrontRes.ok).toBe(true);
+    expect(vacFrontRes.type).toBe('vacancies');
+    expect(vacFrontRes.reply.message).toContain('Frontend');
+
+    const vacBackRes = await vkBotModule.handleVkMessage({ peer_id: 1019, text: '/vacancies бэкенд' });
+    expect(vacBackRes.ok).toBe(true);
+    expect(vacBackRes.type).toBe('vacancies');
+    expect(vacBackRes.reply.message).toContain('Backend');
+
+    // 26. Contextual navigation return to main menu with «0» and «назад»
+    await vkBotModule.handleVkMessage({ peer_id: 1020, text: 'Стажировки' });
+    const backNumRes = await vkBotModule.handleVkMessage({ peer_id: 1020, text: '0' });
+    expect(backNumRes.ok).toBe(true);
+    expect(backNumRes.type).toBe('start');
+    expect(backNumRes.reply.keyboard).toBe(vkBotModule.MAIN_VK_KEYBOARD);
+
+    await vkBotModule.handleVkMessage({ peer_id: 1021, text: 'Компании' });
+    const backTextRes = await vkBotModule.handleVkMessage({ peer_id: 1021, text: 'назад' });
+    expect(backTextRes.ok).toBe(true);
+    expect(backTextRes.type).toBe('start');
+
+    // 27. Unknown command fallback
     const unknownRes = await vkBotModule.handleVkMessage({ peer_id: 1001, text: 'абракадабра123' });
     expect(unknownRes.ok).toBe(true);
     expect(unknownRes.type).toBe('unknown');
@@ -1315,6 +1356,35 @@ describe('12. VKontakte (VK) Bot & VK Mini App Integration', () => {
     expect(html).toContain('Mini App');
     expect(html).toContain('https://vk.com/photo100.jpg');
     expect(html).toContain('VK Бот');
+  });
+
+  it('validates SubscribeModal adapts title and fields for VK user', async () => {
+    const React = await import('react');
+    const { renderToString } = await import('react-dom/server');
+    const { SubscribeModal } = await import('../components/SubscribeModal');
+
+    const mockVkUser = {
+      id: 99887766,
+      first_name: 'Ольга',
+      last_name: 'Иванова',
+    };
+
+    const html = renderToString(
+      React.createElement(SubscribeModal, {
+        isOpen: true,
+        onClose: () => {},
+        telegramUser: null,
+        vkUser: mockVkUser,
+        currentSubscription: null,
+        onSubscriptionSaved: () => {},
+      })
+    );
+
+    expect(html).toContain('Уведомления ВКонтакте');
+    expect(html).toContain('Ваш VK ID');
+    expect(html).toContain('99887766');
+    expect(html).toContain('Официальный VK-бот IT-Старт');
+    expect(html).toContain('Открыть диалог с VK-ботом');
   });
 });
 

@@ -45,6 +45,7 @@ import {
 } from './lib/storage';
 import { initTelegramWebApp, triggerHaptic } from './lib/telegram';
 import { initVkBridge, isVkMiniApp, type VkUser, type VkLaunchParams } from './lib/vkBridge';
+import { VK_COMMUNITY_URL } from './lib/vk';
 
 export function App() {
   // Navigation
@@ -783,8 +784,18 @@ export function App() {
               rel="noopener noreferrer"
               className="text-neutral-700 hover:text-black dark:text-neutral-300 dark:hover:text-white flex items-center gap-1 transition-colors"
             >
-              <Bot className="w-3.5 h-3.5" />
+              <Bot className="w-3.5 h-3.5 text-sky-600" />
               <span>TG: @{TELEGRAM_BOT_USERNAME}</span>
+            </a>
+            <span>•</span>
+            <a
+              href={VK_COMMUNITY_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-neutral-700 hover:text-black dark:text-neutral-300 dark:hover:text-white flex items-center gap-1 transition-colors"
+            >
+              <Bot className="w-3.5 h-3.5 text-blue-600" />
+              <span>VK: club242573933</span>
             </a>
             <span>•</span>
             <a

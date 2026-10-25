@@ -109,14 +109,19 @@ export function parseVkLaunchParams(searchString?: string): VkLaunchParams {
 export function isVkMiniApp(): boolean {
   if (typeof window === 'undefined') return false;
 
-  // 1. Check window.vkBridge existence
-  if (window.vkBridge && typeof window.vkBridge.send === 'function') {
+  // 1. Check vk_* query parameters in URL (primary indicator of VK Mini App launch)
+  const launchParams = parseVkLaunchParams();
+  if (launchParams.vk_user_id || launchParams.vk_app_id || launchParams.vk_platform) {
     return true;
   }
 
-  // 2. Check vk_user_id in query params
-  const launchParams = parseVkLaunchParams();
-  if (launchParams.vk_user_id || launchParams.vk_app_id) {
+  // 2. Check if running inside VK mobile WebView
+  if (typeof window.vkBridge?.isWebView === 'function' && window.vkBridge.isWebView()) {
+    return true;
+  }
+
+  // 3. Check if cached VK user exists
+  if (cachedVkUser) {
     return true;
   }
 
@@ -190,8 +195,9 @@ export async function initVkBridge(): Promise<{
     };
   }
 
-  // 2. Call VKWebAppInit & SetViewSettings if bridge is available
-  if (window.vkBridge && typeof window.vkBridge.send === 'function') {
+  // 2. Call VKWebAppInit & SetViewSettings if bridge is available and running inside VK
+  const isInsideVk = isVkMiniApp();
+  if (window.vkBridge && typeof window.vkBridge.send === 'function' && isInsideVk) {
     try {
       await window.vkBridge.send('VKWebAppInit');
       await setVkViewSettings({

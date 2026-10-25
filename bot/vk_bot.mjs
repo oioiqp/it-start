@@ -345,7 +345,7 @@ export function keyboardToTextMenu(keyboard) {
       }
     });
     if (lines.length === 0) return '';
-    return '\n\n📌 Меню команд (отправьте цифру или слово):\n' + lines.join('\n');
+    return '\n\n📌 Меню команд (отправьте цифру или слово):\n' + lines.join('\n') + '\n[0] 🏠 Главное меню';
   } catch {
     return '';
   }
@@ -532,6 +532,27 @@ export async function notifyVkSubscribers(vacancies = [], token = VK_BOT_TOKEN) 
   return sentCount;
 }
 
+// Direction aliases dictionary for Russian & English commands
+export const VK_DIRECTION_ALIASES = {
+  frontend: ['frontend', 'фронтенд', 'фронт', '/frontend', 'react', 'веб'],
+  backend: ['backend', 'бэкенд', 'бек', 'бэк', '/backend', 'python', 'java', 'go', 'golang'],
+  mobile: ['mobile', 'мобилка', 'мобильная', 'android', 'ios', 'flutter', '/mobile'],
+  data_science: ['data_science', 'datascience', 'data science', 'ds', 'ml', 'дата сайнс', 'машинное обучение', '/data_science'],
+  qa: ['qa', 'тестирование', 'тестировщик', 'кьюа', 'тест', '/qa'],
+  devops: ['devops', 'девопс', 'инфраструктура', 'sre', 'docker', 'кубер', '/devops'],
+};
+
+export function resolveDirectionByQuery(query = '') {
+  const clean = String(query).toLowerCase().trim();
+  if (!clean) return null;
+  for (const [dirKey, aliases] of Object.entries(VK_DIRECTION_ALIASES)) {
+    if (dirKey === clean || aliases.includes(clean)) {
+      return dirKey;
+    }
+  }
+  return null;
+}
+
 /**
  * Handle incoming VK message and produce reply payload
  * Supports both VK API v5.199 formats:
@@ -614,6 +635,11 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
   // Support contextual numeric command shortcuts based on active menu screen
   const numMatch = textClean.match(/^(?:\[(\d+)\]|(\d+)\.?)$/);
   const num = numMatch ? parseInt(numMatch[1] || numMatch[2], 10) : null;
+
+  // Support returning to main menu on 0 or 'назад' / 'главная'
+  if (!cmd && (num === 0 || textClean === '0' || textClean === 'назад' || textClean === 'главная' || textClean === 'в меню' || textClean === 'меню')) {
+    cmd = 'start';
+  }
 
   if (!cmd && num !== null && num >= 1 && num <= 10) {
     const currentMenu = userMenuState.get(String(peerId)) || 'main';
@@ -731,17 +757,32 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
 
     if (arg) {
       const company = findCompanyByQuery(arg);
+      const dirMatch = resolveDirectionByQuery(arg);
       if (company) {
         filtered = allVacancies.filter(
           (v) => (v.companyId || '').toLowerCase() === company.id || (v.company || '').toLowerCase().includes(company.shortName.toLowerCase())
         );
         listTitle = `Стажировки в ${company.name}`;
+      } else if (dirMatch) {
+        filtered = allVacancies.filter(
+          (v) => (v.directionId || '').toLowerCase() === dirMatch
+        );
+        const dirTitles = {
+          frontend: 'Frontend (React / Vue)',
+          backend: 'Backend (Python / Java / Go)',
+          mobile: 'Mobile (Android / iOS / Flutter)',
+          data_science: 'Data Science & ML',
+          qa: 'QA Тестирование',
+          devops: 'DevOps & Инфраструктура',
+        };
+        listTitle = `Стажировки по направлению ${dirTitles[dirMatch] || dirMatch}`;
       } else {
         filtered = allVacancies.filter(
           (v) =>
             (v.directionId || '').toLowerCase() === arg ||
             (v.subTrackId || '').toLowerCase() === arg ||
-            (v.title || '').toLowerCase().includes(arg)
+            (v.title || '').toLowerCase().includes(arg) ||
+            (v.tags || []).some((t) => t.toLowerCase().includes(arg))
         );
         listTitle = `Стажировки по запросу «${arg}»`;
       }
@@ -763,26 +804,11 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
     return finish({ ok: true, type: 'vacancies', reply, count: filtered.length });
   }
 
-  // Direction aliases dictionary for Russian & English commands
-  const dirAliases = {
-    frontend: ['frontend', 'фронтенд', 'фронт', '/frontend', 'react', 'веб'],
-    backend: ['backend', 'бэкенд', 'бек', 'бэк', '/backend', 'python', 'java', 'go', 'golang'],
-    mobile: ['mobile', 'мобилка', 'мобильная', 'android', 'ios', 'flutter', '/mobile'],
-    data_science: ['data_science', 'datascience', 'data science', 'ds', 'ml', 'дата сайнс', 'машинное обучение', '/data_science'],
-    qa: ['qa', 'тестирование', 'тестировщик', 'кьюа', 'тест', '/qa'],
-    devops: ['devops', 'девопс', 'инфраструктура', 'sre', 'docker', 'кубер', '/devops'],
-  };
-
   let matchedDirId = null;
   if (cmd === 'direction' && payload?.id) {
     matchedDirId = payload.id;
   } else {
-    for (const [dirKey, aliases] of Object.entries(dirAliases)) {
-      if (aliases.includes(textClean) || aliases.includes(textLower)) {
-        matchedDirId = dirKey;
-        break;
-      }
-    }
+    matchedDirId = resolveDirectionByQuery(textClean) || resolveDirectionByQuery(textLower);
   }
 
   // 3. Direction selection (Frontend, Backend, Mobile, Data Science, QA, DevOps)

@@ -22,6 +22,7 @@ import {
   triggerHaptic,
 } from '../lib/telegram';
 import { saveLocalSubscription } from '../lib/storage';
+import { getSavedVkToken, sendVkMessage, getVkBotDialogUrl } from '../lib/vk';
 
 interface SubscribeModalProps {
   isOpen: boolean;
@@ -142,7 +143,40 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
 
   const handleTestNotification = async () => {
     if (!chatId) {
-      setStatusMessage({ type: 'error', text: 'Сначала укажите или определите ваш Chat ID' });
+      setStatusMessage({ type: 'error', text: vkUser ? 'Сначала укажите ваш VK ID' : 'Сначала укажите или определите ваш Chat ID' });
+      return;
+    }
+
+    if (vkUser) {
+      setIsLoading(true);
+      setStatusMessage(null);
+      const testText = `🔥 Тестовое уведомление IT-Старт ВКонтакте!\n\nВы успешно подключили уведомления в сервисе IT-Старт.\nВыбранные направления: ${selectedDirections.join(', ')}\nВетки: ${selectedSubTracks.join(', ')}\n\nКак только появится новая стажировка под ваш стек, вы получите мгновенный пуш!`;
+      const vkToken = getSavedVkToken();
+      if (vkToken) {
+        const res = await sendVkMessage(chatId, testText, vkToken);
+        setIsLoading(false);
+        if (res.success) {
+          setStatusMessage({
+            type: 'success',
+            text: 'Тестовое уведомление успешно отправлено в VK! Проверьте диалог с сообществом.',
+          });
+          triggerHaptic('success');
+          confetti({ particleCount: 60, spread: 60 });
+        } else {
+          setStatusMessage({
+            type: 'error',
+            text: res.error || 'Не удалось отправить сообщение в VK.',
+          });
+        }
+      } else {
+        setIsLoading(false);
+        setStatusMessage({
+          type: 'success',
+          text: 'Подписка активна! Чтобы бот сообщества мог писать вам в личные сообщения, отправьте ему команду /subscribe в диалоге ВКонтакте.',
+        });
+        triggerHaptic('success');
+        confetti({ particleCount: 60, spread: 60 });
+      }
       return;
     }
 
@@ -176,7 +210,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
   const handleSaveSubscription = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!chatId.trim()) {
-      setStatusMessage({ type: 'error', text: 'Пожалуйста, укажите Telegram Chat ID' });
+      setStatusMessage({ type: 'error', text: vkUser ? 'Пожалуйста, укажите ваш VK ID' : 'Пожалуйста, укажите Telegram Chat ID' });
       return;
     }
 
@@ -241,10 +275,12 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
           </div>
           <div>
             <h2 className="text-lg font-bold font-sans text-neutral-950">
-              Уведомления в Telegram
+              {vkUser ? 'Уведомления ВКонтакте' : 'Уведомления в Telegram'}
             </h2>
             <p className="text-xs text-neutral-600">
-              Мгновенные пуши о новых стажировках от бота @{TELEGRAM_BOT_USERNAME}
+              {vkUser
+                ? 'Мгновенные пуши о новых стажировках от официального VK-бота IT-Старт'
+                : `Мгновенные пуши о новых стажировках от бота @${TELEGRAM_BOT_USERNAME}`}
             </p>
           </div>
         </div>
@@ -312,13 +348,13 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-medium mb-1 text-neutral-700 dark:text-neutral-300">
-                Ваш Telegram Chat ID <span className="text-red-500">*</span>
+                {vkUser ? 'Ваш VK ID' : 'Ваш Telegram Chat ID'} <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
                 value={chatId}
                 onChange={(e) => setChatId(e.target.value)}
-                placeholder="например 123456789"
+                placeholder={vkUser ? 'например 123456789' : 'например 123456789'}
                 required
                 className="w-full px-3.5 py-2 rounded-xl text-xs sm:text-sm transition-colors focus:outline-none
                   bg-neutral-50 border border-neutral-200/80 text-neutral-900 placeholder:text-neutral-400 focus:border-neutral-400
@@ -328,13 +364,13 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
 
             <div>
               <label className="block text-xs font-medium mb-1 text-neutral-700 dark:text-neutral-300">
-                Username в Telegram
+                {vkUser ? 'Имя в профиле ВКонтакте' : 'Username в Telegram'}
               </label>
               <input
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="@username (необязательно)"
+                placeholder={vkUser ? 'Имя Фамилия' : '@username (необязательно)'}
                 className="w-full px-3.5 py-2 rounded-xl text-xs sm:text-sm transition-colors focus:outline-none
                   bg-neutral-50 border border-neutral-200/80 text-neutral-900 placeholder:text-neutral-400 focus:border-neutral-400
                   dark:bg-white/[0.04] dark:border-white/10 dark:text-neutral-100 dark:placeholder:text-neutral-500 dark:focus:border-white/30"
@@ -397,38 +433,62 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
             </div>
           </div>
 
-          {/* Bot Token Configuration Block */}
-          <div className="p-3.5 rounded-2xl liquid-glass-subtle text-xs space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="font-semibold text-neutral-800">
-                Bot Token для отправки пушей (@BotFather):
-              </span>
-              <button
-                type="button"
-                onClick={() => setShowTokenInput((v) => !v)}
-                className="text-[11px] font-semibold text-neutral-600 hover:text-black underline cursor-pointer"
-              >
-                {showTokenInput ? 'Скрыть поле' : 'Настроить токен'}
-              </button>
-            </div>
-            {showTokenInput && (
-              <div className="space-y-1 pt-1">
-                <input
-                  type="password"
-                  value={botTokenInput}
-                  onChange={(e) => {
-                    setBotTokenInput(e.target.value);
-                    saveBotToken(e.target.value.trim());
-                  }}
-                  placeholder="Токен от @BotFather (сохраняется в браузере)"
-                  className="w-full px-3 py-2 rounded-xl text-xs transition-all focus:outline-none liquid-glass-pill focus:bg-white/50 text-neutral-900 placeholder:text-neutral-500"
-                />
-                <p className="text-[10px] text-neutral-600">
-                  Токен хранится только в вашем браузере и используется для реальных вызовов Bot API.
-                </p>
+          {/* Bot Token Configuration Block or VK Bot Direct Link */}
+          {vkUser ? (
+            <div className="p-3.5 rounded-2xl liquid-glass-subtle text-xs space-y-2 border border-blue-500/20 bg-blue-500/5">
+              <div className="flex items-center justify-between">
+                <span className="font-semibold text-neutral-800 flex items-center gap-1.5">
+                  <Bot className="w-4 h-4 text-blue-600" />
+                  Официальный VK-бот IT-Старт:
+                </span>
               </div>
-            )}
-          </div>
+              <p className="text-[11px] text-neutral-600">
+                Бот автоматически рассылает уведомления о новых стажировках по выбранным направлениям прямо в VK.
+                Для активации личных сообщений откройте диалог с ботом и отправьте /start или /subscribe:
+              </p>
+              <a
+                href={getVkBotDialogUrl()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs shadow-xs transition-colors"
+              >
+                <span>💬 Открыть диалог с VK-ботом</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+            </div>
+          ) : (
+            <div className="p-3.5 rounded-2xl liquid-glass-subtle text-xs space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="font-semibold text-neutral-800">
+                  Bot Token для отправки пушей (@BotFather):
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setShowTokenInput((v) => !v)}
+                  className="text-[11px] font-semibold text-neutral-600 hover:text-black underline cursor-pointer"
+                >
+                  {showTokenInput ? 'Скрыть поле' : 'Настроить токен'}
+                </button>
+              </div>
+              {showTokenInput && (
+                <div className="space-y-1 pt-1">
+                  <input
+                    type="password"
+                    value={botTokenInput}
+                    onChange={(e) => {
+                      setBotTokenInput(e.target.value);
+                      saveBotToken(e.target.value.trim());
+                    }}
+                    placeholder="Токен от @BotFather (сохраняется в браузере)"
+                    className="w-full px-3 py-2 rounded-xl text-xs transition-all focus:outline-none liquid-glass-pill focus:bg-white/50 text-neutral-900 placeholder:text-neutral-500"
+                  />
+                  <p className="text-[10px] text-neutral-600">
+                    Токен хранится только в вашем браузере и используется для реальных вызовов Bot API.
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Status Message */}
           {statusMessage && (
@@ -472,7 +532,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
             </button>
           </div>
 
-          {!botToken && (
+          {!vkUser && !botToken && (
             <p className="text-[11px] text-center text-neutral-600 font-medium">
               * Для реальной отправки сообщений укажите Bot Token во вкладке «Telegram & Парсер»
             </p>

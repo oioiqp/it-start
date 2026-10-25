@@ -1,5 +1,6 @@
 import { GITHUB_PAGES_URL, TELEGRAM_BOT_USERNAME } from './supabase';
 import type { TelegramUser } from '../types';
+import { isVkMiniApp } from './vkBridge';
 
 declare global {
   interface Window {
@@ -81,7 +82,7 @@ export function triggerHaptic(type: 'light' | 'medium' | 'heavy' | 'success' | '
   }
 
   // 2. VK Mini App Taptic (VK Bridge)
-  if (window.vkBridge && typeof window.vkBridge.send === 'function') {
+  if (isVkMiniApp() && window.vkBridge && typeof window.vkBridge.send === 'function') {
     try {
       if (type === 'success') {
         window.vkBridge.send('VKWebAppTapticNotificationOccurred', { result_type: 'success' }).catch(() => {});
