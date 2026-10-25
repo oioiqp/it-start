@@ -809,6 +809,10 @@ describe('12. VKontakte (VK) Bot & VK Mini App Integration', () => {
       sendVkMessage,
       VK_BOT_NAME,
       VK_COMMUNITY_URL,
+      getSavedVkGroupId,
+      saveVkGroupId,
+      getVkBotDialogUrl,
+      getVkCommunityUrl,
     } = await import('../lib/vk');
 
     expect(VK_BOT_NAME).toContain('VK');
@@ -825,6 +829,14 @@ describe('12. VKontakte (VK) Bot & VK Mini App Integration', () => {
     expect(getSavedVkPeerId()).toBe('12345678');
     saveVkPeerId('');
     expect(getSavedVkPeerId()).toBe('');
+
+    // Group ID storage and dynamic URLs
+    saveVkGroupId('987654321');
+    expect(getSavedVkGroupId()).toBe('987654321');
+    expect(getVkBotDialogUrl()).toContain('sel=-987654321');
+    expect(getVkCommunityUrl()).toContain('club987654321');
+    saveVkGroupId('');
+    expect(getSavedVkGroupId()).toBe('');
 
     // Bot Commands catalog
     const commands = getVkBotCommands();

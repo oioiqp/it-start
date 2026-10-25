@@ -13,6 +13,47 @@ export const VK_BOT_DIALOG_URL = 'https://vk.com/im?sel=-225890000';
 
 const VK_BOT_TOKEN_STORAGE_KEY = 'it_start_vk_bot_token';
 const VK_PEER_ID_STORAGE_KEY = 'it_start_vk_peer_id';
+const VK_GROUP_ID_STORAGE_KEY = 'it_start_vk_group_id';
+
+export function getSavedVkGroupId(): string {
+  if (typeof window === 'undefined') return '';
+  return localStorage.getItem(VK_GROUP_ID_STORAGE_KEY) || '';
+}
+
+export function saveVkGroupId(groupId: string): void {
+  if (typeof window === 'undefined') return;
+  const clean = groupId.trim();
+  if (clean) {
+    localStorage.setItem(VK_GROUP_ID_STORAGE_KEY, clean);
+  } else {
+    localStorage.removeItem(VK_GROUP_ID_STORAGE_KEY);
+  }
+}
+
+export function getVkBotDialogUrl(): string {
+  const saved = getSavedVkGroupId();
+  if (saved) {
+    const num = saved.replace(/[^0-9]/g, '');
+    if (num) {
+      return `https://vk.com/im?sel=-${num}`;
+    }
+  }
+  return VK_BOT_DIALOG_URL;
+}
+
+export function getVkCommunityUrl(): string {
+  const saved = getSavedVkGroupId();
+  if (saved) {
+    if (/^\d+$/.test(saved)) {
+      return `https://vk.com/club${saved}`;
+    }
+    if (!saved.startsWith('http')) {
+      return `https://vk.com/${saved}`;
+    }
+    return saved;
+  }
+  return VK_COMMUNITY_URL;
+}
 
 export function getSavedVkToken(): string {
   if (typeof window === 'undefined') return '';

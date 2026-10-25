@@ -45,6 +45,10 @@ import {
   saveVkToken,
   getSavedVkPeerId,
   saveVkPeerId,
+  getSavedVkGroupId,
+  saveVkGroupId,
+  getVkBotDialogUrl,
+  getVkCommunityUrl,
   sendVkMessage,
   getVkBotCommands,
   VK_COMMUNITY_URL,
@@ -210,7 +214,10 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
 
   // VK Bot & Mini App state
   const [vkTokenInput, setVkTokenInput] = useState<string>(getSavedVkToken());
+  const [vkGroupIdInput, setVkGroupIdInput] = useState<string>(getSavedVkGroupId());
   const [vkTokenSavedStatus, setVkTokenSavedStatus] = useState<string>('');
+  const vkDialogUrl = vkGroupIdInput.trim() ? getVkBotDialogUrl() : VK_BOT_DIALOG_URL;
+  const vkCommunityUrl = vkGroupIdInput.trim() ? getVkCommunityUrl() : VK_COMMUNITY_URL;
   const [vkPeerId, setVkPeerId] = useState<string>(() => {
     const saved = getSavedVkPeerId();
     if (saved) return saved;
@@ -326,8 +333,9 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
     e.preventDefault();
     triggerVkHaptic('impact');
     saveVkToken(vkTokenInput.trim());
-    setVkTokenSavedStatus('VK Bot Token сохранен локально в вашем браузере!');
-    addLog('success', 'VK Bot Token сохранен в localStorage');
+    saveVkGroupId(vkGroupIdInput.trim());
+    setVkTokenSavedStatus('Настройки бота VK (токен и сообщество) сохранены!');
+    addLog('success', 'Настройки VK Bot сохранены в localStorage');
     setTimeout(() => setVkTokenSavedStatus(''), 3000);
   };
 
@@ -959,7 +967,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
               <ExternalLink className="w-3 h-3 opacity-60" />
             </a>
             <a
-              href={VK_BOT_DIALOG_URL}
+              href={vkDialogUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 px-4 py-2 rounded-full border border-neutral-200/80 dark:border-white/10 bg-white/60 dark:bg-white/[0.06] hover:bg-neutral-100 dark:hover:bg-white/10 text-neutral-800 dark:text-neutral-200 text-xs sm:text-sm font-medium transition-all shrink-0 shadow-sm"
@@ -1599,7 +1607,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
 
           <div className="flex items-center gap-2 w-full md:w-auto flex-wrap sm:flex-nowrap">
             <a
-              href={VK_BOT_DIALOG_URL}
+              href={vkDialogUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-neutral-900 hover:bg-black text-white dark:bg-white dark:hover:bg-neutral-200 dark:text-neutral-950 font-semibold text-xs sm:text-sm transition-all shadow-sm shrink-0"
@@ -1609,7 +1617,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
               <ExternalLink className="w-3 h-3 opacity-60" />
             </a>
             <a
-              href={VK_COMMUNITY_URL}
+              href={vkCommunityUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-center gap-2 px-4 py-2 rounded-full border border-neutral-200/80 dark:border-white/10 bg-white/60 dark:bg-white/[0.06] hover:bg-neutral-100 dark:hover:bg-white/10 text-neutral-800 dark:text-neutral-200 font-medium text-xs sm:text-sm transition-all shrink-0 shadow-sm"
@@ -1665,6 +1673,22 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
             <form onSubmit={handleSaveVkToken} className="space-y-3">
               <div>
                 <label className="block text-[11px] font-medium text-neutral-700 dark:text-neutral-300 mb-1">
+                  ID или короткий адрес сообщества VK:
+                </label>
+                <input
+                  type="text"
+                  value={vkGroupIdInput}
+                  onChange={(e) => setVkGroupIdInput(e.target.value)}
+                  placeholder="Например: 225890000 или club225890000"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.04] text-neutral-900 dark:text-white placeholder:text-neutral-400 focus:border-neutral-500 focus:dark:border-white/30 focus:outline-none text-xs font-mono"
+                />
+                <span className="text-[10px] text-neutral-500 dark:text-neutral-400 mt-1 block">
+                  Укажите ID вашей группы, чтобы кнопки вели в диалог с вашим ботом.
+                </span>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-medium text-neutral-700 dark:text-neutral-300 mb-1">
                   VK Group Access Token:
                 </label>
                 <input
@@ -1696,7 +1720,9 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                   onClick={() => {
                     setVkTokenInput('');
                     saveVkToken('');
-                    addLog('info', 'VK Bot Token удален из хранилища');
+                    setVkGroupIdInput('');
+                    saveVkGroupId('');
+                    addLog('info', 'Настройки VK Bot удалены из хранилища');
                   }}
                   className="px-3.5 py-2 rounded-full liquid-glass-pill hover:bg-white/80 dark:hover:bg-white/10 text-neutral-700 dark:text-neutral-300 text-xs font-medium transition-colors"
                 >
