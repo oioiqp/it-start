@@ -96,7 +96,7 @@ const SUPABASE_ANON_KEY =
   process.env.SUPABASE_ANON_KEY ||
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBtZ3N5bWFjdmh6c2l4YnBuZHNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwNDA1OTEsImV4cCI6MjEwNzYxNjU5MX0.J3LSRV4pYTogH52y1maMV8NZ1J9s72WU2ydtyQhWWr4';
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: { persistSession: false },
 });
 
@@ -221,6 +221,36 @@ export function findCompanyByQuery(query) {
     }
   }
 
+  return null;
+}
+
+// Direction aliases dictionary for Russian & English commands
+export const DIRECTION_ALIASES = {
+  frontend: ['frontend', 'фронтенд', 'фронт', '/frontend', 'react', 'веб', 'vue', 'angular', 'веб-разработка'],
+  backend: ['backend', 'бэкенд', 'бек', 'бэк', '/backend', 'python', 'java', 'go', 'golang', 'node', 'nodejs'],
+  mobile: ['mobile', 'мобилка', 'мобильная', 'android', 'ios', 'flutter', '/mobile', 'мобайл', 'андроид', 'айос'],
+  data_science: ['data_science', 'datascience', 'data science', 'ds', 'ml', 'дата сайнс', 'машинное обучение', '/data_science', 'дс', 'мл'],
+  qa: ['qa', 'тестирование', 'тестировщик', 'кьюа', 'тест', '/qa', 'автотесты', 'manual qa'],
+  devops: ['devops', 'девопс', 'инфраструктура', 'sre', 'docker', 'кубер', '/devops', 'докер', 'kubernetes'],
+};
+
+export const DIRECTION_TITLES = {
+  frontend: 'Frontend-разработка (React / Vue / Angular)',
+  backend: 'Backend-разработка (Python / Go / Java / Node.js)',
+  mobile: 'Mobile-разработка (Android / iOS / Flutter)',
+  data_science: 'Data Science & ML / AI',
+  qa: 'QA Тестирование (Auto & Manual)',
+  devops: 'DevOps & Инфраструктура',
+};
+
+export function resolveDirectionByQuery(query = '') {
+  const clean = String(query).toLowerCase().trim();
+  if (!clean) return null;
+  for (const [dirKey, aliases] of Object.entries(DIRECTION_ALIASES)) {
+    if (dirKey === clean || aliases.includes(clean)) {
+      return dirKey;
+    }
+  }
   return null;
 }
 
@@ -1869,6 +1899,8 @@ export async function parseChannelPosts(channelHandle, companyInfo) {
         .replace(/&#x([0-9a-fA-F]+);/g, (_, code) => String.fromCharCode(parseInt(code, 16)))
         .trim();
 
+      const textLower = text.toLowerCase();
+
       // Extract first meaningful line as title candidate
       const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
       const firstLine = (lines[0] || 'IT-Стажировка').replace(/^[^\p{L}\p{N}]+/u, '');
@@ -2652,26 +2684,78 @@ export async function unregisterTgSubscriber(chatId) {
 }
 
 /**
+ * Return current runtime status of Telegram Bot
+ */
+export function getTgBotStatus() {
+  return {
+    bot: 'IT-Старт Telegram Бот',
+    username: BOT_USERNAME,
+    status: BOT_TOKEN ? 'active' : 'fallback',
+    mode: BOT_TOKEN ? 'live' : 'fallback',
+    uptime: process.uptime(),
+    commandsCount: 11,
+    port: PORT,
+    renderUrl: RENDER_URL,
+    channelsCount: ALL_TARGET_TG_CHANNELS.length,
+    websitesCount: CAREER_WEBSITES_DATA.length,
+    companiesCount: COMPANIES_DATA.length,
+    lastScanAt: LAST_SCAN_STATUS.lastScanAt,
+    lastActive: new Date().toISOString(),
+  };
+}
+
+/**
  * Handle incoming user messages
  */
 export async function handleMessage(msg) {
-  const chatId = msg.chat?.id;
-  const text = msg.text || '';
+  const chatId = msg.chat?.id || msg.from?.id;
+  const textRaw = (msg.text || '').trim();
   const firstName = msg.from?.first_name || 'Разработчик';
+  const username = msg.from?.username || '';
 
-  if (!chatId) return;
+  if (!chatId) return { ok: false, error: 'Missing chat_id' };
 
-  console.log(`[Message] От @${msg.from?.username || chatId}: "${text}"`);
+  console.log(`[Message] От @${username || chatId}: "${textRaw}"`);
 
-  // /start command
-  if (text.startsWith('/start')) {
+  const textLower = textRaw.toLowerCase();
+  const textClean = textLower.replace(/[!.,?]+$/g, '').trim();
+  const strippedText = textLower.replace(/^[\p{Extended_Pictographic}\p{Emoji}\p{Symbol}\s_.-]+/u, '').trim();
+
+  const isGreeting =
+    strippedText === 'здравствуйте' ||
+    strippedText === 'здравствуй' ||
+    strippedText === 'добрый день' ||
+    strippedText === 'добрый вечер' ||
+    strippedText === 'доброе утро' ||
+    strippedText === 'приветствую' ||
+    strippedText === 'салют' ||
+    strippedText === 'хай' ||
+    strippedText === 'ку' ||
+    strippedText.startsWith('здравствуй') ||
+    strippedText.startsWith('добрый день') ||
+    strippedText.startsWith('добрый вечер') ||
+    strippedText.startsWith('доброе утро') ||
+    strippedText.startsWith('приветствую');
+
+  // 1. /start command, greetings & main menu
+  if (
+    textClean === '/start' ||
+    textClean.startsWith('/start ') ||
+    textClean === 'старт' ||
+    textClean === 'начать' ||
+    textClean === 'меню' ||
+    textClean === 'главное меню' ||
+    textClean === 'привет' ||
+    textClean === 'hello' ||
+    isGreeting
+  ) {
     // Auto-register subscriber in Supabase
     await registerTgSubscriber(chatId, {
-      username: msg.from?.username || '',
+      username,
       first_name: firstName,
     });
 
-    const webAppUrlWithParams = `${WEBAPP_URL}${WEBAPP_URL.includes('?') ? '&' : '?'}tg_chat_id=${chatId}&tg_username=${encodeURIComponent(msg.from?.username || '')}&tg_first_name=${encodeURIComponent(firstName || '')}&subscribed=1#tg_chat_id=${chatId}`;
+    const webAppUrlWithParams = `${WEBAPP_URL}${WEBAPP_URL.includes('?') ? '&' : '?'}tg_chat_id=${chatId}&tg_username=${encodeURIComponent(username || '')}&tg_first_name=${encodeURIComponent(firstName || '')}&subscribed=1#tg_chat_id=${chatId}`;
 
     const welcomeText =
       `👋 <b>Привет, ${firstName}!</b>\n\n` +
@@ -2685,50 +2769,63 @@ export async function handleMessage(msg) {
       `• <b>Тренажёр интервью</b> — 55+ вопросов с эталонными ответами и самопроверкой\n\n` +
       `Нажмите кнопку ниже, чтобы открыть приложение (уведомления уже активны, ID подставлен автоматически)!`;
 
+    const keyboard = {
+      inline_keyboard: [
+        [
+          {
+            text: '🚀 Запустить IT-Старт WebApp',
+            web_app: { url: webAppUrlWithParams },
+          },
+        ],
+        [
+          { text: '💼 Свежие стажировки', callback_data: 'vacancies:all' },
+          { text: '🏢 Компании и каналы', callback_data: 'companies' },
+        ],
+        [
+          { text: '🗺 Роадмапы', callback_data: 'roadmaps' },
+          { text: '❓ Тренажёр вопросов', callback_data: 'questions' },
+        ],
+        [
+          { text: '🔔 Подписка', callback_data: 'subscribe' },
+          { text: '⚡ Сканировать каналы', callback_data: 'scan' },
+        ],
+        [
+          { text: '🌐 Сайт без VPN', url: RENDER_URL },
+          { text: 'ℹ️ Помощь', callback_data: 'help' },
+        ],
+      ],
+    };
+
     await callTelegram('sendMessage', {
       chat_id: chatId,
       text: welcomeText,
       parse_mode: 'HTML',
-      reply_markup: {
-        inline_keyboard: [
-          [
-            {
-              text: '🚀 Запустить IT-Старт WebApp',
-              web_app: { url: webAppUrlWithParams },
-            },
-          ],
-          [
-            { text: '💼 Свежие стажировки', callback_data: 'vacancies:all' },
-            { text: '🏢 Компании и каналы', callback_data: 'companies' },
-          ],
-          [
-            { text: '⚡ Сканировать каналы', callback_data: 'scan' },
-            { text: '🗺 Роадмапы', callback_data: 'roadmaps' },
-          ],
-          [
-            { text: '❓ Тренажёр вопросов', callback_data: 'questions' },
-            { text: 'ℹ️ Помощь', callback_data: 'help' },
-          ],
-        ],
-      },
+      reply_markup: keyboard,
     });
-    return;
+    return { ok: true, type: 'start', chatId, replyText: welcomeText };
   }
 
-  // /subscribe command
-  if (text.startsWith('/subscribe')) {
+  // 2. /subscribe command
+  if (
+    textClean === '/subscribe' ||
+    textClean.startsWith('/subscribe ') ||
+    textClean === 'подписка' ||
+    textClean === 'подписаться' ||
+    textClean === 'включить уведомления'
+  ) {
     await registerTgSubscriber(chatId, {
-      username: msg.from?.username || '',
+      username,
       first_name: firstName,
     });
-    const webAppUrlWithParams = `${WEBAPP_URL}${WEBAPP_URL.includes('?') ? '&' : '?'}tg_chat_id=${chatId}&tg_username=${encodeURIComponent(msg.from?.username || '')}&tg_first_name=${encodeURIComponent(firstName || '')}&subscribed=1#tg_chat_id=${chatId}`;
+    const webAppUrlWithParams = `${WEBAPP_URL}${WEBAPP_URL.includes('?') ? '&' : '?'}tg_chat_id=${chatId}&tg_username=${encodeURIComponent(username || '')}&tg_first_name=${encodeURIComponent(firstName || '')}&subscribed=1#tg_chat_id=${chatId}`;
+    const text =
+      `🔔 <b>Уведомления успешно подключены!</b>\n\n` +
+      `Ваш Telegram Chat ID: <code>${chatId}</code>\n` +
+      `Вы подписаны на все направления стажировок (Frontend, Backend, Mobile, QA, DevOps, Data Science).\n\n` +
+      `Чтобы настроить конкретные направления, откройте приложение IT-Старт:`;
     await callTelegram('sendMessage', {
       chat_id: chatId,
-      text:
-        `🔔 <b>Уведомления успешно подключены!</b>\n\n` +
-        `Ваш Telegram Chat ID: <code>${chatId}</code>\n` +
-        `Вы подписаны на все направления стажировок (Frontend, Backend, Mobile, QA, DevOps, Data Science).\n\n` +
-        `Чтобы настроить конкретные направления, откройте приложение IT-Старт:`,
+      text,
       parse_mode: 'HTML',
       reply_markup: {
         inline_keyboard: [
@@ -2738,14 +2835,24 @@ export async function handleMessage(msg) {
               web_app: { url: webAppUrlWithParams },
             },
           ],
+          [
+            { text: '💼 Свежие стажировки', callback_data: 'vacancies:all' },
+            { text: '🌐 Сайт без VPN', url: RENDER_URL },
+          ],
         ],
       },
     });
-    return;
+    return { ok: true, type: 'subscribe', chatId };
   }
 
-  // /unsubscribe command
-  if (text.startsWith('/unsubscribe')) {
+  // 3. /unsubscribe command
+  if (
+    textClean === '/unsubscribe' ||
+    textClean.startsWith('/unsubscribe ') ||
+    textClean === 'отписаться' ||
+    textClean === 'отписка' ||
+    textClean === 'отключить уведомления'
+  ) {
     await unregisterTgSubscriber(chatId);
     await callTelegram('sendMessage', {
       chat_id: chatId,
@@ -2753,302 +2860,471 @@ export async function handleMessage(msg) {
         `🔕 <b>Вы отписались от уведомлений IT-Старт.</b>\n\n` +
         `Чтобы возобновить подписку, отправьте /subscribe или /start.`,
       parse_mode: 'HTML',
+      reply_markup: {
+        inline_keyboard: [
+          [
+            { text: '🔔 Включить подписку снова', callback_data: 'subscribe' },
+            { text: '💼 Свежие стажировки', callback_data: 'vacancies:all' },
+          ],
+        ],
+      },
     });
-    return;
+    return { ok: true, type: 'unsubscribe', chatId };
   }
 
-  // /id or /myid command
-  if (text.startsWith('/id') || text.startsWith('/myid')) {
+  // 4. /id or /myid command
+  if (
+    textClean === '/id' ||
+    textClean === '/myid' ||
+    textClean === 'id' ||
+    textClean === 'мой id' ||
+    textClean === 'chat_id' ||
+    textClean === 'айди'
+  ) {
+    const text =
+      `🆔 <b>Ваш идентификатор Telegram:</b>\n\n` +
+      `• Chat ID: <code>${chatId}</code>\n` +
+      `• Username: @${username || 'не указан'}\n` +
+      `• Имя: <b>${firstName}</b>\n\n` +
+      `Этот ID используется сервисом IT-Старт для отправки персональных пуш-уведомлений о новых стажировках.\n` +
+      `В Telegram WebApp ваш ID подставляется автоматически!`;
+
+    const webAppUrlWithParams = `${WEBAPP_URL}${WEBAPP_URL.includes('?') ? '&' : '?'}tg_chat_id=${chatId}&tg_username=${encodeURIComponent(username || '')}&tg_first_name=${encodeURIComponent(firstName || '')}&subscribed=1#tg_chat_id=${chatId}`;
+
     await callTelegram('sendMessage', {
       chat_id: chatId,
-      text: `🆔 Ваш Telegram Chat ID: <code>${chatId}</code>\nUsername: @${msg.from?.username || 'не указан'}`,
+      text,
       parse_mode: 'HTML',
+      reply_markup: {
+        inline_keyboard: [
+          [
+            { text: '🚀 Запустить WebApp', web_app: { url: webAppUrlWithParams } },
+            { text: '💼 Стажировки', callback_data: 'vacancies:all' },
+          ],
+        ],
+      },
     });
-    return;
+    return { ok: true, type: 'id', chatId };
   }
 
-  // /vacancies or /internships with optional company argument
-  if (text.startsWith('/vacancies') || text.startsWith('/internships')) {
-    const parts = text.trim().split(/\s+/);
+  // 5. /vacancies or /internships or «стажировки» or «вакансии»
+  if (
+    textClean === '/vacancies' ||
+    textClean.startsWith('/vacancies ') ||
+    textClean === '/internships' ||
+    textClean.startsWith('/internships ') ||
+    textClean === 'стажировки' ||
+    textClean === 'вакансии' ||
+    textClean === 'каталог'
+  ) {
+    const parts = textRaw.split(/\s+/);
     if (parts.length > 1) {
-      const queryCompany = parts.slice(1).join(' ');
-      const matched = findCompanyByQuery(queryCompany);
-      if (matched) {
-        await sendCompanyVacancies(chatId, matched.id);
-        return;
+      const arg = parts.slice(1).join(' ').trim().toLowerCase();
+      const matchedComp = findCompanyByQuery(arg);
+      const matchedDir = resolveDirectionByQuery(arg);
+      if (matchedComp) {
+        return sendCompanyVacancies(chatId, matchedComp.id);
       }
+      if (matchedDir) {
+        return sendVacancies(chatId, matchedDir);
+      }
+      return sendVacancies(chatId, arg);
     }
-    await sendVacancies(chatId, 'all');
-    return;
+    return sendVacancies(chatId, 'all');
   }
 
-  // /companies
-  if (text.startsWith('/companies')) {
-    await sendCompanies(chatId);
-    return;
+  // 6. Direct direction commands (/frontend, /backend, «фронтенд», «бэкенд», etc.)
+  const directDirMatch = resolveDirectionByQuery(textClean);
+  if (directDirMatch) {
+    return sendVacancies(chatId, directDirMatch);
   }
 
-  // /company_<id> shortcut commands
-  const companyCmdMatch = text.match(/^\/company_([a-zA-Z0-9]+)/);
+  // 7. /companies or «компании» or «работодатели»
+  if (
+    textClean === '/companies' ||
+    textClean === 'компании' ||
+    textClean === 'работодатели' ||
+    textClean === 'список компаний'
+  ) {
+    return sendCompanies(chatId);
+  }
+
+  // 8. /company_<id> shortcut commands
+  const companyCmdMatch = textClean.match(/^\/company_([a-zA-Z0-9]+)/);
   if (companyCmdMatch) {
     const targetCompanyId = companyCmdMatch[1].toLowerCase();
-    await sendCompanyVacancies(chatId, targetCompanyId);
-    return;
+    return sendCompanyVacancies(chatId, targetCompanyId);
   }
 
-  // /scan, /track, /parse, or /sync
+  // 9. /roadmaps or «роадмапы» or «дорожные карты»
   if (
-    text.startsWith('/scan') ||
-    text.startsWith('/track') ||
-    text.startsWith('/parse') ||
-    text.startsWith('/sync')
+    textClean === '/roadmaps' ||
+    textClean === 'роадмапы' ||
+    textClean === 'роадмап' ||
+    textClean === 'дорожные карты' ||
+    textClean === 'план обучения'
   ) {
-    await runManualScan(chatId);
-    return;
+    return sendRoadmaps(chatId);
   }
 
-  // /status
-  if (text.startsWith('/status')) {
-    await sendStatus(chatId);
-    return;
+  // 10. /questions or /quiz or /trainer or «вопросы» or «тренажёр» or «тренажер» or «собеседование»
+  if (
+    textClean === '/questions' ||
+    textClean === '/quiz' ||
+    textClean === '/trainer' ||
+    textClean === 'вопросы' ||
+    textClean === 'тренажёр' ||
+    textClean === 'тренажер' ||
+    textClean === 'собеседование' ||
+    textClean === 'интервью'
+  ) {
+    return sendQuestions(chatId);
   }
 
-  // /roadmaps
-  if (text.startsWith('/roadmaps')) {
-    await sendRoadmaps(chatId);
-    return;
+  // 11. /scan, /track, /parse, or /sync or «сканировать», «скан», «парсинг», «синхронизация»
+  if (
+    textClean === '/scan' ||
+    textClean === '/sync' ||
+    textClean === '/parse' ||
+    textClean === '/track' ||
+    textClean === 'сканировать' ||
+    textClean === 'скан' ||
+    textClean === 'парсинг' ||
+    textClean === 'синхронизация' ||
+    textClean === 'обновить'
+  ) {
+    return runManualScan(chatId);
   }
 
-  // /help
-  if (text.startsWith('/help')) {
-    await sendHelp(chatId);
-    return;
+  // 12. /status or «статус» or «состояние»
+  if (
+    textClean === '/status' ||
+    textClean === 'статус' ||
+    textClean === 'состояние' ||
+    textClean === 'сервер'
+  ) {
+    return sendStatus(chatId);
   }
 
-  // /vk
-  if (text.startsWith('/vk')) {
+  // 13. /site, /web, /app or «сайт», «веб», «открыть сайт», «платформа»
+  if (
+    textClean === '/site' ||
+    textClean === '/web' ||
+    textClean === '/app' ||
+    textClean === 'сайт' ||
+    textClean === 'веб' ||
+    textClean === 'платформа' ||
+    textClean.includes('открыть сайт') ||
+    textClean.includes('веб-версия')
+  ) {
+    return sendSite(chatId);
+  }
+
+  // 14. /vk or «вк» or «вконтакте»
+  if (
+    textClean === '/vk' ||
+    textClean === 'вк' ||
+    textClean === 'вконтакте' ||
+    textClean === 'vk bot'
+  ) {
+    const text =
+      `📱 <b>IT-Старт во ВКонтакте:</b>\n\n` +
+      `• <b>VK Бот:</b> Наш официальный бот сообщества ВКонтакте работает 24/7 на Bots Long Poll API!\n` +
+      `• <b>VK Mini App:</b> Платформа IT-Старт оптимизирована для запуска внутри клиента VK.\n\n` +
+      `🔗 <b>Диалог с ботом VK:</b> https://vk.com/im?sel=-242573933\n` +
+      `👥 <b>Группа ВКонтакте:</b> https://vk.com/club242573933\n` +
+      `🚀 <b>VK Mini App:</b> https://vk.com/app54857681\n` +
+      `🌐 <b>Сайт платформы (без VPN):</b> ${RENDER_URL}`;
+
     await callTelegram('sendMessage', {
       chat_id: chatId,
-      text:
-        `📱 <b>IT-Старт во ВКонтакте:</b>\n\n` +
-        `• <b>VK Бот:</b> Наш официальный бот сообщества ВКонтакте работает 24/7 на Bots Long Poll API!\n` +
-        `• <b>VK Mini App:</b> Платформа IT-Старт оптимизирована для запуска внутри мобильного приложения VK.\n\n` +
-        `🔗 <b>Диалог с ботом VK:</b> https://vk.com/im?sel=-242573933\n` +
-        `👥 <b>Группа ВКонтакте:</b> https://vk.com/club242573933\n` +
-        `🌐 <b>Сайт платформы (без VPN):</b> ${RENDER_URL}`,
+      text,
       parse_mode: 'HTML',
+      reply_markup: {
+        inline_keyboard: [
+          [
+            { text: '💬 Открыть бота в VK', url: 'https://vk.com/im?sel=-242573933' },
+            { text: '🚀 VK Mini App', url: 'https://vk.com/app54857681' },
+          ],
+          [
+            { text: '🌐 Сайт без VPN', url: RENDER_URL },
+          ],
+        ],
+      },
     });
-    return;
+    return { ok: true, type: 'vk', chatId };
   }
 
-  // Check if text directly matches company name/alias (e.g. "директум", "директрум", "t1", "контур", "тбанк")
-  const matchedCompany = findCompanyByQuery(text);
+  // 15. /help or «помощь» or «справка»
+  if (
+    textClean === '/help' ||
+    textClean === 'помощь' ||
+    textClean === 'справка' ||
+    textClean === 'команды'
+  ) {
+    return sendHelp(chatId);
+  }
+
+  // 16. Direct company name lookup («т1», «директум», «контур», «яндекс», etc.)
+  const matchedCompany = findCompanyByQuery(textClean) || findCompanyByQuery(textLower);
   if (matchedCompany) {
-    await sendCompanyVacancies(chatId, matchedCompany.id);
-    return;
+    return sendCompanyVacancies(chatId, matchedCompany.id);
   }
 
-  // Default response
+  // 17. Default response
+  const defaultText =
+    `Я получил ваше сообщение: «${textRaw.slice(0, 40)}» 🤔\n\n` +
+    `Используйте меню команд или выберите действие ниже:`;
+
+  const webAppUrlWithParams = `${WEBAPP_URL}${WEBAPP_URL.includes('?') ? '&' : '?'}tg_chat_id=${chatId}&subscribed=1#tg_chat_id=${chatId}`;
+
   await callTelegram('sendMessage', {
     chat_id: chatId,
-    text: `Я получил ваше сообщение: «${text}».\n\nИспользуйте меню команд или откройте WebApp платформы:`,
+    text: defaultText,
     reply_markup: {
       inline_keyboard: [
         [
-          {
-            text: '🚀 Открыть IT-Старт',
-            web_app: { url: WEBAPP_URL },
-          },
+          { text: '🚀 Запустить IT-Старт WebApp', web_app: { url: webAppUrlWithParams } },
         ],
         [
-          { text: '💼 Каталог вакансий', callback_data: 'vacancies:all' },
+          { text: '💼 Свежие стажировки', callback_data: 'vacancies:all' },
           { text: '🏢 Компании', callback_data: 'companies' },
+        ],
+        [
+          { text: '🗺 Роадмапы', callback_data: 'roadmaps' },
+          { text: '❓ Вопросы', callback_data: 'questions' },
+        ],
+        [
+          { text: '🌐 Сайт без VPN', url: RENDER_URL },
+          { text: 'ℹ️ Помощь', callback_data: 'help' },
         ],
       ],
     },
   });
+  return { ok: true, type: 'unknown', chatId };
 }
 
 /**
- * Send vacancies list with company filter buttons
+ * Send vacancies list with company and direction filter buttons
  */
-async function sendVacancies(chatId, filterCompanyId = 'all') {
+export async function sendVacancies(chatId, filter = 'all') {
   const allList = await getActiveInternships();
   let list = allList;
-  let titleHeader = '🔥 <b>Актуальные IT-стажировки 2026:</b>\n\n';
+  let titleHeader = '🔥 <b>Актуальные IT-стажировки 2026:</b>\n════════════════════════════════\n\n';
 
-  if (filterCompanyId !== 'all') {
+  const dirMatch = filter !== 'all' ? resolveDirectionByQuery(filter) : null;
+  const companyMatch = filter !== 'all' && !dirMatch ? (COMPANIES_DATA.find((c) => c.id === filter) || findCompanyByQuery(filter)) : null;
+
+  if (dirMatch) {
+    list = allList.filter((i) => (i.directionId || '').toLowerCase() === dirMatch);
+    titleHeader = `🔥 <b>Стажировки: ${DIRECTION_TITLES[dirMatch] || dirMatch} (${list.length}):</b>\n════════════════════════════════\n\n`;
+  } else if (companyMatch) {
+    list = allList.filter((i) => i.companyId === companyMatch.id || findCompanyByQuery(i.company)?.id === companyMatch.id);
+    titleHeader = `🏢 <b>Вакансии компании ${companyMatch.name} (${companyMatch.channel}):</b>\n════════════════════════════════\n\n`;
+  } else if (filter !== 'all') {
     list = allList.filter(
-      (i) => i.companyId === filterCompanyId || findCompanyByQuery(i.company)?.id === filterCompanyId
+      (i) =>
+        (i.directionId || '').toLowerCase() === filter.toLowerCase() ||
+        (i.title || '').toLowerCase().includes(filter.toLowerCase()) ||
+        (i.tags || []).some((t) => t.toLowerCase().includes(filter.toLowerCase()))
     );
-    const company = COMPANIES_DATA.find((c) => c.id === filterCompanyId);
-    if (company) {
-      titleHeader = `🏢 <b>Вакансии компании ${company.name} (${company.channel}):</b>\n\n`;
-    }
+    titleHeader = `🔍 <b>Стажировки по запросу «${filter}» (${list.length}):</b>\n════════════════════════════════\n\n`;
   }
 
   let text = titleHeader;
   if (list.length === 0) {
-    text += `На данный момент новых вакансий в этой категории не найдено.\n\nПроверьте полный каталог в WebApp или выберите другую компанию ниже:`;
+    text += `🔍 По вашему запросу стажировок не найдено.\nПопробуйте выбрать другое направление или работодателя ниже!`;
   } else {
-    list.slice(0, 6).forEach((item, idx) => {
-      text += `${idx + 1}. <b>${item.company}</b> — ${item.title}\n`;
-      text += `   💰 <i>${item.salary}</i> | 📍 ${item.format} (${item.location || 'РФ'})\n`;
-      text += `   📢 Источник: <code>${item.channel}</code> | <a href="${item.url}">Подать заявку</a>\n\n`;
+    list.slice(0, 5).forEach((item, idx) => {
+      const applyUrl = item.applyUrl || item.url || RENDER_URL;
+      const channel = item.sourceChannel || item.channel || '@t1career';
+      const stack = Array.isArray(item.tags) && item.tags.length > 0 ? item.tags.slice(0, 4).join(' • ') : '';
+      text += `[${idx + 1}] 🏢 <b>${item.company}</b> — ${item.title}\n`;
+      text += `💰 <i>${item.salary || 'По договоренности'}</i> | 📍 ${item.format || 'Удаленно'} (${item.location || item.city || 'РФ'})\n`;
+      if (stack) {
+        text += `🏷 Стек: <code>${stack}</code>\n`;
+      }
+      text += `📢 Источник: <code>${channel}</code>\n`;
+      text += `🔗 <a href="${applyUrl}">Откликнуться</a>\n`;
+      text += `────────────────────────────────\n`;
     });
-    if (list.length > 6) {
-      text += `<i>... и ещё ${list.length - 6} вакансий доступно в WebApp!</i>\n\n`;
+    if (list.length > 5) {
+      text += `<i>... и ещё ${list.length - 5} стажировок доступно в WebApp!</i>\n\n`;
     }
-    text += `⚡ Полный интерактивный каталог, фильтры по стеку и роадмапы доступны в WebApp!`;
+    text += `💡 Все вакансии с фильтрами по стеку, роадмапами и тренажёром доступны в WebApp и на сайте:\n`;
+    text += `🌐 Веб-версия без VPN: ${RENDER_URL}\n`;
+    text += `📱 VK Mini App: https://vk.com/app54857681`;
   }
 
   if (text.length > 3900) {
     text = text.slice(0, 3850) + '\n\n<i>(Список сокращен, откройте WebApp для полного просмотра)</i>';
   }
 
+  const webAppUrlWithParams = `${WEBAPP_URL}${WEBAPP_URL.includes('?') ? '&' : '?'}tg_chat_id=${chatId}&subscribed=1#tg_chat_id=${chatId}`;
+
+  const keyboard = {
+    inline_keyboard: [
+      [
+        { text: '💻 Frontend', callback_data: 'direction:frontend' },
+        { text: '⚙️ Backend', callback_data: 'direction:backend' },
+        { text: '📱 Mobile', callback_data: 'direction:mobile' },
+      ],
+      [
+        { text: '🤖 Data Science', callback_data: 'direction:data_science' },
+        { text: '🧪 QA', callback_data: 'direction:qa' },
+        { text: '☁️ DevOps', callback_data: 'direction:devops' },
+      ],
+      [
+        { text: '💼 Все вакансии', callback_data: 'vacancies:all' },
+        { text: '🏢 Компании', callback_data: 'companies' },
+      ],
+      [
+        { text: 'Т1', callback_data: 'vacancies:t1' },
+        { text: 'Контур', callback_data: 'vacancies:kontur' },
+        { text: 'Т-Банк', callback_data: 'vacancies:tbank' },
+        { text: 'Directum', callback_data: 'vacancies:directum' },
+      ],
+      [
+        { text: 'Яндекс', callback_data: 'vacancies:yandex' },
+        { text: 'Ozon', callback_data: 'vacancies:ozon' },
+        { text: 'Сбер', callback_data: 'vacancies:sber' },
+        { text: 'Авито', callback_data: 'vacancies:avito' },
+        { text: 'VK', callback_data: 'vacancies:vk' },
+      ],
+      [
+        { text: '🚀 Открыть в WebApp', web_app: { url: webAppUrlWithParams } },
+        { text: '🌐 Сайт без VPN', url: RENDER_URL },
+      ],
+    ],
+  };
+
   await callTelegram('sendMessage', {
     chat_id: chatId,
     text,
     parse_mode: 'HTML',
     disable_web_page_preview: true,
-    reply_markup: {
-      inline_keyboard: [
-        [
-          { text: '🏢 Все компании', callback_data: 'vacancies:all' },
-        ],
-        [
-          { text: 'Т1', callback_data: 'vacancies:t1' },
-          { text: 'Контур', callback_data: 'vacancies:kontur' },
-          { text: 'Т-Банк', callback_data: 'vacancies:tbank' },
-          { text: 'Directum', callback_data: 'vacancies:directum' },
-        ],
-        [
-          { text: 'Яндекс', callback_data: 'vacancies:yandex' },
-          { text: 'Ozon', callback_data: 'vacancies:ozon' },
-          { text: 'Сбер', callback_data: 'vacancies:sber' },
-          { text: 'Авито', callback_data: 'vacancies:avito' },
-        ],
-        [
-          { text: 'VK', callback_data: 'vacancies:vk' },
-          { text: '⚡ Сканировать каналы', callback_data: 'scan' },
-        ],
-        [
-          {
-            text: '🚀 Открыть каталог в WebApp',
-            web_app: { url: WEBAPP_URL },
-          },
-        ],
-      ],
-    },
+    reply_markup: keyboard,
   });
+
+  return { ok: true, type: 'vacancies', chatId, filter, count: list.length };
 }
 
 /**
  * Send monitored companies overview
  */
-async function sendCompanies(chatId) {
-  let text = `🏢 <b>Целевые IT-компании и Telegram-источники:</b>\n\n`;
+export async function sendCompanies(chatId) {
+  let text = `🏢 <b>Целевые IT-компании и программы стажировок:</b>\n════════════════════════════════\n\n`;
 
   COMPANIES_DATA.forEach((c, idx) => {
-    text += `${idx + 1}. <b>${c.name}</b> (${c.channel})\n`;
+    text += `${idx + 1}. <b>${c.name}</b> (${c.shortName})\n`;
     text += `   📌 <i>${c.description}</i>\n`;
-    text += `   🛠 Стек: <code>${c.stack}</code>\n\n`;
+    text += `   🛠 Стек: <code>${c.stack}</code>\n`;
+    text += `   📢 Канал: <code>${c.channel}</code>\n\n`;
   });
 
-  text += `Нажмите на кнопку компании ниже, чтобы посмотреть её открытые стажировки:`;
+  text += `💡 Выберите компанию на клавиатуре ниже или отправьте её название в чат (например: «директум», «т1», «контур»):`;
+
+  const webAppUrlWithParams = `${WEBAPP_URL}${WEBAPP_URL.includes('?') ? '&' : '?'}tg_chat_id=${chatId}&subscribed=1#tg_chat_id=${chatId}`;
+
+  const keyboard = {
+    inline_keyboard: [
+      [
+        { text: 'Т1 (Холдинг Т1)', callback_data: 'company:t1' },
+        { text: 'СКБ Контур', callback_data: 'company:kontur' },
+        { text: 'Т-Банк', callback_data: 'company:tbank' },
+      ],
+      [
+        { text: 'Directum (Ижевск)', callback_data: 'company:directum' },
+        { text: 'Яндекс', callback_data: 'company:yandex' },
+        { text: 'Ozon Tech', callback_data: 'company:ozon' },
+      ],
+      [
+        { text: 'Сбер AI', callback_data: 'company:sber' },
+        { text: 'Avito Tech', callback_data: 'company:avito' },
+        { text: 'VK (ВКонтакте)', callback_data: 'company:vk' },
+      ],
+      [
+        { text: '💼 Все вакансии', callback_data: 'vacancies:all' },
+        { text: '🚀 Смотреть в WebApp', web_app: { url: webAppUrlWithParams } },
+      ],
+    ],
+  };
 
   await callTelegram('sendMessage', {
     chat_id: chatId,
     text,
     parse_mode: 'HTML',
     disable_web_page_preview: true,
-    reply_markup: {
-      inline_keyboard: [
-        [
-          { text: 'Т1 (Холдинг Т1)', callback_data: 'company:t1' },
-          { text: 'СКБ Контур', callback_data: 'company:kontur' },
-        ],
-        [
-          { text: 'Т-Банк', callback_data: 'company:tbank' },
-          { text: 'Directum (Ижевск)', callback_data: 'company:directum' },
-        ],
-        [
-          { text: 'Яндекс', callback_data: 'company:yandex' },
-          { text: 'Ozon Tech', callback_data: 'company:ozon' },
-        ],
-        [
-          { text: 'Сбер AI', callback_data: 'company:sber' },
-          { text: 'Avito Tech', callback_data: 'company:avito' },
-        ],
-        [
-          { text: 'VK (ВКонтакте)', callback_data: 'company:vk' },
-          { text: '💼 Все вакансии', callback_data: 'vacancies:all' },
-        ],
-        [
-          {
-            text: '🚀 Смотреть в WebApp с фильтрами',
-            web_app: { url: WEBAPP_URL },
-          },
-        ],
-      ],
-    },
+    reply_markup: keyboard,
   });
+
+  return { ok: true, type: 'companies', chatId, count: COMPANIES_DATA.length };
 }
 
 /**
  * Send vacancies and details for a specific company
  */
-async function sendCompanyVacancies(chatId, companyId) {
-  const company = COMPANIES_DATA.find((c) => c.id === companyId);
+export async function sendCompanyVacancies(chatId, companyId) {
+  const company = COMPANIES_DATA.find((c) => c.id === companyId) || findCompanyByQuery(companyId);
   if (!company) {
-    await sendCompanies(chatId);
-    return;
+    return sendCompanies(chatId);
   }
 
   const allList = await getActiveInternships();
   const list = allList.filter(
-    (i) => i.companyId === companyId || findCompanyByQuery(i.company)?.id === companyId
+    (i) => i.companyId === company.id || findCompanyByQuery(i.company)?.id === company.id
   );
 
-  let text = `🏢 <b>Компания: ${company.name}</b>\n`;
-  text += `📢 Telegram-канал: <code>${company.channel}</code>\n`;
-  text += `ℹ️ ${company.description}\n\n`;
+  let text = `🏢 <b>Компания: ${company.name} (${company.shortName})</b>\n\n`;
+  text += `📢 Канал работодателя: <code>${company.channel}</code>\n`;
+  text += `📝 <i>${company.description}</i>\n`;
+  text += `🛠 Основной стек: <code>${company.stack}</code>\n\n`;
   text += `🔥 <b>Открытые стажировки (${list.length}):</b>\n\n`;
 
   if (list.length === 0) {
-    text += `На данный момент новых вакансий в канале не обнаружено. Проверьте WebApp!\n`;
+    text += `🔍 Сейчас прямых позиций в базе нет, но парсер отслеживает канал <code>${company.channel}</code> 24/7!\nПроверьте WebApp или сайт компании:\n`;
   } else {
-    list.slice(0, 7).forEach((item, idx) => {
-      text += `${idx + 1}. <b>${item.title}</b>\n`;
-      text += `   💰 <i>${item.salary}</i> | 📍 ${item.format} (${item.location || 'РФ'})\n`;
-      text += `   🔗 <a href="${item.url}">Подать заявку / Перейти к посту</a>\n\n`;
+    list.slice(0, 6).forEach((item, idx) => {
+      const applyUrl = item.applyUrl || item.url || RENDER_URL;
+      text += `[${idx + 1}] <b>${item.title}</b>\n`;
+      text += `   💰 <i>${item.salary || 'По договоренности'}</i> | 📍 ${item.format || 'Удаленно'} (${item.location || 'РФ'})\n`;
+      text += `   🔗 <a href="${applyUrl}">Откликнуться / Перейти к посту</a>\n\n`;
     });
   }
+
+  const webAppUrlWithParams = `${WEBAPP_URL}${WEBAPP_URL.includes('?') ? '&' : '?'}tg_chat_id=${chatId}&subscribed=1#tg_chat_id=${chatId}`;
+
+  const keyboard = {
+    inline_keyboard: [
+      [
+        { text: `📢 Канал ${company.channel}`, url: company.channelUrl },
+        { text: '🚀 Открыть в WebApp', web_app: { url: webAppUrlWithParams } },
+      ],
+      [
+        { text: '🏢 Все компании', callback_data: 'companies' },
+        { text: '💼 Все вакансии', callback_data: 'vacancies:all' },
+      ],
+      [
+        { text: '🌐 Сайт без VPN', url: RENDER_URL },
+      ],
+    ],
+  };
 
   await callTelegram('sendMessage', {
     chat_id: chatId,
     text,
     parse_mode: 'HTML',
     disable_web_page_preview: true,
-    reply_markup: {
-      inline_keyboard: [
-        [
-          { text: `🔗 Канал ${company.channel}`, url: company.channelUrl },
-          { text: '🚀 Открыть в WebApp', web_app: { url: WEBAPP_URL } },
-        ],
-        [
-          { text: '⬅️ Все компании', callback_data: 'companies' },
-          { text: '💼 Все вакансии', callback_data: 'vacancies:all' },
-        ],
-      ],
-    },
+    reply_markup: keyboard,
   });
+
+  return { ok: true, type: 'company_details', chatId, companyId: company.id, count: list.length };
 }
 
 /**
  * Trigger manual channels & career sites scan and report back
  */
-async function runManualScan(chatId) {
+export async function runManualScan(chatId) {
   await callTelegram('sendMessage', {
     chat_id: chatId,
     text: `⚡ <b>Запуск полного сканирования ${ALL_TARGET_TG_CHANNELS.length} Telegram-каналов и ${CAREER_WEBSITES_DATA.length} карьерных сайтов...</b>\n\nОпрашиваем @tbank_team, @KonturTech, @Life_in_Directum, @t1career, @yandex_intern, career.directum.ru, kontur.ru, fintech.tbank.ru, t1.ru, Habr Career...`,
@@ -3067,28 +3343,35 @@ async function runManualScan(chatId) {
     `• Отправлено пуш-уведомлений: <b>${res.sentPushes}</b>\n\n` +
     `Все свежие стажировки доступны по команде /vacancies и в WebApp!`;
 
+  const webAppUrlWithParams = `${WEBAPP_URL}${WEBAPP_URL.includes('?') ? '&' : '?'}tg_chat_id=${chatId}&subscribed=1#tg_chat_id=${chatId}`;
+
+  const keyboard = {
+    inline_keyboard: [
+      [
+        { text: '💼 Смотреть вакансии', callback_data: 'vacancies:all' },
+        { text: '📊 Статус системы', callback_data: 'status' },
+      ],
+      [
+        { text: '🚀 Открыть WebApp', web_app: { url: webAppUrlWithParams } },
+        { text: '🌐 Сайт без VPN', url: RENDER_URL },
+      ],
+    ],
+  };
+
   await callTelegram('sendMessage', {
     chat_id: chatId,
     text: reportText,
     parse_mode: 'HTML',
-    reply_markup: {
-      inline_keyboard: [
-        [
-          { text: '💼 Смотреть вакансии', callback_data: 'vacancies:all' },
-          { text: '📊 Статус системы', callback_data: 'status' },
-        ],
-        [
-          { text: '🚀 Открыть WebApp', web_app: { url: WEBAPP_URL } },
-        ],
-      ],
-    },
+    reply_markup: keyboard,
   });
+
+  return { ok: true, type: 'scan', chatId, result: res };
 }
 
 /**
  * Send full parser, bot, and sources status
  */
-async function sendStatus(chatId) {
+export async function sendStatus(chatId) {
   const uptimeMinutes = Math.floor(process.uptime() / 60);
   const uptimeHours = Math.floor(uptimeMinutes / 60);
   const uptimeFormatted = uptimeHours > 0 ? `${uptimeHours} ч ${uptimeMinutes % 60} мин` : `${uptimeMinutes} мин`;
@@ -3108,28 +3391,35 @@ async function sendStatus(chatId) {
     `• <b>Разослано пуш-уведомлений:</b> ${LAST_SCAN_STATUS.sentPushes || 0}\n\n` +
     `💡 Для принудительного запуска обновления отправьте команду /parse или /sync`;
 
+  const webAppUrlWithParams = `${WEBAPP_URL}${WEBAPP_URL.includes('?') ? '&' : '?'}tg_chat_id=${chatId}&subscribed=1#tg_chat_id=${chatId}`;
+
+  const keyboard = {
+    inline_keyboard: [
+      [
+        { text: '⚡ Запустить парсинг', callback_data: 'parse' },
+        { text: '💼 Свежие вакансии', callback_data: 'vacancies:all' },
+      ],
+      [
+        { text: '🚀 Открыть WebApp', web_app: { url: webAppUrlWithParams } },
+        { text: '🌐 Сайт без VPN', url: RENDER_URL },
+      ],
+    ],
+  };
+
   await callTelegram('sendMessage', {
     chat_id: chatId,
     text: statusText,
     parse_mode: 'HTML',
-    reply_markup: {
-      inline_keyboard: [
-        [
-          { text: '⚡ Запустить парсинг', callback_data: 'parse' },
-          { text: '💼 Свежие вакансии', callback_data: 'vacancies:all' },
-        ],
-        [
-          { text: '🚀 Открыть WebApp', web_app: { url: WEBAPP_URL } },
-        ],
-      ],
-    },
+    reply_markup: keyboard,
   });
+
+  return { ok: true, type: 'status', chatId };
 }
 
 /**
  * Send roadmaps summary
  */
-async function sendRoadmaps(chatId) {
+export async function sendRoadmaps(chatId) {
   const text =
     `🗺 <b>Интерактивные Роадмапы IT-Старт:</b>\n\n` +
     `1. <b>Frontend:</b> Веб-сеть, HTML5, CSS Grid, JS ES6+, TS ➔ React / Angular / Vue\n` +
@@ -3140,51 +3430,141 @@ async function sendRoadmaps(chatId) {
     `6. <b>DevOps:</b> Linux, Баш, Сети ➔ CI/CD & Docker / Kubernetes & Terraform\n\n` +
     `Каждый роадмап оформлен в виде дерева (roadmap.sh style) с чекбоксами подтем и подсчетом прогресса в %!`;
 
+  const webAppUrlWithParams = `${WEBAPP_URL}${WEBAPP_URL.includes('?') ? '&' : '?'}tg_chat_id=${chatId}&subscribed=1#tg_chat_id=${chatId}`;
+
+  const keyboard = {
+    inline_keyboard: [
+      [
+        {
+          text: '🗺 Открыть древо роадмапов в WebApp',
+          web_app: { url: webAppUrlWithParams },
+        },
+      ],
+      [
+        { text: '💼 Посмотреть стажировки', callback_data: 'vacancies:all' },
+        { text: '🌐 Сайт без VPN', url: RENDER_URL },
+      ],
+    ],
+  };
+
   await callTelegram('sendMessage', {
     chat_id: chatId,
     text,
     parse_mode: 'HTML',
-    reply_markup: {
-      inline_keyboard: [
-        [
-          {
-            text: '🗺 Открыть древо роадмапов в WebApp',
-            web_app: { url: WEBAPP_URL },
-          },
-        ],
-      ],
-    },
+    reply_markup: keyboard,
   });
+
+  return { ok: true, type: 'roadmaps', chatId };
+}
+
+/**
+ * Send interview questions trainer overview
+ */
+export async function sendQuestions(chatId) {
+  const webAppUrlWithParams = `${WEBAPP_URL}${WEBAPP_URL.includes('?') ? '&' : '?'}tg_chat_id=${chatId}&subscribed=1#tg_chat_id=${chatId}`;
+
+  const text =
+    `❓ <b>Тренажёр вопросов к собеседованию IT-Старт:</b>\n\n` +
+    `В платформе собрана интерактивная база из 55+ реальных вопросов собеседований топ IT-компаний (Т-Банк, Т1, Контур, Directum, Яндекс, Ozon, Сбер, Авито, VK):\n\n` +
+    `• <b>Frontend:</b> Event Loop, Microtasks/Macrotasks, React Fiber, Reconciler, Virtual DOM, CSS Stacking Context\n` +
+    `• <b>Backend:</b> Транзакции & ACID, уровни изоляции PostgreSQL, Goroutines/Channels, Spring Bean Scopes, Event Loop Node.js\n` +
+    `• <b>Mobile:</b> Жизненный цикл Activity/Fragment, Coroutines, Swift ARC & Retain Cycles, Flutter Widget Tree\n` +
+    `• <b>QA:</b> Техники тест-дизайна, эквивалентные классы, REST API тестирование, PageObject в Playwright\n` +
+    `• <b>DevOps:</b> Docker cgroups/namespaces, CI/CD pipelines, Kubernetes Pods/Deployments, Linux permissions\n` +
+    `• <b>Data Science:</b> Gradient Descent, ROC-AUC, Overfitting, SQL Window Functions\n\n` +
+    `🎯 <b>Доступны 2 интерактивных режима:</b>\n` +
+    `1. <i>Флеш-карточки</i> — быстрое повторение ключевых определений\n` +
+    `2. <i>Симуляция интервью</i> — скрытие ответа с самопроверкой после ввода своего решения!`;
+
+  const keyboard = {
+    inline_keyboard: [
+      [
+        { text: '🚀 Запустить тренажёр в WebApp', web_app: { url: webAppUrlWithParams } },
+      ],
+      [
+        { text: '💼 Каталог вакансий', callback_data: 'vacancies:all' },
+        { text: '🗺 Роадмапы', callback_data: 'roadmaps' },
+      ],
+      [
+        { text: '🌐 Сайт без VPN', url: RENDER_URL },
+      ],
+    ],
+  };
+
+  await callTelegram('sendMessage', {
+    chat_id: chatId,
+    text,
+    parse_mode: 'HTML',
+    reply_markup: keyboard,
+  });
+
+  return { ok: true, type: 'questions', chatId };
+}
+
+/**
+ * Send website & cross-platform apps links
+ */
+export async function sendSite(chatId) {
+  const webAppUrlWithParams = `${WEBAPP_URL}${WEBAPP_URL.includes('?') ? '&' : '?'}tg_chat_id=${chatId}&subscribed=1#tg_chat_id=${chatId}`;
+
+  const text =
+    `🚀 <b>Платформа IT-Старт доступна на всех устройствах:</b>\n\n` +
+    `🌐 <b>Веб-версия без VPN:</b> ${RENDER_URL}\n` +
+    `✈️ <b>Telegram Mini App:</b> запускается прямо внутри этого чата\n` +
+    `📱 <b>ВКонтакте Mini App:</b> https://vk.com/app54857681\n` +
+    `🐙 <b>Зеркало на GitHub Pages:</b> ${GITHUB_PAGES_URL}\n\n` +
+    `В платформе доступны:\n` +
+    `• Интерактивные роадмапы со шкалой готовности в %\n` +
+    `• Тренажёр 55+ вопросов к собеседованию с режимом скрытия ответов\n` +
+    `• Каталог стажировок с детальными фильтрами по технологиям и компаниям!`;
+
+  const keyboard = {
+    inline_keyboard: [
+      [
+        { text: '🚀 Запустить WebApp', web_app: { url: webAppUrlWithParams } },
+        { text: '🌐 Открыть сайт без VPN', url: RENDER_URL },
+      ],
+      [
+        { text: '💼 Каталог вакансий', callback_data: 'vacancies:all' },
+        { text: '🏢 Компании', callback_data: 'companies' },
+      ],
+    ],
+  };
+
+  await callTelegram('sendMessage', {
+    chat_id: chatId,
+    text,
+    parse_mode: 'HTML',
+    reply_markup: keyboard,
+  });
+
+  return { ok: true, type: 'site', chatId };
 }
 
 /**
  * Send help message
  */
-async function sendHelp(chatId) {
+export async function sendHelp(chatId) {
   const text =
     `ℹ️ <b>Команды бота @${BOT_USERNAME}:</b>\n\n` +
-    `/start — Главное меню и запуск WebApp\n` +
-    `/subscribe — Включить персональные пуш-уведомления о стажировках\n` +
-    `/unsubscribe — Отключить получение уведомлений\n` +
-    `/id — Узнать свой Telegram Chat ID\n` +
-    `/vacancies — Каталог стажировок с фильтром по компаниям (например: <code>/vacancies t1</code> или <code>/vacancies directum</code>)\n` +
-    `/companies — Список целевых IT-компаний и каналов\n` +
-    `/parse, /sync — Запустить сканирование Telegram-каналов и сайтов с синхронизацией\n` +
-    `/status — Статус парсера, источников и сервера бота\n` +
-    `/roadmaps — Роадмапы по 6 направлениям разработки\n` +
-    `/vk — Официальный бот и сообщество ВКонтакте\n` +
-    `/help — Список всех доступных команд\n\n` +
+    `• /start — Главное меню и запуск WebApp\n` +
+    `• /vacancies — Каталог стажировок с фильтром по направлениям (<code>/vacancies frontend</code>) или компаниям (<code>/vacancies t1</code>)\n` +
+    `• /companies — Список целевых IT-компаний и каналов\n` +
+    `• /roadmaps — Роадмапы по 6 направлениям разработки\n` +
+    `• /questions — Тренажёр вопросов к собеседованию\n` +
+    `• /subscribe — Включить персональные пуш-уведомления о стажировках\n` +
+    `• /unsubscribe — Отключить получение уведомлений\n` +
+    `• /id (или /myid) — Узнать свой Telegram Chat ID\n` +
+    `• /status — Статус парсера, источников и сервера бота\n` +
+    `• /scan (или /sync, /parse) — Принудительное сканирование каналов и сайтов\n` +
+    `• /site — Ссылка на веб-платформу IT-Старт без VPN\n` +
+    `• /vk — Официальный бот и сообщество ВКонтакте\n` +
+    `• /help — Список всех доступных команд\n\n` +
     `🏢 <b>Команды быстрого перехода к компаниям:</b>\n` +
-    `/company_t1 — Холдинг Т1\n` +
-    `/company_kontur — СКБ Контур\n` +
-    `/company_tbank — Т-Банк\n` +
-    `/company_directum — Directum (Ижевск)\n` +
-    `/company_yandex — Яндекс\n` +
-    `/company_ozon — Ozon Tech\n` +
-    `/company_sber — Сбер AI\n` +
-    `/company_avito — Avito Tech\n` +
-    `/company_vk — VK\n\n` +
-    `💡 <i>Вы также можете просто отправить боту название компании (например: «директум», «t1», «тбанк», «контур»), и бот сразу покажет её стажировки!</i>\n\n` +
+    `/company_t1, /company_kontur, /company_tbank, /company_directum, /company_yandex, /company_ozon, /company_sber, /company_avito, /company_vk\n\n` +
+    `💻 <b>Команды по направлениям:</b>\n` +
+    `/frontend, /backend, /mobile, /data_science, /qa, /devops\n\n` +
+    `💡 <i>Вы также можете просто отправить боту название компании (например: «директум», «t1», «тбанк», «контур») или стека («фронтенд», «бэкенд», «девопс»), и бот сразу покажет подходящие стажировки!</i>\n\n` +
     `🌐 <b>Сайт платформы (без VPN):</b> ${RENDER_URL}`;
 
   await callTelegram('sendMessage', {
@@ -3192,55 +3572,55 @@ async function sendHelp(chatId) {
     text,
     parse_mode: 'HTML',
   });
+
+  return { ok: true, type: 'help', chatId };
 }
 
 /**
  * Handle inline button callback queries
  */
-async function handleCallbackQuery(query) {
+export async function handleCallbackQuery(query) {
   const chatId = query.message?.chat?.id;
   const data = query.data;
 
   await callTelegram('answerCallbackQuery', { callback_query_id: query.id });
 
-  if (!chatId) return;
+  if (!chatId) return { ok: false, error: 'Missing chatId' };
 
   if (data === 'vacancies' || data === 'vacancies:all') {
-    await sendVacancies(chatId, 'all');
+    return sendVacancies(chatId, 'all');
+  } else if (data.startsWith('direction:') || data.startsWith('vacancies:direction:')) {
+    const dirId = data.replace(/^vacancies:direction:/, '').replace(/^direction:/, '');
+    return sendVacancies(chatId, dirId);
   } else if (data.startsWith('vacancies:')) {
     const compId = data.replace('vacancies:', '');
-    await sendVacancies(chatId, compId);
+    return sendVacancies(chatId, compId);
   } else if (data === 'companies') {
-    await sendCompanies(chatId);
+    return sendCompanies(chatId);
   } else if (data.startsWith('company:')) {
     const compId = data.replace('company:', '');
-    await sendCompanyVacancies(chatId, compId);
+    return sendCompanyVacancies(chatId, compId);
   } else if (data === 'scan' || data === 'parse' || data === 'sync') {
-    await runManualScan(chatId);
+    return runManualScan(chatId);
   } else if (data === 'status') {
-    await sendStatus(chatId);
+    return sendStatus(chatId);
   } else if (data === 'roadmaps') {
-    await sendRoadmaps(chatId);
+    return sendRoadmaps(chatId);
   } else if (data === 'help') {
-    await sendHelp(chatId);
+    return sendHelp(chatId);
   } else if (data === 'questions') {
-    await callTelegram('sendMessage', {
+    return sendQuestions(chatId);
+  } else if (data === 'site') {
+    return sendSite(chatId);
+  } else if (data === 'subscribe') {
+    await registerTgSubscriber(chatId, {
+      username: query.from?.username || '',
+      first_name: query.from?.first_name || 'Разработчик',
+    });
+    return callTelegram('sendMessage', {
       chat_id: chatId,
-      text:
-        `❓ <b>Тренажёр вопросов к собеседованию:</b>\n\n` +
-        `В приложении доступна база из 70+ детально разобранных вопросов (Event Loop, Fiber, TypeScript infer, CSS Stacking, ACID, Docker и др.).\n` +
-        `Доступен интерактивный режим самопроверки со скрытием ответа до ввода своего варианта!`,
+      text: `🔔 <b>Подписка успешно оформлена!</b> Вы будете получать уведомления о новых стажировках.`,
       parse_mode: 'HTML',
-      reply_markup: {
-        inline_keyboard: [
-          [
-            {
-              text: '🚀 Открыть тренажёр в WebApp',
-              web_app: { url: WEBAPP_URL },
-            },
-          ],
-        ],
-      },
     });
   }
 }

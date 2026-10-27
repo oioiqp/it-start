@@ -30,9 +30,14 @@ import {
   LAST_SCAN_STATUS,
   ALL_TARGET_TG_CHANNELS,
   CAREER_WEBSITES_DATA,
+  scanChannelsAndSyncSupabase,
+  supabase,
+  DIRECTION_ALIASES,
+  DIRECTION_TITLES,
+  resolveDirectionByQuery,
 } from './bot.mjs';
 
-export { ALL_INTERNSHIPS, SEED_INTERNSHIPS, PORTAL_FALLBACK_VACANCIES };
+export { ALL_INTERNSHIPS, SEED_INTERNSHIPS, PORTAL_FALLBACK_VACANCIES, DIRECTION_ALIASES, DIRECTION_TITLES, resolveDirectionByQuery };
 
 // Auto-load .env configuration if present
 function autoLoadEnv() {
@@ -461,18 +466,38 @@ export async function callVk(method, params = {}, token = VK_BOT_TOKEN) {
 }
 
 /**
- * Register a user as a VK push subscriber
+ * Register a user as a VK push subscriber (synced with Supabase & in-memory)
  */
 export async function registerVkSubscriber(peerId, meta = {}) {
   const id = String(peerId);
   const sub = {
     peer_id: id,
     first_name: meta.first_name || 'Пользователь VK',
+    username: meta.username || '',
     directions: meta.directions || ['frontend', 'backend', 'mobile', 'qa', 'devops', 'data_science'],
+    sub_tracks: meta.sub_tracks || ['react', 'python', 'nodejs', 'golang', 'qa_auto', 'devops_cloud'],
     subscribed_at: new Date().toISOString(),
     is_active: true,
   };
   vkSubscribers.set(id, sub);
+
+  try {
+    if (supabase) {
+      const row = {
+        chat_id: `vk_${id}`,
+        username: meta.username || '',
+        first_name: sub.first_name,
+        directions: sub.directions,
+        sub_tracks: sub.sub_tracks,
+        is_active: true,
+        updated_at: new Date().toISOString(),
+      };
+      await supabase.from('tg_subscriptions').upsert(row, { onConflict: 'chat_id' });
+    }
+  } catch {
+    // Graceful offline fallback
+  }
+
   return sub;
 }
 
@@ -481,13 +506,45 @@ export async function registerVkSubscriber(peerId, meta = {}) {
  */
 export async function unregisterVkSubscriber(peerId) {
   const id = String(peerId);
-  return vkSubscribers.delete(id);
+  const deleted = vkSubscribers.delete(id);
+
+  try {
+    if (supabase) {
+      await supabase.from('tg_subscriptions').update({ is_active: false }).eq('chat_id', `vk_${id}`);
+      await supabase.from('tg_subscriptions').update({ is_active: false }).eq('chat_id', id);
+    }
+  } catch {
+    // Graceful offline fallback
+  }
+
+  return Boolean(deleted);
 }
 
 /**
  * Get all active VK subscribers
  */
 export async function getVkSubscribers() {
+  if (vkSubscribers.size === 0 && supabase && process.env.NODE_ENV !== 'test') {
+    try {
+      const { data } = await supabase.from('tg_subscriptions').select('*').eq('is_active', true);
+      if (data && Array.isArray(data)) {
+        for (const row of data) {
+          if (String(row.chat_id).startsWith('vk_')) {
+            const pid = String(row.chat_id).replace(/^vk_/, '');
+            vkSubscribers.set(pid, {
+              peer_id: pid,
+              first_name: row.first_name || 'Пользователь VK',
+              username: row.username || '',
+              directions: row.directions || ['frontend', 'backend', 'mobile', 'qa', 'devops', 'data_science'],
+              sub_tracks: row.sub_tracks || [],
+              subscribed_at: row.updated_at || new Date().toISOString(),
+              is_active: true,
+            });
+          }
+        }
+      }
+    } catch {}
+  }
   return Array.from(vkSubscribers.values()).filter((s) => s.is_active);
 }
 
@@ -563,26 +620,8 @@ export async function notifyVkSubscribers(vacancies = [], token = VK_BOT_TOKEN) 
   return sentCount;
 }
 
-// Direction aliases dictionary for Russian & English commands
-export const VK_DIRECTION_ALIASES = {
-  frontend: ['frontend', 'фронтенд', 'фронт', '/frontend', 'react', 'веб'],
-  backend: ['backend', 'бэкенд', 'бек', 'бэк', '/backend', 'python', 'java', 'go', 'golang'],
-  mobile: ['mobile', 'мобилка', 'мобильная', 'android', 'ios', 'flutter', '/mobile'],
-  data_science: ['data_science', 'datascience', 'data science', 'ds', 'ml', 'дата сайнс', 'машинное обучение', '/data_science'],
-  qa: ['qa', 'тестирование', 'тестировщик', 'кьюа', 'тест', '/qa'],
-  devops: ['devops', 'девопс', 'инфраструктура', 'sre', 'docker', 'кубер', '/devops'],
-};
-
-export function resolveDirectionByQuery(query = '') {
-  const clean = String(query).toLowerCase().trim();
-  if (!clean) return null;
-  for (const [dirKey, aliases] of Object.entries(VK_DIRECTION_ALIASES)) {
-    if (dirKey === clean || aliases.includes(clean)) {
-      return dirKey;
-    }
-  }
-  return null;
-}
+// Direction aliases dictionary for Russian & English commands (shared with Telegram bot)
+export const VK_DIRECTION_ALIASES = DIRECTION_ALIASES;
 
 /**
  * Handle incoming VK message and produce reply payload
@@ -695,7 +734,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
       }
     } else {
       // Main menu shortcuts:
-      // [1] Стажировки, [2] Компании, [3] Роадмапы, [4] Вопросы, [5] Подписка, [6] Открыть сайт, [7] Статус, [8] Помощь
+      // [1] Стажировки, [2] Компании, [3] Роадмапы, [4] Вопросы, [5] Подписка, [6] Открыть сайт, [7] Статус, [8] Помощь, [9] Мой ID, [10] Синхронизация
       if (num === 1) cmd = 'vacancies';
       else if (num === 2) cmd = 'companies';
       else if (num === 3) cmd = 'roadmaps';
@@ -704,6 +743,8 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
       else if (num === 6) cmd = 'site';
       else if (num === 7) cmd = 'status';
       else if (num === 8) cmd = 'help';
+      else if (num === 9) cmd = 'id';
+      else if (num === 10) cmd = 'scan';
     }
   }
 
@@ -917,8 +958,8 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
   } else if (textClean.startsWith('/company_')) {
     const compId = textClean.replace('/company_', '');
     targetCompany = findCompanyByQuery(compId);
-  } else {
-    // Check if the whole message is a company alias
+  } else if (!cmd) {
+    // Check if the whole message is a company alias only when not a recognized command
     const matched = findCompanyByQuery(textClean) || findCompanyByQuery(textLower);
     if (matched) {
       targetCompany = matched;
@@ -1083,14 +1124,109 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
     return finish({ ok: true, type: 'unsubscribed', reply });
   }
 
-  // 10. «Статус» / /status / /scan / /sync
+  // 10. «Мой ID» / /id / /myid
+  if (
+    cmd === 'id' ||
+    textClean === '/id' ||
+    textClean === '/myid' ||
+    textClean === 'id' ||
+    textClean === 'мой id' ||
+    textClean === 'peer_id' ||
+    textClean === 'айди'
+  ) {
+    const isSubscribed = vkSubscribers.has(String(peerId));
+    const text =
+      `🆔 Ваш идентификатор ВКонтакте (Peer ID): ${peerId}\n\n` +
+      `Этот ID используется ботом IT-Старт для отправки персональных пуш-уведомлений о новых стажировках по вашему стеку.\n\n` +
+      `🔔 Статус подписки: ${isSubscribed ? '✅ Активна (уведомления включены)' : '❌ Не активна (отправьте /subscribe для включения)'}\n` +
+      `🚀 VK Mini App: https://vk.com/app${VK_APP_ID}\n` +
+      `🌐 Веб-версия без VPN: ${RENDER_URL}`;
+
+    const reply = {
+      peer_id: peerId,
+      random_id: Math.floor(Math.random() * 2147483647),
+      message: text,
+      keyboard: MAIN_VK_KEYBOARD,
+    };
+
+    if (token) {
+      await callVk('messages.send', reply, token);
+    }
+    userMenuState.set(String(peerId), 'main');
+    return finish({ ok: true, type: 'id', peerId, reply });
+  }
+
+  // 11. «Сканировать» / /scan / /sync / /parse
+  if (
+    cmd === 'scan' ||
+    textClean === '/scan' ||
+    textClean === '/sync' ||
+    textClean === '/parse' ||
+    textClean === 'сканировать' ||
+    textClean === 'скан' ||
+    textClean === 'парсинг' ||
+    textClean === 'синхронизация' ||
+    textClean === 'обновить'
+  ) {
+    if (token) {
+      await callVk(
+        'messages.send',
+        {
+          peer_id: peerId,
+          random_id: Math.floor(Math.random() * 2147483647),
+          message: `⚡ Запуск полного сканирования ${ALL_TARGET_TG_CHANNELS.length} Telegram-каналов и ${CAREER_WEBSITES_DATA.length} карьерных сайтов...`,
+        },
+        token
+      );
+    }
+
+    const res = await scanChannelsAndSyncSupabase(true);
+
+    const reportText =
+      `✅ Сканирование источников успешно завершено!\n\n` +
+      `• Проверено Telegram-каналов: ${res.channelsChecked}\n` +
+      `• Проверено карьерных сайтов/API: ${res.websitesChecked}\n` +
+      `• Спарсено новых вакансий: ${res.parsedCount}\n` +
+      `• Всего активных стажировок в базе: ${res.totalActive}\n` +
+      `• Синхронизировано с Supabase: ${res.savedCount}\n` +
+      `• Отправлено пуш-уведомлений: ${res.sentPushes}\n\n` +
+      `Все свежие стажировки доступны по команде «Стажировки» и в VK Mini App!`;
+
+    const keyboard = createVkKeyboard({
+      inline: true,
+      buttons: [
+        [
+          { label: '💼 Каталог вакансий', payload: { cmd: 'vacancies' }, color: 'primary' },
+          { label: '📊 Статус системы', payload: { cmd: 'status' }, color: 'secondary' },
+        ],
+        [
+          { label: '🚀 Запустить VK Mini App', app_id: VK_APP_ID },
+          { label: '🌐 Сайт без VPN', link: RENDER_URL },
+        ],
+      ],
+    });
+
+    const reply = {
+      peer_id: peerId,
+      random_id: Math.floor(Math.random() * 2147483647),
+      message: reportText,
+      keyboard,
+    };
+
+    if (token) {
+      await callVk('messages.send', reply, token);
+    }
+    userMenuState.set(String(peerId), 'main');
+    return finish({ ok: true, type: 'scan', result: res, reply });
+  }
+
+  // 12. «Статус» / /status / статус / состояние
   if (
     cmd === 'status' ||
     textClean === '/status' ||
     textClean === 'статус' ||
-    textClean === '/scan' ||
-    textClean === '/sync' ||
-    textClean === '/parse'
+    textClean === 'состояние' ||
+    textClean === 'сервер'
   ) {
     const text =
       `⚡ Статус сервиса IT-Старт & VK Bot:\n\n` +
@@ -1119,19 +1255,27 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
     return finish({ ok: true, type: 'status', reply });
   }
 
-  // 11. «Помощь» / /help
-  if (cmd === 'help' || textClean === '/help' || textClean === 'помощь' || textClean === 'справка') {
+  // 13. «Помощь» / /help
+  if (cmd === 'help' || textClean === '/help' || textClean === 'помощь' || textClean === 'справка' || textClean === 'команды') {
     const text =
       `ℹ️ Команды бота IT-Старт ВКонтакте:\n\n` +
-      `• Начать / /start — Главное меню и клавиатура\n` +
-      `• Стажировки / /vacancies — Каталог актуальных вакансий (с фильтром по направлениям)\n` +
-      `• Компании / /companies — Список целевых IT-работодателей (Т1, Контур, Т-Банк, Directum и др.)\n` +
-      `• Роадмапы / /roadmaps — Карты развития по 6 стекам\n` +
-      `• Вопросы / /questions — База 55+ вопросов к собеседованию\n` +
-      `• Подписка / /subscribe — Подписаться на пуш-уведомления о новых вакансиях\n` +
-      `• Сайт / /site — Ссылка на веб-платформу IT-Старт\n` +
-      `• Статус / /status — Состояние парсера и источников\n\n` +
-      `💡 Быстрый поиск: отправьте боту название компании (например, «директум», «контур», «т1», «яндекс»), и бот покажет её вакансии!`;
+      `• Начать / /start — Главное меню и запуск VK Mini App\n` +
+      `• Стажировки / /vacancies — Каталог стажировок с фильтром по направлениям («/vacancies frontend»)\n` +
+      `• Компании / /companies — Список целевых IT-работодателей (Т1, Контур, Т-Банк, Directum, Яндекс, Ozon, Сбер, Авито, VK)\n` +
+      `• Роадмапы / /roadmaps — Карты развития по 6 направлениям\n` +
+      `• Вопросы / /questions — База 55+ вопросов к собеседованиям\n` +
+      `• Подписка / /subscribe — Подписаться на пуш-уведомления о стажировках\n` +
+      `• Отписаться / /unsubscribe — Отключить уведомления\n` +
+      `• ID / /id (или /myid) — Узнать свой VK Peer ID\n` +
+      `• Статус / /status — Состояние парсера, источников и базы данных\n` +
+      `• Сканировать / /scan (или /sync) — Принудительное сканирование каналов и сайтов\n` +
+      `• Сайт / /site — Ссылка на веб-платформу IT-Старт без VPN\n` +
+      `• Помощь / /help — Полный список команд\n\n` +
+      `🏢 Быстрый переход к работодателям:\n` +
+      `/company_t1, /company_kontur, /company_tbank, /company_directum, /company_yandex, /company_ozon, /company_sber, /company_avito, /company_vk\n\n` +
+      `💻 Быстрый переход по направлениям:\n` +
+      `/frontend, /backend, /mobile, /data_science, /qa, /devops\n\n` +
+      `💡 Вы также можете отправить название компании (например: «директум», «контур», «т1», «яндекс») или стека («фронтенд», «бэкенд»), и бот покажет открытые вакансии!`;
 
     const reply = {
       peer_id: peerId,
