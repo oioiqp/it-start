@@ -19,6 +19,7 @@ import http from 'node:http';
 import dns from 'node:dns';
 import fs from 'node:fs';
 import path from 'node:path';
+import zlib from 'node:zlib';
 import { fileURLToPath } from 'node:url';
 import { createClient } from '@supabase/supabase-js';
 
@@ -1471,21 +1472,55 @@ const server = http.createServer(async (req, res) => {
     const CSP_FRAME_ANCESTORS =
       "frame-ancestors 'self' https://vk.com https://*.vk.com https://vk.ru https://*.vk.ru https://m.vk.com https://m.vk.ru https://vk-apps.com https://*.vk-apps.com https://mail.ru https://*.mail.ru https://telegram.org https://*.telegram.org https://web.telegram.org;";
 
+    const serveStaticFile = (filePath, contentType, isImmutable, isHtml) => {
+      try {
+        const stat = fs.statSync(filePath);
+        const mtime = stat.mtime.toUTCString();
+        if (req.headers['if-modified-since'] === mtime) {
+          res.writeHead(304);
+          res.end();
+          return;
+        }
+
+        const headers = {
+          'Content-Type': contentType,
+          'Last-Modified': mtime,
+          'Cache-Control': isImmutable
+            ? 'public, max-age=31536000, immutable'
+            : isHtml
+            ? 'no-cache, must-revalidate'
+            : 'public, max-age=3600, must-revalidate',
+        };
+
+        if (isHtml) {
+          headers['Content-Security-Policy'] = CSP_FRAME_ANCESTORS;
+        }
+
+        const acceptEncoding = req.headers['accept-encoding'] || '';
+        const ext = path.extname(filePath).toLowerCase();
+        const isCompressible = ['.js', '.mjs', '.css', '.html', '.json', '.svg', '.txt'].includes(ext);
+
+        if (isCompressible && /\bgzip\b/.test(acceptEncoding)) {
+          headers['Content-Encoding'] = 'gzip';
+          headers['Vary'] = 'Accept-Encoding';
+          res.writeHead(200, headers);
+          fs.createReadStream(filePath).pipe(zlib.createGzip({ level: 6 })).pipe(res);
+        } else {
+          headers['Content-Length'] = stat.size;
+          res.writeHead(200, headers);
+          fs.createReadStream(filePath).pipe(res);
+        }
+      } catch {
+        res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+        res.end('Not Found\n');
+      }
+    };
+
     if (fs.existsSync(candidateFile) && fs.statSync(candidateFile).isFile()) {
       const ext = path.extname(candidateFile).toLowerCase();
       const contentType = MIME_TYPES[ext] || 'application/octet-stream';
       const isImmutableAsset = cleanPath.startsWith('/assets/');
-
-      const responseHeaders = {
-        'Content-Type': contentType,
-        'Cache-Control': isImmutableAsset ? 'public, max-age=31536000, immutable' : 'no-cache',
-      };
-      if (ext === '.html') {
-        responseHeaders['Content-Security-Policy'] = CSP_FRAME_ANCESTORS;
-      }
-
-      res.writeHead(200, responseHeaders);
-      fs.createReadStream(candidateFile).pipe(res);
+      serveStaticFile(candidateFile, contentType, isImmutableAsset, ext === '.html');
       return;
     }
 
@@ -1493,12 +1528,7 @@ const server = http.createServer(async (req, res) => {
     const hasExtension = path.extname(cleanPath).length > 0;
     const indexHtml = path.join(DIST_DIR, 'index.html');
     if (!hasExtension && fs.existsSync(indexHtml)) {
-      res.writeHead(200, {
-        'Content-Type': 'text/html; charset=utf-8',
-        'Cache-Control': 'no-cache',
-        'Content-Security-Policy': CSP_FRAME_ANCESTORS,
-      });
-      fs.createReadStream(indexHtml).pipe(res);
+      serveStaticFile(indexHtml, 'text/html; charset=utf-8', false, true);
       return;
     }
   }

@@ -1528,4 +1528,108 @@ describe('13. Real Employer Positions & Liquid Glass Bento Dark/Light Theme Syst
   });
 });
 
+describe('14. Mobile VK Header Clearance, Liquid Glass Translucency & Dual Notifications Engine', () => {
+  it('validates Navbar provides right safe area clearance on mobile when inside VK to avoid native capsule collision', async () => {
+    const React = await import('react');
+    const { renderToString } = await import('react-dom/server');
+    const { Navbar } = await import('../components/Navbar');
+
+    // 1. In VK mode: should have right padding clearance for VK native capsule
+    const htmlVk = renderToString(
+      React.createElement(Navbar, {
+        activeTab: 'internships',
+        setActiveTab: () => {},
+        isVk: true,
+        onOpenSubscribeModal: () => {},
+      })
+    );
+    expect(htmlVk).toContain('pr-[88px]');
+
+    // 2. In normal web mode (not VK): should not have the extra VK padding
+    const htmlWeb = renderToString(
+      React.createElement(Navbar, {
+        activeTab: 'internships',
+        setActiveTab: () => {},
+        isVk: false,
+        onOpenSubscribeModal: () => {},
+      })
+    );
+    expect(htmlWeb).not.toContain('pr-[88px]');
+  });
+
+  it('validates SubscribeModal supports switching between Telegram and VK notification channels', async () => {
+    const React = await import('react');
+    const { renderToString } = await import('react-dom/server');
+    const { SubscribeModal } = await import('../components/SubscribeModal');
+
+    // Regular web mode: displays both Telegram and VK buttons
+    const htmlWeb = renderToString(
+      React.createElement(SubscribeModal, {
+        isOpen: true,
+        onClose: () => {},
+        telegramUser: null,
+        vkUser: null,
+        isVk: false,
+        currentSubscription: null,
+        onSubscriptionSaved: () => {},
+      })
+    );
+
+    expect(htmlWeb).toContain('Telegram-бот');
+    expect(htmlWeb).toContain('ВКонтакте-бот');
+    expect(htmlWeb).toContain('Ваш Telegram Chat ID');
+
+    // Inside VK: displays VK by default and switch to Telegram button
+    const htmlVk = renderToString(
+      React.createElement(SubscribeModal, {
+        isOpen: true,
+        onClose: () => {},
+        telegramUser: null,
+        vkUser: { id: 77788899, first_name: 'Тимур' },
+        isVk: true,
+        currentSubscription: null,
+        onSubscriptionSaved: () => {},
+      })
+    );
+
+    expect(htmlVk).toContain('Уведомления ВКонтакте');
+    expect(htmlVk).toContain('77788899');
+    expect(htmlVk).toContain('Настроить через Telegram');
+
+    // Inside Telegram: displays TG by default and switch to VK button
+    const htmlTg = renderToString(
+      React.createElement(SubscribeModal, {
+        isOpen: true,
+        onClose: () => {},
+        telegramUser: { id: 11223344, first_name: 'Тимур', username: 'timur_dev' },
+        vkUser: null,
+        isVk: false,
+        currentSubscription: null,
+        onSubscriptionSaved: () => {},
+      })
+    );
+
+    expect(htmlTg).toContain('Уведомления в Telegram');
+    expect(htmlTg).toContain('11223344');
+    expect(htmlTg).toContain('Настроить через ВКонтакте');
+  });
+
+  it('validates background watermark contains whitespace-nowrap to prevent breaking into two lines', async () => {
+    const React = await import('react');
+    const { renderToString } = await import('react-dom/server');
+    const { App } = await import('../App');
+
+    const html = renderToString(React.createElement(App));
+    expect(html).toContain('whitespace-nowrap');
+    expect(html).toContain('IT-СТАРТ');
+  });
+
+  it('validates bot server exports static directory and runs smoothly', async () => {
+    // @ts-ignore
+    const botModule: any = await import('../../bot/bot.mjs');
+    expect(botModule.DIST_DIR).toBeDefined();
+    expect(botModule.COMPANIES_DATA.length).toBeGreaterThan(0);
+  });
+});
+
 

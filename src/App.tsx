@@ -59,7 +59,7 @@ export function App() {
 
   // VK Mini App User & Params
   const [vkUser, setVkUser] = useState<VkUser | null>(null);
-  const [vkLaunchParams, setVkLaunchParams] = useState<VkLaunchParams>({});
+  const [_vkLaunchParams, setVkLaunchParams] = useState<VkLaunchParams>({});
   const [isVk, setIsVk] = useState<boolean>(false);
 
   // User Progress
@@ -356,6 +356,7 @@ export function App() {
           setActiveTab={setActiveTab}
           telegramUser={telegramUser}
           vkUser={vkUser}
+          isVk={isVk}
           userProgress={userProgress}
           totalTopicsCount={ROADMAP_TOPICS.length}
           totalQuestionsCount={QUESTIONS.length}
@@ -371,59 +372,55 @@ export function App() {
         {activeTab === 'internships' && (
           <div className="relative space-y-6">
             {/* VK Mini App Profile Card (When opened inside VK) */}
+            {/* Compact VK Mini App Profile Capsule */}
             {vkUser && (
-              <div className="relative p-4 sm:p-5 rounded-3xl liquid-glass border border-blue-500/20 bg-gradient-to-r from-blue-500/10 via-sky-500/5 to-transparent shadow-xs transition-all duration-300">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                  <div className="flex items-center gap-3.5">
-                    {vkUser.photo_100 || vkUser.photo_200 ? (
-                      <img
-                        src={vkUser.photo_100 || vkUser.photo_200}
-                        alt={vkUser.first_name || 'VK'}
-                        className="w-12 h-12 rounded-2xl object-cover border-2 border-blue-500/30 shadow-xs"
-                      />
-                    ) : (
-                      <div className="w-12 h-12 rounded-2xl bg-blue-600 text-white font-bold text-lg flex items-center justify-center shadow-xs">
-                        VK
-                      </div>
-                    )}
-                    <div>
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <h2 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white">
-                          {vkUser.first_name} {vkUser.last_name || ''}
-                        </h2>
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-600 border border-blue-500/20">
-                          VK Mini App
-                        </span>
-                        {vkUser.city?.title && (
-                          <span className="text-[11px] text-neutral-500">
-                            • {vkUser.city.title}
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-0.5">
-                        VK ID: <span className="font-mono font-medium">{vkUser.id}</span>
-                        {vkLaunchParams.vk_platform && <span> • {vkLaunchParams.vk_platform}</span>}
-                        <span> • Прогресс: {userProgress.completedTopics.length} тем • {userProgress.completedQuestions.length} вопросов</span>
-                      </p>
+              <div className="flex items-center justify-between gap-3 px-3.5 py-2.5 sm:px-5 sm:py-3.5 rounded-2xl sm:rounded-full liquid-glass border border-blue-500/20 shadow-xs transition-all duration-300">
+                <div className="flex items-center gap-3 min-w-0">
+                  {vkUser.photo_100 || vkUser.photo_200 ? (
+                    <img
+                      src={vkUser.photo_100 || vkUser.photo_200}
+                      alt={vkUser.first_name || 'VK'}
+                      className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover border border-blue-500/30 shrink-0"
+                    />
+                  ) : (
+                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-blue-600 text-white font-bold text-xs sm:text-sm flex items-center justify-center shrink-0">
+                      VK
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="text-xs sm:text-sm font-bold text-neutral-900 truncate">
+                        {vkUser.first_name} {vkUser.last_name || ''}
+                      </span>
+                      <span className="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-blue-500/10 text-blue-600 border border-blue-500/20 shrink-0">
+                        VK Mini App
+                      </span>
+                    </div>
+                    <div className="text-[11px] text-neutral-500 flex items-center gap-1.5 mt-0.5 font-medium truncate">
+                      <span>Прогресс: {userProgress.completedTopics.length} тем</span>
+                      <span>•</span>
+                      <span>{userProgress.completedQuestions.length} вопросов</span>
                     </div>
                   </div>
-                  <button
-                    onClick={() => {
-                      triggerHaptic('medium');
-                      setIsSubscribeModalOpen(true);
-                    }}
-                    className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-all active:scale-95 shrink-0"
-                  >
-                    <Bot className="w-3.5 h-3.5" />
-                    <span>Уведомления VK</span>
-                  </button>
                 </div>
+
+                <button
+                  onClick={() => {
+                    triggerHaptic('medium');
+                    setIsSubscribeModalOpen(true);
+                  }}
+                  className="flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-all active:scale-95 shrink-0 cursor-pointer"
+                  title="Настроить уведомления ВКонтакте"
+                >
+                  <Bot className="w-3.5 h-3.5" />
+                  <span className="hidden xs:inline">Уведомления</span>
+                </button>
               </div>
             )}
 
             {/* Ambient typography watermark behind cards */}
-            <div className="absolute inset-x-0 -top-6 h-96 flex items-center justify-center -z-10 pointer-events-none overflow-hidden select-none opacity-[0.03] blur-[0.5px]">
-              <span className="text-8xl sm:text-[160px] md:text-[200px] font-black tracking-tighter uppercase select-none leading-none text-slate-700">
+            <div className="absolute inset-x-0 -top-4 sm:-top-6 h-64 sm:h-96 flex items-center justify-center -z-10 pointer-events-none overflow-hidden select-none opacity-[0.035] blur-[0.5px]">
+              <span className="text-5xl xs:text-6xl sm:text-[130px] md:text-[170px] lg:text-[200px] font-black tracking-widest uppercase select-none leading-none text-slate-800 dark:text-white whitespace-nowrap">
                 IT-СТАРТ
               </span>
             </div>
@@ -853,6 +850,7 @@ export function App() {
         onClose={() => setIsSubscribeModalOpen(false)}
         telegramUser={telegramUser}
         vkUser={vkUser}
+        isVk={isVk}
         currentSubscription={currentSubscription}
         onSubscriptionSaved={(sub) => setCurrentSubscription(sub)}
       />

@@ -15,6 +15,7 @@ interface NavbarProps {
   setActiveTab: (tab: 'internships' | 'roadmaps' | 'questions' | 'telegram') => void;
   telegramUser?: TelegramUser | null;
   vkUser?: VkUser | null;
+  isVk?: boolean;
   userProgress?: UserProgress;
   totalTopicsCount?: number;
   totalQuestionsCount?: number;
@@ -28,6 +29,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   setActiveTab,
   telegramUser,
   vkUser,
+  isVk,
   onOpenSubscribeModal,
 }) => {
   const handleTabClick = (tab: 'internships' | 'roadmaps' | 'questions' | 'telegram') => {
@@ -44,7 +46,13 @@ export const Navbar: React.FC<NavbarProps> = ({
   ];
 
   return (
-    <header className="sticky top-2 sm:top-4 z-50 flex items-center justify-center px-2 sm:px-4 w-full pointer-events-none">
+    <header
+      className={`sticky top-2 sm:top-4 z-50 flex items-center justify-center w-full pointer-events-none transition-all duration-200 ${
+        (isVk || vkUser)
+          ? 'pl-2 pr-[88px] sm:px-4'
+          : 'px-2 sm:px-4'
+      }`}
+    >
       <div
         className="pointer-events-auto flex items-center justify-between gap-1 sm:gap-2 p-1.5 sm:p-2 rounded-full transition-transform duration-300 max-w-5xl w-full sm:w-auto liquid-glass-nav"
       >
@@ -95,34 +103,52 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div className="h-4 w-px shrink-0 mx-0.5 bg-black/10 dark:bg-white/10" />
 
         {/* Right Controls: User Profile & Bot / Notifications Action Capsule */}
-        <div className="flex items-center gap-1.5 shrink-0 pr-1">
+        <div className="flex items-center gap-1.5 shrink-0 pr-0.5 sm:pr-1">
           {vkUser ? (
-            <div
-              className="flex items-center gap-1.5 pl-1.5 pr-2 sm:pr-2.5 py-1 rounded-full bg-blue-50/80 dark:bg-blue-950/40 border border-blue-500/20 text-neutral-900 dark:text-white select-none shrink-0"
-              title={`VK: ${vkUser.first_name || ''} ${vkUser.last_name || ''} (ID: ${vkUser.id})`}
-            >
-              {vkUser.photo_100 || vkUser.photo_200 ? (
-                <img
-                  src={vkUser.photo_100 || vkUser.photo_200}
-                  alt={vkUser.first_name || 'VK'}
-                  className="w-5 h-5 sm:w-6 sm:h-6 rounded-full object-cover border border-blue-500/40"
-                />
-              ) : (
-                <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-blue-600 text-white font-bold text-[10px] flex items-center justify-center">
-                  VK
-                </div>
-              )}
-              <span className="text-xs font-semibold hidden md:inline truncate max-w-[100px]">
-                {vkUser.first_name || 'VK'}
-              </span>
-              <span className="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-blue-500/10 text-blue-600 border border-blue-500/20 hidden sm:inline">
-                Mini App
-              </span>
+            <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
+              <div
+                className="flex items-center gap-1.5 pl-1.5 pr-2 sm:pr-2.5 py-1 rounded-full bg-blue-50/80 dark:bg-blue-950/40 border border-blue-500/20 text-neutral-900 dark:text-white select-none shrink-0"
+                title={`VK: ${vkUser.first_name || ''} ${vkUser.last_name || ''} (ID: ${vkUser.id})`}
+              >
+                {vkUser.photo_100 || vkUser.photo_200 ? (
+                  <img
+                    src={vkUser.photo_100 || vkUser.photo_200}
+                    alt={vkUser.first_name || 'VK'}
+                    className="w-5 h-5 sm:w-6 sm:h-6 rounded-full object-cover border border-blue-500/40"
+                  />
+                ) : (
+                  <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-blue-600 text-white font-bold text-[10px] flex items-center justify-center">
+                    VK
+                  </div>
+                )}
+                <span className="text-xs font-semibold hidden md:inline truncate max-w-[100px]">
+                  {vkUser.first_name || 'VK'}
+                </span>
+                <span className="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-blue-500/10 text-blue-600 border border-blue-500/20 hidden sm:inline">
+                  Mini App
+                </span>
+              </div>
+              <button
+                onClick={() => {
+                  triggerHaptic('medium');
+                  onOpenSubscribeModal();
+                }}
+                className="flex items-center gap-1 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full font-semibold text-xs transition-transform duration-150 active:scale-95 shadow-xs shrink-0 bg-neutral-900 hover:bg-black text-white dark:bg-white dark:text-neutral-900 cursor-pointer"
+                title={`VK: ${vkUser.first_name || ''} • Уведомления`}
+              >
+                <Bot className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">VK Бот</span>
+                <span className="sm:hidden font-medium text-[11px]">VK</span>
+              </button>
             </div>
           ) : telegramUser ? (
-            <div
-              className="flex items-center gap-1.5 pl-1.5 pr-2 sm:pr-2.5 py-1 rounded-full bg-sky-50/80 dark:bg-sky-950/40 border border-sky-500/20 text-neutral-900 dark:text-white select-none shrink-0"
-              title={`Telegram: ${telegramUser.first_name || ''} (@${telegramUser.username || ''})`}
+            <button
+              onClick={() => {
+                triggerHaptic('medium');
+                onOpenSubscribeModal();
+              }}
+              className="flex items-center gap-1.5 pl-1.5 pr-2 sm:pr-2.5 py-1 rounded-full bg-sky-500/15 hover:bg-sky-500/25 border border-sky-500/25 text-neutral-900 select-none shrink-0 transition-transform active:scale-95 cursor-pointer"
+              title={`Telegram: ${telegramUser.first_name || ''} (@${telegramUser.username || ''}) • Настроить уведомления`}
             >
               <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-sky-600 text-white font-bold text-[10px] flex items-center justify-center">
                 TG
@@ -130,28 +156,21 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span className="text-xs font-semibold hidden md:inline truncate max-w-[100px]">
                 {telegramUser.first_name || 'Telegram'}
               </span>
-            </div>
-          ) : null}
-
-          <button
-            onClick={() => {
-              triggerHaptic('medium');
-              onOpenSubscribeModal();
-            }}
-            className="flex items-center gap-1 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full font-semibold text-xs transition-transform duration-150 active:scale-95 shadow-xs shrink-0
-              bg-neutral-900 hover:bg-black text-white dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-100"
-            title={
-              vkUser
-                ? `VK: ${vkUser.first_name || ''} ${vkUser.last_name || ''} (ID: ${vkUser.id}) • Уведомления`
-                : telegramUser
-                ? `Telegram: ${telegramUser.username ? '@' + telegramUser.username : telegramUser.first_name || 'Подключен'}`
-                : 'Боты и уведомления'
-            }
-          >
-            <Bot className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">{vkUser ? 'VK Бот' : 'Бот в TG'}</span>
-            <span className="sm:hidden font-medium text-[11px]">{vkUser ? 'VK' : 'TG'}</span>
-          </button>
+              <Bot className="w-3.5 h-3.5 text-sky-600" />
+            </button>
+          ) : (
+            <button
+              onClick={() => {
+                triggerHaptic('medium');
+                onOpenSubscribeModal();
+              }}
+              className="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-full font-semibold text-xs transition-transform duration-150 active:scale-95 shadow-xs shrink-0 bg-neutral-900 hover:bg-black text-white cursor-pointer"
+              title="Боты и уведомления"
+            >
+              <Bot className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Боты</span>
+            </button>
+          )}
         </div>
       </div>
     </header>
