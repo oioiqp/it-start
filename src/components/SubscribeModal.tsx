@@ -455,182 +455,273 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
         {/* Scrollable Content Body with Fixed Footer */}
         <form onSubmit={handleSaveSubscription} className="flex-1 flex flex-col min-h-0 justify-between overflow-hidden">
           <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar space-y-3.5 pr-0.5">
-            {/* Top User Profile or Detection Block */}
+            {/* Top Official Bot Card & Profile Status */}
             {platform === 'vk' ? (
-              vkUser ? (
-                /* VK User Connected Card (Inside VK Mini App) */
-                <div className="flex items-center justify-between p-3.5 rounded-2xl liquid-glass-subtle border border-blue-500/25 bg-blue-500/5">
-                  <div className="flex items-center gap-3 min-w-0">
-                    {vkUser.photo_100 || vkUser.photo_200 ? (
-                      <img
-                        src={vkUser.photo_100 || vkUser.photo_200}
-                        alt={vkUser.first_name || 'VK'}
-                        className="w-10 h-10 rounded-full object-cover border border-blue-500/30 shrink-0 shadow-xs"
-                      />
-                    ) : (
-                      <div className="w-10 h-10 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
+              <div className="p-3.5 rounded-2xl border text-xs space-y-2.5 bg-blue-500/5 border-blue-500/20 liquid-glass-subtle">
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                      <Bot className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <span className="font-bold text-neutral-900">Официальный VK-бот IT-Старт</span>
+                    </div>
+                  </div>
+                  <a
+                    href={getVkBotDialogUrl()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-medium text-[11px] shadow-xs transition-colors shrink-0 cursor-pointer"
+                  >
+                    <span>Открыть диалог с VK-ботом</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+
+                <p className="text-[11px] text-neutral-600 leading-relaxed">
+                  Откройте диалог с официальным ботом IT-Старт и отправьте команду /start или /subscribe для активации сообщений.
+                </p>
+
+                {/* Profile badge / Identification status */}
+                {vkUser ? (
+                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-white/60 dark:bg-black/20 border border-blue-500/20">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      {vkUser.photo_100 || vkUser.photo_200 ? (
+                        <img
+                          src={vkUser.photo_100 || vkUser.photo_200}
+                          alt={vkUser.first_name || 'VK'}
+                          className="w-8 h-8 rounded-full object-cover border border-blue-500/30 shrink-0 shadow-xs"
+                        />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
+                          VK
+                        </div>
+                      )}
+                      <div className="min-w-0">
+                        <div className="text-xs font-bold text-neutral-900 truncate">
+                          {`${vkUser.first_name || ''} ${vkUser.last_name || ''}`.trim()}
+                        </div>
+                        <div className="text-[11px] text-blue-600 font-medium truncate">
+                          Ваш VK ID: <span className="font-mono font-bold">{vkUser.id}</span> • Личные сообщения
+                        </div>
+                      </div>
+                    </div>
+                    <span className="text-[10px] px-2.5 py-1 rounded-full font-bold bg-blue-500/10 text-blue-600 border border-blue-500/25 shrink-0 flex items-center gap-1">
+                      <Check className="w-3 h-3" />
+                      <span>Подключен</span>
+                    </span>
+                  </div>
+                ) : vkPeerId ? (
+                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-white/60 dark:bg-black/20 border border-blue-500/20">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-8 h-8 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
                         VK
                       </div>
-                    )}
-                    <div className="min-w-0">
-                      <div className="text-sm font-bold text-neutral-900 truncate">
-                        {`${vkUser.first_name || ''} ${vkUser.last_name || ''}`.trim()}
-                      </div>
-                      <div className="text-[11px] text-blue-600 font-medium truncate">
-                        Ваш VK ID: <span className="font-mono font-bold">{vkUser.id}</span> • Личные сообщения
-                      </div>
-                    </div>
-                  </div>
-                  <span className="text-[10px] px-2.5 py-1 rounded-full font-bold bg-blue-500/10 text-blue-600 border border-blue-500/25 shrink-0 flex items-center gap-1">
-                    <Check className="w-3 h-3" />
-                    <span>Подключен</span>
-                  </span>
-                </div>
-              ) : (
-                /* VK Standalone Web Form */
-                <div className="space-y-3">
-                  <div className="p-3 rounded-2xl border text-xs space-y-2 bg-blue-500/5 border-blue-500/15">
-                    <div className="font-semibold text-neutral-800 flex items-center justify-between gap-1.5 flex-wrap">
-                      <span className="flex items-center gap-1.5">
-                        <Bot className="w-4 h-4 text-blue-600" />
-                        <span>Официальный VK-бот IT-Старт:</span>
-                      </span>
-                      <a
-                        href={getVkBotDialogUrl()}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-medium text-[11px] shadow-xs transition-colors"
-                      >
-                        <span>💬 Открыть диалог с ботом</span>
-                        <ExternalLink className="w-3 h-3" />
-                      </a>
-                    </div>
-                    <p className="text-[11px] text-neutral-600">
-                      Откройте диалог с официальным ботом IT-Старт и отправьте команду /start или /subscribe для активации сообщений.
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                    <div>
-                      <label className="block text-xs font-medium mb-1 text-neutral-700">
-                        Ваш VK ID <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        value={vkPeerId}
-                        onChange={(e) => setVkPeerId(e.target.value)}
-                        placeholder="например 482655491"
-                        required
-                        className="w-full px-3.5 py-2.5 rounded-xl text-base sm:text-sm transition-colors focus:outline-none liquid-glass-pill focus:bg-white/60 text-neutral-900 placeholder:text-neutral-400 border border-neutral-200/80"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium mb-1 text-neutral-700">
-                        Имя в профиле ВКонтакте
-                      </label>
-                      <input
-                        type="text"
-                        value={vkFullName}
-                        onChange={(e) => setVkFullName(e.target.value)}
-                        placeholder="Имя Фамилия"
-                        className="w-full px-3.5 py-2.5 rounded-xl text-base sm:text-sm transition-colors focus:outline-none liquid-glass-pill focus:bg-white/60 text-neutral-900 placeholder:text-neutral-400 border border-neutral-200/80"
-                      />
-                    </div>
-                  </div>
-                </div>
-              )
-            ) : (
-              telegramUser ? (
-                /* Telegram User Connected Card (Inside Telegram WebApp) */
-                <div className="flex items-center justify-between p-3.5 rounded-2xl liquid-glass-subtle border border-sky-500/25 bg-sky-500/5">
-                  <div className="flex items-center gap-3 min-w-0">
-                    {telegramUser.photo_url ? (
-                      <img
-                        src={telegramUser.photo_url}
-                        alt={telegramUser.first_name || 'TG'}
-                        className="w-10 h-10 rounded-full object-cover border border-sky-500/30 shrink-0 shadow-xs"
-                      />
-                    ) : (
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-sky-600 to-blue-500 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
-                        {telegramUser.first_name ? telegramUser.first_name.slice(0, 2).toUpperCase() : 'TG'}
-                      </div>
-                    )}
-                    <div className="min-w-0">
-                      <div className="text-sm font-bold text-neutral-900 truncate">
-                        {`${telegramUser.first_name || ''} ${telegramUser.last_name || ''}`.trim()}
-                        {telegramUser.username && (
-                          <span className="ml-1 text-xs font-normal text-neutral-500">(@{telegramUser.username})</span>
+                      <div className="min-w-0">
+                        {vkFullName && (
+                          <div className="text-xs font-bold text-neutral-900 truncate">{vkFullName}</div>
                         )}
+                        <div className="text-[11px] text-blue-600 font-medium truncate">
+                          Ваш VK ID: <span className="font-mono font-bold">{vkPeerId}</span>
+                        </div>
                       </div>
-                      <div className="text-[11px] text-sky-700 font-medium truncate">
-                        Chat ID: <span className="font-mono font-bold">{telegramUser.id}</span> • Telegram Mini App
-                      </div>
                     </div>
+                    <span className="text-[10px] px-2.5 py-1 rounded-full font-bold bg-blue-500/10 text-blue-600 border border-blue-500/25 shrink-0 flex items-center gap-1">
+                      <Check className="w-3 h-3" />
+                      <span>Подключен</span>
+                    </span>
                   </div>
-                  <span className="text-[10px] px-2.5 py-1 rounded-full font-bold bg-emerald-500/10 text-emerald-700 border border-emerald-500/25 shrink-0 flex items-center gap-1">
-                    <Check className="w-3 h-3" />
-                    <span>Подключен</span>
-                  </span>
-                </div>
-              ) : (
-                /* Telegram Standalone Web Form */
-                <div className="space-y-3">
-                  <div className="p-3 rounded-2xl border text-xs space-y-2 bg-neutral-50 border-neutral-200/80">
-                    <div className="font-semibold flex items-center gap-1.5 text-neutral-800">
-                      <Bot className="w-4 h-4 text-neutral-500" />
-                      Как получать уведомления в Telegram:
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-0.5">
-                      <a
-                        href={`${TELEGRAM_BOT_URL}?start=subscribe`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-full border font-medium transition-colors bg-white hover:bg-neutral-50 text-neutral-800 border-neutral-200/80 shadow-xs"
-                      >
-                        <span>1. Написать /start боту</span>
-                        <ExternalLink className="w-3.5 h-3.5" />
-                      </a>
-                      <button
-                        type="button"
-                        onClick={handleAutoDetect}
-                        disabled={isDetecting}
-                        className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-full border font-medium transition-colors disabled:opacity-50 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 border-neutral-200/80 cursor-pointer"
-                      >
-                        <RefreshCw className={`w-3.5 h-3.5 ${isDetecting ? 'animate-spin' : ''}`} />
-                        <span>2. Определить мой Chat ID</span>
-                      </button>
-                    </div>
-                  </div>
+                ) : null}
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                    <div>
-                      <label className="block text-xs font-medium mb-1 text-neutral-700">
-                        Ваш Telegram Chat ID <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        value={tgChatId}
-                        onChange={(e) => setTgChatId(e.target.value)}
-                        placeholder="например 123456789"
-                        required
-                        className="w-full px-3.5 py-2.5 rounded-xl text-base sm:text-sm transition-colors focus:outline-none liquid-glass-pill focus:bg-white/60 text-neutral-900 placeholder:text-neutral-400 border border-neutral-200/80"
-                      />
+                {/* Subtle manual entry for desktop web (folded by default, no ugly prompts) */}
+                {!vkUser && (
+                  <details className="text-xs pt-0.5">
+                    <summary className="text-[11px] text-neutral-400 hover:text-neutral-600 dark:text-neutral-500 cursor-pointer select-none inline-flex items-center gap-1">
+                      <span>Настроить ID вручную</span>
+                    </summary>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
+                      <div>
+                        <label className="block text-[11px] font-medium mb-1 text-neutral-600">
+                          Ваш VK ID
+                        </label>
+                        <input
+                          type="text"
+                          value={vkPeerId}
+                          onChange={(e) => setVkPeerId(e.target.value)}
+                          placeholder="например 482655491"
+                          className="w-full px-3 py-2 rounded-xl text-xs transition-colors focus:outline-none liquid-glass-pill focus:bg-white/60 text-neutral-900 placeholder:text-neutral-400 border border-neutral-200/80"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-medium mb-1 text-neutral-600">
+                          Имя в профиле ВКонтакте
+                        </label>
+                        <input
+                          type="text"
+                          value={vkFullName}
+                          onChange={(e) => setVkFullName(e.target.value)}
+                          placeholder="Имя Фамилия"
+                          className="w-full px-3 py-2 rounded-xl text-xs transition-colors focus:outline-none liquid-glass-pill focus:bg-white/60 text-neutral-900 placeholder:text-neutral-400 border border-neutral-200/80"
+                        />
+                      </div>
+                    </div>
+                  </details>
+                )}
+              </div>
+            ) : (
+              <div className="p-3.5 rounded-2xl border text-xs space-y-2.5 bg-neutral-500/5 border-neutral-500/20 liquid-glass-subtle">
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-lg bg-neutral-900 text-white flex items-center justify-center shrink-0 shadow-xs">
+                      <Send className="w-3.5 h-3.5" />
                     </div>
                     <div>
-                      <label className="block text-xs font-medium mb-1 text-neutral-700">
-                        Username в Telegram
-                      </label>
-                      <input
-                        type="text"
-                        value={tgUsername}
-                        onChange={(e) => setTgUsername(e.target.value)}
-                        placeholder="@username (необязательно)"
-                        className="w-full px-3.5 py-2.5 rounded-xl text-base sm:text-sm transition-colors focus:outline-none liquid-glass-pill focus:bg-white/60 text-neutral-900 placeholder:text-neutral-400 border border-neutral-200/80"
-                      />
+                      <span className="font-bold text-neutral-900">Официальный Telegram-бот IT-Старт</span>
                     </div>
                   </div>
+                  <a
+                    href={`${TELEGRAM_BOT_URL}?start=subscribe`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neutral-900 hover:bg-black text-white font-medium text-[11px] shadow-xs transition-colors shrink-0 cursor-pointer"
+                  >
+                    <span>Открыть диалог с ботом</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
                 </div>
-              )
+
+                <p className="text-[11px] text-neutral-600 leading-relaxed">
+                  Откройте диалог с официальным ботом IT-Старт и отправьте команду /start или /subscribe для активации сообщений.
+                </p>
+
+                {/* Profile badge / Identification status */}
+                {telegramUser ? (
+                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-white/60 dark:bg-black/20 border border-sky-500/20">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      {telegramUser.photo_url ? (
+                        <img
+                          src={telegramUser.photo_url}
+                          alt={telegramUser.first_name || 'TG'}
+                          className="w-8 h-8 rounded-full object-cover border border-sky-500/30 shrink-0 shadow-xs"
+                        />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-sky-600 to-blue-500 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
+                          {telegramUser.first_name ? telegramUser.first_name.slice(0, 2).toUpperCase() : 'TG'}
+                        </div>
+                      )}
+                      <div className="min-w-0">
+                        <div className="text-xs font-bold text-neutral-900 truncate">
+                          {`${telegramUser.first_name || ''} ${telegramUser.last_name || ''}`.trim()}
+                          {telegramUser.username && (
+                            <span className="ml-1 text-[11px] font-normal text-neutral-500">(@{telegramUser.username})</span>
+                          )}
+                        </div>
+                        <div className="text-[11px] text-sky-700 font-medium truncate">
+                          Chat ID: <span className="font-mono font-bold">{telegramUser.id}</span> • Telegram Bot API подключен
+                        </div>
+                      </div>
+                    </div>
+                    <span className="text-[10px] px-2.5 py-1 rounded-full font-bold bg-emerald-500/10 text-emerald-700 border border-emerald-500/25 shrink-0 flex items-center gap-1">
+                      <Check className="w-3 h-3" />
+                      <span>Подключен</span>
+                    </span>
+                  </div>
+                ) : tgChatId ? (
+                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-white/60 dark:bg-black/20 border border-neutral-200/80">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-sky-600 to-blue-500 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
+                        TG
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-xs font-bold text-neutral-900 truncate">
+                          {tgFirstName || tgUsername || 'Пользователь Telegram'}
+                          {tgUsername && !tgFirstName && (
+                            <span className="ml-1 text-[11px] font-normal text-neutral-500">(@{tgUsername})</span>
+                          )}
+                        </div>
+                        <div className="text-[11px] text-neutral-600 font-medium truncate">
+                          Chat ID: <span className="font-mono font-bold">{tgChatId}</span> • Telegram Bot API подключен
+                        </div>
+                      </div>
+                    </div>
+                    <span className="text-[10px] px-2.5 py-1 rounded-full font-bold bg-emerald-500/10 text-emerald-700 border border-emerald-500/25 shrink-0 flex items-center gap-1">
+                      <Check className="w-3 h-3" />
+                      <span>Подключен</span>
+                    </span>
+                  </div>
+                ) : null}
+
+                {/* Subtle manual entry for desktop web (folded by default, no ugly prompts) */}
+                {!telegramUser && (
+                  <details className="text-xs pt-0.5">
+                    <summary className="text-[11px] text-neutral-400 hover:text-neutral-600 dark:text-neutral-500 cursor-pointer select-none inline-flex items-center gap-1">
+                      <span>Настроить ID вручную</span>
+                    </summary>
+                    <div className="space-y-2 pt-2">
+                      <div className="flex items-center justify-between gap-2 flex-wrap">
+                        <button
+                          type="button"
+                          onClick={handleAutoDetect}
+                          disabled={isDetecting}
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-medium bg-neutral-100 hover:bg-neutral-200 text-neutral-700 transition-colors disabled:opacity-50 cursor-pointer"
+                        >
+                          <RefreshCw className={`w-3 h-3 ${isDetecting ? 'animate-spin' : ''}`} />
+                          <span>Определить Chat ID автоматически</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setShowTokenInput((v) => !v)}
+                          className="text-[11px] text-neutral-500 hover:underline cursor-pointer"
+                        >
+                          {showTokenInput ? 'Скрыть токен' : 'Bot Token'}
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div>
+                          <label className="block text-[11px] font-medium mb-1 text-neutral-600">
+                            Ваш Telegram Chat ID
+                          </label>
+                          <input
+                            type="text"
+                            value={tgChatId}
+                            onChange={(e) => setTgChatId(e.target.value)}
+                            placeholder="например 123456789"
+                            className="w-full px-3 py-2 rounded-xl text-xs transition-colors focus:outline-none liquid-glass-pill focus:bg-white/60 text-neutral-900 placeholder:text-neutral-400 border border-neutral-200/80"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-medium mb-1 text-neutral-600">
+                            Username в Telegram
+                          </label>
+                          <input
+                            type="text"
+                            value={tgUsername}
+                            onChange={(e) => setTgUsername(e.target.value)}
+                            placeholder="@username"
+                            className="w-full px-3 py-2 rounded-xl text-xs transition-colors focus:outline-none liquid-glass-pill focus:bg-white/60 text-neutral-900 placeholder:text-neutral-400 border border-neutral-200/80"
+                          />
+                        </div>
+                      </div>
+
+                      {showTokenInput && (
+                        <div className="space-y-1 pt-1">
+                          <input
+                            type="password"
+                            value={botTokenInput}
+                            onChange={(e) => {
+                              setBotTokenInput(e.target.value);
+                              saveBotToken(e.target.value.trim());
+                            }}
+                            placeholder="Токен от @BotFather (сохраняется в браузере)"
+                            className="w-full px-3 py-2 rounded-xl text-xs transition-colors focus:outline-none liquid-glass-pill focus:bg-white/50 text-neutral-900 placeholder:text-neutral-500 border border-neutral-200/80"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </details>
+                )}
+              </div>
             )}
 
             {/* Directions selector */}
@@ -691,77 +782,6 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
                 )}
               </div>
             </div>
-
-            {/* Platform Helper Note / Bot Token Box */}
-            {platform === 'vk' ? (
-              <div className="p-3 rounded-2xl liquid-glass-subtle text-xs space-y-1.5 border border-blue-500/15 bg-blue-500/5">
-                <div className="flex items-center justify-between text-neutral-800 font-semibold">
-                  <span className="flex items-center gap-1.5">
-                    <Bot className="w-3.5 h-3.5 text-blue-600" />
-                    <span>Официальный VK-бот IT-Старт</span>
-                  </span>
-                  <a
-                    href={getVkBotDialogUrl()}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[11px] text-blue-600 hover:underline flex items-center gap-1"
-                  >
-                    <span>Открыть диалог с VK-ботом</span>
-                    <ExternalLink className="w-3 h-3" />
-                  </a>
-                </div>
-                <p className="text-[11px] text-neutral-600 leading-relaxed">
-                  Пуш-уведомления о новых вакансиях приходят от официального сообщества ВКонтакте сразу после публикации.
-                </p>
-              </div>
-            ) : telegramUser ? (
-              <div className="p-3 rounded-2xl liquid-glass-subtle text-xs space-y-1 border border-sky-500/15 bg-sky-500/5">
-                <div className="flex items-center justify-between text-neutral-800 font-semibold">
-                  <span className="flex items-center gap-1.5">
-                    <Send className="w-3.5 h-3.5 text-sky-600" />
-                    <span>Telegram Bot API подключен</span>
-                  </span>
-                  <span className="text-[10px] text-emerald-700 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
-                    24/7 Сервер
-                  </span>
-                </div>
-                <p className="text-[11px] text-neutral-600 leading-relaxed">
-                  Уведомления рассылаются ботом @{TELEGRAM_BOT_USERNAME}. Подписка сохраняется в облачную базу Supabase.
-                </p>
-              </div>
-            ) : (
-              <div className="p-3 rounded-2xl liquid-glass-subtle text-xs space-y-1.5 border border-black/5 dark:border-white/5">
-                <div className="flex items-center justify-between">
-                  <span className="font-semibold text-neutral-800">
-                    Bot Token (@BotFather, опционально):
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setShowTokenInput((v) => !v)}
-                    className="text-[11px] font-semibold text-neutral-600 hover:text-black underline cursor-pointer"
-                  >
-                    {showTokenInput ? 'Скрыть поле' : 'Настроить токен'}
-                  </button>
-                </div>
-                {showTokenInput && (
-                  <div className="space-y-1 pt-1">
-                    <input
-                      type="password"
-                      value={botTokenInput}
-                      onChange={(e) => {
-                        setBotTokenInput(e.target.value);
-                        saveBotToken(e.target.value.trim());
-                      }}
-                      placeholder="Токен от @BotFather (сохраняется в браузере)"
-                      className="w-full px-3.5 py-2.5 rounded-xl text-base sm:text-sm transition-colors focus:outline-none liquid-glass-pill focus:bg-white/50 text-neutral-900 placeholder:text-neutral-500"
-                    />
-                    <p className="text-[10px] text-neutral-500">
-                      Токен используется для прямых вызовов Telegram Bot API из браузера.
-                    </p>
-                  </div>
-                )}
-              </div>
-            )}
           </div>
 
           {/* Fixed Footer: Status & Action Buttons */}
