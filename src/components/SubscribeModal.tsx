@@ -221,7 +221,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
     } else {
       setStatusMessage({
         type: 'error',
-        text: result.error || 'Не удалось найти Chat ID автоматически. Нажмите кнопку шага 1, напишите /start боту и повторите!',
+        text: result.error || 'Не удалось найти Chat ID автоматически. Откройте диалог с ботом выше, отправьте /start и повторите!',
       });
     }
   };
@@ -231,7 +231,9 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
     if (!currentId) {
       setStatusMessage({
         type: 'error',
-        text: platform === 'vk' ? 'Сначала укажите ваш VK ID' : 'Сначала укажите или определите ваш Telegram Chat ID',
+        text: platform === 'vk'
+          ? 'Сначала откройте диалог с VK-ботом выше или настройте ID вручную'
+          : 'Сначала откройте диалог с ботом выше или настройте ID вручную',
       });
       return;
     }
@@ -304,7 +306,9 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
     if (!currentId) {
       setStatusMessage({
         type: 'error',
-        text: platform === 'vk' ? 'Пожалуйста, укажите ваш VK ID' : 'Пожалуйста, укажите Telegram Chat ID',
+        text: platform === 'vk'
+          ? 'Для подключения откройте диалог с VK-ботом выше или настройте ID вручную'
+          : 'Для подключения откройте диалог с TG-ботом выше или настройте ID вручную',
       });
       return;
     }
@@ -585,7 +589,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neutral-900 hover:bg-black text-white font-medium text-[11px] shadow-xs transition-colors shrink-0 cursor-pointer"
                   >
-                    <span>Открыть диалог с ботом</span>
+                    <span>Открыть диалог с TG-ботом</span>
                     <ExternalLink className="w-3 h-3" />
                   </a>
                 </div>

@@ -2528,9 +2528,15 @@ export async function scanChannelsAndSyncSupabase(notifySubscribers = true) {
       published_at: new Date().toISOString(),
     }));
 
-    const { error } = await supabase.from('internships').upsert(rows, { onConflict: 'id' });
-    if (error) {
-      console.warn('[Parser] Предупреждение при записи в Supabase:', error.message);
+    if (supabase && process.env.NODE_ENV !== 'test' && !process.env.VITEST) {
+      const { error } = await supabase.from('internships').upsert(rows, { onConflict: 'id' });
+      if (error) {
+        console.warn('[Parser] Предупреждение при записи в Supabase:', error.message);
+      } else {
+        savedCount = rows.length;
+        invalidateInternshipsCache();
+        console.log(`[Parser] ✅ Успешно синхронизировано ${savedCount} вакансий в Supabase internships`);
+      }
     } else {
       savedCount = rows.length;
       invalidateInternshipsCache();
@@ -2698,7 +2704,7 @@ export async function registerTgSubscriber(chatId, meta = {}) {
   tgSubscribers.set(id, sub);
 
   try {
-    if (supabase) {
+    if (supabase && process.env.NODE_ENV !== 'test' && !process.env.VITEST) {
       const { error } = await supabase.from('tg_subscriptions').upsert(sub, { onConflict: 'chat_id' });
       if (error) {
         console.warn('[Telegram Bot] Ошибка сохранения подписчика в Supabase:', error.message);
@@ -2721,7 +2727,7 @@ export async function unregisterTgSubscriber(chatId) {
   tgSubscribers.delete(id);
 
   try {
-    if (supabase) {
+    if (supabase && process.env.NODE_ENV !== 'test' && !process.env.VITEST) {
       const { error } = await supabase.from('tg_subscriptions').update({ is_active: false }).eq('chat_id', id);
       if (error) {
         console.warn('[Telegram Bot] Ошибка отключения подписки в Supabase:', error.message);

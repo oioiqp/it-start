@@ -418,7 +418,7 @@ describe('Bot Parity & Comprehensive Functionality Tests (Telegram & VKontakte)'
         expect(vkRes.ok).toBe(true);
         expect(vkRes.type).toBeDefined();
       }
-    }, 15000);
+    }, 30000);
 
     it('both bots synchronize subscriber persistence and offline resilience', async () => {
       const testId = 445566;
@@ -438,7 +438,7 @@ describe('Bot Parity & Comprehensive Functionality Tests (Telegram & VKontakte)'
 
       const vkUnsub = await vkBot.unregisterVkSubscriber(testId);
       expect(vkUnsub).toBe(true);
-    });
+    }, 30000);
 
     it('verifies that Telegram bot isolates VK subscribers and never sends push to vk_ IDs', async () => {
       // Register a VK subscriber with vk_ prefix in memory

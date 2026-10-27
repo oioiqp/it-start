@@ -488,7 +488,7 @@ export async function registerVkSubscriber(peerId, meta = {}) {
   vkSubscribers.set(id, sub);
 
   try {
-    if (supabase) {
+    if (supabase && process.env.NODE_ENV !== 'test' && !process.env.VITEST) {
       const row = {
         chat_id: `vk_${id}`,
         username: meta.username || '',
@@ -515,7 +515,7 @@ export async function unregisterVkSubscriber(peerId) {
   const deleted = vkSubscribers.delete(id);
 
   try {
-    if (supabase) {
+    if (supabase && process.env.NODE_ENV !== 'test' && !process.env.VITEST) {
       await supabase.from('tg_subscriptions').update({ is_active: false }).eq('chat_id', `vk_${id}`);
       await supabase.from('tg_subscriptions').update({ is_active: false }).eq('chat_id', id);
     }

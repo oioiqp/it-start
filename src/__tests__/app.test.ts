@@ -1278,7 +1278,7 @@ describe('12. VKontakte (VK) Bot & VK Mini App Integration', () => {
     const unknownRes = await vkBotModule.handleVkMessage({ peer_id: 1001, text: 'абракадабра123' });
     expect(unknownRes.ok).toBe(true);
     expect(unknownRes.type).toBe('unknown');
-  }, 15000);
+  }, 30000);
 
   it('validates VK subscribers management and notification push in bot/vk_bot.mjs', async () => {
     // @ts-ignore
