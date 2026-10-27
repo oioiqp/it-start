@@ -213,10 +213,12 @@ export function findCompanyByQuery(query) {
 
   // 2. Tokenized word boundary or inclusion match
   for (const c of COMPANIES_DATA) {
-    if (q.includes(c.shortName.toLowerCase()) || c.name.toLowerCase().includes(q)) return c;
+    if (q.includes(c.shortName.toLowerCase())) return c;
+    if (q.length >= 4 && c.name.toLowerCase().includes(q)) return c;
     if (Array.isArray(c.aliases)) {
       for (const alias of c.aliases) {
-        if (q.includes(alias) || alias.includes(q)) return c;
+        if (q.includes(alias)) return c;
+        if (q.length >= 4 && alias.includes(q)) return c;
       }
     }
   }
@@ -226,7 +228,7 @@ export function findCompanyByQuery(query) {
 
 // Direction aliases dictionary for Russian & English commands
 export const DIRECTION_ALIASES = {
-  frontend: ['frontend', 'фронтенд', 'фронт', '/frontend', 'react', 'веб', 'vue', 'angular', 'веб-разработка'],
+  frontend: ['frontend', 'фронтенд', 'фронт', '/frontend', 'react', 'vue', 'angular', 'веб-разработка', 'вебразработка'],
   backend: ['backend', 'бэкенд', 'бек', 'бэк', '/backend', 'python', 'java', 'go', 'golang', 'node', 'nodejs'],
   mobile: ['mobile', 'мобилка', 'мобильная', 'android', 'ios', 'flutter', '/mobile', 'мобайл', 'андроид', 'айос'],
   data_science: ['data_science', 'datascience', 'data science', 'ds', 'ml', 'дата сайнс', 'машинное обучение', '/data_science', 'дс', 'мл'],
@@ -2542,15 +2544,27 @@ export async function scanChannelsAndSyncSupabase(notifySubscribers = true) {
   let sentPushes = 0;
   if (notifySubscribers && BOT_TOKEN) {
     try {
-      const { data: subs, error } = await supabase
-        .from('tg_subscriptions')
-        .select('*')
-        .eq('is_active', true);
+      let subs = [];
+      if (supabase) {
+        const { data, error } = await supabase
+          .from('tg_subscriptions')
+          .select('*')
+          .eq('is_active', true);
+        if (!error && Array.isArray(data)) {
+          subs = data;
+        }
+      }
+      if (subs.length === 0 && tgSubscribers.size > 0) {
+        subs = Array.from(tgSubscribers.values()).filter((s) => s.is_active);
+      }
 
-      if (!error && Array.isArray(subs) && subs.length > 0) {
-        console.log(`[Parser] Найдено ${subs.length} активных подписчиков для рассылки.`);
+      // Filter out VK subscribers to prevent sending Telegram messages to VK IDs
+      const tgSubs = subs.filter((s) => !String(s.chat_id).startsWith('vk_'));
 
-        for (const sub of subs) {
+      if (tgSubs.length > 0) {
+        console.log(`[Parser] Найдено ${tgSubs.length} активных Telegram-подписчиков для рассылки.`);
+
+        for (const sub of tgSubs) {
           const subDirs = Array.isArray(sub.directions) ? sub.directions : [];
           const subTracks = Array.isArray(sub.sub_tracks) ? sub.sub_tracks : [];
 
@@ -2636,8 +2650,38 @@ export async function scanChannelsAndSyncSupabase(notifySubscribers = true) {
   };
 }
 
+// In-memory subscribers store for Telegram push notifications (offline fallback)
+export const tgSubscribers = new Map();
+
 /**
- * Register or update a Telegram subscriber in Supabase
+ * Get all active Telegram subscribers (with Supabase fetch & in-memory fallback)
+ */
+export async function getTgSubscribers() {
+  if (tgSubscribers.size === 0 && supabase && process.env.NODE_ENV !== 'test') {
+    try {
+      const { data, error } = await supabase.from('tg_subscriptions').select('*').eq('is_active', true);
+      if (!error && Array.isArray(data)) {
+        for (const row of data) {
+          if (!String(row.chat_id).startsWith('vk_')) {
+            tgSubscribers.set(String(row.chat_id), {
+              chat_id: String(row.chat_id),
+              username: row.username || '',
+              first_name: row.first_name || 'Пользователь Telegram',
+              directions: row.directions || ['frontend', 'backend', 'mobile', 'qa', 'devops', 'data_science'],
+              sub_tracks: row.sub_tracks || [],
+              is_active: true,
+              updated_at: row.updated_at || new Date().toISOString(),
+            });
+          }
+        }
+      }
+    } catch {}
+  }
+  return Array.from(tgSubscribers.values()).filter((s) => s.is_active);
+}
+
+/**
+ * Register or update a Telegram subscriber in Supabase & memory
  */
 export async function registerTgSubscriber(chatId, meta = {}) {
   const id = String(chatId);
@@ -2651,12 +2695,16 @@ export async function registerTgSubscriber(chatId, meta = {}) {
     updated_at: new Date().toISOString(),
   };
 
+  tgSubscribers.set(id, sub);
+
   try {
-    const { error } = await supabase.from('tg_subscriptions').upsert(sub, { onConflict: 'chat_id' });
-    if (error) {
-      console.warn('[Telegram Bot] Ошибка сохранения подписчика в Supabase:', error.message);
-    } else {
-      console.log(`[Telegram Bot] ✅ Подписчик ${id} (@${meta.username || 'unknown'}) успешно сохранен в Supabase`);
+    if (supabase) {
+      const { error } = await supabase.from('tg_subscriptions').upsert(sub, { onConflict: 'chat_id' });
+      if (error) {
+        console.warn('[Telegram Bot] Ошибка сохранения подписчика в Supabase:', error.message);
+      } else {
+        console.log(`[Telegram Bot] ✅ Подписчик ${id} (@${meta.username || 'unknown'}) успешно сохранен в Supabase`);
+      }
     }
   } catch (err) {
     console.warn('[Telegram Bot] Исключение при сохранении подписчика в Supabase:', err.message);
@@ -2670,11 +2718,15 @@ export async function registerTgSubscriber(chatId, meta = {}) {
  */
 export async function unregisterTgSubscriber(chatId) {
   const id = String(chatId);
+  tgSubscribers.delete(id);
+
   try {
-    const { error } = await supabase.from('tg_subscriptions').update({ is_active: false }).eq('chat_id', id);
-    if (error) {
-      console.warn('[Telegram Bot] Ошибка отключения подписки в Supabase:', error.message);
-      return false;
+    if (supabase) {
+      const { error } = await supabase.from('tg_subscriptions').update({ is_active: false }).eq('chat_id', id);
+      if (error) {
+        console.warn('[Telegram Bot] Ошибка отключения подписки в Supabase:', error.message);
+        return false;
+      }
     }
     return true;
   } catch (err) {
@@ -2693,7 +2745,8 @@ export function getTgBotStatus() {
     status: BOT_TOKEN ? 'active' : 'fallback',
     mode: BOT_TOKEN ? 'live' : 'fallback',
     uptime: process.uptime(),
-    commandsCount: 11,
+    commandsCount: 12,
+    subscribersCount: tgSubscribers.size,
     port: PORT,
     renderUrl: RENDER_URL,
     channelsCount: ALL_TARGET_TG_CHANNELS.length,
@@ -2736,6 +2789,22 @@ export async function handleMessage(msg) {
     strippedText.startsWith('добрый вечер') ||
     strippedText.startsWith('доброе утро') ||
     strippedText.startsWith('приветствую');
+
+  // Support numeric menu shortcuts (1..10) matching VK bot main menu
+  const numMatch = textClean.match(/^(?:\[(\d+)\]|(\d+)\.?)$/);
+  const num = numMatch ? parseInt(numMatch[1] || numMatch[2], 10) : null;
+  if (num !== null && num >= 1 && num <= 10) {
+    if (num === 1) return sendVacancies(chatId, 'all');
+    if (num === 2) return sendCompanies(chatId);
+    if (num === 3) return sendRoadmaps(chatId);
+    if (num === 4) return sendQuestions(chatId);
+    if (num === 5) return sendSubscribe(chatId, firstName, username);
+    if (num === 6) return sendSite(chatId);
+    if (num === 7) return sendStatus(chatId);
+    if (num === 8) return sendHelp(chatId);
+    if (num === 9) return sendId(chatId, firstName, username);
+    if (num === 10) return runManualScan(chatId);
+  }
 
   // 1. /start command, greetings & main menu
   if (
@@ -2813,36 +2882,7 @@ export async function handleMessage(msg) {
     textClean === 'подписаться' ||
     textClean === 'включить уведомления'
   ) {
-    await registerTgSubscriber(chatId, {
-      username,
-      first_name: firstName,
-    });
-    const webAppUrlWithParams = `${WEBAPP_URL}${WEBAPP_URL.includes('?') ? '&' : '?'}tg_chat_id=${chatId}&tg_username=${encodeURIComponent(username || '')}&tg_first_name=${encodeURIComponent(firstName || '')}&subscribed=1#tg_chat_id=${chatId}`;
-    const text =
-      `🔔 <b>Уведомления успешно подключены!</b>\n\n` +
-      `Ваш Telegram Chat ID: <code>${chatId}</code>\n` +
-      `Вы подписаны на все направления стажировок (Frontend, Backend, Mobile, QA, DevOps, Data Science).\n\n` +
-      `Чтобы настроить конкретные направления, откройте приложение IT-Старт:`;
-    await callTelegram('sendMessage', {
-      chat_id: chatId,
-      text,
-      parse_mode: 'HTML',
-      reply_markup: {
-        inline_keyboard: [
-          [
-            {
-              text: '🚀 Настроить направления в WebApp',
-              web_app: { url: webAppUrlWithParams },
-            },
-          ],
-          [
-            { text: '💼 Свежие стажировки', callback_data: 'vacancies:all' },
-            { text: '🌐 Сайт без VPN', url: RENDER_URL },
-          ],
-        ],
-      },
-    });
-    return { ok: true, type: 'subscribe', chatId };
+    return sendSubscribe(chatId, firstName, username);
   }
 
   // 3. /unsubscribe command
@@ -2881,30 +2921,7 @@ export async function handleMessage(msg) {
     textClean === 'chat_id' ||
     textClean === 'айди'
   ) {
-    const text =
-      `🆔 <b>Ваш идентификатор Telegram:</b>\n\n` +
-      `• Chat ID: <code>${chatId}</code>\n` +
-      `• Username: @${username || 'не указан'}\n` +
-      `• Имя: <b>${firstName}</b>\n\n` +
-      `Этот ID используется сервисом IT-Старт для отправки персональных пуш-уведомлений о новых стажировках.\n` +
-      `В Telegram WebApp ваш ID подставляется автоматически!`;
-
-    const webAppUrlWithParams = `${WEBAPP_URL}${WEBAPP_URL.includes('?') ? '&' : '?'}tg_chat_id=${chatId}&tg_username=${encodeURIComponent(username || '')}&tg_first_name=${encodeURIComponent(firstName || '')}&subscribed=1#tg_chat_id=${chatId}`;
-
-    await callTelegram('sendMessage', {
-      chat_id: chatId,
-      text,
-      parse_mode: 'HTML',
-      reply_markup: {
-        inline_keyboard: [
-          [
-            { text: '🚀 Запустить WebApp', web_app: { url: webAppUrlWithParams } },
-            { text: '💼 Стажировки', callback_data: 'vacancies:all' },
-          ],
-        ],
-      },
-    });
-    return { ok: true, type: 'id', chatId };
+    return sendId(chatId, firstName, username);
   }
 
   // 5. /vacancies or /internships or «стажировки» or «вакансии»
@@ -3055,7 +3072,38 @@ export async function handleMessage(msg) {
     return { ok: true, type: 'vk', chatId };
   }
 
-  // 15. /help or «помощь» or «справка»
+  // 15. /tg or /telegram
+  if (
+    textClean === '/tg' ||
+    textClean === '/telegram' ||
+    textClean === 'тг' ||
+    textClean === 'телеграм' ||
+    textClean === 'telegram'
+  ) {
+    const webAppUrlWithParams = `${WEBAPP_URL}${WEBAPP_URL.includes('?') ? '&' : '?'}tg_chat_id=${chatId}&subscribed=1#tg_chat_id=${chatId}`;
+    const text =
+      `✈️ <b>IT-Старт в Telegram:</b>\n\n` +
+      `Вы уже находитесь в официальном боте <b>@${BOT_USERNAME}</b>!\n\n` +
+      `• Telegram WebApp: запускается в 1 клик прямо в чате\n` +
+      `• Персональные пуш-уведомления о новых вакансиях\n` +
+      `• Роадмапы и тренажёр собеседований\n\n` +
+      `🌐 <b>Сайт платформы без VPN:</b> ${RENDER_URL}\n` +
+      `📱 <b>ВКонтакте Mini App:</b> https://vk.com/app54857681`;
+    await callTelegram('sendMessage', {
+      chat_id: chatId,
+      text,
+      parse_mode: 'HTML',
+      reply_markup: {
+        inline_keyboard: [
+          [{ text: '🚀 Запустить WebApp', web_app: { url: webAppUrlWithParams } }],
+          [{ text: '🌐 Открыть сайт без VPN', url: RENDER_URL }],
+        ],
+      },
+    });
+    return { ok: true, type: 'tg', chatId };
+  }
+
+  // 16. /help or «помощь» or «справка»
   if (
     textClean === '/help' ||
     textClean === 'помощь' ||
@@ -3065,13 +3113,13 @@ export async function handleMessage(msg) {
     return sendHelp(chatId);
   }
 
-  // 16. Direct company name lookup («т1», «директум», «контур», «яндекс», etc.)
+  // 17. Direct company name lookup («т1», «директум», «контур», «яндекс», etc.)
   const matchedCompany = findCompanyByQuery(textClean) || findCompanyByQuery(textLower);
   if (matchedCompany) {
     return sendCompanyVacancies(chatId, matchedCompany.id);
   }
 
-  // 17. Default response
+  // 18. Default response
   const defaultText =
     `Я получил ваше сообщение: «${textRaw.slice(0, 40)}» 🤔\n\n` +
     `Используйте меню команд или выберите действие ниже:`;
@@ -3102,6 +3150,72 @@ export async function handleMessage(msg) {
     },
   });
   return { ok: true, type: 'unknown', chatId };
+}
+
+/**
+ * Send subscription confirmation and WebApp link
+ */
+export async function sendSubscribe(chatId, firstName = 'Разработчик', username = '') {
+  await registerTgSubscriber(chatId, {
+    username,
+    first_name: firstName,
+  });
+  const webAppUrlWithParams = `${WEBAPP_URL}${WEBAPP_URL.includes('?') ? '&' : '?'}tg_chat_id=${chatId}&tg_username=${encodeURIComponent(username || '')}&tg_first_name=${encodeURIComponent(firstName || '')}&subscribed=1#tg_chat_id=${chatId}`;
+  const text =
+    `🔔 <b>Уведомления успешно подключены!</b>\n\n` +
+    `Ваш Telegram Chat ID: <code>${chatId}</code>\n` +
+    `Вы подписаны на все направления стажировок (Frontend, Backend, Mobile, QA, DevOps, Data Science).\n\n` +
+    `Чтобы настроить конкретные направления, откройте приложение IT-Старт:`;
+  await callTelegram('sendMessage', {
+    chat_id: chatId,
+    text,
+    parse_mode: 'HTML',
+    reply_markup: {
+      inline_keyboard: [
+        [
+          {
+            text: '🚀 Настроить направления в WebApp',
+            web_app: { url: webAppUrlWithParams },
+          },
+        ],
+        [
+          { text: '💼 Свежие стажировки', callback_data: 'vacancies:all' },
+          { text: '🌐 Сайт без VPN', url: RENDER_URL },
+        ],
+      ],
+    },
+  });
+  return { ok: true, type: 'subscribe', chatId };
+}
+
+/**
+ * Send user Telegram Chat ID and details
+ */
+export async function sendId(chatId, firstName = 'Разработчик', username = '') {
+  const text =
+    `🆔 <b>Ваш идентификатор Telegram:</b>\n\n` +
+    `• Chat ID: <code>${chatId}</code>\n` +
+    `• Username: @${username || 'не указан'}\n` +
+    `• Имя: <b>${firstName}</b>\n\n` +
+    `Этот ID используется сервисом IT-Старт для отправки персональных пуш-уведомлений о новых стажировках.\n` +
+    `В Telegram WebApp ваш ID подставляется автоматически!`;
+
+  const webAppUrlWithParams = `${WEBAPP_URL}${WEBAPP_URL.includes('?') ? '&' : '?'}tg_chat_id=${chatId}&tg_username=${encodeURIComponent(username || '')}&tg_first_name=${encodeURIComponent(firstName || '')}&subscribed=1#tg_chat_id=${chatId}`;
+
+  await callTelegram('sendMessage', {
+    chat_id: chatId,
+    text,
+    parse_mode: 'HTML',
+    reply_markup: {
+      inline_keyboard: [
+        [
+          { text: '🚀 Запустить WebApp', web_app: { url: webAppUrlWithParams } },
+          { text: '💼 Стажировки', callback_data: 'vacancies:all' },
+        ],
+      ],
+    },
+  });
+  return { ok: true, type: 'id', chatId };
 }
 
 /**
@@ -3386,7 +3500,7 @@ export async function sendStatus(chatId) {
     `  <i>(@tbank_team, @KonturTech, @Life_in_Directum, @t1career, @yandex_intern, @forjunior, @normrabota...)</i>\n` +
     `• <b>Карьерных сайтов & API:</b> <b>${CAREER_WEBSITES_DATA.length}</b> источников\n` +
     `  <i>(career.directum.ru, kontur.ru, fintech.tbank.ru, t1.ru, Habr Career...)</i>\n` +
-    `• <b>Последняя синхронизация:</b> <code>${new Date(LAST_SCAN_STATUS.lastScanAt).toLocaleTimeString('ru-RU')}</code>\n` +
+    `• <b>Последняя синхронизация:</b> <code>${LAST_SCAN_STATUS.lastScanAt ? new Date(LAST_SCAN_STATUS.lastScanAt).toLocaleTimeString('ru-RU') : 'недавно'}</code>\n` +
     `• <b>Синхронизировано в Supabase:</b> ${LAST_SCAN_STATUS.savedCount || 0} вакансий\n` +
     `• <b>Разослано пуш-уведомлений:</b> ${LAST_SCAN_STATUS.sentPushes || 0}\n\n` +
     `💡 Для принудительного запуска обновления отправьте команду /parse или /sync`;
@@ -3559,6 +3673,7 @@ export async function sendHelp(chatId) {
     `• /scan (или /sync, /parse) — Принудительное сканирование каналов и сайтов\n` +
     `• /site — Ссылка на веб-платформу IT-Старт без VPN\n` +
     `• /vk — Официальный бот и сообщество ВКонтакте\n` +
+    `• /tg (или /telegram) — Информация о Telegram-боте и WebApp\n` +
     `• /help — Список всех доступных команд\n\n` +
     `🏢 <b>Команды быстрого перехода к компаниям:</b>\n` +
     `/company_t1, /company_kontur, /company_tbank, /company_directum, /company_yandex, /company_ozon, /company_sber, /company_avito, /company_vk\n\n` +

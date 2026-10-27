@@ -1344,7 +1344,7 @@ describe('12. VKontakte (VK) Bot & VK Mini App Integration', () => {
     const vkBotModule: any = await import('../../bot/vk_bot.mjs');
     const vkStatus = vkBotModule.getVkBotStatus();
     expect(vkStatus.bot).toBe('IT-Старт VK Бот');
-    expect(vkStatus.commandsCount).toBe(8);
+    expect(vkStatus.commandsCount).toBeGreaterThanOrEqual(8);
     expect(vkStatus.version).toBe('5.199');
   });
 

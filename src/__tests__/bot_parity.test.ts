@@ -51,13 +51,18 @@ describe('Bot Parity & Comprehensive Functionality Tests (Telegram & VKontakte)'
     it('both bots export status diagnostics', () => {
       const tgStatus = tgBot.getTgBotStatus();
       expect(tgStatus.bot).toBe('IT-Старт Telegram Бот');
-      expect(tgStatus.commandsCount).toBe(11);
+      expect(tgStatus.commandsCount).toBe(12);
       expect(tgStatus.channelsCount).toBeGreaterThan(0);
       expect(tgStatus.websitesCount).toBeGreaterThan(0);
+      expect(tgStatus.subscribersCount).toBeDefined();
 
       const vkStatus = vkBot.getVkBotStatus();
       expect(vkStatus.bot).toBe('IT-Старт VK Бот');
-      expect(vkStatus.commandsCount).toBe(8);
+      expect(vkStatus.commandsCount).toBe(12);
+      expect(vkStatus.channelsCount).toBeGreaterThan(0);
+      expect(vkStatus.websitesCount).toBeGreaterThan(0);
+      expect(vkStatus.companiesCount).toBe(9);
+      expect(vkStatus.subscribersCount).toBeDefined();
       expect(vkStatus.version).toBe('5.199');
     });
   });
@@ -212,6 +217,32 @@ describe('Bot Parity & Comprehensive Functionality Tests (Telegram & VKontakte)'
       expect(resScan.result.websitesChecked).toBeGreaterThan(0);
     }, 25000);
 
+    it('handles numeric menu shortcuts and prevents single letters from false company matches', async () => {
+      // Numeric shortcuts
+      const resNum1 = await tgBot.handleMessage({ chat: { id: mockChatId }, text: '1' });
+      expect(resNum1.ok).toBe(true);
+      expect(resNum1.type).toBe('vacancies');
+
+      const resNum2 = await tgBot.handleMessage({ chat: { id: mockChatId }, text: '2' });
+      expect(resNum2.ok).toBe(true);
+      expect(resNum2.type).toBe('companies');
+
+      // 'веб' must open site, not frontend vacancies
+      const resWeb = await tgBot.handleMessage({ chat: { id: mockChatId }, text: 'веб' });
+      expect(resWeb.ok).toBe(true);
+      expect(resWeb.type).toBe('site');
+
+      // Single characters must NOT match company T1 or any company
+      const resLetterT = await tgBot.handleMessage({ chat: { id: mockChatId }, text: 'т' });
+      expect(resLetterT.type).toBe('unknown');
+
+      const resLetterYa = await tgBot.handleMessage({ chat: { id: mockChatId }, text: 'я' });
+      expect(resLetterYa.type).toBe('unknown');
+
+      const resLetterA = await tgBot.handleMessage({ chat: { id: mockChatId }, text: 'а' });
+      expect(resLetterA.type).toBe('unknown');
+    });
+
     it('handles unknown command fallback gracefully', async () => {
       const resUnknown = await tgBot.handleMessage({ chat: { id: mockChatId }, text: 'непонятный_текст_12345' });
       expect(resUnknown.ok).toBe(true);
@@ -328,10 +359,33 @@ describe('Bot Parity & Comprehensive Functionality Tests (Telegram & VKontakte)'
       expect(res9.ok).toBe(true);
       expect(res9.type).toBe('id');
     });
+
+    it('handles /tg, /vk, "веб", and Russian prefix vacancies in VK', async () => {
+      // /tg
+      const resTg = await vkBot.handleVkMessage({ peer_id: mockPeerId, text: '/tg' });
+      expect(resTg.ok).toBe(true);
+      expect(resTg.type).toBe('tg');
+      expect(resTg.reply.message).toContain('Telegram');
+
+      // /vk
+      const resVk = await vkBot.handleVkMessage({ peer_id: mockPeerId, text: '/vk' });
+      expect(resVk.ok).toBe(true);
+      expect(resVk.type).toBe('vk');
+
+      // 'веб' must open site
+      const resWeb = await vkBot.handleVkMessage({ peer_id: mockPeerId, text: 'веб' });
+      expect(resWeb.ok).toBe(true);
+      expect(resWeb.type).toBe('site');
+
+      // Russian prefix: 'стажировки frontend'
+      const resPref = await vkBot.handleVkMessage({ peer_id: mockPeerId, text: 'стажировки frontend' });
+      expect(resPref.ok).toBe(true);
+      expect(resPref.type).toBe('vacancies');
+    });
   });
 
   describe('4. Full Cross-Platform Feature Parity Matrix', () => {
-    it('both bots support the complete list of 11 functional commands', async () => {
+    it('both bots support the complete list of 13 functional commands', async () => {
       const commands = [
         'start',
         'vacancies',
@@ -344,6 +398,8 @@ describe('Bot Parity & Comprehensive Functionality Tests (Telegram & VKontakte)'
         'status',
         'site',
         'help',
+        'vk',
+        'tg',
       ];
 
       for (const cmd of commands) {
@@ -382,6 +438,18 @@ describe('Bot Parity & Comprehensive Functionality Tests (Telegram & VKontakte)'
 
       const vkUnsub = await vkBot.unregisterVkSubscriber(testId);
       expect(vkUnsub).toBe(true);
+    });
+
+    it('verifies that Telegram bot isolates VK subscribers and never sends push to vk_ IDs', async () => {
+      // Register a VK subscriber with vk_ prefix in memory
+      const vkPeerId = 998877;
+      await vkBot.registerVkSubscriber(vkPeerId, { first_name: 'VK Tester' });
+
+      // In tg_subscriptions, VK subscribers have prefix "vk_"
+      // Verify that tgSubscribers only contains valid Telegram chat IDs
+      for (const [chatId] of tgBot.tgSubscribers.entries()) {
+        expect(String(chatId).startsWith('vk_')).toBe(false);
+      }
     });
   });
 });
