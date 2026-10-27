@@ -992,7 +992,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
       </div>
 
       {/* SECTION: INTERACTIVE TELEGRAM CHANNELS & WEBSITES MONITOR */}
-      <div className="liquid-glass rounded-[28px] sm:rounded-[32px] p-6 sm:p-8 space-y-6 transition-all duration-300">
+      <div className="liquid-glass rounded-[28px] sm:rounded-[32px] p-4 sm:p-8 space-y-6 transition-all duration-300">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-neutral-200/80 dark:border-white/10">
           <div>
             <div className="flex items-center gap-2 mb-1 flex-wrap">
@@ -1023,10 +1023,17 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
               onClick={handleScanChannels}
               disabled={isScanningChannels}
               className="w-full md:w-auto flex items-center justify-center gap-2 px-5 py-2.5 rounded-full font-semibold text-xs sm:text-sm active:scale-95 transition-all disabled:opacity-50
-                bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white dark:hover:bg-neutral-200 dark:text-neutral-950 shadow-sm"
+                bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white dark:hover:bg-neutral-200 dark:text-neutral-950 shadow-sm text-center"
             >
-              <RefreshCw className={`w-4 h-4 ${isScanningChannels ? 'animate-spin' : ''}`} />
-              <span>{isScanningChannels ? `Сканирование... ${scanProgress}%` : 'Запустить сканирование сайтов и каналов'}</span>
+              <RefreshCw className={`w-4 h-4 shrink-0 ${isScanningChannels ? 'animate-spin' : ''}`} />
+              <span className="leading-snug">
+                <span className="sm:hidden">
+                  {isScanningChannels ? `Сканирование... ${scanProgress}%` : 'Сканировать источники'}
+                </span>
+                <span className="hidden sm:inline">
+                  {isScanningChannels ? `Сканирование... ${scanProgress}%` : 'Запустить сканирование сайтов и каналов'}
+                </span>
+              </span>
             </button>
           </div>
         </div>

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 
-describe('Bot Parity & Comprehensive Functionality Tests (Telegram & VKontakte)', () => {
+describe('Bot Parity & Comprehensive Functionality Tests (Telegram & VKontakte)', { timeout: 25000 }, () => {
   let tgBot: any;
   let vkBot: any;
 

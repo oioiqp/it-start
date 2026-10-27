@@ -143,7 +143,7 @@ export const SelfCheckTrainer: React.FC<SelfCheckTrainerProps> = ({
   return (
     <div className="max-w-3xl mx-auto space-y-4">
       {/* Top Header & Navigation */}
-      <div className="rounded-[28px] sm:rounded-[32px] p-3.5 sm:p-4 flex items-center justify-between gap-3 transition-colors liquid-glass">
+      <div className="rounded-[28px] sm:rounded-[32px] p-3 sm:p-4 flex items-center justify-between gap-3 transition-colors liquid-glass flex-wrap">
         <div className="flex items-center gap-2 text-xs">
           <span className="text-neutral-600 dark:text-neutral-400">
             Вопрос <strong className="text-neutral-900 dark:text-white">{currentIndex + 1}</strong> из {deck.length}
@@ -182,7 +182,7 @@ export const SelfCheckTrainer: React.FC<SelfCheckTrainerProps> = ({
       </div>
 
       {/* Question Card */}
-      <div className="rounded-[28px] sm:rounded-[32px] p-6 sm:p-7 space-y-5 transition-colors liquid-glass">
+      <div className="rounded-[28px] sm:rounded-[32px] p-4 sm:p-7 space-y-4 sm:space-y-5 transition-colors liquid-glass">
         {/* Badges */}
         <div className="flex items-center justify-between gap-2 flex-wrap">
           <div className="flex items-center gap-2 flex-wrap">
@@ -217,10 +217,10 @@ export const SelfCheckTrainer: React.FC<SelfCheckTrainerProps> = ({
 
         {/* Title & Question text */}
         <div>
-          <h3 className="text-base sm:text-lg font-bold mb-2 leading-snug font-sans text-neutral-900 dark:text-white">
+          <h3 className="text-base sm:text-lg font-bold mb-2 leading-snug font-sans text-neutral-900 dark:text-white break-words">
             {currentCard.title}
           </h3>
-          <p className="text-xs sm:text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
+          <p className="text-xs sm:text-sm leading-relaxed text-neutral-600 dark:text-neutral-300 break-words">
             {currentCard.question}
           </p>
         </div>
@@ -235,7 +235,7 @@ export const SelfCheckTrainer: React.FC<SelfCheckTrainerProps> = ({
               </span>
               <span className="text-[10px] text-neutral-500">Пример из интервью</span>
             </div>
-            <pre className="p-3.5 text-xs font-mono text-neutral-200 overflow-x-auto leading-relaxed">
+            <pre className="p-3.5 text-xs font-mono text-neutral-200 overflow-x-auto leading-relaxed touch-pan-x overscroll-x-contain">
               <code>{currentCard.codeSnippet}</code>
             </pre>
           </div>
@@ -287,7 +287,7 @@ export const SelfCheckTrainer: React.FC<SelfCheckTrainerProps> = ({
               <button
                 type="button"
                 onClick={handleSubmit}
-                className="ml-auto flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-xs active:scale-95 transition-all
+                className="w-full sm:w-auto ml-auto flex items-center justify-center gap-2 px-5 py-2.5 rounded-full font-semibold text-xs active:scale-95 transition-all
                   bg-neutral-900 hover:bg-black text-white shadow-md
                   dark:bg-white dark:hover:bg-neutral-100 dark:text-neutral-950"
               >
@@ -355,21 +355,23 @@ export const SelfCheckTrainer: React.FC<SelfCheckTrainerProps> = ({
                 <button
                   type="button"
                   onClick={handleRepeat}
-                  className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium liquid-glass-pill bg-amber-500/15 hover:bg-amber-500/25 text-amber-700 dark:text-amber-300 active:scale-95 transition-all"
+                  className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2 sm:py-2.5 rounded-full text-xs font-medium liquid-glass-pill bg-amber-500/15 hover:bg-amber-500/25 text-amber-700 dark:text-amber-300 active:scale-95 transition-all"
                 >
-                  <RotateCcw className="w-3.5 h-3.5" />
-                  <span>Нужно повторить</span>
+                  <RotateCcw className="w-3.5 h-3.5 shrink-0" />
+                  <span className="hidden min-[380px]:inline">Нужно повторить</span>
+                  <span className="min-[380px]:hidden">Повторить</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={handleLearned}
-                  className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-full text-xs font-semibold active:scale-95 transition-all
+                  className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs font-semibold active:scale-95 transition-all
                     bg-neutral-900 hover:bg-black text-white shadow-md
                     dark:bg-white dark:hover:bg-neutral-100 dark:text-neutral-950"
                 >
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span>Ответил верно</span>
+                  <CheckCircle2 className="w-4 h-4 shrink-0" />
+                  <span className="hidden min-[380px]:inline">Ответил верно</span>
+                  <span className="min-[380px]:hidden">Верно</span>
                 </button>
               </div>
             </div>

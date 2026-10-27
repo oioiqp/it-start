@@ -100,8 +100,8 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
   return (
     <div className="max-w-2xl mx-auto space-y-4">
       {/* Top Controls Bar */}
-      <div className="flex items-center justify-between text-xs px-1 text-neutral-600">
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between text-xs px-1 text-neutral-600 gap-2 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap min-w-0">
           <span className="font-semibold text-sm text-neutral-950">
             Карточка {currentIndex + 1} из {deck.length}
           </span>
@@ -119,7 +119,7 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
 
         <button
           onClick={handleShuffle}
-          className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full transition-all active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-700 cursor-pointer font-medium"
+          className="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-full transition-all active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-700 cursor-pointer font-medium shrink-0"
         >
           <Shuffle className="w-3.5 h-3.5" />
           <span>Перемешать</span>
@@ -129,7 +129,7 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
       {/* Flashcard interactive body */}
       <div
         onClick={handleFlip}
-        className="relative min-h-[340px] p-6 sm:p-8 rounded-[28px] sm:rounded-[32px] cursor-pointer select-none transition-all flex flex-col justify-between group liquid-glass liquid-glass-interactive overflow-hidden"
+        className="relative min-h-[340px] p-4 sm:p-8 rounded-[28px] sm:rounded-[32px] cursor-pointer select-none transition-all flex flex-col justify-between group liquid-glass liquid-glass-interactive overflow-hidden"
       >
         {/* Top Badges */}
         <div className="flex items-center justify-between gap-2 mb-4">
@@ -148,10 +148,10 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
               <span className="text-xs font-semibold uppercase tracking-wider block text-neutral-500">
                 Вопрос собеседования:
               </span>
-              <h3 className="text-lg sm:text-xl font-bold leading-snug font-sans text-neutral-950">
+              <h3 className="text-lg sm:text-xl font-bold leading-snug font-sans text-neutral-950 break-words">
                 {currentCard.title}
               </h3>
-              <p className="text-sm leading-relaxed text-neutral-600 font-normal">
+              <p className="text-sm leading-relaxed text-neutral-600 font-normal break-words">
                 {currentCard.question}
               </p>
             </div>
@@ -160,12 +160,12 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
               <span className="text-xs font-semibold uppercase tracking-wider block text-emerald-800">
                 Развернутый эталонный ответ:
               </span>
-              <p className="text-sm leading-relaxed p-4 rounded-2xl liquid-glass-subtle text-neutral-900">
+              <p className="text-sm leading-relaxed p-4 rounded-2xl liquid-glass-subtle text-neutral-900 break-words">
                 {currentCard.answer}
               </p>
 
               {currentCard.codeSnippet && (
-                <pre className="p-3.5 rounded-2xl border text-xs font-mono text-neutral-200 overflow-x-auto bg-neutral-950 border-black/10 dark:border-white/10 shadow-sm">
+                <pre className="p-3.5 rounded-2xl border text-xs font-mono text-neutral-200 overflow-x-auto bg-neutral-950 border-black/10 dark:border-white/10 shadow-sm touch-pan-x overscroll-x-contain">
                   <code>{currentCard.codeSnippet}</code>
                 </pre>
               )}
@@ -200,35 +200,36 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
         <button
           onClick={handlePrev}
           disabled={currentIndex === 0}
-          className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-semibold transition-all active:scale-95 disabled:opacity-40 liquid-glass-pill hover:bg-white/50 text-neutral-800 cursor-pointer"
+          className="flex items-center justify-center gap-1.5 px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-full text-xs font-semibold transition-all active:scale-95 disabled:opacity-40 liquid-glass-pill hover:bg-white/50 text-neutral-800 cursor-pointer"
         >
-          <ChevronLeft className="w-4 h-4" />
+          <ChevronLeft className="w-4 h-4 shrink-0" />
           <span>Назад</span>
         </button>
 
         <button
           onClick={handleRepeat}
-          className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-semibold transition-all active:scale-95 liquid-glass-pill hover:bg-amber-500/15 text-amber-800 cursor-pointer"
+          className="flex items-center justify-center gap-1.5 px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-full text-xs font-semibold transition-all active:scale-95 liquid-glass-pill hover:bg-amber-500/15 text-amber-800 cursor-pointer"
         >
-          <RotateCcw className="w-4 h-4" />
+          <RotateCcw className="w-4 h-4 shrink-0" />
           <span>Повторить</span>
         </button>
 
         <button
           onClick={handleLearned}
-          className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-semibold transition-all active:scale-95 bg-neutral-900 hover:bg-black text-white shadow-xs cursor-pointer"
+          className="flex items-center justify-center gap-1.5 px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-full text-xs font-semibold transition-all active:scale-95 bg-neutral-900 hover:bg-black text-white shadow-xs cursor-pointer"
         >
-          <CheckCircle2 className="w-4 h-4" />
-          <span>Знаю отлично</span>
+          <CheckCircle2 className="w-4 h-4 shrink-0" />
+          <span className="hidden min-[380px]:inline">Знаю отлично</span>
+          <span className="min-[380px]:hidden">Знаю</span>
         </button>
 
         <button
           onClick={handleNext}
           disabled={currentIndex === deck.length - 1}
-          className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-semibold transition-all active:scale-95 disabled:opacity-40 liquid-glass-pill hover:bg-white/50 text-neutral-800 cursor-pointer"
+          className="flex items-center justify-center gap-1.5 px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-full text-xs font-semibold transition-all active:scale-95 disabled:opacity-40 liquid-glass-pill hover:bg-white/50 text-neutral-800 cursor-pointer"
         >
           <span>Вперед</span>
-          <ChevronRight className="w-4 h-4" />
+          <ChevronRight className="w-4 h-4 shrink-0" />
         </button>
       </div>
     </div>

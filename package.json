@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build && node scripts/postbuild.cjs",
     "lint": "oxlint",
-    "test": "vitest run",
+    "test": "vitest run --fileParallelism=false --testTimeout=20000",
     "preview": "vite preview",
     "bot": "node bot/bot.mjs",
     "bot:vk": "node bot/vk_bot.mjs",

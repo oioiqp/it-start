@@ -260,12 +260,12 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                     }`}
                   >
                     {/* Header: Title, Order & Doc Link */}
-                    <div className="flex items-start justify-between gap-3 mb-2">
-                      <div className="flex items-center gap-2 flex-wrap">
+                    <div className="flex items-start justify-between gap-2.5 sm:gap-3 mb-2">
+                      <div className="flex items-center gap-2 flex-wrap min-w-0 flex-1">
                         <span className="text-xs font-semibold text-neutral-500 dark:text-neutral-400">
                           Узел #{idx + 1}
                         </span>
-                        <h4 className="text-sm sm:text-base font-bold text-neutral-900 dark:text-white transition-colors font-sans">
+                        <h4 className="text-sm sm:text-base font-bold text-neutral-900 dark:text-white transition-colors font-sans break-words">
                           {topic.title}
                         </h4>
                         <span className="px-2.5 py-0.5 rounded-full text-[10px] font-medium liquid-glass-pill text-neutral-700 dark:text-neutral-200">
@@ -526,15 +526,15 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                     }`}
                   >
                     {/* Header: Title, Order & Doc Link */}
-                    <div className="flex items-start justify-between gap-3 mb-2">
-                      <div className="flex items-center gap-2 flex-wrap">
+                    <div className="flex items-start justify-between gap-2.5 sm:gap-3 mb-2">
+                      <div className="flex items-center gap-2 flex-wrap min-w-0 flex-1">
                         <span className="text-xs font-semibold text-neutral-500 dark:text-neutral-400">
                           Узел #{nodeNumber}
                         </span>
                         <span className="px-2.5 py-0.5 rounded-full text-[10px] font-medium liquid-glass-pill text-neutral-700 dark:text-neutral-200">
                           {currentDirection.subTracks.find((s) => s.id === validSubTrack)?.name}
                         </span>
-                        <h4 className="text-sm sm:text-base font-bold text-neutral-900 dark:text-white transition-colors font-sans">
+                        <h4 className="text-sm sm:text-base font-bold text-neutral-900 dark:text-white transition-colors font-sans break-words">
                           {topic.title}
                         </h4>
                         <span className="px-2.5 py-0.5 rounded-full text-[10px] font-medium liquid-glass-pill text-neutral-700 dark:text-neutral-200">

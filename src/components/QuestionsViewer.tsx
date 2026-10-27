@@ -102,7 +102,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
   return (
     <div className="space-y-6">
       {/* Top Banner & Stats - Apple Minimalist Liquid Glass */}
-      <div className="rounded-[28px] sm:rounded-[32px] p-5 sm:p-6 flex flex-col md:flex-row items-center justify-between gap-4 transition-all duration-300 liquid-glass">
+      <div className="rounded-[28px] sm:rounded-[32px] p-4 sm:p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-all duration-300 liquid-glass">
         <div>
           <div className="flex items-center gap-2 mb-1 flex-wrap">
             <h2 className="text-lg sm:text-xl font-bold tracking-tight flex items-center gap-2 font-sans text-neutral-900 dark:text-white">
@@ -118,7 +118,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
         </div>
 
         {/* View Mode Switcher: 3 Modes (Segmented Capsule Control) */}
-        <div className="flex items-center p-1 rounded-full text-xs transition-colors liquid-glass-subtle max-w-full overflow-x-auto no-scrollbar shrink-0">
+        <div className="flex items-center p-1 rounded-full text-xs transition-colors liquid-glass-subtle max-w-full overflow-x-auto no-scrollbar shrink-0 touch-pan-x overscroll-x-contain">
           <button
             onClick={() => {
               triggerHaptic('selection');
@@ -181,7 +181,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
             />
           </div>
 
-          <div className="flex items-center gap-1.5 w-full sm:w-auto overflow-x-auto no-scrollbar shrink-0">
+          <div className="flex items-center gap-1.5 w-full sm:w-auto overflow-x-auto no-scrollbar shrink-0 touch-pan-x overscroll-x-contain pb-0.5 sm:pb-0">
             <button
               onClick={() => setStatusFilter('all')}
               className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 ${
@@ -218,7 +218,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
         </div>
 
         {/* Row 2: Directions pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1">
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1 touch-pan-x overscroll-x-contain">
           <button
             onClick={() => {
               setSelectedDirection('all');
@@ -252,7 +252,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
 
         {/* Row 3: Sub-tracks pills if direction chosen */}
         {selectedDirection !== 'all' && (
-          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1.5 border-t border-black/5 dark:border-white/5">
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1.5 border-t border-black/5 dark:border-white/5 touch-pan-x overscroll-x-contain">
             <button
               onClick={() => setSelectedSubTrack('all')}
               className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 ${

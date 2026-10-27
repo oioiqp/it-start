@@ -428,7 +428,7 @@ export function App() {
             {/* VK Mini App Profile Card (When opened inside VK) */}
             {/* Ultra-Compact Sleek Apple Liquid Glass Profile Capsule */}
             {vkUser && (
-              <div className="flex items-center justify-between gap-2.5 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-full liquid-glass border border-blue-500/20 shadow-xs transition-all duration-300">
+              <div className="flex items-center justify-between gap-2.5 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl sm:rounded-full liquid-glass border border-blue-500/20 shadow-xs transition-all duration-300">
                 <div className="flex items-center gap-2.5 min-w-0">
                   {vkUser.photo_100 || vkUser.photo_200 ? (
                     <img
@@ -466,14 +466,15 @@ export function App() {
                   title="Настроить уведомления ВКонтакте"
                 >
                   <Bot className="w-3.5 h-3.5" />
-                  <span className="text-xs font-semibold">Уведомления</span>
+                  <span className="sm:hidden text-xs font-semibold">Пуши</span>
+                  <span className="hidden sm:inline text-xs font-semibold">Уведомления</span>
                 </button>
               </div>
             )}
 
             {/* Telegram Mini App Profile Card (When opened inside Telegram) */}
             {telegramUser && !vkUser && (
-              <div className="flex items-center justify-between gap-2.5 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-full liquid-glass border border-sky-500/25 shadow-xs transition-all duration-300">
+              <div className="flex items-center justify-between gap-2.5 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl sm:rounded-full liquid-glass border border-sky-500/25 shadow-xs transition-all duration-300">
                 <div className="flex items-center gap-2.5 min-w-0">
                   {telegramUser.photo_url ? (
                     <img
@@ -516,14 +517,15 @@ export function App() {
                   title="Настроить уведомления в Telegram"
                 >
                   <Send className="w-3.5 h-3.5 text-sky-400" />
-                  <span className="text-xs font-semibold">Уведомления TG</span>
+                  <span className="sm:hidden text-xs font-semibold">Пуши TG</span>
+                  <span className="hidden sm:inline text-xs font-semibold">Уведомления TG</span>
                 </button>
               </div>
             )}
 
             {/* Ambient typography watermark behind cards - guaranteed single line */}
             <div className="absolute inset-x-0 -top-4 sm:-top-6 h-48 sm:h-96 flex items-center justify-center -z-10 pointer-events-none overflow-hidden select-none opacity-[0.035] blur-[0.5px]">
-              <span className="text-4xl xs:text-5xl sm:text-[120px] md:text-[160px] lg:text-[190px] font-black tracking-widest uppercase select-none leading-none text-slate-800 dark:text-white whitespace-nowrap shrink-0">
+              <span className="text-4xl sm:text-[120px] md:text-[160px] lg:text-[190px] font-black tracking-widest uppercase select-none leading-none text-slate-800 dark:text-white whitespace-nowrap shrink-0">
                 IT&#8209;СТАРТ
               </span>
             </div>
@@ -959,7 +961,12 @@ export function App() {
       />
 
       {/* Footer */}
-      <footer className="w-full py-8 px-4 sm:px-6 lg:px-8 text-xs mt-12 transition-colors border-t border-black/5 dark:border-white/5 liquid-glass-subtle text-neutral-600 dark:text-neutral-400">
+      <footer
+        className="w-full py-8 pb-[max(2rem,calc(env(safe-area-inset-bottom,0px)+1.5rem))] px-4 sm:px-6 lg:px-8 text-xs mt-12 transition-colors border-t border-black/5 dark:border-white/5 liquid-glass-subtle text-neutral-600 dark:text-neutral-400"
+        style={{
+          paddingBottom: 'max(2rem, calc(max(env(safe-area-inset-bottom, 0px), var(--vk-safe-area-bottom, 0px)) + 1.5rem))',
+        }}
+      >
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs tracking-tight shadow-xs

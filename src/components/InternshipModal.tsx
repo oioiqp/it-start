@@ -157,6 +157,10 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
         if (e.target === e.currentTarget) onClose();
       }}
       className="fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-[max(0.75rem,env(safe-area-inset-bottom))] liquid-modal-overlay overflow-y-auto overscroll-contain touch-pan-y modal-overlay-animation"
+      style={{
+        paddingTop: 'max(0.75rem, max(env(safe-area-inset-top, 0px), var(--vk-safe-area-top, 0px)))',
+        paddingBottom: 'max(0.75rem, max(env(safe-area-inset-bottom, 0px), var(--vk-safe-area-bottom, 0px)))',
+      }}
     >
       <div
         className="relative w-full max-w-3xl rounded-[24px] sm:rounded-[32px] p-4 sm:p-8 my-auto sm:my-8 max-h-[92vh] sm:max-h-[90vh] flex flex-col modal-enter-animation liquid-glass-modal text-neutral-900 dark:text-neutral-100 overflow-hidden shadow-2xl"
@@ -193,7 +197,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                   {internship.format}
                 </span>
               </div>
-              <h2 className="text-lg sm:text-2xl font-bold tracking-tight text-neutral-900 dark:text-white font-sans">
+              <h2 className="text-lg sm:text-2xl font-bold tracking-tight text-neutral-900 dark:text-white font-sans break-words">
                 План подготовки: {internship.title}
               </h2>
             </div>
@@ -265,12 +269,12 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                         : 'liquid-glass-subtle'
                     }`}
                   >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex items-start gap-3">
+                    <div className="flex items-start justify-between gap-2.5 sm:gap-3">
+                      <div className="flex items-start gap-2.5 sm:gap-3 min-w-0 flex-1">
                         <button
                           type="button"
                           onClick={() => handleToggleTopic(topic.id)}
-                          className="mt-0.5 text-neutral-400 hover:text-emerald-500 transition-colors"
+                          className="mt-0.5 text-neutral-400 hover:text-emerald-500 transition-colors shrink-0"
                           title={isDone ? 'Снять отметку' : 'Отметить тему как изученную'}
                         >
                           {isDone ? (
@@ -279,9 +283,9 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                             <Circle className="w-5 h-5 text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200" />
                           )}
                         </button>
-                        <div>
+                        <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-sm font-semibold text-neutral-900 dark:text-white font-sans">{topic.title}</span>
+                            <span className="text-sm font-semibold text-neutral-900 dark:text-white font-sans break-words">{topic.title}</span>
                             <span className="text-[10px] uppercase font-semibold px-2 py-0.5 rounded-full liquid-glass-pill text-neutral-700 dark:text-neutral-200">
                               {topic.category === 'core' ? 'База' : 'Стек'}
                             </span>
@@ -387,8 +391,8 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                         : 'liquid-glass-subtle'
                     }`}
                   >
-                    <div className="p-3.5 flex items-start justify-between gap-3">
-                      <div className="flex items-start gap-3 flex-1">
+                    <div className="p-3.5 flex items-start justify-between gap-2.5 sm:gap-3">
+                      <div className="flex items-start gap-2.5 sm:gap-3 flex-1 min-w-0">
                         <button
                           type="button"
                           onClick={() => handleToggleQuestion(q.id)}
@@ -402,15 +406,15 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                           )}
                         </button>
 
-                        <div className="cursor-pointer flex-1" onClick={() => setExpandedQuestionId(isExpanded ? null : q.id)}>
+                        <div className="cursor-pointer flex-1 min-w-0" onClick={() => setExpandedQuestionId(isExpanded ? null : q.id)}>
                           <div className="flex items-center gap-2 flex-wrap mb-1 text-[11px]">
                             <span className="font-semibold px-2 py-0.5 rounded-full bg-neutral-100 text-neutral-700 dark:bg-white/[0.06] dark:text-neutral-300">
                               {q.category}
                             </span>
                             <span className="text-neutral-500 dark:text-neutral-400">{q.difficulty}</span>
                           </div>
-                          <h4 className="text-sm font-semibold text-neutral-900 dark:text-white font-sans">{q.title}</h4>
-                          <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">{q.question}</p>
+                          <h4 className="text-sm font-semibold text-neutral-900 dark:text-white font-sans break-words">{q.title}</h4>
+                          <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1 break-words">{q.question}</p>
                         </div>
                       </div>
 
@@ -418,7 +422,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                         type="button"
                         onClick={() => setExpandedQuestionId(isExpanded ? null : q.id)}
                         aria-label={isExpanded ? 'Свернуть' : 'Развернуть'}
-                        className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-full transition-transform duration-150 active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-700 cursor-pointer"
+                        className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-full transition-transform duration-150 active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-700 cursor-pointer shrink-0"
                       >
                         {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                       </button>
@@ -426,7 +430,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
 
                     {isExpanded && (
                       <div className="px-4 pb-4 pt-2 border-t space-y-3 border-black/5 dark:border-white/5 liquid-glass-subtle rounded-b-2xl">
-                        <div className="text-xs leading-relaxed p-3.5 rounded-xl liquid-glass-pill text-neutral-900">
+                        <div className="text-xs leading-relaxed p-3.5 rounded-xl liquid-glass-pill text-neutral-900 break-words">
                           <span className="font-bold text-emerald-700 block mb-1">Эталонный ответ:</span>
                           {q.answer}
                         </div>
@@ -436,7 +440,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                             <div className="px-3 py-1 text-[11px] font-mono text-neutral-400 border-b border-neutral-800 bg-neutral-900">
                               {q.codeLanguage || 'code'}
                             </div>
-                            <pre className="p-3 text-xs font-mono text-neutral-200 overflow-x-auto">
+                            <pre className="p-3 text-xs font-mono text-neutral-200 overflow-x-auto touch-pan-x overscroll-x-contain">
                               <code>{q.codeSnippet}</code>
                             </pre>
                           </div>

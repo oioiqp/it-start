@@ -119,6 +119,9 @@ describe('16. Comprehensive Responsive & Adaptive Layout Suite', () => {
       expect(html).toContain('max-h-[92vh] sm:max-h-[90vh]');
       // Footer buttons wrap and expand on mobile
       expect(html).toContain('w-full sm:w-auto');
+      // Safe area padding for notches and native app bars (VK & TG Mini Apps)
+      expect(html).toContain('var(--vk-safe-area-top');
+      expect(html).toContain('var(--vk-safe-area-bottom');
       // Responsive button text: compact on mobile, detailed on desktop
       expect(html).toContain('sm:hidden truncate');
       expect(html).toContain('hidden sm:inline');
@@ -149,6 +152,9 @@ describe('16. Comprehensive Responsive & Adaptive Layout Suite', () => {
       expect(html).toContain('min(620px, 90vh)');
       // Platform toggle row has flex-wrap to avoid 320px overflow
       expect(html).toContain('px-1 flex-wrap');
+      // Safe area padding for notches and native app bars (VK & TG Mini Apps)
+      expect(html).toContain('var(--vk-safe-area-top');
+      expect(html).toContain('var(--vk-safe-area-bottom');
     });
   });
 
@@ -211,8 +217,59 @@ describe('16. Comprehensive Responsive & Adaptive Layout Suite', () => {
     });
   });
 
+  describe('FlashcardsTrainer Responsive Adaptation (320px - 1920px)', () => {
+    it('renders with flex-wrap controls, compact padding, and adaptive rating labels for narrow screens', async () => {
+      const { FlashcardsTrainer } = await import('../components/FlashcardsTrainer');
+      const html = renderToString(
+        React.createElement(FlashcardsTrainer, {
+          questions: QUESTIONS,
+          userProgress: mockUserProgress,
+          onMarkLearned: () => {},
+          onMarkRepeat: () => {},
+        })
+      );
+
+      // Top control bar has flex-wrap and min-w-0 to prevent button push-out on 320px
+      expect(html).toContain('flex items-center justify-between text-xs px-1 text-neutral-600 gap-2 flex-wrap');
+      expect(html).toContain('flex items-center gap-2 flex-wrap min-w-0');
+      // Compact p-4 on mobile gives usable width
+      expect(html).toContain('p-4 sm:p-8');
+      // Break-words for long question titles
+      expect(html).toContain('break-words');
+      // Adaptive action buttons with compact text on ultra-narrow viewports
+      expect(html).toContain('min-[380px]:inline');
+      expect(html).toContain('min-[380px]:hidden');
+      expect(html).toContain('Знаю отлично');
+      expect(html).toContain('Знаю');
+    });
+  });
+
+  describe('SelfCheckTrainer Responsive Adaptation (320px - 1920px)', () => {
+    it('adapts header, card padding, and action buttons for 320px screens', async () => {
+      const { SelfCheckTrainer } = await import('../components/SelfCheckTrainer');
+      const html = renderToString(
+        React.createElement(SelfCheckTrainer, {
+          questions: QUESTIONS,
+          userProgress: mockUserProgress,
+          onMarkLearned: () => {},
+          onMarkRepeat: () => {},
+        })
+      );
+
+      // Header navigation bar has flex-wrap
+      expect(html).toContain('p-3 sm:p-4 flex items-center justify-between gap-3 transition-colors liquid-glass flex-wrap');
+      // Adaptive card padding p-4 sm:p-7
+      expect(html).toContain('p-4 sm:p-7');
+      // Break-words on title and text
+      expect(html).toContain('break-words');
+      // Full-width submit button on mobile
+      expect(html).toContain('w-full sm:w-auto ml-auto');
+      expect(html).toContain('Проверить ответ');
+    });
+  });
+
   describe('App Viewport Adaptation & Touch Smoothness', () => {
-    it('ensures search container has min-w-0 and carousels have mobile touch scrolling classes', async () => {
+    it('ensures search container has min-w-0, carousels have mobile touch scrolling, and ambient watermark is resilient', async () => {
       const { App } = await import('../App');
       const html = renderToString(React.createElement(App));
 
@@ -223,6 +280,38 @@ describe('16. Comprehensive Responsive & Adaptive Layout Suite', () => {
       expect(html).toContain('overscroll-x-contain');
       // Footer links centered on mobile
       expect(html).toContain('justify-center md:justify-end');
+      // Footer accounts for safe area bottom inset
+      expect(html).toContain('safe-area-inset-bottom');
+      // Ambient watermark avoids non-standard Tailwind breakpoint and preserves non-breaking hyphen
+      expect(html).not.toContain('xs:text-5xl');
+      expect(html).toMatch(/IT[\u2011-]СТАРТ/);
+    });
+
+    it('renders Mini App profile capsule with rounded-2xl to rounded-full responsive geometry and compact labels', async () => {
+      (window as any).Telegram = {
+        WebApp: {
+          ready: () => {},
+          expand: () => {},
+          initDataUnsafe: {
+            user: {
+              id: 998877,
+              first_name: 'Алексей',
+              username: 'alex_dev',
+            },
+          },
+        },
+      };
+
+      const { App } = await import('../App');
+      const html = renderToString(React.createElement(App));
+
+      // Profile capsule adapts from rounded-2xl on mobile to rounded-full on desktop
+      expect(html).toContain('rounded-2xl sm:rounded-full');
+      // Adaptive compact push button labels
+      expect(html).toContain('Пуши TG');
+      expect(html).toContain('Уведомления TG');
+
+      delete (window as any).Telegram;
     });
   });
 });

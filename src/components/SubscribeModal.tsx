@@ -366,6 +366,10 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
         if (e.target === e.currentTarget) onClose();
       }}
       className="fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-[max(0.75rem,env(safe-area-inset-bottom))] liquid-modal-overlay overflow-y-auto overscroll-contain touch-pan-y modal-overlay-animation"
+      style={{
+        paddingTop: 'max(0.75rem, max(env(safe-area-inset-top, 0px), var(--vk-safe-area-top, 0px)))',
+        paddingBottom: 'max(0.75rem, max(env(safe-area-inset-bottom, 0px), var(--vk-safe-area-bottom, 0px)))',
+      }}
     >
       <div
         className="relative w-full max-w-xl rounded-[24px] sm:rounded-[32px] shadow-2xl p-4 sm:p-6 my-auto sm:my-8 modal-enter-animation liquid-glass-modal text-neutral-900 dark:text-neutral-100 flex flex-col h-[610px] sm:h-[620px] min-h-[580px] max-h-[92vh] sm:max-h-[88vh] overflow-hidden"
