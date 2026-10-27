@@ -53,29 +53,36 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
   // Inside TG -> Telegram notifications by default
   // Regular Web -> Telegram by default (with prominent dual-choice switch)
   const isInsideVk = Boolean(vkUser || isVk || isVkMiniApp());
-  const isInsideTg = Boolean(telegramUser || isTelegramWebApp());
   const initialPlatform: NotificationPlatform = isInsideVk ? 'vk' : 'telegram';
 
   const [platform, setPlatform] = useState<NotificationPlatform>(initialPlatform);
 
-  const [chatId, setChatId] = useState<string>(() => {
-    if (isInsideVk && vkUser) return String(vkUser.id);
-    if (isInsideTg && telegramUser) return String(telegramUser.id);
-    if (currentSubscription) return String(currentSubscription.chat_id);
-    return getSavedVkPeerId() || '';
-  });
-
-  const [username, setUsername] = useState<string>(() => {
-    if (isInsideVk && vkUser) return `${vkUser.first_name || ''} ${vkUser.last_name || ''}`.trim();
-    if (isInsideTg && telegramUser) return telegramUser.username || '';
-    if (currentSubscription) return currentSubscription.username || '';
+  // Dedicated separate states for Telegram and VK to eliminate cross-contamination
+  const [tgChatId, setTgChatId] = useState<string>(() => {
+    if (telegramUser) return String(telegramUser.id);
+    if (currentSubscription && !isInsideVk) return String(currentSubscription.chat_id);
     return '';
   });
 
-  const [firstName, setFirstName] = useState<string>(() => {
-    if (isInsideVk && vkUser?.first_name) return vkUser.first_name;
-    if (isInsideTg && telegramUser?.first_name) return telegramUser.first_name;
-    if (currentSubscription?.first_name) return currentSubscription.first_name;
+  const [tgUsername, setTgUsername] = useState<string>(() => {
+    if (telegramUser?.username) return telegramUser.username;
+    if (currentSubscription?.username && !isInsideVk) return currentSubscription.username;
+    return '';
+  });
+
+  const [tgFirstName, setTgFirstName] = useState<string>(() => {
+    if (telegramUser?.first_name) return telegramUser.first_name;
+    if (currentSubscription?.first_name && !isInsideVk) return currentSubscription.first_name;
+    return '';
+  });
+
+  const [vkPeerId, setVkPeerId] = useState<string>(() => {
+    if (vkUser) return String(vkUser.id);
+    return getSavedVkPeerId() || '';
+  });
+
+  const [vkFullName, setVkFullName] = useState<string>(() => {
+    if (vkUser) return `${vkUser.first_name || ''} ${vkUser.last_name || ''}`.trim();
     return '';
   });
 
@@ -114,62 +121,41 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
     if (inVk) {
       setPlatform('vk');
       if (vkUser) {
-        setChatId(String(vkUser.id));
-        setFirstName(vkUser.first_name || '');
-        setUsername(`${vkUser.first_name || ''} ${vkUser.last_name || ''}`.trim());
+        setVkPeerId(String(vkUser.id));
+        setVkFullName(`${vkUser.first_name || ''} ${vkUser.last_name || ''}`.trim());
       } else {
         const savedPeer = getSavedVkPeerId();
-        if (savedPeer) setChatId(savedPeer);
+        if (savedPeer) setVkPeerId(savedPeer);
       }
     } else if (inTg) {
       setPlatform('telegram');
       if (telegramUser) {
-        setChatId(String(telegramUser.id));
-        if (telegramUser.first_name) setFirstName(telegramUser.first_name);
-        if (telegramUser.username) setUsername(telegramUser.username);
+        setTgChatId(String(telegramUser.id));
+        if (telegramUser.username) setTgUsername(telegramUser.username);
+        if (telegramUser.first_name) setTgFirstName(telegramUser.first_name);
+      } else if (currentSubscription) {
+        setTgChatId(String(currentSubscription.chat_id));
+        if (currentSubscription.username) setTgUsername(currentSubscription.username);
+        if (currentSubscription.first_name) setTgFirstName(currentSubscription.first_name);
       }
     } else {
       // Standalone web mode
       if (currentSubscription && String(currentSubscription.chat_id).length > 0) {
-        setChatId(String(currentSubscription.chat_id));
-        if (currentSubscription.username) setUsername(currentSubscription.username);
-        if (currentSubscription.first_name) setFirstName(currentSubscription.first_name);
+        setTgChatId(String(currentSubscription.chat_id));
+        if (currentSubscription.username) setTgUsername(currentSubscription.username);
+        if (currentSubscription.first_name) setTgFirstName(currentSubscription.first_name);
       }
+      const savedVk = getSavedVkPeerId();
+      if (savedVk) setVkPeerId(savedVk);
     }
     setStatusMessage(null);
   }, [isOpen, vkUser, isVk, telegramUser, currentSubscription]);
 
-  // Switch between Telegram and VK notification channels
+  // Switch between Telegram and VK notification channels without losing input or cross-contaminating
   const handleSwitchPlatform = (targetPlatform: NotificationPlatform) => {
     triggerHaptic('selection');
     setPlatform(targetPlatform);
     setStatusMessage(null);
-
-    if (targetPlatform === 'vk') {
-      if (vkUser) {
-        setChatId(String(vkUser.id));
-        setFirstName(vkUser.first_name || '');
-        const fullName = `${vkUser.first_name || ''} ${vkUser.last_name || ''}`.trim();
-        setUsername(fullName);
-      } else {
-        const savedPeer = getSavedVkPeerId();
-        setChatId(savedPeer || '');
-        setUsername('');
-      }
-    } else {
-      if (telegramUser) {
-        setChatId(String(telegramUser.id));
-        if (telegramUser.username) setUsername(telegramUser.username);
-        if (telegramUser.first_name) setFirstName(telegramUser.first_name);
-      } else if (currentSubscription && !vkUser) {
-        setChatId(String(currentSubscription.chat_id));
-        if (currentSubscription.username) setUsername(currentSubscription.username);
-        if (currentSubscription.first_name) setFirstName(currentSubscription.first_name);
-      } else {
-        setChatId('');
-        setUsername('');
-      }
-    }
   };
 
   if (!isOpen) return null;
@@ -211,9 +197,9 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
     setIsDetecting(false);
 
     if (result.success && result.chatId) {
-      setChatId(String(result.chatId));
-      if (result.username) setUsername(result.username);
-      if (result.firstName) setFirstName(result.firstName);
+      setTgChatId(String(result.chatId));
+      if (result.username) setTgUsername(result.username);
+      if (result.firstName) setTgFirstName(result.firstName);
       setStatusMessage({
         type: 'success',
         text: `Chat ID успешно определен: ${result.chatId} (${result.username ? '@' + result.username : result.firstName || 'Пользователь'})! Подписка синхронизирована.`,
@@ -222,8 +208,8 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
 
       const subData: TelegramSubscription = {
         chat_id: String(result.chatId),
-        username: (result.username || username).trim(),
-        first_name: (result.firstName || firstName).trim(),
+        username: (result.username || tgUsername).trim(),
+        first_name: (result.firstName || tgFirstName).trim(),
         directions: selectedDirections,
         sub_tracks: selectedSubTracks,
         is_active: true,
@@ -241,7 +227,8 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
   };
 
   const handleTestNotification = async () => {
-    if (!chatId) {
+    const currentId = platform === 'vk' ? vkPeerId.trim() : tgChatId.trim();
+    if (!currentId) {
       setStatusMessage({
         type: 'error',
         text: platform === 'vk' ? 'Сначала укажите ваш VK ID' : 'Сначала укажите или определите ваш Telegram Chat ID',
@@ -257,7 +244,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
       const vkToken = getSavedVkToken();
 
       if (vkToken) {
-        const res = await sendVkMessage(chatId, testText, vkToken);
+        const res = await sendVkMessage(currentId, testText, vkToken);
         setIsLoading(false);
         if (res.success) {
           setStatusMessage({
@@ -290,7 +277,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
     }
 
     const testText = `<b>🚀 Тестовое уведомление от @${TELEGRAM_BOT_USERNAME}!</b>\n\nВы успешно подключили уведомления в сервисе <b>IT-Старт</b>.\n\nВыбранные направления: ${selectedDirections.join(', ')}\nВетки: ${selectedSubTracks.join(', ')}\n\nКак только появится новая стажировка под ваш стек, вы получите мгновенный пуш!`;
-    const res = await sendTelegramMessage(chatId, testText, botTokenInput.trim() || undefined);
+    const res = await sendTelegramMessage(currentId, testText, botTokenInput.trim() || undefined);
     setIsLoading(false);
 
     if (res.success) {
@@ -310,7 +297,11 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
 
   const handleSaveSubscription = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!chatId.trim()) {
+    const currentId = platform === 'vk' ? vkPeerId.trim() : tgChatId.trim();
+    const currentUsername = platform === 'vk' ? vkFullName.trim() : tgUsername.trim();
+    const currentFirstName = platform === 'vk' ? (vkUser?.first_name || vkFullName.trim()) : tgFirstName.trim();
+
+    if (!currentId) {
       setStatusMessage({
         type: 'error',
         text: platform === 'vk' ? 'Пожалуйста, укажите ваш VK ID' : 'Пожалуйста, укажите Telegram Chat ID',
@@ -334,9 +325,9 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
     }
 
     const subData: TelegramSubscription = {
-      chat_id: chatId.trim(),
-      username: username.trim(),
-      first_name: firstName.trim(),
+      chat_id: currentId,
+      username: currentUsername,
+      first_name: currentFirstName,
       directions: selectedDirections,
       sub_tracks: selectedSubTracks,
       is_active: true,
@@ -344,14 +335,11 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
     };
 
     if (platform === 'vk') {
-      saveVkPeerId(chatId.trim());
+      saveVkPeerId(currentId);
+    } else {
+      saveLocalSubscription(subData);
+      saveSubscriptionToSupabase(subData);
     }
-
-    // Save locally
-    saveLocalSubscription(subData);
-
-    // Save to Supabase
-    const savedToSupabase = await saveSubscriptionToSupabase(subData);
 
     setIsLoading(false);
     triggerHaptic('success');
@@ -360,9 +348,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
     onSubscriptionSaved(subData);
     setStatusMessage({
       type: 'success',
-      text: savedToSupabase
-        ? `Подписка успешно сохранена! Уведомления ${platform === 'vk' ? 'ВКонтакте' : 'в Telegram'} активированы.`
-        : `Подписка сохранена локально! Уведомления ${platform === 'vk' ? 'ВКонтакте' : 'в Telegram'} активированы.`,
+      text: `Подписка успешно сохранена! Уведомления ${platform === 'vk' ? 'ВКонтакте' : 'в Telegram'} активированы.`,
     });
 
     setTimeout(() => {
@@ -382,7 +368,8 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
       className="fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-[max(0.75rem,env(safe-area-inset-bottom))] liquid-modal-overlay overflow-y-auto overscroll-contain touch-pan-y modal-overlay-animation"
     >
       <div
-        className="relative w-full max-w-xl rounded-[24px] sm:rounded-[32px] shadow-2xl p-4 sm:p-6 my-auto sm:my-8 modal-enter-animation liquid-glass-modal text-neutral-900 dark:text-neutral-100 flex flex-col min-h-[580px] sm:min-h-[610px] max-h-[92vh] sm:max-h-[86vh]"
+        className="relative w-full max-w-xl rounded-[24px] sm:rounded-[32px] shadow-2xl p-4 sm:p-6 my-auto sm:my-8 modal-enter-animation liquid-glass-modal text-neutral-900 dark:text-neutral-100 flex flex-col h-[610px] sm:h-[620px] min-h-[580px] max-h-[92vh] sm:max-h-[88vh] overflow-hidden"
+        style={{ height: 'min(620px, 90vh)' }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
@@ -462,8 +449,8 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
         </div>
 
         {/* Scrollable Content Body with Fixed Footer */}
-        <form onSubmit={handleSaveSubscription} className="flex-1 flex flex-col justify-between overflow-hidden">
-          <div className="flex-1 overflow-y-auto no-scrollbar space-y-3.5 pr-0.5">
+        <form onSubmit={handleSaveSubscription} className="flex-1 flex flex-col min-h-0 justify-between overflow-hidden">
+          <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar space-y-3.5 pr-0.5">
             {/* Top User Profile or Detection Block */}
             {platform === 'vk' ? (
               vkUser ? (
@@ -526,8 +513,8 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
                       </label>
                       <input
                         type="text"
-                        value={chatId}
-                        onChange={(e) => setChatId(e.target.value)}
+                        value={vkPeerId}
+                        onChange={(e) => setVkPeerId(e.target.value)}
                         placeholder="например 482655491"
                         required
                         className="w-full px-3.5 py-2.5 rounded-xl text-base sm:text-sm transition-colors focus:outline-none liquid-glass-pill focus:bg-white/60 text-neutral-900 placeholder:text-neutral-400 border border-neutral-200/80"
@@ -539,8 +526,8 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
                       </label>
                       <input
                         type="text"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
+                        value={vkFullName}
+                        onChange={(e) => setVkFullName(e.target.value)}
                         placeholder="Имя Фамилия"
                         className="w-full px-3.5 py-2.5 rounded-xl text-base sm:text-sm transition-colors focus:outline-none liquid-glass-pill focus:bg-white/60 text-neutral-900 placeholder:text-neutral-400 border border-neutral-200/80"
                       />
@@ -618,8 +605,8 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
                       </label>
                       <input
                         type="text"
-                        value={chatId}
-                        onChange={(e) => setChatId(e.target.value)}
+                        value={tgChatId}
+                        onChange={(e) => setTgChatId(e.target.value)}
                         placeholder="например 123456789"
                         required
                         className="w-full px-3.5 py-2.5 rounded-xl text-base sm:text-sm transition-colors focus:outline-none liquid-glass-pill focus:bg-white/60 text-neutral-900 placeholder:text-neutral-400 border border-neutral-200/80"
@@ -631,8 +618,8 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
                       </label>
                       <input
                         type="text"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
+                        value={tgUsername}
+                        onChange={(e) => setTgUsername(e.target.value)}
                         placeholder="@username (необязательно)"
                         className="w-full px-3.5 py-2.5 rounded-xl text-base sm:text-sm transition-colors focus:outline-none liquid-glass-pill focus:bg-white/60 text-neutral-900 placeholder:text-neutral-400 border border-neutral-200/80"
                       />
@@ -798,7 +785,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
               <button
                 type="button"
                 onClick={handleTestNotification}
-                disabled={isLoading || !chatId}
+                disabled={isLoading || !(platform === 'vk' ? vkPeerId.trim() : tgChatId.trim())}
                 className="w-full sm:w-1/2 min-h-[44px] flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-transform duration-150 active:scale-95 disabled:opacity-50 liquid-glass-pill hover:bg-white/50 text-neutral-800 cursor-pointer"
               >
                 <Send className="w-3.5 h-3.5 text-neutral-600" />

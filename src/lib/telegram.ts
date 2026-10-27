@@ -49,16 +49,51 @@ export function parseTelegramUserFromRawString(raw?: string): TelegramUser | nul
       clean = clean.slice(1);
     }
     const params = new URLSearchParams(clean);
+
+    // 1. Direct query / hash parameter checks: tg_chat_id, chat_id, tg_user_id, tg_id
+    const directChatId =
+      params.get('tg_chat_id') ||
+      params.get('chat_id') ||
+      params.get('tg_user_id') ||
+      params.get('tg_id');
+    if (directChatId && /^\d+$/.test(directChatId)) {
+      const usernameParam = params.get('tg_username') || params.get('username') || '';
+      return {
+        id: Number(directChatId),
+        first_name: params.get('tg_first_name') || params.get('first_name') || 'Пользователь Telegram',
+        last_name: params.get('tg_last_name') || params.get('last_name') || undefined,
+        username: usernameParam ? usernameParam.replace(/^@/, '') : undefined,
+        photo_url: params.get('tg_photo_url') || params.get('photo_url') || undefined,
+      };
+    }
+
+    // 2. Check for user JSON string directly or inside tgWebAppData
     let userRaw = params.get('user');
     if (!userRaw && params.get('tgWebAppData')) {
       const nested = new URLSearchParams(params.get('tgWebAppData') || '');
       userRaw = nested.get('user');
+
+      // Nested direct chat_id check inside tgWebAppData
+      const nestedChatId = nested.get('tg_chat_id') || nested.get('chat_id') || nested.get('id');
+      if (!userRaw && nestedChatId && /^\d+$/.test(nestedChatId)) {
+        const nestedUsername = nested.get('username') || nested.get('tg_username') || '';
+        return {
+          id: Number(nestedChatId),
+          first_name: nested.get('first_name') || nested.get('tg_first_name') || 'Пользователь Telegram',
+          last_name: nested.get('last_name') || undefined,
+          username: nestedUsername ? nestedUsername.replace(/^@/, '') : undefined,
+        };
+      }
     }
+
     if (userRaw) {
       const decoded = decodeURIComponent(userRaw);
       const parsed = JSON.parse(decoded);
-      if (parsed && typeof parsed.id === 'number') {
-        return parsed as TelegramUser;
+      if (parsed && (typeof parsed.id === 'number' || (typeof parsed.id === 'string' && /^\d+$/.test(parsed.id)))) {
+        return {
+          ...parsed,
+          id: Number(parsed.id),
+        } as TelegramUser;
       }
     }
   } catch {
@@ -67,9 +102,19 @@ export function parseTelegramUserFromRawString(raw?: string): TelegramUser | nul
       if (match) {
         const decoded = decodeURIComponent(match[1]);
         const parsed = JSON.parse(decoded);
-        if (parsed && typeof parsed.id === 'number') {
-          return parsed as TelegramUser;
+        if (parsed && (typeof parsed.id === 'number' || (typeof parsed.id === 'string' && /^\d+$/.test(parsed.id)))) {
+          return {
+            ...parsed,
+            id: Number(parsed.id),
+          } as TelegramUser;
         }
+      }
+      const idMatch = raw.match(/(?:tg_chat_id|chat_id)=(\d+)/);
+      if (idMatch) {
+        return {
+          id: Number(idMatch[1]),
+          first_name: 'Пользователь Telegram',
+        };
       }
     } catch {}
   }
@@ -106,9 +151,13 @@ export function setCachedTelegramUser(user: TelegramUser | null): void {
 export function isTelegramWebApp(): boolean {
   if (typeof window === 'undefined') return false;
   if (window.Telegram?.WebApp?.initDataUnsafe?.user) return true;
+  if (window.Telegram?.WebApp?.initData && window.Telegram.WebApp.initData.length > 0) return true;
   if (typeof window.location !== 'undefined') {
-    if (window.location.hash?.includes('tgWebAppData') || window.location.search?.includes('tgWebAppData')) return true;
-    if (window.location.hash?.includes('tgWebAppVersion') || window.location.search?.includes('tgWebAppVersion')) return true;
+    const s = window.location.search || '';
+    const h = window.location.hash || '';
+    if (s.includes('tgWebAppData') || h.includes('tgWebAppData')) return true;
+    if (s.includes('tgWebAppVersion') || h.includes('tgWebAppVersion')) return true;
+    if (s.includes('tg_chat_id') || h.includes('tg_chat_id')) return true;
   }
   return false;
 }
@@ -136,18 +185,22 @@ export function initTelegramWebApp(): TelegramUser | null {
       console.warn('Error expanding Telegram WebApp:', e);
     }
 
-    if (webApp.initDataUnsafe?.user && typeof webApp.initDataUnsafe.user.id === 'number') {
-      user = webApp.initDataUnsafe.user;
+    if (webApp.initDataUnsafe?.user && (typeof webApp.initDataUnsafe.user.id === 'number' || typeof (webApp.initDataUnsafe.user as any).id === 'string')) {
+      const u = webApp.initDataUnsafe.user;
+      user = {
+        ...u,
+        id: Number(u.id),
+      };
     } else if (webApp.initData) {
       user = parseTelegramUserFromRawString(webApp.initData);
     }
   }
 
-  // Fallback to URL parameters (tgWebAppData in hash or search)
-  if (!user) {
+  // Fallback to URL parameters (search query string first, then hash)
+  if (!user && typeof window.location !== 'undefined') {
     user =
-      parseTelegramUserFromRawString(window.location.hash) ||
-      parseTelegramUserFromRawString(window.location.search);
+      parseTelegramUserFromRawString(window.location.search) ||
+      parseTelegramUserFromRawString(window.location.hash);
   }
 
   // Fallback to cached localStorage user

@@ -1469,6 +1469,36 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  if (urlPath === '/subscribe' && req.method === 'POST') {
+    let body = '';
+    req.on('data', (chunk) => {
+      body += chunk;
+    });
+    req.on('end', async () => {
+      try {
+        const parsed = JSON.parse(body || '{}');
+        const { chatId, username, firstName, directions, sub_tracks } = parsed;
+        if (!chatId) {
+          res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
+          res.end(JSON.stringify({ success: false, error: 'chatId is required' }));
+          return;
+        }
+        const sub = await registerTgSubscriber(chatId, {
+          username,
+          first_name: firstName,
+          directions,
+          sub_tracks,
+        });
+        res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+        res.end(JSON.stringify({ success: true, subscriber: sub }));
+      } catch (e) {
+        res.writeHead(500, { 'Content-Type': 'application/json; charset=utf-8' });
+        res.end(JSON.stringify({ success: false, error: e.message }));
+      }
+    });
+    return;
+  }
+
   if (urlPath === '/vk/status') {
     res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
     try {
@@ -2575,9 +2605,56 @@ export async function scanChannelsAndSyncSupabase(notifySubscribers = true) {
 }
 
 /**
+ * Register or update a Telegram subscriber in Supabase
+ */
+export async function registerTgSubscriber(chatId, meta = {}) {
+  const id = String(chatId);
+  const sub = {
+    chat_id: id,
+    username: meta.username || '',
+    first_name: meta.first_name || 'Пользователь Telegram',
+    directions: meta.directions || ['frontend', 'backend', 'mobile', 'qa', 'devops', 'data_science'],
+    sub_tracks: meta.sub_tracks || ['react', 'python', 'nodejs', 'golang', 'qa_auto', 'devops_cloud'],
+    is_active: true,
+    updated_at: new Date().toISOString(),
+  };
+
+  try {
+    const { error } = await supabase.from('tg_subscriptions').upsert(sub, { onConflict: 'chat_id' });
+    if (error) {
+      console.warn('[Telegram Bot] Ошибка сохранения подписчика в Supabase:', error.message);
+    } else {
+      console.log(`[Telegram Bot] ✅ Подписчик ${id} (@${meta.username || 'unknown'}) успешно сохранен в Supabase`);
+    }
+  } catch (err) {
+    console.warn('[Telegram Bot] Исключение при сохранении подписчика в Supabase:', err.message);
+  }
+
+  return sub;
+}
+
+/**
+ * Unregister a Telegram subscriber
+ */
+export async function unregisterTgSubscriber(chatId) {
+  const id = String(chatId);
+  try {
+    const { error } = await supabase.from('tg_subscriptions').update({ is_active: false }).eq('chat_id', id);
+    if (error) {
+      console.warn('[Telegram Bot] Ошибка отключения подписки в Supabase:', error.message);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.warn('[Telegram Bot] Исключение при отключении подписки в Supabase:', err.message);
+    return false;
+  }
+}
+
+/**
  * Handle incoming user messages
  */
-async function handleMessage(msg) {
+export async function handleMessage(msg) {
   const chatId = msg.chat?.id;
   const text = msg.text || '';
   const firstName = msg.from?.first_name || 'Разработчик';
@@ -2588,15 +2665,25 @@ async function handleMessage(msg) {
 
   // /start command
   if (text.startsWith('/start')) {
+    // Auto-register subscriber in Supabase
+    await registerTgSubscriber(chatId, {
+      username: msg.from?.username || '',
+      first_name: firstName,
+    });
+
+    const webAppUrlWithParams = `${WEBAPP_URL}${WEBAPP_URL.includes('?') ? '&' : '?'}tg_chat_id=${chatId}&tg_username=${encodeURIComponent(msg.from?.username || '')}&tg_first_name=${encodeURIComponent(firstName || '')}&subscribed=1#tg_chat_id=${chatId}`;
+
     const welcomeText =
       `👋 <b>Привет, ${firstName}!</b>\n\n` +
-      `Добро пожаловать в <b>IT-Старт</b> — платформу для подготовки к IT-стажировкам и Junior-вакансиям!\n\n` +
+      `✅ <b>Вы автоматически подписаны на уведомления IT-Старт!</b>\n` +
+      `Ваш Telegram Chat ID: <code>${chatId}</code>\n\n` +
+      `Теперь вы будете мгновенно получать персональные пуши о новых стажировках и Junior-вакансиях компаний Т1, Контур, Т-Банк, Directum, Яндекс, Ozon, Сбер, Авито и VK.\n\n` +
       `🎯 <b>Что доступно прямо сейчас:</b>\n` +
       `• <b>Интерактивный WebApp</b> — роадмапы в стиле roadmap.sh, тренажёр собеседований и база стажировок\n` +
       `• <b>Отслеживание компаний</b> — Т1, Контур, Т-Банк, Directum, Яндекс, Ozon, Сбер, Авито, VK\n` +
       `• <b>Мониторинг Telegram-каналов</b> — автоматический парсинг вакансий и персональные пуш-уведомления\n` +
-      `• <b>Тренажёр интервью</b> — 70+ вопросов с эталонными ответами и самопроверкой\n\n` +
-      `Нажмите кнопку ниже, чтобы запустить приложение!`;
+      `• <b>Тренажёр интервью</b> — 55+ вопросов с эталонными ответами и самопроверкой\n\n` +
+      `Нажмите кнопку ниже, чтобы открыть приложение (уведомления уже активны, ID подставлен автоматически)!`;
 
     await callTelegram('sendMessage', {
       chat_id: chatId,
@@ -2607,7 +2694,7 @@ async function handleMessage(msg) {
           [
             {
               text: '🚀 Запустить IT-Старт WebApp',
-              web_app: { url: WEBAPP_URL },
+              web_app: { url: webAppUrlWithParams },
             },
           ],
           [
@@ -2624,6 +2711,58 @@ async function handleMessage(msg) {
           ],
         ],
       },
+    });
+    return;
+  }
+
+  // /subscribe command
+  if (text.startsWith('/subscribe')) {
+    await registerTgSubscriber(chatId, {
+      username: msg.from?.username || '',
+      first_name: firstName,
+    });
+    const webAppUrlWithParams = `${WEBAPP_URL}${WEBAPP_URL.includes('?') ? '&' : '?'}tg_chat_id=${chatId}&tg_username=${encodeURIComponent(msg.from?.username || '')}&tg_first_name=${encodeURIComponent(firstName || '')}&subscribed=1#tg_chat_id=${chatId}`;
+    await callTelegram('sendMessage', {
+      chat_id: chatId,
+      text:
+        `🔔 <b>Уведомления успешно подключены!</b>\n\n` +
+        `Ваш Telegram Chat ID: <code>${chatId}</code>\n` +
+        `Вы подписаны на все направления стажировок (Frontend, Backend, Mobile, QA, DevOps, Data Science).\n\n` +
+        `Чтобы настроить конкретные направления, откройте приложение IT-Старт:`,
+      parse_mode: 'HTML',
+      reply_markup: {
+        inline_keyboard: [
+          [
+            {
+              text: '🚀 Настроить направления в WebApp',
+              web_app: { url: webAppUrlWithParams },
+            },
+          ],
+        ],
+      },
+    });
+    return;
+  }
+
+  // /unsubscribe command
+  if (text.startsWith('/unsubscribe')) {
+    await unregisterTgSubscriber(chatId);
+    await callTelegram('sendMessage', {
+      chat_id: chatId,
+      text:
+        `🔕 <b>Вы отписались от уведомлений IT-Старт.</b>\n\n` +
+        `Чтобы возобновить подписку, отправьте /subscribe или /start.`,
+      parse_mode: 'HTML',
+    });
+    return;
+  }
+
+  // /id or /myid command
+  if (text.startsWith('/id') || text.startsWith('/myid')) {
+    await callTelegram('sendMessage', {
+      chat_id: chatId,
+      text: `🆔 Ваш Telegram Chat ID: <code>${chatId}</code>\nUsername: @${msg.from?.username || 'не указан'}`,
+      parse_mode: 'HTML',
     });
     return;
   }
@@ -3025,6 +3164,9 @@ async function sendHelp(chatId) {
   const text =
     `ℹ️ <b>Команды бота @${BOT_USERNAME}:</b>\n\n` +
     `/start — Главное меню и запуск WebApp\n` +
+    `/subscribe — Включить персональные пуш-уведомления о стажировках\n` +
+    `/unsubscribe — Отключить получение уведомлений\n` +
+    `/id — Узнать свой Telegram Chat ID\n` +
     `/vacancies — Каталог стажировок с фильтром по компаниям (например: <code>/vacancies t1</code> или <code>/vacancies directum</code>)\n` +
     `/companies — Список целевых IT-компаний и каналов\n` +
     `/parse, /sync — Запустить сканирование Telegram-каналов и сайтов с синхронизацией\n` +

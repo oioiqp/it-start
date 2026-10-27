@@ -33,6 +33,7 @@ import {
   fetchInternshipsFromSupabase,
   seedInternshipsToSupabase,
   saveUserProgressToSupabase,
+  saveSubscriptionToSupabase,
   TELEGRAM_BOT_USERNAME,
   TELEGRAM_BOT_URL,
   GITHUB_PAGES_URL,
@@ -41,6 +42,7 @@ import {
   getCachedInternships,
   getLocalProgress,
   getLocalSubscription,
+  saveLocalSubscription,
   saveCachedInternships,
   saveLocalProgress,
   saveLocalTheme,
@@ -124,10 +126,33 @@ export function App() {
 
   // Initialize Telegram WebApp, VK Mini App & Supabase
   useEffect(() => {
+    const syncTelegramAutoSubscription = (u: TelegramUser) => {
+      const existing = getLocalSubscription();
+      if (!existing || String(existing.chat_id) !== String(u.id) || !existing.is_active) {
+        const autoSub: TelegramSubscription = {
+          chat_id: String(u.id),
+          username: u.username || existing?.username || '',
+          first_name: u.first_name || existing?.first_name || 'Пользователь Telegram',
+          directions: existing?.directions?.length
+            ? existing.directions
+            : ['frontend', 'backend', 'mobile', 'qa', 'devops', 'data_science'],
+          sub_tracks: existing?.sub_tracks?.length
+            ? existing.sub_tracks
+            : ['react', 'python', 'nodejs', 'golang', 'auto_qa', 'cicd_docker'],
+          is_active: true,
+          created_at: existing?.created_at || new Date().toISOString(),
+        };
+        saveLocalSubscription(autoSub);
+        setCurrentSubscription(autoSub);
+        saveSubscriptionToSupabase(autoSub);
+      }
+    };
+
     // 1. Detect Telegram WebApp
     const user = initTelegramWebApp();
     if (user) {
       setTelegramUser(user);
+      syncTelegramAutoSubscription(user);
     } else {
       let checks = 0;
       const interval = setInterval(() => {
@@ -135,8 +160,9 @@ export function App() {
         const delayedUser = initTelegramWebApp();
         if (delayedUser) {
           setTelegramUser(delayedUser);
+          syncTelegramAutoSubscription(delayedUser);
           clearInterval(interval);
-        } else if (checks >= 10) {
+        } else if (checks >= 20) {
           clearInterval(interval);
         }
       }, 150);

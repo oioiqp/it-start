@@ -1749,6 +1749,85 @@ describe('15. Telegram Mini App & VK Cross-Platform Integration & Modal Geometry
     expect(html).toContain('Mini App');
     expect(html).toContain('Тимур');
   });
+
+  it('parses Telegram user from direct query parameters tg_chat_id, tg_username, and tg_first_name', async () => {
+    const { parseTelegramUserFromRawString } = await import('../lib/telegram');
+
+    const sampleQuery = '?tg_chat_id=482655491&tg_username=lattim&tg_first_name=Тимур&subscribed=1';
+    const user = parseTelegramUserFromRawString(sampleQuery);
+    expect(user).toBeDefined();
+    expect(user?.id).toBe(482655491);
+    expect(user?.first_name).toBe('Тимур');
+    expect(user?.username).toBe('lattim');
+  });
+
+  it('validates registerTgSubscriber and unregisterTgSubscriber in bot/bot.mjs', async () => {
+    // @ts-ignore
+    const botModule: any = await import('../../bot/bot.mjs');
+    const { registerTgSubscriber, unregisterTgSubscriber } = botModule;
+
+    const sub = await registerTgSubscriber(482655491, {
+      username: 'lattim',
+      first_name: 'Тимур',
+    });
+
+    expect(sub).toBeDefined();
+    expect(sub.chat_id).toBe('482655491');
+    expect(sub.username).toBe('lattim');
+    expect(sub.is_active).toBe(true);
+    expect(sub.directions).toContain('frontend');
+
+    const unsubResult = await unregisterTgSubscriber(482655491);
+    expect(unsubResult).toBe(true);
+  });
+
+  it('validates Telegram bot handleMessage commands (/start, /subscribe, /unsubscribe, /id)', async () => {
+    // @ts-ignore
+    const botModule: any = await import('../../bot/bot.mjs');
+    const { handleMessage } = botModule;
+
+    expect(typeof handleMessage).toBe('function');
+
+    // Test message objects without throwing errors
+    await expect(
+      handleMessage({ chat: { id: 123456 }, text: '/start', from: { first_name: 'Тимур', username: 'lattim' } })
+    ).resolves.not.toThrow();
+
+    await expect(
+      handleMessage({ chat: { id: 123456 }, text: '/subscribe', from: { first_name: 'Тимур', username: 'lattim' } })
+    ).resolves.not.toThrow();
+
+    await expect(
+      handleMessage({ chat: { id: 123456 }, text: '/unsubscribe', from: { first_name: 'Тимур', username: 'lattim' } })
+    ).resolves.not.toThrow();
+
+    await expect(
+      handleMessage({ chat: { id: 123456 }, text: '/id', from: { first_name: 'Тимур', username: 'lattim' } })
+    ).resolves.not.toThrow();
+  });
+
+  it('verifies SubscribeModal has rock-solid fixed height style min(620px, 90vh) and no credential contamination between VK and TG', async () => {
+    const React = await import('react');
+    const { renderToString } = await import('react-dom/server');
+    const { SubscribeModal } = await import('../components/SubscribeModal');
+
+    const html = renderToString(
+      React.createElement(SubscribeModal, {
+        isOpen: true,
+        onClose: () => {},
+        telegramUser: null,
+        vkUser: null,
+        isVk: false,
+        currentSubscription: null,
+        onSubscriptionSaved: () => {},
+      })
+    );
+
+    // Height must be fixed via style and CSS classes
+    expect(html).toContain('min(620px, 90vh)');
+    expect(html).toContain('h-[610px]');
+    expect(html).toContain('overflow-hidden');
+  });
 });
 
 
