@@ -83,6 +83,9 @@ const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || process.argv[2] || '';
 const GITHUB_PAGES_URL = 'https://oioiqp.github.io/it-start/';
 const BOT_USERNAME = 'IT_start_izh_bot';
 const PORT = process.env.PORT || 3000;
+const __botFilename = fileURLToPath(import.meta.url);
+const __botDirname = path.dirname(__botFilename);
+export const DIST_DIR = path.resolve(__botDirname, '..', 'dist');
 
 // Supabase configuration
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://pmgsymacvhzsixbpndsn.supabase.co';
@@ -1430,6 +1433,63 @@ const server = http.createServer(async (req, res) => {
       res.end(JSON.stringify({ status: 'standby', bot: 'IT-Старт VK Бот' }));
     }
     return;
+  }
+
+  // -------------------------------------------------------------
+  // Static Web File Serving for Render (Enables VPN-free access in Russia & VK Mini App)
+  // -------------------------------------------------------------
+  if (fs.existsSync(DIST_DIR)) {
+    let cleanPath = urlPath.replace(/^\/it-start\/?/, '/');
+    if (cleanPath === '' || cleanPath === '/') {
+      cleanPath = '/index.html';
+    }
+
+    const safePath = path.normalize(cleanPath).replace(/^(\.\.[/\\])+/, '');
+    const candidateFile = path.join(DIST_DIR, safePath);
+
+    const MIME_TYPES = {
+      '.html': 'text/html; charset=utf-8',
+      '.js': 'application/javascript; charset=utf-8',
+      '.mjs': 'application/javascript; charset=utf-8',
+      '.css': 'text/css; charset=utf-8',
+      '.json': 'application/json; charset=utf-8',
+      '.svg': 'image/svg+xml',
+      '.png': 'image/png',
+      '.jpg': 'image/jpeg',
+      '.jpeg': 'image/jpeg',
+      '.gif': 'image/gif',
+      '.ico': 'image/x-icon',
+      '.webp': 'image/webp',
+      '.woff2': 'font/woff2',
+      '.woff': 'font/woff',
+      '.ttf': 'font/ttf',
+      '.txt': 'text/plain; charset=utf-8',
+    };
+
+    if (fs.existsSync(candidateFile) && fs.statSync(candidateFile).isFile()) {
+      const ext = path.extname(candidateFile).toLowerCase();
+      const contentType = MIME_TYPES[ext] || 'application/octet-stream';
+      const isImmutableAsset = cleanPath.startsWith('/assets/');
+
+      res.writeHead(200, {
+        'Content-Type': contentType,
+        'Cache-Control': isImmutableAsset ? 'public, max-age=31536000, immutable' : 'no-cache',
+      });
+      fs.createReadStream(candidateFile).pipe(res);
+      return;
+    }
+
+    // SPA Fallback: if not an asset request (no file extension), return dist/index.html
+    const hasExtension = path.extname(cleanPath).length > 0;
+    const indexHtml = path.join(DIST_DIR, 'index.html');
+    if (!hasExtension && fs.existsSync(indexHtml)) {
+      res.writeHead(200, {
+        'Content-Type': 'text/html; charset=utf-8',
+        'Cache-Control': 'no-cache',
+      });
+      fs.createReadStream(indexHtml).pipe(res);
+      return;
+    }
   }
 
   res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });

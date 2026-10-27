@@ -44,14 +44,14 @@ export const Navbar: React.FC<NavbarProps> = ({
   ];
 
   return (
-    <header className="sticky top-2.5 sm:top-4 z-50 flex items-center justify-center px-3 sm:px-4 w-full pointer-events-none">
+    <header className="sticky top-2 sm:top-4 z-50 flex items-center justify-center px-2 sm:px-4 w-full pointer-events-none">
       <div
         className="pointer-events-auto flex items-center justify-between gap-1 sm:gap-2 p-1.5 sm:p-2 rounded-full transition-transform duration-300 max-w-5xl w-full sm:w-auto liquid-glass-nav"
       >
         {/* Brand / Logo (Minimalist & Clean) */}
         <div
           onClick={() => handleTabClick('internships')}
-          className="flex items-center gap-2 pl-2 pr-1.5 sm:pr-2.5 py-1 cursor-pointer select-none group shrink-0"
+          className="flex items-center gap-1.5 pl-1.5 pr-1 sm:pr-2.5 py-1 cursor-pointer select-none group shrink-0"
           title="IT-Старт Главная"
         >
           <div
@@ -68,7 +68,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Subtle Divider */}
         <div className="h-4 w-px shrink-0 mx-0.5 bg-black/10 dark:bg-white/10" />
 
-        {/* Center Navigation Tabs - Uniform style, height and rounded-full pill indicator */}
+        {/* Center Navigation Tabs - Responsive Dynamic Island (Active label + sleek compact icons on mobile) */}
         <nav className="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5 px-0.5">
           {navTabs.map((tab) => {
             const isActive = activeTab === tab.id;
@@ -77,14 +77,15 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 key={tab.id}
                 onClick={() => handleTabClick(tab.id)}
-                className={`flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-transform duration-150 active:scale-95 ${
+                className={`flex items-center gap-1.5 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 active:scale-95 shrink-0 ${
                   isActive
                     ? 'bg-neutral-900 text-white shadow-xs dark:bg-white dark:text-black'
                     : 'text-neutral-700 hover:text-neutral-950 hover:bg-white/40 dark:text-neutral-300 dark:hover:text-white dark:hover:bg-white/10'
                 }`}
+                title={tab.label}
               >
-                <Icon className="w-3.5 h-3.5" />
-                <span>{tab.label}</span>
+                <Icon className="w-3.5 h-3.5 shrink-0" />
+                <span className={isActive ? 'inline' : 'hidden sm:inline'}>{tab.label}</span>
               </button>
             );
           })}
@@ -97,7 +98,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div className="flex items-center gap-1.5 shrink-0 pr-1">
           {vkUser ? (
             <div
-              className="flex items-center gap-1.5 pl-1.5 pr-2.5 py-1 rounded-full bg-blue-50/80 dark:bg-blue-950/40 border border-blue-500/20 text-neutral-900 dark:text-white select-none shrink-0"
+              className="flex items-center gap-1.5 pl-1.5 pr-2 sm:pr-2.5 py-1 rounded-full bg-blue-50/80 dark:bg-blue-950/40 border border-blue-500/20 text-neutral-900 dark:text-white select-none shrink-0"
               title={`VK: ${vkUser.first_name || ''} ${vkUser.last_name || ''} (ID: ${vkUser.id})`}
             >
               {vkUser.photo_100 || vkUser.photo_200 ? (
@@ -114,13 +115,13 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span className="text-xs font-semibold hidden md:inline truncate max-w-[100px]">
                 {vkUser.first_name || 'VK'}
               </span>
-              <span className="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-blue-500/10 text-blue-600 border border-blue-500/20">
+              <span className="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-blue-500/10 text-blue-600 border border-blue-500/20 hidden sm:inline">
                 Mini App
               </span>
             </div>
           ) : telegramUser ? (
             <div
-              className="flex items-center gap-1.5 pl-2 pr-2.5 py-1 rounded-full bg-sky-50/80 dark:bg-sky-950/40 border border-sky-500/20 text-neutral-900 dark:text-white select-none shrink-0"
+              className="flex items-center gap-1.5 pl-1.5 pr-2 sm:pr-2.5 py-1 rounded-full bg-sky-50/80 dark:bg-sky-950/40 border border-sky-500/20 text-neutral-900 dark:text-white select-none shrink-0"
               title={`Telegram: ${telegramUser.first_name || ''} (@${telegramUser.username || ''})`}
             >
               <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-sky-600 text-white font-bold text-[10px] flex items-center justify-center">
@@ -137,7 +138,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               triggerHaptic('medium');
               onOpenSubscribeModal();
             }}
-            className="flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full font-semibold text-xs transition-transform duration-150 active:scale-95 shadow-xs
+            className="flex items-center gap-1 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full font-semibold text-xs transition-transform duration-150 active:scale-95 shadow-xs shrink-0
               bg-neutral-900 hover:bg-black text-white dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-100"
             title={
               vkUser
@@ -149,7 +150,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
             <Bot className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">{vkUser ? 'VK Бот' : 'Бот в TG'}</span>
-            <span className="sm:hidden font-medium">{vkUser ? 'VK' : 'TG'}</span>
+            <span className="sm:hidden font-medium text-[11px]">{vkUser ? 'VK' : 'TG'}</span>
           </button>
         </div>
       </div>

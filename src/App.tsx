@@ -6,6 +6,7 @@ import {
   Bot,
   RefreshCw,
   X,
+  SlidersHorizontal,
 } from 'lucide-react';
 import type {
   DirectionId,
@@ -79,6 +80,7 @@ export function App() {
   const [selectedSubTrack, setSelectedSubTrack] = useState<SubTrackId | 'all'>('all');
   const [selectedFormat, setSelectedFormat] = useState<WorkFormat | 'all'>('all');
   const [selectedSource, setSelectedSource] = useState<'all' | 'telegram' | 'portal'>('all');
+  const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState<boolean>(false);
 
   const TARGET_COMPANIES = [
     'Т-Банк',
@@ -427,36 +429,37 @@ export function App() {
             </div>
 
             {/* Hero Header - Apple Liquid Glass Minimalist */}
-            <div className="relative pt-2 sm:pt-6 pb-2 sm:pb-3 text-center space-y-2.5 select-none">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-[11px] font-semibold liquid-glass-pill text-neutral-800 dark:text-neutral-200">
+            <div className="relative pt-2 sm:pt-6 pb-2 text-center space-y-2 select-none">
+              <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold liquid-glass-pill text-neutral-800 dark:text-neutral-200">
                 <span className="w-1.5 h-1.5 rounded-full bg-neutral-600 dark:bg-neutral-400" />
-                <span>IT Start Web • Агрегатор стажировок IT-компаний РФ</span>
+                <span className="hidden sm:inline">IT Start Web • Агрегатор стажировок IT-компаний РФ</span>
+                <span className="sm:hidden">IT-Старт • Проверенные IT-стажировки</span>
               </div>
               <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight font-sans text-neutral-900 dark:text-white">
                 Агрегатор IT-стажировок
               </h1>
               <p className="text-xs sm:text-sm font-normal leading-relaxed max-w-xl mx-auto text-neutral-600 dark:text-neutral-300">
-                Интерактивная дорожная карта • Тренажёры • Проверенные позиции
+                100% реальные вакансии • Роадмапы • 55+ вопросов к собеседованиям
               </p>
             </div>
 
-            {/* Filter and Search Panel - Liquid Glass Capsule */}
-            <div className="rounded-[28px] sm:rounded-[32px] p-5 sm:p-7 space-y-4 liquid-glass">
-              {/* Row 1: Search & Reset */}
-              <div className="flex flex-col sm:flex-row items-center gap-3">
-                <div className="relative w-full sm:flex-1 group">
-                  <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-neutral-500 dark:text-neutral-400 pointer-events-none transition-colors group-focus-within:text-neutral-950 dark:group-focus-within:text-white" />
+            {/* Filter and Search Panel - Mobile-First Liquid Glass Capsule */}
+            <div className="rounded-[24px] sm:rounded-[32px] p-4 sm:p-6 space-y-3 sm:space-y-4 liquid-glass">
+              {/* Row 1: Search & Filter Toggles */}
+              <div className="flex items-center gap-2">
+                <div className="relative flex-1 group">
+                  <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-500 dark:text-neutral-400 pointer-events-none transition-colors group-focus-within:text-neutral-950 dark:group-focus-within:text-white" />
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Поиск по названию, компании или технологиям (React, Python, Go, C#, QA)..."
-                    className="w-full pl-11 pr-10 py-3 rounded-full text-xs sm:text-sm font-normal transition-all focus:outline-none liquid-glass-subtle focus:bg-white/50 text-neutral-900 placeholder:text-neutral-500 dark:text-white dark:placeholder:text-neutral-400"
+                    placeholder="Поиск вакансий, стека или компаний..."
+                    className="w-full pl-10 pr-9 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-normal transition-all focus:outline-none liquid-glass-subtle focus:bg-white/50 text-neutral-900 placeholder:text-neutral-500 dark:text-white dark:placeholder:text-neutral-400"
                   />
                   {searchQuery && (
                     <button
                       onClick={() => setSearchQuery('')}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 rounded-full text-neutral-500 hover:text-neutral-950 dark:hover:text-white transition-colors"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full text-neutral-500 hover:text-neutral-950 dark:hover:text-white transition-colors"
                       title="Очистить поиск"
                     >
                       <X className="w-3.5 h-3.5" />
@@ -464,9 +467,33 @@ export function App() {
                   )}
                 </div>
 
-                <div className="flex items-center gap-2 w-full sm:w-auto shrink-0">
+                {/* Mobile Filters Toggle Button */}
+                <button
+                  onClick={() => {
+                    triggerHaptic('selection');
+                    setIsMobileFiltersOpen(!isMobileFiltersOpen);
+                  }}
+                  className={`flex items-center gap-1.5 px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 shrink-0 ${
+                    (selectedCompany !== 'all' || selectedFormat !== 'all' || selectedSource !== 'all' || isMobileFiltersOpen)
+                      ? 'bg-neutral-900 text-white shadow-xs dark:bg-white dark:text-neutral-950'
+                      : 'liquid-glass-pill hover:bg-white/50 text-neutral-700 dark:text-neutral-300'
+                  }`}
+                  title="Все фильтры (Работодатели, Формат, Источник)"
+                >
+                  <SlidersHorizontal className="w-3.5 h-3.5" />
+                  <span>Фильтры</span>
+                  {(selectedCompany !== 'all' || selectedFormat !== 'all' || selectedSource !== 'all') && (
+                    <span className="w-4 h-4 rounded-full bg-white text-neutral-950 text-[10px] font-bold flex items-center justify-center">
+                      {(selectedCompany !== 'all' ? 1 : 0) + (selectedFormat !== 'all' ? 1 : 0) + (selectedSource !== 'all' ? 1 : 0)}
+                    </span>
+                  )}
+                </button>
+
+                {/* Reset Filters button if any active */}
+                {(searchQuery || selectedCompany !== 'all' || selectedDirection !== 'all' || selectedSubTrack !== 'all' || selectedFormat !== 'all' || selectedSource !== 'all') && (
                   <button
                     onClick={() => {
+                      triggerHaptic('light');
                       setSearchQuery('');
                       setSelectedCompany('all');
                       setSelectedDirection('all');
@@ -474,54 +501,50 @@ export function App() {
                       setSelectedFormat('all');
                       setSelectedSource('all');
                     }}
-                    className="w-full sm:w-auto px-5 py-3 rounded-full text-xs font-semibold transition-all duration-150 active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-700 dark:text-neutral-300"
+                    className="p-2.5 sm:px-3 sm:py-3 rounded-full text-xs font-semibold transition-all duration-150 active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-700 dark:text-neutral-300 shrink-0"
+                    title="Сбросить все фильтры"
                   >
-                    Сбросить фильтры
+                    <X className="w-3.5 h-3.5" />
+                    <span className="hidden md:inline ml-1">Сброс</span>
                   </button>
-                </div>
+                )}
               </div>
 
-              {/* Row 2: Company Filter */}
-              <div className="space-y-2 pt-2 border-t border-black/5 dark:border-white/5">
-                <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-neutral-600 dark:text-neutral-400">
-                  <span className="flex items-center gap-1.5">
-                    <Building2 className="w-3.5 h-3.5 text-neutral-600 dark:text-neutral-400" />
-                    Работодатель (Топ IT-компании):
-                  </span>
-                  {selectedCompany !== 'all' && (
+              {/* Row 2: Direction tabs (Swipeable Pill Carousel) */}
+              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+                <button
+                  onClick={() => {
+                    triggerHaptic('selection');
+                    setSelectedDirection('all');
+                    setSelectedSubTrack('all');
+                  }}
+                  className={`px-3 sm:px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 shrink-0 ${
+                    selectedDirection === 'all'
+                      ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-xs'
+                      : 'liquid-glass-pill hover:bg-white/50 text-neutral-700 dark:text-neutral-300'
+                  }`}
+                >
+                  Все ({internships.length})
+                </button>
+                {DIRECTIONS.map((dir) => {
+                  const isSelected = selectedDirection === dir.id;
+                  const count = internships.filter((item) => item.directionId === dir.id).length;
+                  return (
                     <button
-                      onClick={() => setSelectedCompany('all')}
-                      className="text-xs text-neutral-800 hover:text-black dark:text-neutral-300 dark:hover:text-white normal-case font-semibold underline decoration-neutral-400"
+                      key={dir.id}
+                      onClick={() => {
+                        triggerHaptic('selection');
+                        setSelectedDirection(isSelected ? 'all' : dir.id);
+                        setSelectedSubTrack('all');
+                      }}
+                      className={`px-3 sm:px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 shrink-0 flex items-center gap-1.5 ${
+                        isSelected
+                          ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-xs'
+                          : 'liquid-glass-pill hover:bg-white/50 text-neutral-700 dark:text-neutral-300'
+                      }`}
                     >
-                      Показать все
-                    </button>
-                  )}
-                </div>
-                <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
-                  <button
-                    onClick={() => setSelectedCompany('all')}
-                    className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 ${
-                      selectedCompany === 'all'
-                        ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-xs'
-                        : 'liquid-glass-pill hover:bg-white/50 text-neutral-700 dark:text-neutral-300'
-                    }`}
-                  >
-                    Все ({internships.length})
-                  </button>
-                  {TARGET_COMPANIES.map((company) => {
-                    const isSelected = selectedCompany === company;
-                    const count = internships.filter((item) => matchesCompanyFilter(item.company, company)).length;
-                    return (
-                      <button
-                        key={company}
-                        onClick={() => setSelectedCompany(isSelected ? 'all' : company)}
-                        className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 flex items-center gap-1.5 ${
-                          isSelected
-                            ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-xs'
-                            : 'liquid-glass-pill hover:bg-white/50 text-neutral-700 dark:text-neutral-300'
-                        }`}
-                      >
-                        <span>{company}</span>
+                      <span>{dir.title.split('-')[0]}</span>
+                      {count > 0 && (
                         <span
                           className={`text-[10px] px-1.5 py-0.2 rounded-full font-medium ${
                             isSelected
@@ -531,120 +554,194 @@ export function App() {
                         >
                           {count}
                         </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Row 3: Direction tabs */}
-              <div className="space-y-2 pt-2 border-t border-black/5 dark:border-white/5">
-                <div className="text-[11px] font-bold uppercase tracking-wider text-neutral-600 dark:text-neutral-400">
-                  Направление:
-                </div>
-                <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
-                  <button
-                    onClick={() => {
-                      setSelectedDirection('all');
-                      setSelectedSubTrack('all');
-                    }}
-                    className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 ${
-                      selectedDirection === 'all'
-                        ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-xs'
-                        : 'liquid-glass-pill hover:bg-white/50 text-neutral-700 dark:text-neutral-300'
-                    }`}
-                  >
-                    Все направления ({internships.length})
-                  </button>
-                  {DIRECTIONS.map((dir) => (
-                    <button
-                      key={dir.id}
-                      onClick={() => {
-                        setSelectedDirection(dir.id);
-                        setSelectedSubTrack('all');
-                      }}
-                      className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 ${
-                        selectedDirection === dir.id
-                          ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-xs'
-                          : 'liquid-glass-pill hover:bg-white/50 text-neutral-700 dark:text-neutral-300'
-                      }`}
-                    >
-                      {dir.title.split('-')[0]}
+                      )}
                     </button>
-                  ))}
-                </div>
+                  );
+                })}
               </div>
 
-              {/* Row 4: Sub-tracks */}
-              {selectedDirection !== 'all' && (
-                <div className="space-y-2 pt-2 border-t border-black/5 dark:border-white/5">
-                  <div className="text-[11px] font-bold uppercase tracking-wider text-neutral-600 dark:text-neutral-400">
-                    Специализация:
+              {/* Row 3: Active Filters Pills (Quick-dismiss tags) */}
+              {(selectedCompany !== 'all' || selectedSubTrack !== 'all' || selectedFormat !== 'all' || selectedSource !== 'all') && (
+                <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1">
+                  <span className="text-[11px] font-semibold text-neutral-500 shrink-0">Активно:</span>
+                  {selectedCompany !== 'all' && (
+                    <button
+                      onClick={() => setSelectedCompany('all')}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-neutral-900 text-white dark:bg-white dark:text-black shrink-0 transition-transform active:scale-95"
+                    >
+                      <span>{selectedCompany}</span>
+                      <X className="w-3 h-3 opacity-70" />
+                    </button>
+                  )}
+                  {selectedSubTrack !== 'all' && (
+                    <button
+                      onClick={() => setSelectedSubTrack('all')}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-neutral-900 text-white dark:bg-white dark:text-black shrink-0 transition-transform active:scale-95"
+                    >
+                      <span>{selectedSubTrack}</span>
+                      <X className="w-3 h-3 opacity-70" />
+                    </button>
+                  )}
+                  {selectedFormat !== 'all' && (
+                    <button
+                      onClick={() => setSelectedFormat('all')}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-neutral-900 text-white dark:bg-white dark:text-black shrink-0 transition-transform active:scale-95"
+                    >
+                      <span>{selectedFormat}</span>
+                      <X className="w-3 h-3 opacity-70" />
+                    </button>
+                  )}
+                  {selectedSource !== 'all' && (
+                    <button
+                      onClick={() => setSelectedSource('all')}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-neutral-900 text-white dark:bg-white dark:text-black shrink-0 transition-transform active:scale-95"
+                    >
+                      <span>{selectedSource === 'telegram' ? 'Telegram' : 'Порталы'}</span>
+                      <X className="w-3 h-3 opacity-70" />
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {/* Secondary Filters Container (Always visible on desktop, collapsible on mobile) */}
+              <div className={`space-y-3.5 pt-3 border-t border-black/5 dark:border-white/5 ${isMobileFiltersOpen ? 'block' : 'hidden sm:block'}`}>
+                {/* Company Filter */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-neutral-600 dark:text-neutral-400">
+                    <span className="flex items-center gap-1.5">
+                      <Building2 className="w-3.5 h-3.5 text-neutral-600 dark:text-neutral-400" />
+                      Работодатель (Топ IT-компании):
+                    </span>
+                    {selectedCompany !== 'all' && (
+                      <button
+                        onClick={() => setSelectedCompany('all')}
+                        className="text-xs text-neutral-800 hover:text-black dark:text-neutral-300 dark:hover:text-white normal-case font-semibold underline decoration-neutral-400"
+                      >
+                        Все компании
+                      </button>
+                    )}
                   </div>
                   <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
                     <button
-                      onClick={() => setSelectedSubTrack('all')}
-                      className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 ${
-                        selectedSubTrack === 'all'
+                      onClick={() => setSelectedCompany('all')}
+                      className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 shrink-0 ${
+                        selectedCompany === 'all'
                           ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-xs'
                           : 'liquid-glass-pill hover:bg-white/50 text-neutral-700 dark:text-neutral-300'
                       }`}
                     >
-                      Все ветки
+                      Все ({internships.length})
                     </button>
-                    {DIRECTIONS.find((d) => d.id === selectedDirection)?.subTracks.map((st) => (
+                    {TARGET_COMPANIES.map((company) => {
+                      const isSelected = selectedCompany === company;
+                      const count = internships.filter((item) => matchesCompanyFilter(item.company, company)).length;
+                      return (
+                        <button
+                          key={company}
+                          onClick={() => setSelectedCompany(isSelected ? 'all' : company)}
+                          className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 shrink-0 flex items-center gap-1.5 ${
+                            isSelected
+                              ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-xs'
+                              : 'liquid-glass-pill hover:bg-white/50 text-neutral-700 dark:text-neutral-300'
+                          }`}
+                        >
+                          <span>{company}</span>
+                          <span
+                            className={`text-[10px] px-1.5 py-0.2 rounded-full font-medium ${
+                              isSelected
+                                ? 'bg-white/20 text-white dark:bg-black/10 dark:text-neutral-950'
+                                : 'bg-black/5 text-neutral-700 dark:bg-white/10 dark:text-neutral-300'
+                            }`}
+                          >
+                            {count}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Sub-tracks if direction chosen */}
+                {selectedDirection !== 'all' && (
+                  <div className="space-y-1.5 pt-2 border-t border-black/5 dark:border-white/5">
+                    <div className="text-[11px] font-bold uppercase tracking-wider text-neutral-600 dark:text-neutral-400">
+                      Специализация:
+                    </div>
+                    <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
                       <button
-                        key={st.id}
-                        onClick={() => setSelectedSubTrack(st.id)}
-                        className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 ${
-                          selectedSubTrack === st.id
+                        onClick={() => setSelectedSubTrack('all')}
+                        className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 shrink-0 ${
+                          selectedSubTrack === 'all'
                             ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-xs'
                             : 'liquid-glass-pill hover:bg-white/50 text-neutral-700 dark:text-neutral-300'
                         }`}
                       >
-                        {st.name}
+                        Все ветки
+                      </button>
+                      {DIRECTIONS.find((d) => d.id === selectedDirection)?.subTracks.map((st) => (
+                        <button
+                          key={st.id}
+                          onClick={() => setSelectedSubTrack(st.id)}
+                          className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 shrink-0 ${
+                            selectedSubTrack === st.id
+                              ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-xs'
+                              : 'liquid-glass-pill hover:bg-white/50 text-neutral-700 dark:text-neutral-300'
+                          }`}
+                        >
+                          {st.name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Format & Source selectors */}
+                <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-black/5 dark:border-white/5 text-xs">
+                  {/* Format Filter */}
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="text-neutral-600 dark:text-neutral-400 font-semibold text-[11px]">Формат:</span>
+                    {(['all', 'Удаленно', 'Гибрид', 'Офис'] as const).map((fmt) => (
+                      <button
+                        key={fmt}
+                        onClick={() => setSelectedFormat(fmt)}
+                        className={`px-2.5 py-1 rounded-full transition-all duration-150 active:scale-95 text-xs font-medium ${
+                          selectedFormat === fmt
+                            ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-xs'
+                            : 'liquid-glass-pill hover:bg-white/50 text-neutral-700 dark:text-neutral-300'
+                        }`}
+                      >
+                        {fmt === 'all' ? 'Все' : fmt}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Source Filter */}
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="text-neutral-600 dark:text-neutral-400 font-semibold text-[11px]">Источник:</span>
+                    {(['all', 'telegram', 'portal'] as const).map((src) => (
+                      <button
+                        key={src}
+                        onClick={() => setSelectedSource(src)}
+                        className={`px-2.5 py-1 rounded-full transition-all duration-150 active:scale-95 text-xs font-medium ${
+                          selectedSource === src
+                            ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-xs'
+                            : 'liquid-glass-pill hover:bg-white/50 text-neutral-700 dark:text-neutral-300'
+                        }`}
+                      >
+                        {src === 'all' ? 'Все' : src === 'telegram' ? 'Telegram' : 'Порталы'}
                       </button>
                     ))}
                   </div>
                 </div>
-              )}
 
-              {/* Row 5: Format & Source selectors */}
-              <div className="flex flex-wrap items-center justify-between gap-3 pt-2.5 border-t border-black/5 dark:border-white/5 text-xs">
-                {/* Format Filter */}
-                <div className="flex items-center gap-1.5">
-                  <span className="text-neutral-600 dark:text-neutral-400 font-semibold">Формат:</span>
-                  {(['all', 'Удаленно', 'Гибрид', 'Офис'] as const).map((fmt) => (
-                    <button
-                      key={fmt}
-                      onClick={() => setSelectedFormat(fmt)}
-                      className={`px-3 py-1 rounded-full transition-all duration-150 active:scale-95 font-medium ${
-                        selectedFormat === fmt
-                          ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-xs'
-                          : 'liquid-glass-pill hover:bg-white/50 text-neutral-700 dark:text-neutral-300'
-                      }`}
-                    >
-                      {fmt === 'all' ? 'Все' : fmt}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Source Filter */}
-                <div className="flex items-center gap-1.5">
-                  <span className="text-neutral-600 dark:text-neutral-400 font-semibold">Источник:</span>
-                  {(['all', 'telegram', 'portal'] as const).map((src) => (
-                    <button
-                      key={src}
-                      onClick={() => setSelectedSource(src)}
-                      className={`px-3 py-1 rounded-full transition-all duration-150 active:scale-95 font-medium ${
-                        selectedSource === src
-                          ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-xs'
-                          : 'liquid-glass-pill hover:bg-white/50 text-neutral-700 dark:text-neutral-300'
-                      }`}
-                    >
-                      {src === 'all' ? 'Все' : src === 'telegram' ? 'Telegram-каналы' : 'Карьерные порталы'}
-                    </button>
-                  ))}
+                {/* Mobile close button */}
+                <div className="sm:hidden pt-1">
+                  <button
+                    onClick={() => setIsMobileFiltersOpen(false)}
+                    className="w-full py-2 rounded-full text-xs font-semibold bg-neutral-900 text-white dark:bg-white dark:text-black shadow-xs transition-transform active:scale-95"
+                  >
+                    Показать стажировки ({filteredInternships.length})
+                  </button>
                 </div>
               </div>
             </div>
