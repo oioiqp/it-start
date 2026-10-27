@@ -49,7 +49,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     <header
       className={`sticky top-2 sm:top-4 z-50 flex items-center justify-center w-full pointer-events-none transition-all duration-200 ${
         (isVk || vkUser)
-          ? 'pl-2 pr-[max(84px,var(--vk-safe-area-right,0px))] sm:px-4'
+          ? 'pl-2 pr-[max(84px,var(--vk-safe-area-right,0px))] sm:pl-4 sm:pr-[max(84px,var(--vk-safe-area-right,0px))]'
           : 'px-2 sm:px-4'
       }`}
       style={{
@@ -80,7 +80,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div className="h-4 w-px shrink-0 mx-0.5 bg-black/10 dark:bg-white/10" />
 
         {/* Center Navigation Tabs - Responsive Dynamic Island (Active label + sleek compact icons on mobile) */}
-        <nav className="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5 px-0.5">
+        <nav className="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5 px-0.5 min-w-0">
           {navTabs.map((tab) => {
             const isActive = activeTab === tab.id;
             const Icon = tab.icon;
@@ -88,7 +88,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 key={tab.id}
                 onClick={() => handleTabClick(tab.id)}
-                className={`flex items-center gap-1.5 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 active:scale-95 shrink-0 ${
+                className={`flex items-center gap-1.5 px-2 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 active:scale-95 shrink-0 ${
                   isActive
                     ? 'bg-neutral-900 text-white shadow-xs dark:bg-white dark:text-black'
                     : 'text-neutral-700 hover:text-neutral-950 hover:bg-white/40 dark:text-neutral-300 dark:hover:text-white dark:hover:bg-white/10'

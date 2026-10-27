@@ -53,18 +53,18 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
   };
 
   return (
-    <div className="group relative rounded-[28px] sm:rounded-[32px] p-5 sm:p-6 flex flex-col justify-between liquid-glass liquid-glass-interactive overflow-hidden">
+    <div className="group relative rounded-[28px] sm:rounded-[32px] p-4 sm:p-6 flex flex-col justify-between liquid-glass liquid-glass-interactive overflow-hidden">
       {/* Top row */}
       <div>
-        <div className="flex items-start justify-between gap-3 mb-3.5">
-          <div className="flex items-center gap-3">
+        <div className="flex items-start justify-between gap-2.5 sm:gap-3 mb-3.5">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
             {/* Minimalist Matte Glass App Squircle Tile */}
             <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center font-bold text-sm sm:text-base shrink-0 overflow-hidden liquid-glass-tile text-neutral-800 dark:text-neutral-100 transition-transform duration-200 group-hover:scale-[1.02]">
               <span className="relative z-10 select-none tracking-tight">
                 {getCompanyMonogram(internship.company)}
               </span>
             </div>
-            <div>
+            <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1.5 flex-wrap">
                 <span className="font-bold text-sm text-neutral-950 dark:text-white font-sans tracking-tight">
                   {internship.company}
@@ -165,7 +165,7 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
                     href={`https://t.me/${cleanChannel}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-1 text-[11px] font-semibold truncate text-neutral-600 hover:text-black dark:text-neutral-400 dark:hover:text-white transition-colors"
+                    className="flex items-center gap-1 text-[11px] font-semibold truncate min-w-0 text-neutral-600 hover:text-black dark:text-neutral-400 dark:hover:text-white transition-colors"
                     title={`Открыть проверенный Telegram-канал ${verifiedChannel}`}
                   >
                     <Bot className="w-3.5 h-3.5 shrink-0 text-neutral-500 dark:text-neutral-400" />
@@ -174,7 +174,7 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
                     </span>
                   </a>
                 ) : (
-                  <div className="flex items-center gap-1 text-[11px] text-neutral-600 dark:text-neutral-400 font-medium truncate">
+                  <div className="flex items-center gap-1 text-[11px] text-neutral-600 dark:text-neutral-400 font-medium truncate min-w-0">
                     <Bot className="w-3.5 h-3.5 shrink-0 opacity-70" />
                     <span className="truncate">{verifiedChannel}</span>
                   </div>

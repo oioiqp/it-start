@@ -460,11 +460,11 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
         </div>
 
         {/* Modal Footer */}
-        <div className="shrink-0 pt-3 sm:pt-4 pb-[max(0.25rem,env(safe-area-inset-bottom))] border-t flex flex-wrap items-center justify-between gap-2.5 sm:gap-3 border-black/5 dark:border-white/5">
-          <div className="flex items-center gap-2">
+        <div className="shrink-0 pt-3 sm:pt-4 pb-[max(0.25rem,env(safe-area-inset-bottom))] border-t flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-3 border-black/5 dark:border-white/5">
+          <div className="flex items-center gap-2 w-full sm:w-auto">
             <button
               onClick={onClose}
-              className="min-h-[44px] px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-transform duration-150 active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-800 cursor-pointer"
+              className="flex-1 sm:flex-initial min-h-[44px] px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-transform duration-150 active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-800 cursor-pointer text-center"
             >
               Закрыть
             </button>
@@ -478,12 +478,12 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                   href={`https://t.me/${cleanChannel}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="min-h-[44px] flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold transition-transform duration-150 active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-800"
+                  className="flex-1 sm:flex-initial min-h-[44px] flex items-center justify-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-full text-xs font-semibold transition-transform duration-150 active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-800 truncate"
                   title={`Открыть проверенный Telegram-канал ${verifiedChannel}`}
                 >
-                  <Bot className="w-3.5 h-3.5 text-neutral-600" />
-                  <span>Канал {verifiedChannel}</span>
-                  <ExternalLink className="w-3 h-3" />
+                  <Bot className="w-3.5 h-3.5 shrink-0 text-neutral-600" />
+                  <span className="truncate">Канал {verifiedChannel}</span>
+                  <ExternalLink className="w-3 h-3 shrink-0" />
                 </a>
               ) : null;
             })()}
@@ -496,11 +496,12 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                 href={verifiedApplyUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="min-h-[44px] flex items-center gap-2 px-6 py-2.5 rounded-full font-semibold text-xs sm:text-sm active:scale-95 transition-transform duration-150 bg-neutral-900 hover:bg-black text-white shadow-xs cursor-pointer"
+                className="w-full sm:w-auto min-h-[44px] flex items-center justify-center gap-2 px-5 sm:px-6 py-2.5 rounded-full font-semibold text-xs sm:text-sm active:scale-95 transition-transform duration-150 bg-neutral-900 hover:bg-black text-white shadow-xs cursor-pointer text-center"
                 title={`Подать заявку на официальном сайте компании ${internship.company}`}
               >
-                <span>Подать заявку на сайте {internship.company}</span>
-                <ExternalLink className="w-3.5 h-3.5" />
+                <span className="sm:hidden truncate">Откликнуться на {internship.company}</span>
+                <span className="hidden sm:inline">Подать заявку на сайте {internship.company}</span>
+                <ExternalLink className="w-3.5 h-3.5 shrink-0" />
               </a>
             );
           })()}

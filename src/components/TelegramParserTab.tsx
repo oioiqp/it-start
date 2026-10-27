@@ -1051,7 +1051,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
         )}
 
         {/* Source Type Filter Tabs */}
-        <div className="flex items-center gap-1.5 p-1 rounded-full liquid-glass-subtle overflow-x-auto no-scrollbar w-fit">
+        <div className="flex items-center gap-1.5 p-1 rounded-full liquid-glass-subtle overflow-x-auto no-scrollbar max-w-full w-full sm:w-fit touch-pan-x overscroll-x-contain">
           {[
             { id: 'all' as const, label: `Все источники (${monitoredChannels.length + monitoredWebsites.length})`, icon: Building2 },
             { id: 'telegram' as const, label: `Telegram-каналы (${monitoredChannels.length})`, icon: Send },
@@ -1079,7 +1079,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
         </div>
 
         {/* Channel / Company Filter Chips */}
-        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 text-xs">
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 text-xs touch-pan-x overscroll-x-contain">
           <span className="text-neutral-500 dark:text-neutral-400 font-medium shrink-0 mr-1">Компания:</span>
           {[
             { id: 'all', label: 'Все компании' },
@@ -1945,13 +1945,20 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
               type="button"
               onClick={handlePublishAndNotify}
               disabled={isPublishing}
-              className="w-full flex items-center justify-center gap-2.5 py-3.5 px-6 rounded-full bg-neutral-900 hover:bg-black text-white dark:bg-white dark:hover:bg-neutral-200 dark:text-neutral-950 font-semibold text-sm sm:text-base shadow-sm active:scale-98 transition-all disabled:opacity-50"
+              className="w-full flex items-center justify-center gap-2.5 py-3 sm:py-3.5 px-4 sm:px-6 rounded-full bg-neutral-900 hover:bg-black text-white dark:bg-white dark:hover:bg-neutral-200 dark:text-neutral-950 font-semibold text-xs sm:text-base shadow-sm active:scale-98 transition-all disabled:opacity-50 text-center"
             >
-              <Send className={`w-4 h-4 ${isPublishing ? 'animate-spin' : ''}`} />
-              <span>
-                {isPublishing
-                  ? 'Публикация и рассылка уведомлений в Telegram & VK...'
-                  : 'Опубликовать стажировку и разослать уведомления в Telegram & VK 🚀'}
+              <Send className={`w-4 h-4 shrink-0 ${isPublishing ? 'animate-spin' : ''}`} />
+              <span className="leading-snug">
+                <span className="sm:hidden">
+                  {isPublishing
+                    ? 'Публикация в TG & VK...'
+                    : 'Опубликовать стажировку и разослать пуши 🚀'}
+                </span>
+                <span className="hidden sm:inline">
+                  {isPublishing
+                    ? 'Публикация и рассылка уведомлений в Telegram & VK...'
+                    : 'Опубликовать стажировку и разослать уведомления в Telegram & VK 🚀'}
+                </span>
               </span>
             </button>
           </div>

@@ -118,13 +118,13 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
         </div>
 
         {/* View Mode Switcher: 3 Modes (Segmented Capsule Control) */}
-        <div className="flex items-center p-1 rounded-full shrink-0 text-xs transition-colors liquid-glass-subtle">
+        <div className="flex items-center p-1 rounded-full text-xs transition-colors liquid-glass-subtle max-w-full overflow-x-auto no-scrollbar shrink-0">
           <button
             onClick={() => {
               triggerHaptic('selection');
               setViewMode('self_check');
             }}
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full font-semibold transition-all duration-150 active:scale-95 ${
+            className={`flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-full font-semibold transition-all duration-150 active:scale-95 ${
               viewMode === 'self_check'
                 ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-sm'
                 : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-950 dark:hover:text-white'
@@ -139,7 +139,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
               triggerHaptic('selection');
               setViewMode('accordion');
             }}
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full font-semibold transition-all duration-150 active:scale-95 ${
+            className={`flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-full font-semibold transition-all duration-150 active:scale-95 ${
               viewMode === 'accordion'
                 ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-sm'
                 : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-950 dark:hover:text-white'
@@ -154,7 +154,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
               triggerHaptic('selection');
               setViewMode('flashcards');
             }}
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full font-semibold transition-all duration-150 active:scale-95 ${
+            className={`flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-full font-semibold transition-all duration-150 active:scale-95 ${
               viewMode === 'flashcards'
                 ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-sm'
                 : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-950 dark:hover:text-white'
@@ -170,7 +170,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
       <div className="rounded-[28px] sm:rounded-[32px] p-4 sm:p-5 space-y-3.5 transition-all duration-300 liquid-glass">
         {/* Row 1: Search + Status tabs */}
         <div className="flex flex-col sm:flex-row items-center gap-3">
-          <div className="relative w-full sm:flex-1">
+          <div className="relative w-full sm:flex-1 min-w-0">
             <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-neutral-500" />
             <input
               type="text"

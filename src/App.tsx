@@ -547,7 +547,7 @@ export function App() {
             <div className="rounded-[24px] sm:rounded-[32px] p-4 sm:p-6 space-y-3 sm:space-y-4 liquid-glass">
               {/* Row 1: Search & Filter Toggles */}
               <div className="flex items-center gap-2">
-                <div className="relative flex-1 group">
+                <div className="relative flex-1 min-w-0 group">
                   <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-500 dark:text-neutral-400 pointer-events-none transition-colors group-focus-within:text-neutral-950 dark:group-focus-within:text-white" />
                   <input
                     type="text"
@@ -611,7 +611,7 @@ export function App() {
               </div>
 
               {/* Row 2: Direction tabs (Swipeable Pill Carousel) */}
-              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 touch-pan-x overscroll-x-contain">
                 <button
                   onClick={() => {
                     triggerHaptic('selection');
@@ -662,7 +662,7 @@ export function App() {
 
               {/* Row 3: Active Filters Pills (Quick-dismiss tags) */}
               {(selectedCompany !== 'all' || selectedSubTrack !== 'all' || selectedFormat !== 'all' || selectedSource !== 'all') && (
-                <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1">
+                <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1 touch-pan-x overscroll-x-contain">
                   <span className="text-[11px] font-semibold text-neutral-500 shrink-0">Активно:</span>
                   {selectedCompany !== 'all' && (
                     <button
@@ -721,7 +721,7 @@ export function App() {
                       </button>
                     )}
                   </div>
-                  <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
+                  <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 touch-pan-x overscroll-x-contain">
                     <button
                       onClick={() => setSelectedCompany('all')}
                       className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 shrink-0 ${
@@ -767,7 +767,7 @@ export function App() {
                     <div className="text-[11px] font-bold uppercase tracking-wider text-neutral-600 dark:text-neutral-400">
                       Специализация:
                     </div>
-                    <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
+                    <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 touch-pan-x overscroll-x-contain">
                       <button
                         onClick={() => setSelectedSubTrack('all')}
                         className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 shrink-0 ${
@@ -975,7 +975,7 @@ export function App() {
             </div>
           </div>
 
-          <div className="flex items-center gap-4 flex-wrap text-[11px]">
+          <div className="flex items-center justify-center md:justify-end gap-3 sm:gap-4 flex-wrap text-[11px]">
             <a
               href={TELEGRAM_BOT_URL}
               target="_blank"

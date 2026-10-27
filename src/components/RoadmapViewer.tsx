@@ -193,7 +193,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
         </div>
 
         {/* Track Progress Indicator */}
-        <div className="rounded-2xl p-3.5 shrink-0 min-w-[220px] transition-colors liquid-glass-subtle">
+        <div className="rounded-2xl p-3.5 shrink-0 w-full md:w-auto sm:min-w-[220px] transition-colors liquid-glass-subtle">
           <div className="flex items-center justify-between text-xs mb-1.5">
             <span className="text-neutral-600 dark:text-neutral-400 font-medium flex items-center gap-1.5">
               <Trophy className="w-4 h-4 text-amber-500" />
@@ -222,7 +222,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
               {currentDirection.coreTitle}
             </div>
             <div className="h-px flex-1 bg-neutral-200 dark:bg-white/10"></div>
-            <span className="text-xs text-neutral-500 dark:text-neutral-400">Базовый фундамент (Обязательно для всех)</span>
+            <span className="text-xs text-neutral-500 dark:text-neutral-400 hidden sm:inline">Базовый фундамент (Обязательно для всех)</span>
           </div>
 
           {/* Core Nodes Spine */}
@@ -253,7 +253,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
 
                   {/* Node Card */}
                   <div
-                    className={`p-5 sm:p-6 rounded-[28px] transition-all duration-300 ${
+                    className={`p-4 sm:p-6 rounded-[28px] transition-all duration-300 ${
                       isDone
                         ? 'bg-emerald-500/10 border border-emerald-500/25 dark:bg-emerald-500/15 dark:border-emerald-500/35 liquid-glass-interactive'
                         : 'liquid-glass liquid-glass-interactive'
@@ -487,7 +487,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
               Ветка: {currentDirection.subTracks.find((s) => s.id === validSubTrack)?.name}
             </div>
             <div className="h-px flex-1 bg-neutral-200 dark:bg-white/10"></div>
-            <span className="text-xs text-neutral-500 dark:text-neutral-400">Профильные требования к стажёрам</span>
+            <span className="text-xs text-neutral-500 dark:text-neutral-400 hidden sm:inline">Профильные требования к стажёрам</span>
           </div>
 
           {/* Sub-track Nodes Spine */}
@@ -519,7 +519,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
 
                   {/* Node Card */}
                   <div
-                    className={`p-5 sm:p-6 rounded-[28px] transition-all duration-300 ${
+                    className={`p-4 sm:p-6 rounded-[28px] transition-all duration-300 ${
                       isDone
                         ? 'bg-emerald-500/10 border border-emerald-500/25 dark:bg-emerald-500/15 dark:border-emerald-500/35 liquid-glass-interactive'
                         : 'liquid-glass liquid-glass-interactive'

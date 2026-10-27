@@ -432,7 +432,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
               </button>
             </div>
           ) : (
-            <div className="flex items-center justify-between gap-2 px-1">
+            <div className="flex items-center justify-between gap-2 px-1 flex-wrap">
               <span className="text-[11px] text-neutral-500 font-medium">
                 Канал: <strong className="text-neutral-800">{platform === 'vk' ? 'ВКонтакте' : 'Telegram'}</strong>
               </span>
