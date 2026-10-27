@@ -10,6 +10,8 @@ import { GITHUB_PAGES_URL } from './supabase';
 export const VK_BOT_NAME = 'IT-Старт VK Бот';
 export const VK_COMMUNITY_URL = 'https://vk.com/club242573933';
 export const VK_BOT_DIALOG_URL = 'https://vk.com/im?sel=-242573933';
+export const VK_APP_ID = '54857681';
+export const VK_MINI_APP_URL = 'https://vk.com/app54857681';
 
 const VK_BOT_TOKEN_STORAGE_KEY = 'it_start_vk_bot_token';
 const VK_PEER_ID_STORAGE_KEY = 'it_start_vk_peer_id';

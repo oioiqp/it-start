@@ -93,7 +93,7 @@ export const VK_BOT_TOKEN =
   (process.argv[2] && !process.argv[2].startsWith('-') ? process.argv[2] : '');
 
 export const VK_GROUP_ID = process.env.VK_GROUP_ID || '242573933';
-export const VK_APP_ID = process.env.VK_APP_ID || '';
+export const VK_APP_ID = process.env.VK_APP_ID || '54857681';
 export const VK_API_VERSION = '5.199';
 export const VK_API_BASE = 'https://api.vk.com/method';
 export const GITHUB_PAGES_URL = 'https://oioiqp.github.io/it-start/';
