@@ -1543,7 +1543,7 @@ describe('14. Mobile VK Header Clearance, Liquid Glass Translucency & Dual Notif
         onOpenSubscribeModal: () => {},
       })
     );
-    expect(htmlVk).toContain('pr-[88px]');
+    expect(htmlVk).toContain('pr-[max(84px');
 
     // 2. In normal web mode (not VK): should not have the extra VK padding
     const htmlWeb = renderToString(
@@ -1554,7 +1554,7 @@ describe('14. Mobile VK Header Clearance, Liquid Glass Translucency & Dual Notif
         onOpenSubscribeModal: () => {},
       })
     );
-    expect(htmlWeb).not.toContain('pr-[88px]');
+    expect(htmlWeb).not.toContain('pr-[max(84px');
   });
 
   it('validates SubscribeModal supports switching between Telegram and VK notification channels', async () => {
@@ -1621,7 +1621,12 @@ describe('14. Mobile VK Header Clearance, Liquid Glass Translucency & Dual Notif
 
     const html = renderToString(React.createElement(App));
     expect(html).toContain('whitespace-nowrap');
-    expect(html).toContain('IT-СТАРТ');
+    expect(html).toMatch(/IT.*СТАРТ/);
+  });
+
+  it('validates requestVkNotificationsPermission is exported and callable', async () => {
+    const { requestVkNotificationsPermission } = await import('../lib/vkBridge');
+    expect(typeof requestVkNotificationsPermission).toBe('function');
   });
 
   it('validates bot server exports static directory and runs smoothly', async () => {

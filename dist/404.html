@@ -42,15 +42,15 @@
         } catch (e) {}
       })();
     </script>
-    <!-- Non-blocking Telegram Mini App Script (Loaded asynchronously only outside VK / inside Telegram) -->
+    <!-- Non-blocking Telegram Mini App Script (Loaded only when launching inside Telegram) -->
     <script>
       (function() {
         try {
-          var isInsideVk = window.location.search.indexOf('vk_') !== -1 ||
-                           window.location.hash.indexOf('vk_') !== -1 ||
-                           (window.name && window.name.indexOf('vk_') !== -1) ||
-                           (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.VKWebAppInit);
-          if (!isInsideVk) {
+          var isInsideTg = window.location.search.indexOf('tgWebAppData') !== -1 ||
+                           window.location.hash.indexOf('tgWebAppData') !== -1 ||
+                           (window.Telegram && window.Telegram.WebApp) ||
+                           (navigator.userAgent && navigator.userAgent.indexOf('Telegram') !== -1);
+          if (isInsideTg) {
             var tgScript = document.createElement('script');
             tgScript.src = 'https://telegram.org/js/telegram-web-app.js';
             tgScript.async = true;
@@ -59,8 +59,13 @@
         } catch (e) {}
       })();
     </script>
-    <script type="module" crossorigin src="./assets/index-4AkwPUfL.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-DplRIXZq.css">
+    <script type="module" crossorigin src="./assets/index-Db0B9vvu.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/rolldown-runtime-WkwZ5CU-.js">
+    <link rel="modulepreload" crossorigin href="./assets/vendor-icons-teqUZ8Z1.js">
+    <link rel="modulepreload" crossorigin href="./assets/vendor-react-MjarHA6-.js">
+    <link rel="modulepreload" crossorigin href="./assets/vendor-supabase-1yby8ldT.js">
+    <link rel="modulepreload" crossorigin href="./assets/vendor-vk-NSow72zy.js">
+    <link rel="stylesheet" crossorigin href="./assets/index-DQ9YOs3B.css">
   </head>
   <body class="antialiased selection:bg-neutral-900 selection:text-white">
     <div id="root"></div>

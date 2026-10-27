@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import type { DirectionId, SubTrackId, TelegramSubscription, TelegramUser } from '../types';
-import type { VkUser } from '../lib/vkBridge';
+import { requestVkNotificationsPermission, type VkUser } from '../lib/vkBridge';
 import { DIRECTIONS } from '../data/directions';
 import { saveSubscriptionToSupabase, TELEGRAM_BOT_USERNAME, TELEGRAM_BOT_URL } from '../lib/supabase';
 import {
@@ -287,6 +287,13 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
     setIsLoading(true);
     setStatusMessage(null);
 
+    // If inside VK Mini App, request native community messages permission
+    if (platform === 'vk' && (isVk || vkUser)) {
+      try {
+        await requestVkNotificationsPermission(242573933);
+      } catch {}
+    }
+
     const subData: TelegramSubscription = {
       chat_id: chatId.trim(),
       username: username.trim(),
@@ -417,35 +424,28 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
 
         {/* Platform Guidance & Auto-Detection Callouts */}
         {platform === 'vk' ? (
-          vkUser ? (
-            <div className="mb-4 p-3 rounded-2xl border text-xs flex items-center gap-2.5 bg-blue-500/10 border-blue-500/20 text-blue-900">
-              <div className="w-2 h-2 rounded-full bg-blue-500 animate-ping shrink-0" />
-              <div className="min-w-0">
-                <span className="font-semibold">VK Mini App подключен:</span> Профиль{' '}
-                <strong className="font-bold">{vkUser.first_name}</strong> (VK ID:{' '}
-                <span className="font-mono font-bold">{vkUser.id}</span>). Уведомления будут отправляться в личные сообщения.
-              </div>
-            </div>
-          ) : (
-            <div className="mb-4 p-3 rounded-2xl border text-xs space-y-2 bg-blue-500/5 border-blue-500/15">
-              <div className="font-semibold text-neutral-800 flex items-center gap-1.5">
+          <div className="mb-4 p-3.5 rounded-2xl border text-xs space-y-2 bg-blue-500/5 border-blue-500/15">
+            <div className="font-semibold text-neutral-800 flex items-center justify-between gap-1.5 flex-wrap">
+              <span className="flex items-center gap-1.5">
                 <Bot className="w-4 h-4 text-blue-600" />
-                <span>Как получать уведомления ВКонтакте:</span>
-              </div>
-              <p className="text-[11px] text-neutral-600">
-                Откройте диалог с официальным ботом IT-Старт и отправьте команду /start или /subscribe:
-              </p>
+                <span>Официальный VK-бот IT-Старт:</span>
+              </span>
               <a
                 href={getVkBotDialogUrl()}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs shadow-xs transition-colors"
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-medium text-[11px] shadow-xs transition-colors"
               >
                 <span>💬 Открыть диалог с VK-ботом</span>
-                <ExternalLink className="w-3.5 h-3.5" />
+                <ExternalLink className="w-3 h-3" />
               </a>
             </div>
-          )
+            <p className="text-[11px] text-neutral-600">
+              {vkUser
+                ? `VK Mini App подключен: профиль ${vkUser.first_name} (Ваш VK ID: ${vkUser.id}). Уведомления будут приходить в личные сообщения.`
+                : 'Откройте диалог с официальным ботом IT-Старт и отправьте команду /start или /subscribe для активации уведомлений.'}
+            </p>
+          </div>
         ) : telegramUser ? (
           <div className="mb-4 p-3 rounded-2xl border text-xs flex items-center gap-2.5 bg-emerald-500/10 border-emerald-500/20 text-emerald-900">
             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-ping shrink-0" />
@@ -485,34 +485,63 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
 
         <form onSubmit={handleSaveSubscription} className="space-y-4">
           {/* Chat ID & User Info */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-medium mb-1 text-neutral-700">
-                {platform === 'vk' ? 'Ваш VK ID' : 'Ваш Telegram Chat ID'} <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                value={chatId}
-                onChange={(e) => setChatId(e.target.value)}
-                placeholder={platform === 'vk' ? 'например 482655491' : 'например 123456789'}
-                required
-                className="w-full px-3.5 py-2.5 rounded-xl text-base sm:text-sm transition-colors focus:outline-none bg-neutral-50 border border-neutral-200/80 text-neutral-900 placeholder:text-neutral-400 focus:border-neutral-400"
-              />
+          {platform === 'vk' && vkUser ? (
+            <div className="flex items-center justify-between p-3 rounded-2xl liquid-glass-subtle border border-blue-500/20">
+              <div className="flex items-center gap-2.5 min-w-0">
+                {vkUser.photo_100 || vkUser.photo_200 ? (
+                  <img
+                    src={vkUser.photo_100 || vkUser.photo_200}
+                    alt={vkUser.first_name || 'VK'}
+                    className="w-8 h-8 rounded-full object-cover border border-blue-500/30 shrink-0 shadow-xs"
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center shrink-0">
+                    VK
+                  </div>
+                )}
+                <div className="min-w-0">
+                  <div className="text-xs sm:text-sm font-bold text-neutral-900 truncate">
+                    {vkUser.first_name} {vkUser.last_name || ''}
+                  </div>
+                  <div className="text-[11px] text-blue-600 font-medium">
+                    VK ID: <span className="font-mono font-bold">{vkUser.id}</span> • Личные сообщения
+                  </div>
+                </div>
+              </div>
+              <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-blue-500/10 text-blue-600 border border-blue-500/20 shrink-0">
+                Подключен
+              </span>
             </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-medium mb-1 text-neutral-700">
+                  {platform === 'vk' ? 'Ваш VK ID' : 'Ваш Telegram Chat ID'} <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={chatId}
+                  onChange={(e) => setChatId(e.target.value)}
+                  placeholder={platform === 'vk' ? 'например 482655491' : 'например 123456789'}
+                  required
+                  className="w-full px-3.5 py-2.5 rounded-xl text-base sm:text-sm transition-colors focus:outline-none liquid-glass-pill focus:bg-white/60 text-neutral-900 placeholder:text-neutral-400 border border-neutral-200/80"
+                />
+              </div>
 
-            <div>
-              <label className="block text-xs font-medium mb-1 text-neutral-700">
-                {platform === 'vk' ? 'Имя в профиле ВКонтакте' : 'Username в Telegram'}
-              </label>
-              <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder={platform === 'vk' ? 'Имя Фамилия' : '@username (необязательно)'}
-                className="w-full px-3.5 py-2.5 rounded-xl text-base sm:text-sm transition-colors focus:outline-none bg-neutral-50 border border-neutral-200/80 text-neutral-900 placeholder:text-neutral-400 focus:border-neutral-400"
-              />
+              <div>
+                <label className="block text-xs font-medium mb-1 text-neutral-700">
+                  {platform === 'vk' ? 'Имя в профиле ВКонтакте' : 'Username в Telegram'}
+                </label>
+                <input
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder={platform === 'vk' ? 'Имя Фамилия' : '@username (необязательно)'}
+                  className="w-full px-3.5 py-2.5 rounded-xl text-base sm:text-sm transition-colors focus:outline-none liquid-glass-pill focus:bg-white/60 text-neutral-900 placeholder:text-neutral-400 border border-neutral-200/80"
+                />
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Directions selector */}
           <div>

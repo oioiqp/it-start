@@ -49,9 +49,12 @@ export const Navbar: React.FC<NavbarProps> = ({
     <header
       className={`sticky top-2 sm:top-4 z-50 flex items-center justify-center w-full pointer-events-none transition-all duration-200 ${
         (isVk || vkUser)
-          ? 'pl-2 pr-[88px] sm:px-4'
+          ? 'pl-2 pr-[max(84px,var(--vk-safe-area-right,0px))] sm:px-4'
           : 'px-2 sm:px-4'
       }`}
+      style={{
+        paddingTop: 'max(0px, var(--vk-safe-area-top, 0px), env(safe-area-inset-top, 0px))',
+      }}
     >
       <div
         className="pointer-events-auto flex items-center justify-between gap-1 sm:gap-2 p-1.5 sm:p-2 rounded-full transition-transform duration-300 max-w-5xl w-full sm:w-auto liquid-glass-nav"
@@ -105,7 +108,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Right Controls: User Profile & Bot / Notifications Action Capsule */}
         <div className="flex items-center gap-1.5 shrink-0 pr-0.5 sm:pr-1">
           {vkUser ? (
-            <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
+            <div className="hidden sm:flex items-center gap-1.5 shrink-0">
               <div
                 className="flex items-center gap-1.5 pl-1.5 pr-2 sm:pr-2.5 py-1 rounded-full bg-blue-50/80 dark:bg-blue-950/40 border border-blue-500/20 text-neutral-900 dark:text-white select-none shrink-0"
                 title={`VK: ${vkUser.first_name || ''} ${vkUser.last_name || ''} (ID: ${vkUser.id})`}
@@ -138,7 +141,6 @@ export const Navbar: React.FC<NavbarProps> = ({
               >
                 <Bot className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">VK Бот</span>
-                <span className="sm:hidden font-medium text-[11px]">VK</span>
               </button>
             </div>
           ) : telegramUser ? (

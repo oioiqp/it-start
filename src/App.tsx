@@ -341,9 +341,9 @@ export function App() {
         {/* Top subtle sheen */}
         <div className="absolute top-0 inset-x-0 h-[360px] bg-gradient-to-b from-white/70 via-white/20 to-transparent pointer-events-none" />
 
-        {/* Ambient diffusion spheres - hidden on mobile to avoid 4x full-screen 90px blur shaders */}
-        <div className="hidden sm:block absolute -top-[10%] -right-[5%] w-[680px] h-[680px] sm:w-[900px] sm:h-[900px] rounded-full bg-gradient-to-br from-white/60 via-slate-200/40 to-slate-300/25 blur-[90px] transform-gpu pointer-events-none" />
-        <div className="hidden sm:block absolute top-[20%] -left-[10%] w-[640px] h-[640px] sm:w-[850px] sm:h-[850px] rounded-full bg-gradient-to-tr from-slate-300/35 via-zinc-200/25 to-slate-200/30 blur-[90px] transform-gpu pointer-events-none" />
+        {/* Ambient diffusion spheres - soft optical glow for Apple Liquid Glass refraction */}
+        <div className="absolute -top-[10%] -right-[5%] w-[320px] h-[320px] sm:w-[900px] sm:h-[900px] rounded-full bg-gradient-to-br from-white/70 via-slate-200/50 to-blue-200/30 blur-[40px] sm:blur-[90px] transform-gpu pointer-events-none" />
+        <div className="absolute top-[20%] -left-[10%] w-[300px] h-[300px] sm:w-[850px] sm:h-[850px] rounded-full bg-gradient-to-tr from-slate-300/40 via-zinc-200/30 to-slate-200/35 blur-[40px] sm:blur-[90px] transform-gpu pointer-events-none" />
         <div className="hidden sm:block absolute top-[50%] -right-[6%] w-[600px] h-[600px] sm:w-[800px] sm:h-[800px] rounded-full bg-gradient-to-bl from-zinc-200/40 via-slate-200/25 to-slate-300/25 blur-[90px] transform-gpu pointer-events-none" />
         <div className="hidden sm:block absolute -bottom-[8%] left-[8%] w-[620px] h-[620px] sm:w-[850px] sm:h-[850px] rounded-full bg-gradient-to-tr from-slate-300/30 via-zinc-200/25 to-slate-200/25 blur-[90px] transform-gpu pointer-events-none" />
       </div>
@@ -372,18 +372,18 @@ export function App() {
         {activeTab === 'internships' && (
           <div className="relative space-y-6">
             {/* VK Mini App Profile Card (When opened inside VK) */}
-            {/* Compact VK Mini App Profile Capsule */}
+            {/* Ultra-Compact Sleek Apple Liquid Glass Profile Capsule */}
             {vkUser && (
-              <div className="flex items-center justify-between gap-3 px-3.5 py-2.5 sm:px-5 sm:py-3.5 rounded-2xl sm:rounded-full liquid-glass border border-blue-500/20 shadow-xs transition-all duration-300">
-                <div className="flex items-center gap-3 min-w-0">
+              <div className="flex items-center justify-between gap-2.5 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-full liquid-glass border border-blue-500/20 shadow-xs transition-all duration-300">
+                <div className="flex items-center gap-2.5 min-w-0">
                   {vkUser.photo_100 || vkUser.photo_200 ? (
                     <img
                       src={vkUser.photo_100 || vkUser.photo_200}
                       alt={vkUser.first_name || 'VK'}
-                      className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover border border-blue-500/30 shrink-0"
+                      className="w-8 h-8 rounded-full object-cover border border-blue-500/30 shrink-0 shadow-xs"
                     />
                   ) : (
-                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-blue-600 text-white font-bold text-xs sm:text-sm flex items-center justify-center shrink-0">
+                    <div className="w-8 h-8 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
                       VK
                     </div>
                   )}
@@ -392,14 +392,13 @@ export function App() {
                       <span className="text-xs sm:text-sm font-bold text-neutral-900 truncate">
                         {vkUser.first_name} {vkUser.last_name || ''}
                       </span>
+                      <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
                       <span className="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-blue-500/10 text-blue-600 border border-blue-500/20 shrink-0">
                         VK Mini App
                       </span>
                     </div>
-                    <div className="text-[11px] text-neutral-500 flex items-center gap-1.5 mt-0.5 font-medium truncate">
-                      <span>Прогресс: {userProgress.completedTopics.length} тем</span>
-                      <span>•</span>
-                      <span>{userProgress.completedQuestions.length} вопросов</span>
+                    <div className="text-[10px] sm:text-[11px] text-neutral-500 font-medium truncate">
+                      {userProgress.completedTopics.length} тем • {userProgress.completedQuestions.length} вопросов
                     </div>
                   </div>
                 </div>
@@ -409,19 +408,19 @@ export function App() {
                     triggerHaptic('medium');
                     setIsSubscribeModalOpen(true);
                   }}
-                  className="flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-all active:scale-95 shrink-0 cursor-pointer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-all active:scale-95 shrink-0 cursor-pointer"
                   title="Настроить уведомления ВКонтакте"
                 >
                   <Bot className="w-3.5 h-3.5" />
-                  <span className="hidden xs:inline">Уведомления</span>
+                  <span className="text-xs font-semibold">Уведомления</span>
                 </button>
               </div>
             )}
 
-            {/* Ambient typography watermark behind cards */}
-            <div className="absolute inset-x-0 -top-4 sm:-top-6 h-64 sm:h-96 flex items-center justify-center -z-10 pointer-events-none overflow-hidden select-none opacity-[0.035] blur-[0.5px]">
-              <span className="text-5xl xs:text-6xl sm:text-[130px] md:text-[170px] lg:text-[200px] font-black tracking-widest uppercase select-none leading-none text-slate-800 dark:text-white whitespace-nowrap">
-                IT-СТАРТ
+            {/* Ambient typography watermark behind cards - guaranteed single line */}
+            <div className="absolute inset-x-0 -top-4 sm:-top-6 h-48 sm:h-96 flex items-center justify-center -z-10 pointer-events-none overflow-hidden select-none opacity-[0.035] blur-[0.5px]">
+              <span className="text-4xl xs:text-5xl sm:text-[120px] md:text-[160px] lg:text-[190px] font-black tracking-widest uppercase select-none leading-none text-slate-800 dark:text-white whitespace-nowrap shrink-0">
+                IT&#8209;СТАРТ
               </span>
             </div>
 

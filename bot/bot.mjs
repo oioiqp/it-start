@@ -1367,6 +1367,9 @@ export const LAST_SCAN_STATUS = {
 // Cache of already notified users to avoid duplicate notifications
 const notifiedKeys = new Set();
 
+// In-memory cache for pre-gzipped static assets to optimize TTFB and eliminate CPU spikes on Render
+const staticGzipCache = new Map();
+
 // HTTP Health Check and Parser API server for Render.com Web Service
 const server = http.createServer(async (req, res) => {
   // CORS headers for WebApp integration
@@ -1503,8 +1506,17 @@ const server = http.createServer(async (req, res) => {
         if (isCompressible && /\bgzip\b/.test(acceptEncoding)) {
           headers['Content-Encoding'] = 'gzip';
           headers['Vary'] = 'Accept-Encoding';
+
+          const cacheKey = `${filePath}:${stat.mtimeMs}:${stat.size}`;
+          let gzipped = staticGzipCache.get(cacheKey);
+          if (!gzipped) {
+            const rawContent = fs.readFileSync(filePath);
+            gzipped = zlib.gzipSync(rawContent, { level: 6 });
+            staticGzipCache.set(cacheKey, gzipped);
+          }
+          headers['Content-Length'] = gzipped.length;
           res.writeHead(200, headers);
-          fs.createReadStream(filePath).pipe(zlib.createGzip({ level: 6 })).pipe(res);
+          res.end(gzipped);
         } else {
           headers['Content-Length'] = stat.size;
           res.writeHead(200, headers);

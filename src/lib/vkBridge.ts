@@ -204,6 +204,22 @@ export async function initVkBridge(): Promise<{
   const bridge = getVkBridge();
   if (bridge && typeof bridge.send === 'function' && isInsideVk) {
     try {
+      // Subscribe to VK Bridge events for dynamic safe-area insets
+      if (typeof bridge.subscribe === 'function') {
+        bridge.subscribe((event: any) => {
+          if (event?.detail?.type === 'VKWebAppUpdateConfig') {
+            const insets = event.detail.data?.insets;
+            if (insets && typeof document !== 'undefined') {
+              const root = document.documentElement;
+              if (insets.top != null) root.style.setProperty('--vk-safe-area-top', `${insets.top}px`);
+              if (insets.right != null) root.style.setProperty('--vk-safe-area-right', `${insets.right}px`);
+              if (insets.bottom != null) root.style.setProperty('--vk-safe-area-bottom', `${insets.bottom}px`);
+              if (insets.left != null) root.style.setProperty('--vk-safe-area-left', `${insets.left}px`);
+            }
+          }
+        });
+      }
+
       await bridge.send('VKWebAppInit');
       await setVkViewSettings({
         statusBarStyle: 'dark',
@@ -232,6 +248,33 @@ export async function initVkBridge(): Promise<{
 
   cachedVkUser = user;
   return { success: isVkMiniApp(), user, launchParams };
+}
+
+/**
+ * Request native VK permission for bot community messages (VKWebAppAllowMessagesFromGroup)
+ * and/or push notifications inside VK Mini App
+ */
+export async function requestVkNotificationsPermission(groupId: number = 242573933): Promise<{ success: boolean; error?: string }> {
+  const bridge = getVkBridge();
+  if (!bridge || typeof bridge.send !== 'function') {
+    return { success: false, error: 'VK Bridge недоступен вне клиента ВКонтакте' };
+  }
+
+  try {
+    const res = await bridge.send('VKWebAppAllowMessagesFromGroup', { group_id: groupId });
+    if (res?.result) {
+      return { success: true };
+    }
+  } catch (e: any) {
+    // If user already gave permission or dismissed without fatal block
+    const reason = e?.error_data?.error_reason || '';
+    if (reason.includes('already') || e?.error_type === 'client_error') {
+      return { success: true };
+    }
+    return { success: false, error: e?.error_data?.error_description || reason || e?.message || 'Разрешение не получено' };
+  }
+
+  return { success: true };
 }
 
 /**
