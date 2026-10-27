@@ -220,7 +220,7 @@ export const MAIN_VK_INLINE_KEYBOARD = createVkKeyboard({
   inline: true,
   buttons: [
     [
-      { label: '🚀 Запустить IT-Старт (Mini App)', app_id: VK_APP_ID, owner_id: -Number(VK_GROUP_ID) },
+      { label: '🚀 Запустить IT-Старт (Mini App)', app_id: VK_APP_ID },
     ],
     [
       { label: '💼 Стажировки', payload: { cmd: 'vacancies' }, color: 'primary' },
@@ -251,7 +251,7 @@ export const MAIN_VK_KEYBOARD = createVkKeyboard({
     ],
     [
       { label: '🔔 Подписка', payload: { cmd: 'subscribe' }, color: 'positive' },
-      { label: '🚀 Запустить IT-Старт', app_id: VK_APP_ID, owner_id: -Number(VK_GROUP_ID) },
+      { label: '🚀 Запустить IT-Старт', app_id: VK_APP_ID },
     ],
   ],
 });
@@ -260,7 +260,7 @@ export const VACANCIES_VK_KEYBOARD = createVkKeyboard({
   inline: true,
   buttons: [
     [
-      { label: '🚀 Запустить IT-Старт (Mini App)', app_id: VK_APP_ID, owner_id: -Number(VK_GROUP_ID) },
+      { label: '🚀 Запустить IT-Старт (Mini App)', app_id: VK_APP_ID },
     ],
     [
       { label: '💻 Frontend', payload: { cmd: 'direction', id: 'frontend' }, color: 'primary' },
@@ -300,7 +300,7 @@ export const COMPANIES_VK_KEYBOARD = createVkKeyboard({
       { label: 'VK', payload: { cmd: 'company', id: 'vk' }, color: 'secondary' },
     ],
     [
-      { label: '🚀 Открыть в Mini App', app_id: VK_APP_ID, owner_id: -Number(VK_GROUP_ID) },
+      { label: '🚀 Открыть в Mini App', app_id: VK_APP_ID },
     ],
   ],
 });

@@ -1002,6 +1002,23 @@ describe('12. VKontakte (VK) Bot & VK Mini App Integration', () => {
     const compKbParsed = JSON.parse(vkBotModule.COMPANIES_VK_KEYBOARD);
     const compTotalButtons = compKbParsed.buttons.flat().length;
     expect(compTotalButtons).toBeLessThanOrEqual(10); // VK inline keyboard hard limit
+
+    // 4b. Ensure open_app buttons in all predefined keyboards do NOT have owner_id (prevents foreign VPN blocks)
+    const allPredefinedKeyboards = [
+      vkBotModule.MAIN_VK_INLINE_KEYBOARD,
+      vkBotModule.MAIN_VK_KEYBOARD,
+      vkBotModule.VACANCIES_VK_KEYBOARD,
+      vkBotModule.COMPANIES_VK_KEYBOARD,
+    ];
+    for (const kbStr of allPredefinedKeyboards) {
+      const parsed = JSON.parse(kbStr);
+      parsed.buttons.flat().forEach((btn: any) => {
+        if (btn.action && btn.action.type === 'open_app') {
+          expect(btn.action.owner_id).toBeUndefined();
+          expect(btn.action.app_id).toBeDefined();
+        }
+      });
+    }
   });
 
   it('validates VK bot command handlers in bot/vk_bot.mjs (start, vacancies, companies, roadmaps, questions, subscribe, status, help)', async () => {

@@ -1466,15 +1466,23 @@ const server = http.createServer(async (req, res) => {
       '.txt': 'text/plain; charset=utf-8',
     };
 
+    const CSP_FRAME_ANCESTORS =
+      "frame-ancestors 'self' https://vk.com https://*.vk.com https://m.vk.com https://m.vk.ru https://*.vk.ru https://*.vk-apps.com https://web.telegram.org https://*.telegram.org;";
+
     if (fs.existsSync(candidateFile) && fs.statSync(candidateFile).isFile()) {
       const ext = path.extname(candidateFile).toLowerCase();
       const contentType = MIME_TYPES[ext] || 'application/octet-stream';
       const isImmutableAsset = cleanPath.startsWith('/assets/');
 
-      res.writeHead(200, {
+      const responseHeaders = {
         'Content-Type': contentType,
         'Cache-Control': isImmutableAsset ? 'public, max-age=31536000, immutable' : 'no-cache',
-      });
+      };
+      if (ext === '.html') {
+        responseHeaders['Content-Security-Policy'] = CSP_FRAME_ANCESTORS;
+      }
+
+      res.writeHead(200, responseHeaders);
       fs.createReadStream(candidateFile).pipe(res);
       return;
     }
@@ -1486,6 +1494,7 @@ const server = http.createServer(async (req, res) => {
       res.writeHead(200, {
         'Content-Type': 'text/html; charset=utf-8',
         'Cache-Control': 'no-cache',
+        'Content-Security-Policy': CSP_FRAME_ANCESTORS,
       });
       fs.createReadStream(indexHtml).pipe(res);
       return;
