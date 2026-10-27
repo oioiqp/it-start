@@ -42,23 +42,8 @@
         } catch (e) {}
       })();
     </script>
-    <!-- Non-blocking Telegram Mini App Script (Loaded only when launching inside Telegram) -->
-    <script>
-      (function() {
-        try {
-          var isInsideTg = window.location.search.indexOf('tgWebAppData') !== -1 ||
-                           window.location.hash.indexOf('tgWebAppData') !== -1 ||
-                           (window.Telegram && window.Telegram.WebApp) ||
-                           (navigator.userAgent && navigator.userAgent.indexOf('Telegram') !== -1);
-          if (isInsideTg) {
-            var tgScript = document.createElement('script');
-            tgScript.src = 'https://telegram.org/js/telegram-web-app.js';
-            tgScript.async = true;
-            document.head.appendChild(tgScript);
-          }
-        } catch (e) {}
-      })();
-    </script>
+    <!-- Telegram Mini App Official WebApp Script -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
   </head>
   <body class="antialiased selection:bg-neutral-900 selection:text-white">
     <div id="root"></div>

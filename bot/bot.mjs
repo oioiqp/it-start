@@ -1430,6 +1430,45 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  if (urlPath === '/notify' && req.method === 'POST') {
+    let body = '';
+    req.on('data', (chunk) => {
+      body += chunk;
+    });
+    req.on('end', async () => {
+      try {
+        const parsed = JSON.parse(body || '{}');
+        const { chatId, text } = parsed;
+        if (!chatId || !text) {
+          res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
+          res.end(JSON.stringify({ success: false, error: 'chatId and text are required' }));
+          return;
+        }
+
+        const tgRes = await callTelegram('sendMessage', {
+          chat_id: chatId,
+          text,
+          parse_mode: 'HTML',
+          reply_markup: {
+            inline_keyboard: [
+              [
+                { text: '🚀 Открыть IT-Старт', web_app: { url: WEBAPP_URL } },
+                { text: '💬 Бот @' + BOT_USERNAME, url: `https://t.me/${BOT_USERNAME}` },
+              ],
+            ],
+          },
+        });
+
+        res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+        res.end(JSON.stringify({ success: tgRes.ok, messageId: tgRes.result?.message_id, error: tgRes.description }));
+      } catch (e) {
+        res.writeHead(500, { 'Content-Type': 'application/json; charset=utf-8' });
+        res.end(JSON.stringify({ success: false, error: e.message }));
+      }
+    });
+    return;
+  }
+
   if (urlPath === '/vk/status') {
     res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
     try {

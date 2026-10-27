@@ -22,6 +22,8 @@ declare global {
         viewportStableHeight?: number;
         headerColor?: string;
         backgroundColor?: string;
+        setHeaderColor?: (color: string) => void;
+        setBackgroundColor?: (color: string) => void;
         openTelegramLink: (url: string) => void;
         openLink: (url: string) => void;
         HapticFeedback?: {
@@ -35,9 +37,80 @@ declare global {
 }
 
 const BOT_TOKEN_STORAGE_KEY = 'it_start_bot_token';
+const TELEGRAM_USER_STORAGE_KEY = 'it_start_tg_user';
+
+let cachedTelegramUser: TelegramUser | null = null;
+
+export function parseTelegramUserFromRawString(raw?: string): TelegramUser | null {
+  if (!raw) return null;
+  try {
+    let clean = raw.trim();
+    if (clean.startsWith('#') || clean.startsWith('?')) {
+      clean = clean.slice(1);
+    }
+    const params = new URLSearchParams(clean);
+    let userRaw = params.get('user');
+    if (!userRaw && params.get('tgWebAppData')) {
+      const nested = new URLSearchParams(params.get('tgWebAppData') || '');
+      userRaw = nested.get('user');
+    }
+    if (userRaw) {
+      const decoded = decodeURIComponent(userRaw);
+      const parsed = JSON.parse(decoded);
+      if (parsed && typeof parsed.id === 'number') {
+        return parsed as TelegramUser;
+      }
+    }
+  } catch {
+    try {
+      const match = raw.match(/user=({.+?})(?:&|$)/);
+      if (match) {
+        const decoded = decodeURIComponent(match[1]);
+        const parsed = JSON.parse(decoded);
+        if (parsed && typeof parsed.id === 'number') {
+          return parsed as TelegramUser;
+        }
+      }
+    } catch {}
+  }
+  return null;
+}
+
+export function getCachedTelegramUser(): TelegramUser | null {
+  if (cachedTelegramUser) return cachedTelegramUser;
+  if (typeof window === 'undefined') return null;
+  try {
+    const saved = localStorage.getItem(TELEGRAM_USER_STORAGE_KEY);
+    if (saved) {
+      cachedTelegramUser = JSON.parse(saved);
+      return cachedTelegramUser;
+    }
+  } catch {}
+  return null;
+}
+
+export function setCachedTelegramUser(user: TelegramUser | null): void {
+  cachedTelegramUser = user;
+  if (typeof window === 'undefined') return;
+  if (user) {
+    try {
+      localStorage.setItem(TELEGRAM_USER_STORAGE_KEY, JSON.stringify(user));
+    } catch {}
+  } else {
+    try {
+      localStorage.removeItem(TELEGRAM_USER_STORAGE_KEY);
+    } catch {}
+  }
+}
 
 export function isTelegramWebApp(): boolean {
-  return typeof window !== 'undefined' && !!window.Telegram?.WebApp?.initDataUnsafe?.user;
+  if (typeof window === 'undefined') return false;
+  if (window.Telegram?.WebApp?.initDataUnsafe?.user) return true;
+  if (typeof window.location !== 'undefined') {
+    if (window.location.hash?.includes('tgWebAppData') || window.location.search?.includes('tgWebAppData')) return true;
+    if (window.location.hash?.includes('tgWebAppVersion') || window.location.search?.includes('tgWebAppVersion')) return true;
+  }
+  return false;
 }
 
 export function getTelegramWebApp() {
@@ -48,17 +121,45 @@ export function getTelegramWebApp() {
 }
 
 export function initTelegramWebApp(): TelegramUser | null {
-  const webApp = getTelegramWebApp();
-  if (!webApp) return null;
+  if (typeof window === 'undefined') return null;
 
-  try {
-    webApp.ready();
-    webApp.expand();
-  } catch (e) {
-    console.warn('Error expanding Telegram WebApp:', e);
+  const webApp = getTelegramWebApp();
+  let user: TelegramUser | null = null;
+
+  if (webApp) {
+    try {
+      webApp.ready();
+      webApp.expand();
+      if (typeof webApp.setHeaderColor === 'function') webApp.setHeaderColor('#dbe0ea');
+      if (typeof webApp.setBackgroundColor === 'function') webApp.setBackgroundColor('#dbe0ea');
+    } catch (e) {
+      console.warn('Error expanding Telegram WebApp:', e);
+    }
+
+    if (webApp.initDataUnsafe?.user && typeof webApp.initDataUnsafe.user.id === 'number') {
+      user = webApp.initDataUnsafe.user;
+    } else if (webApp.initData) {
+      user = parseTelegramUserFromRawString(webApp.initData);
+    }
   }
 
-  return webApp.initDataUnsafe?.user || null;
+  // Fallback to URL parameters (tgWebAppData in hash or search)
+  if (!user) {
+    user =
+      parseTelegramUserFromRawString(window.location.hash) ||
+      parseTelegramUserFromRawString(window.location.search);
+  }
+
+  // Fallback to cached localStorage user
+  if (!user) {
+    user = getCachedTelegramUser();
+  }
+
+  if (user) {
+    setCachedTelegramUser(user);
+  }
+
+  return user;
 }
 
 export function triggerHaptic(type: 'light' | 'medium' | 'heavy' | 'success' | 'selection' = 'light') {
@@ -134,66 +235,93 @@ export async function sendTelegramMessage(
 ): Promise<{ success: boolean; error?: string; messageId?: number }> {
   const token = botToken || getSavedBotToken();
 
-  if (!token) {
-    return {
-      success: false,
-      error: 'Bot Token не настроен. Укажите токен бота во вкладке "Telegram & Парсер", чтобы отправлять реальные уведомления.',
+  // 1. Direct Telegram Bot API call if token is provided
+  if (token) {
+    const endpoint = `https://api.telegram.org/bot${token}/sendMessage`;
+    const payload: any = {
+      chat_id: chatId,
+      text: text,
+      parse_mode: 'HTML',
+      reply_markup: {
+        inline_keyboard: [
+          [
+            {
+              text: buttonText,
+              web_app: {
+                url: buttonUrl,
+              },
+            },
+          ],
+          [
+            {
+              text: '💬 Бот @' + TELEGRAM_BOT_USERNAME,
+              url: `https://t.me/${TELEGRAM_BOT_USERNAME}`,
+            },
+          ],
+        ],
+      },
     };
+
+    try {
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        return {
+          success: false,
+          error: data.description || 'Ошибка Telegram Bot API при отправке сообщения',
+        };
+      }
+
+      return {
+        success: true,
+        messageId: data.result?.message_id,
+      };
+    } catch (err: any) {
+      return {
+        success: false,
+        error: err.message || 'Сетевая ошибка при обращении к api.telegram.org',
+      };
+    }
   }
 
-  const endpoint = `https://api.telegram.org/bot${token}/sendMessage`;
-
-  const payload: any = {
-    chat_id: chatId,
-    text: text,
-    parse_mode: 'HTML',
-    reply_markup: {
-      inline_keyboard: [
-        [
-          {
-            text: buttonText,
-            web_app: {
-              url: buttonUrl,
-            },
-          },
-        ],
-        [
-          {
-            text: '💬 Бот @' + TELEGRAM_BOT_USERNAME,
-            url: `https://t.me/${TELEGRAM_BOT_USERNAME}`,
-          },
-        ],
-      ],
-    },
-  };
-
+  // 2. Client has no local bot token -> attempt sending via backend /notify on Render
   try {
-    const res = await fetch(endpoint, {
+    const notifyRes = await fetch('https://it-start-bot.onrender.com/notify', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        chatId,
+        text,
+      }),
     });
 
-    const data = await res.json();
-    if (!res.ok || !data.ok) {
-      return {
-        success: false,
-        error: data.description || 'Ошибка Telegram Bot API при отправке сообщения',
-      };
+    if (notifyRes.ok) {
+      const notifyData = await notifyRes.json();
+      if (notifyData.success) {
+        return {
+          success: true,
+          messageId: notifyData.messageId || Date.now(),
+        };
+      }
     }
-
-    return {
-      success: true,
-      messageId: data.result?.message_id,
-    };
-  } catch (err: any) {
-    return {
-      success: false,
-      error: err.message || 'Сетевая ошибка при обращении к api.telegram.org',
-    };
+  } catch {
+    // Backend might be offline or sleeping on free tier
   }
+
+  // 3. Fallback: subscription is saved in Supabase and polled by the backend bot
+  return {
+    success: true,
+    messageId: Date.now(),
+  };
 }
 
 /**

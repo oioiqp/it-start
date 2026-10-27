@@ -4,6 +4,7 @@ import {
   Building2,
   Briefcase,
   Bot,
+  Send,
   RefreshCw,
   X,
   SlidersHorizontal,
@@ -45,7 +46,14 @@ import {
   saveLocalTheme,
 } from './lib/storage';
 import { initTelegramWebApp, triggerHaptic } from './lib/telegram';
-import { initVkBridge, isVkMiniApp, type VkUser, type VkLaunchParams } from './lib/vkBridge';
+import {
+  initVkBridge,
+  isVkMiniApp,
+  getCachedVkUser,
+  getVkLaunchParams,
+  type VkUser,
+  type VkLaunchParams,
+} from './lib/vkBridge';
 import { VK_COMMUNITY_URL } from './lib/vk';
 
 export function App() {
@@ -53,14 +61,22 @@ export function App() {
   const [activeTab, setActiveTab] = useState<'internships' | 'roadmaps' | 'questions' | 'telegram'>('internships');
 
   // Telegram User & Subscription
-  const [telegramUser, setTelegramUser] = useState<TelegramUser | null>(null);
-  const [currentSubscription, setCurrentSubscription] = useState<TelegramSubscription | null>(null);
+  const [telegramUser, setTelegramUser] = useState<TelegramUser | null>(() => initTelegramWebApp());
+  const [currentSubscription, setCurrentSubscription] = useState<TelegramSubscription | null>(() => getLocalSubscription());
   const [isSubscribeModalOpen, setIsSubscribeModalOpen] = useState<boolean>(false);
 
   // VK Mini App User & Params
-  const [vkUser, setVkUser] = useState<VkUser | null>(null);
-  const [_vkLaunchParams, setVkLaunchParams] = useState<VkLaunchParams>({});
-  const [isVk, setIsVk] = useState<boolean>(false);
+  const [vkUser, setVkUser] = useState<VkUser | null>(() => {
+    const cached = getCachedVkUser();
+    if (cached) return cached;
+    const lp = getVkLaunchParams();
+    if (lp.vk_user_id) {
+      return { id: lp.vk_user_id, first_name: 'Пользователь VK' };
+    }
+    return null;
+  });
+  const [_vkLaunchParams, setVkLaunchParams] = useState<VkLaunchParams>(() => getVkLaunchParams());
+  const [isVk, setIsVk] = useState<boolean>(() => isVkMiniApp());
 
   // User Progress
   const [userProgress, setUserProgress] = useState<UserProgress>(() => getLocalProgress());
@@ -112,6 +128,18 @@ export function App() {
     const user = initTelegramWebApp();
     if (user) {
       setTelegramUser(user);
+    } else {
+      let checks = 0;
+      const interval = setInterval(() => {
+        checks++;
+        const delayedUser = initTelegramWebApp();
+        if (delayedUser) {
+          setTelegramUser(delayedUser);
+          clearInterval(interval);
+        } else if (checks >= 10) {
+          clearInterval(interval);
+        }
+      }, 150);
     }
 
     // 2. Detect and initialize VK Mini App
@@ -413,6 +441,56 @@ export function App() {
                 >
                   <Bot className="w-3.5 h-3.5" />
                   <span className="text-xs font-semibold">Уведомления</span>
+                </button>
+              </div>
+            )}
+
+            {/* Telegram Mini App Profile Card (When opened inside Telegram) */}
+            {telegramUser && !vkUser && (
+              <div className="flex items-center justify-between gap-2.5 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-full liquid-glass border border-sky-500/25 shadow-xs transition-all duration-300">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  {telegramUser.photo_url ? (
+                    <img
+                      src={telegramUser.photo_url}
+                      alt={telegramUser.first_name || 'TG'}
+                      className="w-8 h-8 rounded-full object-cover border border-sky-500/30 shrink-0 shadow-xs"
+                    />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-sky-600 to-blue-500 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
+                      {telegramUser.first_name ? telegramUser.first_name.slice(0, 2).toUpperCase() : 'TG'}
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="text-xs sm:text-sm font-bold text-neutral-900 truncate">
+                        {telegramUser.first_name} {telegramUser.last_name || ''}
+                      </span>
+                      {telegramUser.username && (
+                        <span className="text-[11px] text-neutral-500 font-medium truncate">
+                          @{telegramUser.username}
+                        </span>
+                      )}
+                      <span className="w-1.5 h-1.5 rounded-full bg-sky-500 shrink-0" />
+                      <span className="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-sky-500/10 text-sky-700 border border-sky-500/20 shrink-0">
+                        Telegram Mini App
+                      </span>
+                    </div>
+                    <div className="text-[10px] sm:text-[11px] text-neutral-500 font-medium truncate">
+                      {userProgress.completedTopics.length} тем • {userProgress.completedQuestions.length} вопросов
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => {
+                    triggerHaptic('medium');
+                    setIsSubscribeModalOpen(true);
+                  }}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neutral-900 hover:bg-black text-white text-xs font-semibold shadow-xs transition-all active:scale-95 shrink-0 cursor-pointer"
+                  title="Настроить уведомления в Telegram"
+                >
+                  <Send className="w-3.5 h-3.5 text-sky-400" />
+                  <span className="text-xs font-semibold">Уведомления TG</span>
                 </button>
               </div>
             )}

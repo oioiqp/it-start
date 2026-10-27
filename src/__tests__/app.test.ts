@@ -1637,4 +1637,119 @@ describe('14. Mobile VK Header Clearance, Liquid Glass Translucency & Dual Notif
   });
 });
 
+describe('15. Telegram Mini App & VK Cross-Platform Integration & Modal Geometry Stability', () => {
+  it('parses Telegram user from raw hash and search strings reliably', async () => {
+    const { parseTelegramUserFromRawString } = await import('../lib/telegram');
+
+    const sampleHash =
+      '#tgWebAppData=user%3D%257B%2522id%2522%253A482655491%252C%2522first_name%2522%253A%2522%25D0%25A2%25D0%25B8%25D0%25BC%25D1%2583%25D1%2580%2522%252C%2522username%2522%253A%2522timur_dev%2522%257D&tgWebAppVersion=7.0';
+    const user = parseTelegramUserFromRawString(sampleHash);
+    expect(user).toBeDefined();
+    expect(user?.id).toBe(482655491);
+    expect(user?.first_name).toBe('Тимур');
+    expect(user?.username).toBe('timur_dev');
+  });
+
+  it('SubscribeModal in VK mode: defaults to VK, displays profile, no token input, has switch to TG', async () => {
+    const React = await import('react');
+    const { renderToString } = await import('react-dom/server');
+    const { SubscribeModal } = await import('../components/SubscribeModal');
+
+    const html = renderToString(
+      React.createElement(SubscribeModal, {
+        isOpen: true,
+        onClose: () => {},
+        telegramUser: null,
+        vkUser: { id: 482655491, first_name: 'Тимур', last_name: 'Латыпов' },
+        isVk: true,
+        currentSubscription: null,
+        onSubscriptionSaved: () => {},
+      })
+    );
+
+    // Channel must be VK
+    expect(html).toContain('Уведомления ВКонтакте');
+    expect(html).toContain('Тимур Латыпов');
+    expect(html).toContain('482655491');
+    expect(html).toContain('Подключить в VK');
+    expect(html).toContain('Настроить через Telegram');
+
+    // No BotFather token prompt or input in VK Mini App
+    expect(html).not.toContain('Bot Token для пушей в Telegram');
+    expect(html).not.toContain('@BotFather');
+  });
+
+  it('SubscribeModal in Telegram mode: defaults to TG, displays profile with id prefilled, no token prompt, has switch to VK', async () => {
+    const React = await import('react');
+    const { renderToString } = await import('react-dom/server');
+    const { SubscribeModal } = await import('../components/SubscribeModal');
+
+    const html = renderToString(
+      React.createElement(SubscribeModal, {
+        isOpen: true,
+        onClose: () => {},
+        telegramUser: { id: 99887711, first_name: 'Тимур', username: 'timur_izh' },
+        vkUser: null,
+        isVk: false,
+        currentSubscription: null,
+        onSubscriptionSaved: () => {},
+      })
+    );
+
+    // Channel must be Telegram
+    expect(html).toContain('Уведомления в Telegram');
+    expect(html).toContain('timur_izh');
+    expect(html).toContain('99887711');
+    expect(html).toContain('Подключить в TG');
+    expect(html).toContain('Настроить через ВКонтакте');
+
+    // No Bot Token prompt inside Telegram WebApp
+    expect(html).not.toContain('@BotFather');
+    expect(html).toContain('Telegram Bot API подключен');
+  });
+
+  it('verifies SubscribeModal has rock-solid layout container with min-height and flex-col to prevent jumping', async () => {
+    const React = await import('react');
+    const { renderToString } = await import('react-dom/server');
+    const { SubscribeModal } = await import('../components/SubscribeModal');
+
+    const html = renderToString(
+      React.createElement(SubscribeModal, {
+        isOpen: true,
+        onClose: () => {},
+        telegramUser: null,
+        vkUser: null,
+        isVk: false,
+        currentSubscription: null,
+        onSubscriptionSaved: () => {},
+      })
+    );
+
+    expect(html).toContain('min-h-[580px]');
+    expect(html).toContain('flex flex-col');
+  });
+
+  it('verifies Navbar renders harmonious Telegram profile capsule and TG Бот button when inside Telegram', async () => {
+    const React = await import('react');
+    const { renderToString } = await import('react-dom/server');
+    const { Navbar } = await import('../components/Navbar');
+
+    const html = renderToString(
+      React.createElement(Navbar, {
+        activeTab: 'internships',
+        setActiveTab: () => {},
+        telegramUser: { id: 55443322, first_name: 'Тимур', username: 'timur_app' },
+        vkUser: null,
+        isVk: false,
+        onOpenSubscribeModal: () => {},
+      })
+    );
+
+    expect(html).toContain('TG Бот');
+    expect(html).toContain('Mini App');
+    expect(html).toContain('Тимур');
+  });
+});
+
+
 

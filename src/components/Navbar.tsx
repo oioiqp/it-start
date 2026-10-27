@@ -144,22 +144,41 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
             </div>
           ) : telegramUser ? (
-            <button
-              onClick={() => {
-                triggerHaptic('medium');
-                onOpenSubscribeModal();
-              }}
-              className="flex items-center gap-1.5 pl-1.5 pr-2 sm:pr-2.5 py-1 rounded-full bg-sky-500/15 hover:bg-sky-500/25 border border-sky-500/25 text-neutral-900 select-none shrink-0 transition-transform active:scale-95 cursor-pointer"
-              title={`Telegram: ${telegramUser.first_name || ''} (@${telegramUser.username || ''}) • Настроить уведомления`}
-            >
-              <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-sky-600 text-white font-bold text-[10px] flex items-center justify-center">
-                TG
+            <div className="flex items-center gap-1.5 shrink-0">
+              <div
+                className="hidden sm:flex items-center gap-1.5 pl-1.5 pr-2 sm:pr-2.5 py-1 rounded-full bg-sky-500/10 dark:bg-sky-950/40 border border-sky-500/20 text-neutral-900 dark:text-white select-none shrink-0"
+                title={`Telegram: ${telegramUser.first_name || ''} (@${telegramUser.username || ''}) (ID: ${telegramUser.id})`}
+              >
+                {telegramUser.photo_url ? (
+                  <img
+                    src={telegramUser.photo_url}
+                    alt={telegramUser.first_name || 'TG'}
+                    className="w-5 h-5 sm:w-6 sm:h-6 rounded-full object-cover border border-sky-500/40"
+                  />
+                ) : (
+                  <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-sky-600 text-white font-bold text-[10px] flex items-center justify-center">
+                    TG
+                  </div>
+                )}
+                <span className="text-xs font-semibold hidden md:inline truncate max-w-[100px]">
+                  {telegramUser.first_name || 'Telegram'}
+                </span>
+                <span className="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-sky-500/10 text-sky-700 border border-sky-500/20 hidden sm:inline">
+                  Mini App
+                </span>
               </div>
-              <span className="text-xs font-semibold hidden md:inline truncate max-w-[100px]">
-                {telegramUser.first_name || 'Telegram'}
-              </span>
-              <Bot className="w-3.5 h-3.5 text-sky-600" />
-            </button>
+              <button
+                onClick={() => {
+                  triggerHaptic('medium');
+                  onOpenSubscribeModal();
+                }}
+                className="flex items-center gap-1 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full font-semibold text-xs transition-transform duration-150 active:scale-95 shadow-xs shrink-0 bg-neutral-900 hover:bg-black text-white dark:bg-white dark:text-neutral-900 cursor-pointer"
+                title={`Telegram: ${telegramUser.first_name || ''} • Уведомления`}
+              >
+                <Send className="w-3.5 h-3.5 text-sky-400" />
+                <span className="hidden sm:inline">TG Бот</span>
+              </button>
+            </div>
           ) : (
             <button
               onClick={() => {
