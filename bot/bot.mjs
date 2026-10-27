@@ -81,6 +81,8 @@ if (dns.setDefaultResultOrder) {
 
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || process.argv[2] || '';
 const GITHUB_PAGES_URL = 'https://oioiqp.github.io/it-start/';
+export const RENDER_URL = process.env.RENDER_URL || 'https://it-start-bot.onrender.com/';
+export const WEBAPP_URL = process.env.WEBAPP_URL || RENDER_URL;
 const BOT_USERNAME = 'IT_start_izh_bot';
 const PORT = process.env.PORT || 3000;
 const __botFilename = fileURLToPath(import.meta.url);
@@ -1467,7 +1469,7 @@ const server = http.createServer(async (req, res) => {
     };
 
     const CSP_FRAME_ANCESTORS =
-      "frame-ancestors 'self' https://vk.com https://*.vk.com https://m.vk.com https://m.vk.ru https://*.vk.ru https://*.vk-apps.com https://web.telegram.org https://*.telegram.org;";
+      "frame-ancestors 'self' https://vk.com https://*.vk.com https://vk.ru https://*.vk.ru https://m.vk.com https://m.vk.ru https://vk-apps.com https://*.vk-apps.com https://mail.ru https://*.mail.ru https://telegram.org https://*.telegram.org https://web.telegram.org;";
 
     if (fs.existsSync(candidateFile) && fs.statSync(candidateFile).isFile()) {
       const ext = path.extname(candidateFile).toLowerCase();
@@ -2435,7 +2437,7 @@ export async function scanChannelsAndSyncSupabase(notifySubscribers = true) {
                     [
                       {
                         text: '🚀 Открыть в WebApp',
-                        web_app: { url: GITHUB_PAGES_URL },
+                        web_app: { url: WEBAPP_URL },
                       },
                       {
                         text: isWeb ? '🔗 Страница вакансии' : '🔗 Канал источника',
@@ -2524,7 +2526,7 @@ async function handleMessage(msg) {
           [
             {
               text: '🚀 Запустить IT-Старт WebApp',
-              web_app: { url: GITHUB_PAGES_URL },
+              web_app: { url: WEBAPP_URL },
             },
           ],
           [
@@ -2613,7 +2615,7 @@ async function handleMessage(msg) {
         `• <b>VK Mini App:</b> Платформа IT-Старт оптимизирована для запуска внутри мобильного приложения VK.\n\n` +
         `🔗 <b>Диалог с ботом VK:</b> https://vk.com/im?sel=-242573933\n` +
         `👥 <b>Группа ВКонтакте:</b> https://vk.com/club242573933\n` +
-        `🌐 <b>Сайт платформы:</b> ${GITHUB_PAGES_URL}`,
+        `🌐 <b>Сайт платформы (без VPN):</b> ${RENDER_URL}`,
       parse_mode: 'HTML',
     });
     return;
@@ -2635,7 +2637,7 @@ async function handleMessage(msg) {
         [
           {
             text: '🚀 Открыть IT-Старт',
-            web_app: { url: GITHUB_PAGES_URL },
+            web_app: { url: WEBAPP_URL },
           },
         ],
         [
@@ -2713,7 +2715,7 @@ async function sendVacancies(chatId, filterCompanyId = 'all') {
         [
           {
             text: '🚀 Открыть каталог в WebApp',
-            web_app: { url: GITHUB_PAGES_URL },
+            web_app: { url: WEBAPP_URL },
           },
         ],
       ],
@@ -2765,7 +2767,7 @@ async function sendCompanies(chatId) {
         [
           {
             text: '🚀 Смотреть в WebApp с фильтрами',
-            web_app: { url: GITHUB_PAGES_URL },
+            web_app: { url: WEBAPP_URL },
           },
         ],
       ],
@@ -2812,7 +2814,7 @@ async function sendCompanyVacancies(chatId, companyId) {
       inline_keyboard: [
         [
           { text: `🔗 Канал ${company.channel}`, url: company.channelUrl },
-          { text: '🚀 Открыть в WebApp', web_app: { url: GITHUB_PAGES_URL } },
+          { text: '🚀 Открыть в WebApp', web_app: { url: WEBAPP_URL } },
         ],
         [
           { text: '⬅️ Все компании', callback_data: 'companies' },
@@ -2856,7 +2858,7 @@ async function runManualScan(chatId) {
           { text: '📊 Статус системы', callback_data: 'status' },
         ],
         [
-          { text: '🚀 Открыть WebApp', web_app: { url: GITHUB_PAGES_URL } },
+          { text: '🚀 Открыть WebApp', web_app: { url: WEBAPP_URL } },
         ],
       ],
     },
@@ -2897,7 +2899,7 @@ async function sendStatus(chatId) {
           { text: '💼 Свежие вакансии', callback_data: 'vacancies:all' },
         ],
         [
-          { text: '🚀 Открыть WebApp', web_app: { url: GITHUB_PAGES_URL } },
+          { text: '🚀 Открыть WebApp', web_app: { url: WEBAPP_URL } },
         ],
       ],
     },
@@ -2927,7 +2929,7 @@ async function sendRoadmaps(chatId) {
         [
           {
             text: '🗺 Открыть древо роадмапов в WebApp',
-            web_app: { url: GITHUB_PAGES_URL },
+            web_app: { url: WEBAPP_URL },
           },
         ],
       ],
@@ -2960,7 +2962,7 @@ async function sendHelp(chatId) {
     `/company_avito — Avito Tech\n` +
     `/company_vk — VK\n\n` +
     `💡 <i>Вы также можете просто отправить боту название компании (например: «директум», «t1», «тбанк», «контур»), и бот сразу покажет её стажировки!</i>\n\n` +
-    `🌐 <b>Сайт платформы:</b> ${GITHUB_PAGES_URL}`;
+    `🌐 <b>Сайт платформы (без VPN):</b> ${RENDER_URL}`;
 
   await callTelegram('sendMessage', {
     chat_id: chatId,
@@ -3011,7 +3013,7 @@ async function handleCallbackQuery(query) {
           [
             {
               text: '🚀 Открыть тренажёр в WebApp',
-              web_app: { url: GITHUB_PAGES_URL },
+              web_app: { url: WEBAPP_URL },
             },
           ],
         ],

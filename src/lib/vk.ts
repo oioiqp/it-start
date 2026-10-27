@@ -5,7 +5,6 @@
  * и справочник команд бота.
  */
 
-import { GITHUB_PAGES_URL } from './supabase';
 
 export const VK_BOT_NAME = 'IT-Старт VK Бот';
 export const VK_COMMUNITY_URL = 'https://vk.com/club242573933';
@@ -177,9 +176,9 @@ export async function sendVkMessage(
       [
         {
           action: {
-            type: 'open_link',
-            link: GITHUB_PAGES_URL,
-            label: '🚀 Открыть IT-Старт',
+            type: 'open_app',
+            app_id: Number(VK_APP_ID),
+            label: '🚀 Запустить IT-Старт',
           },
         },
       ],

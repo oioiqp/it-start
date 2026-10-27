@@ -534,14 +534,14 @@ export async function notifyVkSubscribers(vacancies = [], token = VK_BOT_TOKEN) 
         `💰 Зарплата: ${vac.salary || 'По договоренности'} | 📍 Формат: ${vac.format || 'Удаленно'}\n` +
         `📢 Источник: ${vac.channel || vac.sourceChannel || 'Канал/Сайт работодателя'}\n\n` +
         `🎯 В IT-Старт уже подготовлен персональный план вопросов для этого направления!\n` +
-        `🔗 Откликнуться: ${vac.url || vac.applyUrl || GITHUB_PAGES_URL}`;
+        `🔗 Откликнуться: ${vac.url || vac.applyUrl || RENDER_URL}`;
 
       const keyboard = createVkKeyboard({
         inline: true,
         buttons: [
           [
-            { label: '🚀 Открыть IT-Старт', link: GITHUB_PAGES_URL },
-            { label: '🔗 Источник', link: vac.url || vac.applyUrl || GITHUB_PAGES_URL },
+            { label: '🚀 Открыть в Mini App', app_id: VK_APP_ID },
+            { label: '🔗 Источник', link: vac.url || vac.applyUrl || RENDER_URL },
           ],
         ],
       });
@@ -943,13 +943,13 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
       companyVacancies.forEach((v, idx) => {
         text += `\n[${idx + 1}] ${v.title}\n`;
         text += `   💰 ${v.salary || 'По договоренности'} | 📍 ${v.format || 'Удаленно'}\n`;
-        text += `   🔗 ${v.applyUrl || v.url || GITHUB_PAGES_URL}\n`;
+        text += `   🔗 ${v.applyUrl || v.url || RENDER_URL}\n`;
       });
     } else {
       text += `🔍 Сейчас прямых позиций в базе нет, но парсер отслеживает канал ${targetCompany.channel} 24/7!\n`;
     }
 
-    text += `\n🚀 Посмотреть все стажировки: ${GITHUB_PAGES_URL}`;
+    text += `\n🚀 VK Mini App: https://vk.com/app${VK_APP_ID}\n🌐 Веб-версия без VPN: ${RENDER_URL}`;
 
     const reply = {
       peer_id: peerId,
@@ -977,13 +977,15 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
       `5. QA: Core (Тест-дизайн, API) + Manual & Auto QA\n` +
       `6. DevOps: Core (Linux, CI/CD) + Docker, Kubernetes, Cloud\n\n` +
       `🚀 Открыть интерактивное древо роадмапов с сохранением личного прогресса:\n` +
-      `${GITHUB_PAGES_URL}`;
+      `https://vk.com/app${VK_APP_ID}\n` +
+      `🌐 Без VPN в браузере: ${RENDER_URL}`;
 
     const keyboard = createVkKeyboard({
       inline: true,
       buttons: [
-        [{ label: '🗺 Открыть роадмапы в IT-Старт', link: GITHUB_PAGES_URL }],
+        [{ label: '🚀 Открыть роадмапы (Mini App)', app_id: VK_APP_ID }],
         [{ label: '💼 Посмотреть стажировки', payload: { cmd: 'vacancies' }, color: 'primary' }],
+        [{ label: '🌐 Сайт без VPN', link: RENDER_URL }],
       ],
     });
 
@@ -1012,13 +1014,15 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
       `• Устройство Docker & cgroups/namespaces\n` +
       `• Clean Architecture & SOLID\n\n` +
       `🎯 Доступен режим флеш-карточек и симуляция реального собеседования со скрытием правильного ответа!\n\n` +
-      `🚀 Запустить тренажёр: ${GITHUB_PAGES_URL}`;
+      `🚀 Запустить тренажёр: https://vk.com/app${VK_APP_ID}\n` +
+      `🌐 Без VPN в браузере: ${RENDER_URL}`;
 
     const keyboard = createVkKeyboard({
       inline: true,
       buttons: [
-        [{ label: '🎯 Открыть тренажёр вопросов', link: GITHUB_PAGES_URL }],
+        [{ label: '🚀 Запустить тренажёр (Mini App)', app_id: VK_APP_ID }],
         [{ label: '💼 Каталог вакансий', payload: { cmd: 'vacancies' }, color: 'primary' }],
+        [{ label: '🌐 Сайт без VPN', link: RENDER_URL }],
       ],
     });
 
@@ -1098,7 +1102,8 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
       `👥 Активных подписчиков в VK: ${vkSubscribers.size}\n` +
       `🕒 Последнее сканирование: ${LAST_SCAN_STATUS.lastScanAt || 'недавно'}\n` +
       `💾 База данных: Supabase PostgreSQL (public.internships)\n\n` +
-      `🚀 Платформа: ${GITHUB_PAGES_URL}`;
+      `🚀 VK Mini App: https://vk.com/app${VK_APP_ID}\n` +
+      `🌐 Веб-версия без VPN: ${RENDER_URL}`;
 
     const reply = {
       peer_id: peerId,
@@ -1158,7 +1163,8 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
     const text =
       `🚀 Платформа «IT-Старт» доступна как VK Mini App, Telegram Mini App и веб-сервис:\n\n` +
       `📱 VK Mini App: запускается прямо в клиенте ВКонтакте с авто-подстановкой профиля\n` +
-      `🌐 Веб-сайт: ${GITHUB_PAGES_URL}\n` +
+      `🌐 Веб-сайт без VPN: ${RENDER_URL}\n` +
+      `🌐 Зеркало GitHub Pages: ${GITHUB_PAGES_URL}\n` +
       `✈️ Telegram-бот: https://t.me/IT_start_izh_bot\n\n` +
       `В интерактивном приложении вас ждут:\n` +
       `• Интерактивные роадмапы со шкалой готовности в %\n` +
@@ -1173,8 +1179,8 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
       });
     }
     appRow.push({
-      label: '🚀 Перейти на сайт IT-Старт',
-      link: GITHUB_PAGES_URL,
+      label: '🌐 Сайт без VPN',
+      link: RENDER_URL,
     });
 
     const keyboard = createVkKeyboard({

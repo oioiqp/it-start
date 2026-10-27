@@ -1,12 +1,4 @@
-/**
- * Lightweight VK Bridge Adapter & Launch Parameters Parser
- *
- * Implements official VK Mini App bridge protocol:
- * - Detects execution inside VK iframe / mobile app via URL query params & window.vkBridge
- * - Parses vk_* launch parameters (vk_user_id, vk_app_id, vk_platform, vk_language)
- * - Safely calls VKWebAppInit, VKWebAppGetUserInfo, and Taptic feedback
- * - Graceful fallback in standard browser and test environments
- */
+import officialVkBridge from '@vkontakte/vk-bridge';
 
 export interface VkLaunchParams {
   vk_user_id?: number;
@@ -104,6 +96,16 @@ export function parseVkLaunchParams(searchString?: string): VkLaunchParams {
 }
 
 /**
+ * Get active VK Bridge instance (window.vkBridge if defined, otherwise official @vkontakte/vk-bridge)
+ */
+export function getVkBridge() {
+  if (typeof window !== 'undefined' && (window as any).vkBridge) {
+    return (window as any).vkBridge;
+  }
+  return officialVkBridge;
+}
+
+/**
  * Detect if the application is currently running inside VK Mini App
  */
 export function isVkMiniApp(): boolean {
@@ -116,7 +118,8 @@ export function isVkMiniApp(): boolean {
   }
 
   // 2. Check if running inside VK mobile WebView
-  if (typeof window.vkBridge?.isWebView === 'function' && window.vkBridge.isWebView()) {
+  const bridge = getVkBridge();
+  if (typeof bridge?.isWebView === 'function' && bridge.isWebView()) {
     return true;
   }
 
@@ -155,12 +158,13 @@ export function setCachedVkUser(user: VkUser | null): void {
  * Configure VK Mini App View Settings (Status Bar and Action Bar colors)
  */
 export async function setVkViewSettings(settings?: VkViewSettings): Promise<boolean> {
-  if (typeof window === 'undefined' || !window.vkBridge || typeof window.vkBridge.send !== 'function') {
+  const bridge = getVkBridge();
+  if (!bridge || typeof bridge.send !== 'function') {
     return false;
   }
 
   try {
-    await window.vkBridge.send('VKWebAppSetViewSettings', {
+    await bridge.send('VKWebAppSetViewSettings', {
       status_bar_style: settings?.statusBarStyle || 'dark',
       action_bar_color: settings?.actionBarColor || '#ffffff',
       navigation_bar_color: settings?.navigationBarColor || '#ffffff',
@@ -197,9 +201,10 @@ export async function initVkBridge(): Promise<{
 
   // 2. Call VKWebAppInit & SetViewSettings if bridge is available and running inside VK
   const isInsideVk = isVkMiniApp();
-  if (window.vkBridge && typeof window.vkBridge.send === 'function' && isInsideVk) {
+  const bridge = getVkBridge();
+  if (bridge && typeof bridge.send === 'function' && isInsideVk) {
     try {
-      await window.vkBridge.send('VKWebAppInit');
+      await bridge.send('VKWebAppInit');
       await setVkViewSettings({
         statusBarStyle: 'dark',
         actionBarColor: '#ffffff',
@@ -207,7 +212,7 @@ export async function initVkBridge(): Promise<{
       });
 
       try {
-        const userInfo = await window.vkBridge.send('VKWebAppGetUserInfo');
+        const userInfo = await bridge.send('VKWebAppGetUserInfo');
         if (userInfo && userInfo.id) {
           user = {
             ...(user || {}),
@@ -248,19 +253,20 @@ export function triggerVkHaptic(
   type: 'impact' | 'notification' | 'selection' = 'impact',
   styleOrResult?: VkHapticImpactStyle | VkHapticNotificationType | string
 ) {
-  if (typeof window === 'undefined' || !window.vkBridge || typeof window.vkBridge.send !== 'function') return;
+  const bridge = getVkBridge();
+  if (!bridge || typeof bridge.send !== 'function') return;
 
   try {
     if (type === 'notification') {
       const resType =
         styleOrResult === 'warning' || styleOrResult === 'error' ? styleOrResult : 'success';
-      window.vkBridge.send('VKWebAppTapticNotificationOccurred', { result_type: resType }).catch(() => {});
+      bridge.send('VKWebAppTapticNotificationOccurred', { result_type: resType }).catch(() => {});
     } else if (type === 'selection') {
-      window.vkBridge.send('VKWebAppTapticSelectionChanged', {}).catch(() => {});
+      bridge.send('VKWebAppTapticSelectionChanged', {}).catch(() => {});
     } else {
       const style =
         styleOrResult === 'medium' || styleOrResult === 'heavy' ? styleOrResult : 'light';
-      window.vkBridge.send('VKWebAppTapticImpactOccurred', { style }).catch(() => {});
+      bridge.send('VKWebAppTapticImpactOccurred', { style }).catch(() => {});
     }
   } catch {
     // Ignore haptic errors on unsupported platforms

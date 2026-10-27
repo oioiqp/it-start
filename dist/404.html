@@ -6,17 +6,18 @@
     <script>
       (function() {
         try {
-          // iOS WKWebView (нативный клиент VK на iPhone)
+          // iOS WKWebView (нативный клиент VK на iPhone / iPad)
           if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.VKWebAppInit) {
             window.webkit.messageHandlers.VKWebAppInit.postMessage({});
           }
-          // Android WebView
-          else if (window.AndroidBridge && typeof window.AndroidBridge.VKWebAppInit === 'function') {
+          // Android WebView (нативный клиент VK на Android)
+          if (window.AndroidBridge && typeof window.AndroidBridge.VKWebAppInit === 'function') {
             window.AndroidBridge.VKWebAppInit(JSON.stringify({}));
           }
-          // Desktop Web / Mobile Web Iframe
-          else if (window.parent && window.parent !== window) {
+          // Desktop Web / Mobile Web Iframe (vk.com, vk.ru, m.vk.com)
+          if (window.parent && window.parent !== window) {
             window.parent.postMessage({ handler: 'VKWebAppInit', params: {}, type: 'vk-connect' }, '*');
+            window.parent.postMessage({ type: 'vk-connect', data: { handler: 'VKWebAppInit', params: {} } }, '*');
           }
         } catch (e) {}
       })();
@@ -46,24 +47,7 @@
     </script>
     <!-- Telegram Mini App Script -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <!-- VK Mini App Bridge Script with Safe Fallback -->
-    <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js" onerror="console.warn('[VK Bridge] CDN unreachable, fallback bridge initialized')"></script>
-    <script>
-      (function() {
-        if (typeof window !== 'undefined' && !window.vkBridge) {
-          window.vkBridge = {
-            send: function(method, params) {
-              return Promise.resolve({ result: true });
-            },
-            subscribe: function() {},
-            unsubscribe: function() {},
-            supports: function() { return false; },
-            isWebView: function() { return false; }
-          };
-        }
-      })();
-    </script>
-    <script type="module" crossorigin src="./assets/index-CnKLrQpZ.js"></script>
+    <script type="module" crossorigin src="./assets/index-FCqVwLeL.js"></script>
     <link rel="stylesheet" crossorigin href="./assets/index-BO2GftUz.css">
   </head>
   <body class="antialiased selection:bg-neutral-900 selection:text-white">
