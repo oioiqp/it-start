@@ -161,7 +161,7 @@ export async function sendVkMessage(
     };
   }
 
-  const cleanPeerId = String(peerId).trim();
+  const cleanPeerId = String(peerId).trim().replace(/^vk_/, '');
   if (!cleanPeerId) {
     return {
       success: false,

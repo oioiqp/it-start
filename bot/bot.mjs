@@ -1470,10 +1470,42 @@ const server = http.createServer(async (req, res) => {
     req.on('end', async () => {
       try {
         const parsed = JSON.parse(body || '{}');
-        const { chatId, text } = parsed;
+        const { chatId, text, platform } = parsed;
         if (!chatId || !text) {
           res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
           res.end(JSON.stringify({ success: false, error: 'chatId and text are required' }));
+          return;
+        }
+
+        const isVkTarget = platform === 'vk' || String(chatId).startsWith('vk_');
+
+        if (isVkTarget) {
+          const { callVk, createVkKeyboard, VK_APP_ID, cleanHtmlForVk } = await import('./vk_bot.mjs');
+          const cleanPeerId = String(chatId).replace(/^vk_/, '');
+          const keyboard = createVkKeyboard({
+            inline: true,
+            buttons: [
+              [
+                { label: '🚀 Открыть IT-Старт (Mini App)', app_id: VK_APP_ID },
+                { label: '🌐 Веб-версия', link: RENDER_URL },
+              ],
+            ],
+          });
+          const vkRes = await callVk('messages.send', {
+            peer_id: cleanPeerId,
+            random_id: Math.floor(Math.random() * 2147483647),
+            message: cleanHtmlForVk(text),
+            keyboard,
+          });
+
+          res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+          res.end(
+            JSON.stringify({
+              success: vkRes.ok,
+              messageId: vkRes.result,
+              error: vkRes.error?.error_msg || vkRes.error,
+            })
+          );
           return;
         }
 
@@ -1509,12 +1541,29 @@ const server = http.createServer(async (req, res) => {
     req.on('end', async () => {
       try {
         const parsed = JSON.parse(body || '{}');
-        const { chatId, username, firstName, directions, sub_tracks } = parsed;
+        const { chatId, username, firstName, directions, sub_tracks, platform } = parsed;
         if (!chatId) {
           res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
           res.end(JSON.stringify({ success: false, error: 'chatId is required' }));
           return;
         }
+
+        const isVkTarget = platform === 'vk' || String(chatId).startsWith('vk_');
+
+        if (isVkTarget) {
+          const { registerVkSubscriber } = await import('./vk_bot.mjs');
+          const cleanPeerId = String(chatId).replace(/^vk_/, '');
+          const sub = await registerVkSubscriber(cleanPeerId, {
+            username,
+            first_name: firstName,
+            directions,
+            sub_tracks,
+          });
+          res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+          res.end(JSON.stringify({ success: true, subscriber: sub }));
+          return;
+        }
+
         const sub = await registerTgSubscriber(chatId, {
           username,
           first_name: firstName,

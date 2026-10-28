@@ -451,5 +451,76 @@ describe('Bot Parity & Comprehensive Functionality Tests (Telegram & VKontakte)'
         expect(String(chatId).startsWith('vk_')).toBe(false);
       }
     });
+
+    it('validates unified subscription service and VK push preference filtering', async () => {
+      const {
+        normalizeVkChatId,
+        stripVkPrefix,
+        saveUnifiedSubscription,
+      } = await import('../services/subscriptionService');
+
+      // Test normalization
+      expect(normalizeVkChatId('12345')).toBe('vk_12345');
+      expect(normalizeVkChatId('vk_12345')).toBe('vk_12345');
+      expect(stripVkPrefix('vk_12345')).toBe('12345');
+      expect(stripVkPrefix('12345')).toBe('12345');
+
+      // Test saving unified VK subscription
+      const saveRes = await saveUnifiedSubscription({
+        platform: 'vk',
+        id: '556677',
+        username: 'vk_user',
+        firstName: 'Виктор',
+        directions: ['frontend'],
+        subTracks: ['react'],
+      });
+      expect(saveRes.success).toBe(true);
+      expect(saveRes.subscription.chat_id).toBe('vk_556677');
+      expect(saveRes.subscription.directions).toEqual(['frontend']);
+
+      // Isolate subscriber map for deterministic preference filtering check
+      const savedSubs = new Map(vkBot.vkSubscribers);
+      vkBot.vkSubscribers.clear();
+      vkBot.clearVkNotifiedCache();
+
+      // Register subscriber with only 'frontend' direction
+      await vkBot.registerVkSubscriber('556677', {
+        first_name: 'Виктор',
+        directions: ['frontend'],
+        sub_tracks: ['react'],
+      });
+
+      // Vacancy with 'backend' should NOT be delivered to frontend subscriber
+      const backendVac = {
+        id: 'vac-backend-999',
+        company: 'Т-Банк',
+        title: 'Стажёр Go / Python',
+        salary: '100 000 ₽',
+        format: 'Удаленно',
+        directionId: 'backend',
+        subTrackId: 'golang',
+      };
+      const sentBackend = await vkBot.notifyVkSubscribers([backendVac]);
+      expect(sentBackend).toBe(0);
+
+      // Vacancy with 'frontend' SHOULD be delivered
+      const frontendVac = {
+        id: 'vac-frontend-999',
+        company: 'Яндекс',
+        title: 'Стажёр Frontend (React)',
+        salary: '110 000 ₽',
+        format: 'Удаленно',
+        directionId: 'frontend',
+        subTrackId: 'react',
+      };
+      const sentFrontend = await vkBot.notifyVkSubscribers([frontendVac]);
+      expect(sentFrontend).toBeGreaterThanOrEqual(1);
+
+      // Restore subscribers map
+      vkBot.vkSubscribers.clear();
+      for (const [k, v] of savedSubs.entries()) {
+        vkBot.vkSubscribers.set(k, v);
+      }
+    });
   });
 });

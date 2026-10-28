@@ -78,11 +78,19 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
 
   const [vkPeerId, setVkPeerId] = useState<string>(() => {
     if (vkUser) return String(vkUser.id);
-    return getSavedVkPeerId() || '';
+    const saved = getSavedVkPeerId();
+    if (saved) return saved;
+    if (currentSubscription && String(currentSubscription.chat_id).startsWith('vk_')) {
+      return String(currentSubscription.chat_id).replace(/^vk_/, '');
+    }
+    return '';
   });
 
   const [vkFullName, setVkFullName] = useState<string>(() => {
     if (vkUser) return `${vkUser.first_name || ''} ${vkUser.last_name || ''}`.trim();
+    if (currentSubscription && String(currentSubscription.chat_id).startsWith('vk_')) {
+      return currentSubscription.username || currentSubscription.first_name || '';
+    }
     return '';
   });
 
@@ -125,7 +133,12 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
         setVkFullName(`${vkUser.first_name || ''} ${vkUser.last_name || ''}`.trim());
       } else {
         const savedPeer = getSavedVkPeerId();
-        if (savedPeer) setVkPeerId(savedPeer);
+        if (savedPeer) {
+          setVkPeerId(savedPeer);
+        } else if (currentSubscription && String(currentSubscription.chat_id).startsWith('vk_')) {
+          setVkPeerId(String(currentSubscription.chat_id).replace(/^vk_/, ''));
+          setVkFullName(currentSubscription.username || currentSubscription.first_name || '');
+        }
       }
     } else if (inTg) {
       setPlatform('telegram');
@@ -133,17 +146,20 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
         setTgChatId(String(telegramUser.id));
         if (telegramUser.username) setTgUsername(telegramUser.username);
         if (telegramUser.first_name) setTgFirstName(telegramUser.first_name);
-      } else if (currentSubscription) {
+      } else if (currentSubscription && !String(currentSubscription.chat_id).startsWith('vk_')) {
         setTgChatId(String(currentSubscription.chat_id));
         if (currentSubscription.username) setTgUsername(currentSubscription.username);
         if (currentSubscription.first_name) setTgFirstName(currentSubscription.first_name);
       }
     } else {
       // Standalone web mode
-      if (currentSubscription && String(currentSubscription.chat_id).length > 0) {
+      if (currentSubscription && !String(currentSubscription.chat_id).startsWith('vk_')) {
         setTgChatId(String(currentSubscription.chat_id));
         if (currentSubscription.username) setTgUsername(currentSubscription.username);
         if (currentSubscription.first_name) setTgFirstName(currentSubscription.first_name);
+      } else if (currentSubscription && String(currentSubscription.chat_id).startsWith('vk_')) {
+        setVkPeerId(String(currentSubscription.chat_id).replace(/^vk_/, ''));
+        setVkFullName(currentSubscription.username || currentSubscription.first_name || '');
       }
       const savedVk = getSavedVkPeerId();
       if (savedVk) setVkPeerId(savedVk);
@@ -242,34 +258,48 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
     setStatusMessage(null);
 
     if (platform === 'vk') {
+      const cleanPeer = currentId.replace(/^vk_/, '');
       const testText = `🔥 Тестовое уведомление IT-Старт ВКонтакте!\n\nВы успешно подключили уведомления в сервисе IT-Старт.\nВыбранные направления: ${selectedDirections.join(', ')}\nВетки: ${selectedSubTracks.join(', ')}\n\nКак только появится новая стажировка под ваш стек, вы получите мгновенный пуш!`;
       const vkToken = getSavedVkToken();
 
+      let delivered = false;
       if (vkToken) {
-        const res = await sendVkMessage(currentId, testText, vkToken);
-        setIsLoading(false);
+        const res = await sendVkMessage(cleanPeer, testText, vkToken);
         if (res.success) {
-          setStatusMessage({
-            type: 'success',
-            text: 'Тестовое уведомление отправлено в VK! Проверьте диалог с сообществом.',
-          });
-          triggerHaptic('success');
-          confetti({ particleCount: 60, spread: 60 });
-        } else {
-          setStatusMessage({
-            type: 'error',
-            text: res.error || 'Не удалось отправить сообщение в VK.',
-          });
+          delivered = true;
         }
-      } else {
-        setIsLoading(false);
-        setStatusMessage({
-          type: 'success',
-          text: 'Уведомления ВКонтакте активны! Чтобы бот мог писать вам в личные сообщения, откройте диалог с ботом и отправьте /subscribe.',
-        });
-        triggerHaptic('success');
-        confetti({ particleCount: 60, spread: 60 });
       }
+
+      if (!delivered) {
+        // Try server-side delivery via Render /notify
+        try {
+          const srvRes = await fetch('https://it-start-bot.onrender.com/notify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              chatId: `vk_${cleanPeer}`,
+              text: testText,
+              platform: 'vk',
+            }),
+          });
+          if (srvRes.ok) {
+            const data = await srvRes.json();
+            if (data.success) {
+              delivered = true;
+            }
+          }
+        } catch {}
+      }
+
+      setIsLoading(false);
+      setStatusMessage({
+        type: 'success',
+        text: delivered
+          ? 'Тестовое уведомление отправлено в VK! Проверьте диалог с сообществом.'
+          : 'Уведомления ВКонтакте активны! Чтобы бот мог писать вам в личные сообщения, откройте диалог с ботом и отправьте /subscribe.',
+      });
+      triggerHaptic('success');
+      confetti({ particleCount: 60, spread: 60 });
       return;
     }
 
@@ -328,8 +358,11 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
       } catch {}
     }
 
+    const cleanPeerId = currentId.replace(/^vk_/, '');
+    const targetChatId = platform === 'vk' ? `vk_${cleanPeerId}` : currentId;
+
     const subData: TelegramSubscription = {
-      chat_id: currentId,
+      chat_id: targetChatId,
       username: currentUsername,
       first_name: currentFirstName,
       directions: selectedDirections,
@@ -339,11 +372,26 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
     };
 
     if (platform === 'vk') {
-      saveVkPeerId(currentId);
-    } else {
-      saveLocalSubscription(subData);
-      saveSubscriptionToSupabase(subData);
+      saveVkPeerId(cleanPeerId);
     }
+    saveLocalSubscription(subData);
+    await saveSubscriptionToSupabase(subData);
+
+    // Optional server sync if online
+    try {
+      fetch('https://it-start-bot.onrender.com/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chatId: targetChatId,
+          username: currentUsername,
+          firstName: currentFirstName,
+          directions: selectedDirections,
+          sub_tracks: selectedSubTracks,
+          platform,
+        }),
+      }).catch(() => {});
+    } catch {}
 
     setIsLoading(false);
     triggerHaptic('success');

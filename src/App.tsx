@@ -56,7 +56,7 @@ import {
   type VkUser,
   type VkLaunchParams,
 } from './lib/vkBridge';
-import { VK_COMMUNITY_URL } from './lib/vk';
+import { VK_COMMUNITY_URL, saveVkPeerId } from './lib/vk';
 
 export function App() {
   // Navigation
@@ -168,11 +168,36 @@ export function App() {
       }, 150);
     }
 
+    const syncVkAutoSubscription = (u: VkUser) => {
+      const vkKey = `vk_${u.id}`;
+      const existing = getLocalSubscription();
+      if (!existing || String(existing.chat_id) !== vkKey || !existing.is_active) {
+        const autoSub: TelegramSubscription = {
+          chat_id: vkKey,
+          username: `${u.first_name || ''} ${u.last_name || ''}`.trim(),
+          first_name: u.first_name || 'Пользователь VK',
+          directions: existing?.directions?.length
+            ? existing.directions
+            : ['frontend', 'backend', 'mobile', 'qa', 'devops', 'data_science'],
+          sub_tracks: existing?.sub_tracks?.length
+            ? existing.sub_tracks
+            : ['react', 'python', 'nodejs', 'golang', 'auto_qa', 'cicd_docker'],
+          is_active: true,
+          created_at: existing?.created_at || new Date().toISOString(),
+        };
+        saveVkPeerId(String(u.id));
+        saveLocalSubscription(autoSub);
+        setCurrentSubscription(autoSub);
+        saveSubscriptionToSupabase(autoSub);
+      }
+    };
+
     // 2. Detect and initialize VK Mini App
     initVkBridge()
       .then((res) => {
         if (res.user) {
           setVkUser(res.user);
+          syncVkAutoSubscription(res.user);
         }
         setVkLaunchParams(res.launchParams);
         setIsVk(isVkMiniApp());
