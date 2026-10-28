@@ -110,7 +110,7 @@ async function run() {
 
     // Check Directum
     if (companyLower.includes('directum') || companyLower.includes('директ')) {
-      if (!newSourceUrl || newSourceUrl === 'https://career.directum.ru/' || newSourceUrl === 'https://career.directum.ru' || newSourceUrl.includes('t.me') || newSourceUrl.includes('clck.ru') || newSourceUrl.includes('vc.ru')) {
+      if (!newSourceUrl || newSourceUrl === 'https://career.directum.ru/' || newSourceUrl === 'https://career.directum.ru' || newSourceUrl.includes('clck.ru') || newSourceUrl.includes('vc.ru')) {
         newSourceUrl = 'https://career.directum.ru/vacancy';
         needsUpdate = true;
       }
@@ -122,7 +122,7 @@ async function run() {
 
     // Check Kontur
     if (companyLower.includes('контур') || companyLower.includes('kontur')) {
-      if (!newSourceUrl || newSourceUrl.includes('t.me') || newSourceUrl.includes('bit.ly') || newSourceUrl.includes('timepad')) {
+      if (!newSourceUrl || newSourceUrl.includes('bit.ly') || newSourceUrl.includes('timepad') || newSourceUrl === 'https://kontur.ru' || newSourceUrl === 'https://kontur.ru/') {
         newSourceUrl = 'https://kontur.ru/career/vacancies';
         needsUpdate = true;
       }
@@ -134,8 +134,8 @@ async function run() {
 
     // Check T1
     if (companyLower.includes('т1') || companyLower.includes('t1')) {
-      if (!newSourceUrl || newSourceUrl.includes('t.me') || newSourceUrl.includes('bit.ly') || newSourceUrl.includes('vk.cc') || newSourceUrl.includes('digital')) {
-        newSourceUrl = 'https://career.t1.ru/';
+      if (!newSourceUrl || newSourceUrl.includes('bit.ly') || newSourceUrl.includes('vk.cc') || newSourceUrl.includes('digital') || newSourceUrl === 'https://career.t1.ru' || newSourceUrl === 'https://career.t1.ru/') {
+        newSourceUrl = 'https://career.t1.ru/vacancies?search=стажер';
         needsUpdate = true;
       }
       if (newSourceName === '@t1_holding') {
@@ -146,23 +146,23 @@ async function run() {
 
     // Check Yandex
     if (companyLower.includes('яндекс') || companyLower.includes('yandex')) {
-      if (!newSourceUrl || newSourceUrl.includes('t.me') || newSourceUrl === 'https://yandex.ru/yabackend/') {
-        newSourceUrl = 'https://yandex.ru/jobs/';
+      if (!newSourceUrl || newSourceUrl === 'https://yandex.ru/yabackend/' || newSourceUrl === 'https://yandex.ru' || newSourceUrl === 'https://yandex.ru/') {
+        newSourceUrl = 'https://yandex.ru/jobs/pages/internship';
         needsUpdate = true;
       }
     }
 
     // Check Avito
     if (companyLower.includes('авито') || companyLower.includes('avito')) {
-      if (!newSourceUrl || newSourceUrl.includes('t.me') || newSourceUrl.includes('/internship/')) {
-        newSourceUrl = 'https://career.avito.com/';
+      if (!newSourceUrl || newSourceUrl === 'https://career.avito.com/' || newSourceUrl === 'https://career.avito.com') {
+        newSourceUrl = 'https://career.avito.com/vacancies/?search=стажер';
         needsUpdate = true;
       }
     }
 
     // Check T-Bank
     if (companyLower.includes('т-банк') || companyLower.includes('тинькофф') || companyLower.includes('tbank')) {
-      if (!newSourceUrl || newSourceUrl.includes('t.me') || newSourceUrl.includes('2w.ru')) {
+      if (!newSourceUrl || newSourceUrl.includes('2w.ru') || newSourceUrl === 'https://tbank.ru' || newSourceUrl === 'https://tbank.ru/') {
         newSourceUrl = 'https://fintech.tbank.ru/start/';
         needsUpdate = true;
       }

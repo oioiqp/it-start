@@ -284,34 +284,47 @@ export async function sendTelegramMessage(
   text: string,
   botToken?: string,
   buttonText = '🚀 Открыть IT-Старт',
-  buttonUrl = GITHUB_PAGES_URL
+  buttonUrl = GITHUB_PAGES_URL,
+  actionButton?: { text: string; url: string }
 ): Promise<{ success: boolean; error?: string; messageId?: number }> {
   const token = botToken || getSavedBotToken();
 
   // 1. Direct Telegram Bot API call if token is provided
   if (token) {
     const endpoint = `https://api.telegram.org/bot${token}/sendMessage`;
+    const inlineKeyboard: any[][] = [];
+
+    if (actionButton && actionButton.url) {
+      inlineKeyboard.push([
+        {
+          text: actionButton.text,
+          url: actionButton.url,
+        },
+      ]);
+    }
+
+    inlineKeyboard.push([
+      {
+        text: buttonText,
+        web_app: {
+          url: buttonUrl,
+        },
+      },
+    ]);
+
+    inlineKeyboard.push([
+      {
+        text: '💬 Бот @' + TELEGRAM_BOT_USERNAME,
+        url: `https://t.me/${TELEGRAM_BOT_USERNAME}`,
+      },
+    ]);
+
     const payload: any = {
       chat_id: chatId,
       text: text,
       parse_mode: 'HTML',
       reply_markup: {
-        inline_keyboard: [
-          [
-            {
-              text: buttonText,
-              web_app: {
-                url: buttonUrl,
-              },
-            },
-          ],
-          [
-            {
-              text: '💬 Бот @' + TELEGRAM_BOT_USERNAME,
-              url: `https://t.me/${TELEGRAM_BOT_USERNAME}`,
-            },
-          ],
-        ],
+        inline_keyboard: inlineKeyboard,
       },
     };
 
@@ -354,6 +367,10 @@ export async function sendTelegramMessage(
       body: JSON.stringify({
         chatId,
         text,
+        actionButton,
+        applyUrl: actionButton?.url,
+        buttonText,
+        buttonUrl,
       }),
     });
 

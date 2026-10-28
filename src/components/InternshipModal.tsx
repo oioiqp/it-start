@@ -14,6 +14,7 @@ import {
   Map,
   HelpCircle,
   Bot,
+  Globe,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import type { Internship, Question, RoadmapTopic, UserProgress } from '../types';
@@ -207,9 +208,49 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
             <span className="text-xs font-semibold px-2.5 py-1 rounded-full liquid-glass-pill text-neutral-800 dark:text-neutral-200">
               {internship.salary}
             </span>
-            <span className="text-xs px-2.5 py-1 rounded-full liquid-glass-pill text-neutral-600 dark:text-neutral-400">
-              Источник: {internship.sourceChannel}
-            </span>
+            {(() => {
+              const verifiedChannel = resolveChannelHandle(internship.sourceChannel, internship.company);
+              const cleanChannel = verifiedChannel.replace(/^@/, '');
+              const isTg = verifiedChannel.startsWith('@');
+              const isWeb = verifiedChannel.includes('.');
+
+              if (isTg) {
+                return (
+                  <a
+                    href={`https://t.me/${cleanChannel}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs px-2.5 py-1 rounded-full liquid-glass-pill text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white flex items-center gap-1 transition-colors"
+                  >
+                    <Bot className="w-3 h-3 text-neutral-500" />
+                    <span>Источник: {verifiedChannel}</span>
+                    <ExternalLink className="w-2.5 h-2.5 opacity-60" />
+                  </a>
+                );
+              }
+
+              if (isWeb) {
+                const targetUrl = verifiedChannel.startsWith('http') ? verifiedChannel : `https://${verifiedChannel}`;
+                return (
+                  <a
+                    href={targetUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs px-2.5 py-1 rounded-full liquid-glass-pill text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white flex items-center gap-1 transition-colors"
+                  >
+                    <Globe className="w-3 h-3 text-neutral-500" />
+                    <span>Источник: {verifiedChannel}</span>
+                    <ExternalLink className="w-2.5 h-2.5 opacity-60" />
+                  </a>
+                );
+              }
+
+              return (
+                <span className="text-xs px-2.5 py-1 rounded-full liquid-glass-pill text-neutral-600 dark:text-neutral-400">
+                  Источник: {internship.sourceChannel}
+                </span>
+              );
+            })()}
           </div>
         </div>
 
@@ -476,35 +517,59 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
             {(() => {
               const verifiedChannel = resolveChannelHandle(internship.sourceChannel, internship.company);
               const cleanChannel = verifiedChannel.replace(/^@/, '');
+              const isTg = verifiedChannel.startsWith('@');
+              const isWeb = verifiedChannel.includes('.');
 
-              return verifiedChannel.startsWith('@') ? (
-                <a
-                  href={`https://t.me/${cleanChannel}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 sm:flex-initial min-h-[44px] flex items-center justify-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-full text-xs font-semibold transition-transform duration-150 active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-800 truncate"
-                  title={`Открыть проверенный Telegram-канал ${verifiedChannel}`}
-                >
-                  <Bot className="w-3.5 h-3.5 shrink-0 text-neutral-600" />
-                  <span className="truncate">Канал {verifiedChannel}</span>
-                  <ExternalLink className="w-3 h-3 shrink-0" />
-                </a>
-              ) : null;
+              if (isTg) {
+                return (
+                  <a
+                    href={`https://t.me/${cleanChannel}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 sm:flex-initial min-h-[44px] flex items-center justify-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-full text-xs font-semibold transition-transform duration-150 active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-800 dark:text-neutral-200 truncate"
+                    title={`Открыть проверенный Telegram-канал ${verifiedChannel}`}
+                  >
+                    <Bot className="w-3.5 h-3.5 shrink-0 text-neutral-600 dark:text-neutral-400" />
+                    <span className="truncate">Канал {verifiedChannel}</span>
+                    <ExternalLink className="w-3 h-3 shrink-0" />
+                  </a>
+                );
+              }
+
+              if (isWeb) {
+                const targetUrl = verifiedChannel.startsWith('http') ? verifiedChannel : `https://${verifiedChannel}`;
+                return (
+                  <a
+                    href={targetUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 sm:flex-initial min-h-[44px] flex items-center justify-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-full text-xs font-semibold transition-transform duration-150 active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-800 dark:text-neutral-200 truncate"
+                    title={`Открыть карьерный сайт ${verifiedChannel}`}
+                  >
+                    <Globe className="w-3.5 h-3.5 shrink-0 text-neutral-600 dark:text-neutral-400" />
+                    <span className="truncate">Сайт {verifiedChannel}</span>
+                    <ExternalLink className="w-3 h-3 shrink-0" />
+                  </a>
+                );
+              }
+
+              return null;
             })()}
           </div>
 
           {(() => {
-            const verifiedApplyUrl = resolveApplyUrl(internship.applyUrl, internship.company);
+            const verifiedApplyUrl = resolveApplyUrl(internship.applyUrl, internship.company, internship.sourceChannel);
+            const isTgPost = verifiedApplyUrl.includes('t.me/');
             return (
               <a
                 href={verifiedApplyUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full sm:w-auto min-h-[44px] flex items-center justify-center gap-2 px-5 sm:px-6 py-2.5 rounded-full font-semibold text-xs sm:text-sm active:scale-95 transition-transform duration-150 bg-neutral-900 hover:bg-black text-white shadow-xs cursor-pointer text-center"
-                title={`Подать заявку на официальном сайте компании ${internship.company}`}
+                className="w-full sm:w-auto min-h-[44px] flex items-center justify-center gap-2 px-5 sm:px-6 py-2.5 rounded-full font-semibold text-xs sm:text-sm active:scale-95 transition-transform duration-150 bg-neutral-900 hover:bg-black text-white dark:bg-white dark:hover:bg-neutral-100 dark:text-neutral-900 shadow-xs cursor-pointer text-center"
+                title={`Подать заявку: ${verifiedApplyUrl}`}
               >
-                <span className="sm:hidden truncate">Откликнуться на {internship.company}</span>
-                <span className="hidden sm:inline">Подать заявку на сайте {internship.company}</span>
+                <span className="sm:hidden truncate">{isTgPost ? 'Пост с вакансией' : `Откликнуться на ${internship.company}`}</span>
+                <span className="hidden sm:inline">{isTgPost ? 'Перейти к вакансии в Telegram' : `Подать заявку на сайте ${internship.company}`}</span>
                 <ExternalLink className="w-3.5 h-3.5 shrink-0" />
               </a>
             );

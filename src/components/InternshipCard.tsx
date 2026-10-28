@@ -7,6 +7,7 @@ import {
   Flame,
   Bot,
   GraduationCap,
+  Globe,
 } from 'lucide-react';
 import type { Internship, Question, RoadmapTopic, UserProgress } from '../types';
 import { triggerHaptic } from '../lib/telegram';
@@ -154,13 +155,15 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
         {/* Source and Actions */}
         <div className="flex items-center justify-between gap-2">
           {(() => {
-            const verifiedApplyUrl = resolveApplyUrl(internship.applyUrl, internship.company);
+            const verifiedApplyUrl = resolveApplyUrl(internship.applyUrl, internship.company, internship.sourceChannel);
             const verifiedChannel = resolveChannelHandle(internship.sourceChannel, internship.company);
             const cleanChannel = verifiedChannel.replace(/^@/, '');
+            const isTg = verifiedChannel.startsWith('@');
+            const isWeb = verifiedChannel.includes('.');
 
             return (
               <>
-                {verifiedChannel.startsWith('@') ? (
+                {isTg ? (
                   <a
                     href={`https://t.me/${cleanChannel}`}
                     target="_blank"
@@ -169,6 +172,19 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
                     title={`Открыть проверенный Telegram-канал ${verifiedChannel}`}
                   >
                     <Bot className="w-3.5 h-3.5 shrink-0 text-neutral-500 dark:text-neutral-400" />
+                    <span className="truncate underline decoration-neutral-300 dark:decoration-neutral-700">
+                      {verifiedChannel}
+                    </span>
+                  </a>
+                ) : isWeb ? (
+                  <a
+                    href={verifiedChannel.startsWith('http') ? verifiedChannel : `https://${verifiedChannel}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 text-[11px] font-semibold truncate min-w-0 text-neutral-600 hover:text-black dark:text-neutral-400 dark:hover:text-white transition-colors"
+                    title={`Открыть карьерный сайт ${verifiedChannel}`}
+                  >
+                    <Globe className="w-3.5 h-3.5 shrink-0 text-neutral-500 dark:text-neutral-400" />
                     <span className="truncate underline decoration-neutral-300 dark:decoration-neutral-700">
                       {verifiedChannel}
                     </span>

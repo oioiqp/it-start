@@ -751,7 +751,11 @@ export async function notifyVkSubscribers(vacancies = [], token = VK_BOT_TOKEN) 
 
       const cleanPeerId = Number(String(sub.peer_id).replace(/^vk_/, '')) || String(sub.peer_id).replace(/^vk_/, '');
       const tagsStr = Array.isArray(vac.tags) && vac.tags.length > 0 ? vac.tags.slice(0, 4).join(' • ') : 'Junior / Стажировка';
+      const isWeb = vac.sourceType === 'portal' || vac.sourceType === 'website';
+      const sourceLabel = isWeb ? 'Карьерный сайт' : 'Telegram-канал';
+      const sourceChannel = vac.sourceChannel || vac.channel || (isWeb ? 'Сайт работодателя' : 'Telegram-канал');
       const applyUrl = vac.applyUrl || vac.url || RENDER_URL;
+      const actionLabel = isWeb ? '🔗 Откликнуться на сайте' : '🔗 Открыть пост с вакансией';
 
       const msg =
         `🔥 Новая стажировка из мониторинга работодателей!\n` +
@@ -760,7 +764,8 @@ export async function notifyVkSubscribers(vacancies = [], token = VK_BOT_TOKEN) 
         `💰 Зарплата: ${vac.salary || 'По договоренности'}\n` +
         `📍 Формат: ${vac.format || 'Удаленно'} | ${vac.location || vac.city || 'РФ'}\n` +
         `🏷 Стек: ${tagsStr}\n` +
-        `📢 Источник: ${vac.channel || vac.sourceChannel || 'Канал/Сайт работодателя'}\n\n` +
+        `📢 Источник: ${sourceChannel} (${sourceLabel})\n` +
+        `🔗 Ссылка на вакансию: ${applyUrl}\n\n` +
         `🎯 В IT-Старт уже подготовлен персональный план вопросов для этого направления!\n` +
         `🔗 Откликнуться: ${applyUrl}`;
 
@@ -774,7 +779,7 @@ export async function notifyVkSubscribers(vacancies = [], token = VK_BOT_TOKEN) 
             buttons: [
               [
                 { label: '🚀 Открыть в Mini App', app_id: VK_APP_ID },
-                { label: '🔗 Откликнуться', link: applyUrl },
+                { label: actionLabel, link: applyUrl },
               ],
               [
                 { label: '💼 Каталог вакансий', payload: { cmd: 'vacancies' }, color: 'primary' },

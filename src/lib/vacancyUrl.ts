@@ -60,30 +60,92 @@ export function getCompanyMonogram(companyName = ''): string {
 }
 
 /**
- * Resolves an application URL, guaranteeing it leads to a working official career portal
- * or verified direct vacancy page instead of a broken Telegram link, shortener, or root page.
+ * Returns a direct vacancy search or internship catalog URL on official company career portals
  */
-export function resolveApplyUrl(rawUrl: string | undefined, companyName = ''): string {
+export function getDirectVacancyPortalUrl(companyKey: string, fallback = 'https://career.directum.ru/vacancy?search=стажер'): string {
+  switch (companyKey) {
+    case 'avito':
+      return 'https://career.avito.com/vacancies/?search=стажер';
+    case 'tbank':
+      return 'https://www.tbank.ru/career/it/vacancies/?search=стажер';
+    case 'kontur':
+      return 'https://kontur.ru/career/vacancies?search=стажер';
+    case 'directum':
+      return 'https://career.directum.ru/vacancy?search=стажер';
+    case 't1':
+      return 'https://career.t1.ru/vacancies/?search=стажер';
+    case 'yandex':
+      return 'https://yandex.ru/jobs/vacancies/?search=стажер';
+    case 'ozon':
+      return 'https://job.ozon.ru/it/vacancies/?search=стажер';
+    case 'sber':
+      return 'https://sbergraduate.ru/sberseasons-moscow/';
+    case 'vk':
+      return 'https://internship.vk.company/internship';
+    default:
+      return fallback;
+  }
+}
+
+/**
+ * Resolves an application URL, guaranteeing it leads to a working direct vacancy page,
+ * specific Telegram post, job board page, or targeted vacancy search on employer's portal
+ * instead of a generic homepage (e.g. root avito.com) or broken shortener.
+ */
+export function resolveApplyUrl(rawUrl: string | undefined, companyName = '', sourceChannel = ''): string {
   const companyKey = getCompanyKey(companyName);
-  const officialPortal = COMPANY_OFFICIAL_PORTALS[companyKey] || 'https://career.directum.ru/vacancy';
+  const directPortal = getDirectVacancyPortalUrl(companyKey);
 
   if (!rawUrl || typeof rawUrl !== 'string') {
-    return officialPortal;
+    if (sourceChannel) {
+      const trimmedSource = sourceChannel.trim();
+      if (/^https?:\/\/t\.me\/[a-zA-Z0-9_]+\/\d+/i.test(trimmedSource)) {
+        return trimmedSource;
+      }
+      if (trimmedSource.startsWith('@')) {
+        return `https://t.me/${trimmedSource.replace(/^@/, '')}`;
+      }
+    }
+    return directPortal;
   }
 
   const trimmed = rawUrl.trim();
 
-  // If link is an internal Telegram link (t.me/... or telegram.org/...)
-  if (
-    trimmed.includes('t.me/') ||
-    trimmed.includes('telegram.me/') ||
-    trimmed.includes('telegram.org/') ||
-    trimmed.startsWith('@')
-  ) {
-    return officialPortal;
+  // 1. Direct Telegram post link (e.g. https://t.me/channel/123 or t.me/channel/123)
+  if (/^https?:\/\/t\.me\/[a-zA-Z0-9_]+\/\d+/i.test(trimmed)) {
+    return trimmed;
+  }
+  if (/^t\.me\/[a-zA-Z0-9_]+\/\d+/i.test(trimmed)) {
+    return `https://${trimmed}`;
   }
 
-  // If link is an external shortener or non-career blog/pr aggregator
+  // 2. Direct job boards (hh.ru vacancy, habr career vacancy)
+  if (trimmed.includes('hh.ru/vacancy/') || trimmed.includes('career.habr.com/vacancies/')) {
+    return trimmed.startsWith('http') ? trimmed : `https://${trimmed}`;
+  }
+
+  // 3. Direct company vacancy page with search params or specific vacancy path
+  if (
+    trimmed.includes('/vacancies/') ||
+    trimmed.includes('/vacancy/') ||
+    trimmed.includes('/vacancies?') ||
+    trimmed.includes('/vacancy?') ||
+    trimmed.includes('?search=') ||
+    trimmed.includes('?direction=') ||
+    trimmed.includes('/lead_')
+  ) {
+    return trimmed.startsWith('http') ? trimmed : `https://${trimmed}`;
+  }
+
+  // 4. Handle bare telegram channel without post number
+  if (trimmed.startsWith('@') || /^https?:\/\/t\.me\/[a-zA-Z0-9_]+\/?$/i.test(trimmed)) {
+    const clean = trimmed.replace(/^https?:\/\/t\.me\//i, '').replace(/^@/, '').replace(/\/$/, '');
+    if (clean) {
+      return `https://t.me/${clean}`;
+    }
+  }
+
+  // 5. External shorteners or non-career aggregators
   if (
     trimmed.includes('bit.ly') ||
     trimmed.includes('vk.cc') ||
@@ -93,37 +155,52 @@ export function resolveApplyUrl(rawUrl: string | undefined, companyName = ''): s
     trimmed.includes('youtube.com') ||
     trimmed.includes('digital')
   ) {
-    return officialPortal;
+    return directPortal;
   }
 
-  // Directum: root page does not show vacancies, redirect to /vacancy
+  // 6. Generic root homepages - replace with direct vacancy search for the employer
+  if (
+    trimmed === 'https://career.avito.com/' ||
+    trimmed === 'https://career.avito.com' ||
+    trimmed.includes('career.avito.com/internship')
+  ) {
+    return 'https://career.avito.com/vacancies/?search=стажер';
+  }
+
   if (trimmed === 'https://career.directum.ru/' || trimmed === 'https://career.directum.ru') {
-    return 'https://career.directum.ru/vacancy';
+    return 'https://career.directum.ru/vacancy?search=стажер';
   }
 
-  // T-Bank: fintech.tbank.ru DNS often fails, use verified official portal
   if (trimmed.includes('fintech.tbank.ru')) {
-    return 'https://www.tbank.ru/career/it/';
+    return trimmed.includes('direction=') ? trimmed : 'https://www.tbank.ru/career/it/vacancies/?search=стажер';
   }
 
-  // T1: t1.ru/school returned 404, use verified official portal career.t1.ru
-  if (trimmed.includes('t1.ru/school')) {
-    return 'https://career.t1.ru/';
+  if (trimmed === 'https://www.tbank.ru/career/it/' || trimmed === 'https://www.tbank.ru/career/it') {
+    return 'https://www.tbank.ru/career/it/vacancies/?search=стажер';
   }
 
-  // Yandex: outdated yabackend URL
-  if (trimmed === 'https://yandex.ru/yabackend/' || trimmed === 'https://yandex.ru/yabackend') {
-    return 'https://yandex.ru/jobs/';
+  if (trimmed.includes('t1.ru/school') || trimmed === 'https://career.t1.ru/' || trimmed === 'https://career.t1.ru') {
+    return 'https://career.t1.ru/vacancies/?search=стажер';
   }
 
-  // Avito: old internship 404 URL
-  if (trimmed.includes('career.avito.com/internship')) {
-    return 'https://career.avito.com/';
+  if (trimmed === 'https://yandex.ru/jobs/' || trimmed === 'https://yandex.ru/jobs' || trimmed.includes('yabackend')) {
+    return 'https://yandex.ru/jobs/vacancies/?search=стажер';
   }
 
-  // Kontur: ensure working career portal
-  if (trimmed === 'https://kontur.ru/career/' || trimmed === 'https://kontur.ru/career') {
-    return 'https://kontur.ru/career/vacancies';
+  if (trimmed === 'https://job.ozon.ru/it/' || trimmed === 'https://job.ozon.ru/it') {
+    return 'https://job.ozon.ru/it/vacancies/?search=стажер';
+  }
+
+  if (trimmed === 'https://sbergraduate.ru/' || trimmed === 'https://sbergraduate.ru') {
+    return 'https://sbergraduate.ru/sberseasons-moscow/';
+  }
+
+  if (trimmed === 'https://kontur.ru/career/' || trimmed === 'https://kontur.ru/career' || trimmed === 'https://kontur.ru/career/vacancies') {
+    return 'https://kontur.ru/career/vacancies?search=стажер';
+  }
+
+  if (trimmed === 'https://internship.vk.company/' || trimmed === 'https://internship.vk.company') {
+    return 'https://internship.vk.company/internship';
   }
 
   return trimmed;

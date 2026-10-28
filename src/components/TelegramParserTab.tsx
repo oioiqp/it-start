@@ -92,7 +92,7 @@ const PRESET_VACANCIES = [
     directionId: 'backend' as DirectionId,
     subTrackId: 'java' as SubTrackId,
     sourceChannel: '@t1career',
-    applyUrl: 'https://career.t1.ru/',
+    applyUrl: 'https://t.me/t1career/264',
     description: 'Обучение и стажировка в Открытой школе Т1 с переходом в штат. Разработка надежных Enterprise-сервисов.',
     tags: ['Java 21', 'Spring Boot', 'Открытая школа Т1', 'PostgreSQL'],
   },
@@ -105,7 +105,7 @@ const PRESET_VACANCIES = [
     directionId: 'frontend' as DirectionId,
     subTrackId: 'react' as SubTrackId,
     sourceChannel: '@KonturTech',
-    applyUrl: 'https://kontur.ru/career/vacancies',
+    applyUrl: 'https://t.me/KonturTech/481',
     description: 'Оплачиваемая программа Контур.Старт 2026: разработка веб-сервисов на React/TypeScript с наставником.',
     tags: ['React', 'TypeScript', 'Контур.Старт', 'Jest'],
   },
@@ -118,7 +118,7 @@ const PRESET_VACANCIES = [
     directionId: 'frontend' as DirectionId,
     subTrackId: 'react' as SubTrackId,
     sourceChannel: '@tbank_team',
-    applyUrl: 'https://fintech.tbank.ru/start/',
+    applyUrl: 'https://t.me/tbank_team/1432',
     description: 'Разработка новых витрин и финансовых сервисов для мобильного и веб-банкинга.',
     tags: ['React', 'TypeScript', 'Redux', 'Tailwind'],
   },
@@ -131,7 +131,7 @@ const PRESET_VACANCIES = [
     directionId: 'frontend' as DirectionId,
     subTrackId: 'react' as SubTrackId,
     sourceChannel: '@Life_in_Directum',
-    applyUrl: 'https://career.directum.ru/vacancy',
+    applyUrl: 'https://t.me/Life_in_Directum/312',
     description: 'Разработка веб-клиента флагманской платформы Directum RX в Ижевске на современном TypeScript и React.',
     tags: ['React', 'TypeScript', 'Directum RX', 'Ижевск'],
   },
@@ -144,7 +144,7 @@ const PRESET_VACANCIES = [
     directionId: 'backend' as DirectionId,
     subTrackId: 'python' as SubTrackId,
     sourceChannel: '@yandex_intern',
-    applyUrl: 'https://yandex.ru/jobs/',
+    applyUrl: 'https://t.me/yandex_intern/684',
     description: 'Разработка высоконагруженных бэкенд-сервисов на FastAPI и асинхронном Python.',
     tags: ['Python 3.12', 'FastAPI', 'PostgreSQL', 'asyncio'],
   },
@@ -157,7 +157,7 @@ const PRESET_VACANCIES = [
     directionId: 'backend' as DirectionId,
     subTrackId: 'golang' as SubTrackId,
     sourceChannel: '@ozon_tech_career',
-    applyUrl: 'https://job.ozon.ru/it/',
+    applyUrl: 'https://t.me/ozon_tech_career/512',
     description: 'Микросервисы логистики и маршрутизации на Go с обменом через gRPC и Kafka.',
     tags: ['Go', 'gRPC', 'PostgreSQL', 'Docker'],
   },
@@ -170,7 +170,7 @@ const PRESET_VACANCIES = [
     directionId: 'data_science' as DirectionId,
     subTrackId: 'ml' as SubTrackId,
     sourceChannel: '@sber_careers',
-    applyUrl: 'https://sbergraduate.ru/',
+    applyUrl: 'https://t.me/sber_careers/318',
     description: 'Обучение моделей ранжирования, NLP и классических табличных бустингов.',
     tags: ['Python', 'PyTorch', 'CatBoost', 'SQL'],
   },
@@ -183,7 +183,7 @@ const PRESET_VACANCIES = [
     directionId: 'mobile' as DirectionId,
     subTrackId: 'android' as SubTrackId,
     sourceChannel: '@avito_tech',
-    applyUrl: 'https://career.avito.com/',
+    applyUrl: 'https://t.me/avito_tech/745',
     description: 'Фичи для супераппа объявлений Авито на Kotlin и Jetpack Compose.',
     tags: ['Kotlin', 'Jetpack Compose', 'Coroutines'],
   },
@@ -196,7 +196,7 @@ const PRESET_VACANCIES = [
     directionId: 'qa' as DirectionId,
     subTrackId: 'auto_qa' as SubTrackId,
     sourceChannel: '@vk_team',
-    applyUrl: 'https://internship.vk.company/',
+    applyUrl: 'https://t.me/vk_team/621',
     description: 'Автоматизация тестирования сервисов сообществ и видео в VK на Python, Pytest и Playwright.',
     tags: ['Python', 'Pytest', 'Playwright', 'VK Team'],
   },
@@ -687,13 +687,17 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
 
     // 4. Send Telegram push
     const targetChat = chatId || currentSubscription?.chat_id;
+    const directUrl = resolveApplyUrl(post.url, post.company, post.channelHandle);
+    const isWeb = post.sourceType === 'website' || post.channelHandle.startsWith('http');
+    const sourceLabel = isWeb ? 'Карьерный сайт' : 'Telegram';
+
     if (targetChat) {
-      const isWeb = post.sourceType === 'website' || post.channelHandle.startsWith('http');
       const msg =
         `🔥 <b>Новая вакансия: монитор работодателей!</b>\n\n` +
         `🏢 <b>${post.company}</b> — <b>${post.title}</b>\n` +
         `💰 Зарплата: <b>${post.salary}</b> | 📍 Формат: <b>${post.format}</b>\n` +
-        `📢 Источник: <code>${post.channelHandle}</code> (${isWeb ? 'Карьерный сайт' : 'Telegram'})\n\n` +
+        `📢 Источник: <code>${post.channelHandle}</code> (${sourceLabel})\n` +
+        `🔗 <b>Прямой отклик:</b> <a href="${directUrl}">${directUrl}</a>\n\n` +
         `<i>Для этой позиции в IT-Старт уже доступен персонализированный роадмап и тренажёр!</i>`;
 
       await sendTelegramMessage(
@@ -701,15 +705,18 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
         msg,
         tokenInput.trim() || undefined,
         '🚀 Открыть вакансию в IT-Старт',
-        GITHUB_PAGES_URL
+        GITHUB_PAGES_URL,
+        {
+          text: isWeb ? '🔗 Откликнуться на сайте' : '🔗 Открыть пост с вакансией',
+          url: directUrl,
+        }
       );
       addLog('success', `Push-уведомление успешно доставлено в Telegram для Chat ID: ${targetChat}`);
     }
 
     // 5. Send VK push if peer ID is configured
     if (vkPeerId) {
-      const isWeb = post.sourceType === 'website' || post.channelHandle.startsWith('http');
-      const vkMsg = `🔥 Новая вакансия из мониторинга!\n\n🏢 ${post.company} — ${post.title}\n💰 Зарплата: ${post.salary} | 📍 Формат: ${post.format}\n📢 Источник: ${post.channelHandle} (${isWeb ? 'Карьерный сайт' : 'Telegram'})\n\n🔗 Откликнуться: ${post.url || GITHUB_PAGES_URL}`;
+      const vkMsg = `🔥 Новая вакансия из мониторинга!\n\n🏢 ${post.company} — ${post.title}\n💰 Зарплата: ${post.salary} | 📍 Формат: ${post.format}\n📢 Источник: ${post.channelHandle} (${sourceLabel})\n\n🔗 Откликнуться: ${directUrl}`;
       sendVkMessage(vkPeerId, vkMsg, vkTokenInput.trim() || undefined).then((res) => {
         if (res.success) {
           addLog('success', `Push-уведомление успешно доставлено в VK (Peer ID: ${vkPeerId})`);
@@ -829,7 +836,17 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
       DIRECTIONS.flatMap((d) => d.subTracks).find((st) => st.id === customSubTrack)?.name ||
       customSubTrack;
 
-    const notificationMessage = `🔥 <b>Новая стажировка под твой стек!</b>\n\n🏢 <b>${customCompany}</b> — <b>${customTitle}</b> (${dirTitle} / ${subTrackTitle})\n💰 Зарплата: <b>${customSalary}</b>\n📢 Источник: <code>${customChannel}</code>\n\n🎯 <i>Для этой вакансии в IT-Старт уже сформирован план подготовки из профильных вопросов!</i>`;
+    const directUrl = resolveApplyUrl(customApplyUrl, customCompany, customChannel);
+    const isWeb = customChannel.startsWith('http') || customChannel.includes('.');
+    const sourceLabel = isWeb ? 'Карьерный сайт' : 'Telegram';
+
+    const notificationMessage =
+      `🔥 <b>Новая стажировка под твой стек!</b>\n\n` +
+      `🏢 <b>${customCompany}</b> — <b>${customTitle}</b> (${dirTitle} / ${subTrackTitle})\n` +
+      `💰 Зарплата: <b>${customSalary}</b>\n` +
+      `📢 Источник: <code>${customChannel}</code> (${sourceLabel})\n` +
+      `🔗 <b>Прямой отклик:</b> <a href="${directUrl}">${directUrl}</a>\n\n` +
+      `🎯 <i>Для этой вакансии в IT-Старт уже сформирован план подготовки из профильных вопросов!</i>`;
 
     let successCount = 0;
     const botTokenToUse = tokenInput.trim() || undefined;
@@ -840,7 +857,11 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
         notificationMessage,
         botTokenToUse,
         '🚀 Открыть IT-Старт',
-        GITHUB_PAGES_URL
+        GITHUB_PAGES_URL,
+        {
+          text: isWeb ? '🔗 Откликнуться на сайте' : '🔗 Открыть пост с вакансией',
+          url: directUrl,
+        }
       );
 
       if (sendRes.success) {
@@ -854,7 +875,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
     // Dispatch to VK if configured
     if (vkPeerId) {
       addLog('info', `Отправка уведомления о вакансии в VK подписчику (Peer ID: ${vkPeerId})...`);
-      const vkNotificationMsg = `🔥 Новая стажировка под твой стек!\n\n🏢 ${customCompany} — ${customTitle} (${dirTitle} / ${subTrackTitle})\n💰 Зарплата: ${customSalary}\n📢 Источник: ${customChannel}\n\n🎯 Персональный план подготовки доступен в IT-Старт:\n${GITHUB_PAGES_URL}`;
+      const vkNotificationMsg = `🔥 Новая стажировка под твой стек!\n\n🏢 ${customCompany} — ${customTitle} (${dirTitle} / ${subTrackTitle})\n💰 Зарплата: ${customSalary}\n📢 Источник: ${customChannel} (${sourceLabel})\n🔗 Откликнуться: ${directUrl}\n\n🎯 Персональный план подготовки доступен в IT-Старт:\n${GITHUB_PAGES_URL}`;
       sendVkMessage(vkPeerId, vkNotificationMsg, vkTokenInput.trim() || undefined).then((res) => {
         if (res.success) {
           addLog('success', `Уведомление в VK успешно отправлено на Peer ID ${vkPeerId}`);
