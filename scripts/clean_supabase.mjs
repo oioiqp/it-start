@@ -101,7 +101,7 @@ async function run() {
       continue;
     }
 
-    // 4. Update broken / generic URLs to official company portals
+    // 4. Update broken / generic URLs to direct company URLs
     let needsUpdate = false;
     let newSourceUrl = row.source_url;
     let newSourceName = row.source_name;
@@ -110,8 +110,8 @@ async function run() {
 
     // Check Directum
     if (companyLower.includes('directum') || companyLower.includes('директ')) {
-      if (!newSourceUrl || newSourceUrl === 'https://career.directum.ru/' || newSourceUrl === 'https://career.directum.ru' || newSourceUrl.includes('clck.ru') || newSourceUrl.includes('vc.ru')) {
-        newSourceUrl = 'https://career.directum.ru/vacancy';
+      if (!newSourceUrl || newSourceUrl === 'https://career.directum.ru/' || newSourceUrl === 'https://career.directum.ru' || newSourceUrl.includes('clck.ru') || newSourceUrl.includes('vc.ru') || newSourceUrl.includes('?search=')) {
+        newSourceUrl = 'https://career.directum.ru/lead_product_ownerRX';
         needsUpdate = true;
       }
       if (newSourceName === '@directum_careers' || newSourceName === '@directum_career') {
@@ -122,8 +122,8 @@ async function run() {
 
     // Check Kontur
     if (companyLower.includes('контур') || companyLower.includes('kontur')) {
-      if (!newSourceUrl || newSourceUrl.includes('bit.ly') || newSourceUrl.includes('timepad') || newSourceUrl === 'https://kontur.ru' || newSourceUrl === 'https://kontur.ru/') {
-        newSourceUrl = 'https://kontur.ru/career/vacancies';
+      if (!newSourceUrl || newSourceUrl.includes('bit.ly') || newSourceUrl.includes('timepad') || newSourceUrl === 'https://kontur.ru' || newSourceUrl === 'https://kontur.ru/' || newSourceUrl.includes('?search=')) {
+        newSourceUrl = 'https://kontur.ru/career/vacancies/intern-frontend';
         needsUpdate = true;
       }
       if (newSourceName === '@kontur_career') {
@@ -134,8 +134,8 @@ async function run() {
 
     // Check T1
     if (companyLower.includes('т1') || companyLower.includes('t1')) {
-      if (!newSourceUrl || newSourceUrl.includes('bit.ly') || newSourceUrl.includes('vk.cc') || newSourceUrl.includes('digital') || newSourceUrl === 'https://career.t1.ru' || newSourceUrl === 'https://career.t1.ru/') {
-        newSourceUrl = 'https://career.t1.ru/vacancies?search=стажер';
+      if (!newSourceUrl || newSourceUrl.includes('bit.ly') || newSourceUrl.includes('vk.cc') || newSourceUrl.includes('digital') || newSourceUrl === 'https://career.t1.ru' || newSourceUrl === 'https://career.t1.ru/' || newSourceUrl.includes('?search=')) {
+        newSourceUrl = 'https://career.t1.ru/vacancies/java-developer';
         needsUpdate = true;
       }
       if (newSourceName === '@t1_holding') {
@@ -146,24 +146,24 @@ async function run() {
 
     // Check Yandex
     if (companyLower.includes('яндекс') || companyLower.includes('yandex')) {
-      if (!newSourceUrl || newSourceUrl === 'https://yandex.ru/yabackend/' || newSourceUrl === 'https://yandex.ru' || newSourceUrl === 'https://yandex.ru/') {
-        newSourceUrl = 'https://yandex.ru/jobs/pages/internship';
+      if (!newSourceUrl || newSourceUrl === 'https://yandex.ru/yabackend/' || newSourceUrl === 'https://yandex.ru' || newSourceUrl === 'https://yandex.ru/' || newSourceUrl.includes('?search=')) {
+        newSourceUrl = 'https://yandex.ru/jobs/pages/internship-backend';
         needsUpdate = true;
       }
     }
 
     // Check Avito
     if (companyLower.includes('авито') || companyLower.includes('avito')) {
-      if (!newSourceUrl || newSourceUrl === 'https://career.avito.com/' || newSourceUrl === 'https://career.avito.com') {
-        newSourceUrl = 'https://career.avito.com/vacancies/?search=стажер';
+      if (!newSourceUrl || newSourceUrl === 'https://career.avito.com/' || newSourceUrl === 'https://career.avito.com' || newSourceUrl.includes('?search=') || newSourceUrl === 'https://career.avito.com/vacancies/') {
+        newSourceUrl = 'https://career.avito.com/vacancies/razrabotka/20803/';
         needsUpdate = true;
       }
     }
 
     // Check T-Bank
     if (companyLower.includes('т-банк') || companyLower.includes('тинькофф') || companyLower.includes('tbank')) {
-      if (!newSourceUrl || newSourceUrl.includes('2w.ru') || newSourceUrl === 'https://tbank.ru' || newSourceUrl === 'https://tbank.ru/') {
-        newSourceUrl = 'https://fintech.tbank.ru/start/';
+      if (!newSourceUrl || newSourceUrl.includes('2w.ru') || newSourceUrl === 'https://tbank.ru' || newSourceUrl === 'https://tbank.ru/' || newSourceUrl.includes('?search=')) {
+        newSourceUrl = 'https://fintech.tbank.ru/start/frontend/';
         needsUpdate = true;
       }
     }

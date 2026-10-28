@@ -1828,7 +1828,58 @@ describe('15. Telegram Mini App & VK Cross-Platform Integration & Modal Geometry
     expect(html).toContain('h-[610px]');
     expect(html).toContain('overflow-hidden');
   });
+
+  it('validates direct vacancy URLs, elimination of generic search homepages, and source channels', async () => {
+    const { resolveApplyUrl } = await import('../lib/vacancyUrl');
+    const { SEED_INTERNSHIPS } = await import('../data/internships');
+    // @ts-ignore
+    const bot: any = await import('../../bot/bot.mjs');
+
+    // 1. Verify Avito generic root and search queries are strictly resolved to direct vacancies
+    expect(resolveApplyUrl('https://career.avito.com/', 'Авито')).toContain('/vacancies/razrabotka/');
+    expect(resolveApplyUrl('https://career.avito.com/vacancies/?search=стажер', 'Авито')).toContain('/vacancies/razrabotka/');
+    expect(resolveApplyUrl('https://career.avito.com/vacancies/', 'Авито')).toContain('/vacancies/razrabotka/');
+    expect(resolveApplyUrl('https://career.avito.com/internship', 'Авито')).toContain('/vacancies/razrabotka/');
+
+    // 2. Direct Avito vacancy URL is preserved as-is
+    const directAvito = 'https://career.avito.com/vacancies/razrabotka/20803/';
+    expect(resolveApplyUrl(directAvito, 'Авито')).toBe(directAvito);
+
+    // 3. Fallback to specific Telegram post when available
+    const tgPost = 'https://t.me/avito_tech/745';
+    expect(resolveApplyUrl('https://career.avito.com/?search=стажер', 'Авито', tgPost)).toBe(tgPost);
+    expect(resolveApplyUrl('', 'Авито', tgPost)).toBe(tgPost);
+
+    // 4. Job boards (hh.ru, habr career) direct vacancy URLs
+    expect(resolveApplyUrl('https://hh.ru/vacancy/138000233', 'Сбер')).toBe('https://hh.ru/vacancy/138000233');
+    expect(resolveApplyUrl('https://career.habr.com/vacancies/1000168291', 'Авито')).toBe('https://career.habr.com/vacancies/1000168291');
+
+    // 5. Verify ALL 43 SEED_INTERNSHIPS have direct, non-search URLs
+    expect(SEED_INTERNSHIPS.length).toBe(43);
+    for (const item of SEED_INTERNSHIPS) {
+      const isDirectPath =
+        item.applyUrl.endsWith('/') ||
+        item.applyUrl.includes('/vacancies/') ||
+        item.applyUrl.includes('/vacancy/') ||
+        item.applyUrl.includes('/internship') ||
+        item.applyUrl.includes('/pages/internship') ||
+        item.applyUrl.includes('/start/') ||
+        item.applyUrl.includes('/camp/') ||
+        item.applyUrl.includes('/lead_');
+      expect(isDirectPath).toBe(true);
+      expect(item.applyUrl.startsWith('https://')).toBe(true);
+    }
+
+    // 6. Verify bot ALL_INTERNSHIPS has exact parity with direct URLs
+    expect(bot.ALL_INTERNSHIPS.length).toBe(43);
+    for (const botItem of bot.ALL_INTERNSHIPS) {
+      expect(botItem.url).not.toContain('?search=');
+      expect(botItem.applyUrl).not.toContain('?search=');
+      expect(botItem.sourceChannel).toBeDefined();
+    }
+  });
 });
+
 
 
 

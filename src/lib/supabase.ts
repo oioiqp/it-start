@@ -98,7 +98,7 @@ export async function fetchInternshipsFromSupabase(): Promise<Internship[] | nul
           responsibilities: parseArray(item.responsibilities, defaultResponsibilities),
           sourceChannel: resolveChannelHandle(item.source_name || item.source_channel, item.company),
           sourceType: (item.source_type || 'telegram') as 'telegram' | 'portal',
-          applyUrl: resolveApplyUrl(item.source_url || item.apply_url, item.company),
+          applyUrl: resolveApplyUrl(item.source_url || item.apply_url, item.company, item.source_name || item.source_channel),
           publishedAt: item.published_at || new Date().toISOString(),
           isHot: Boolean(item.is_hot),
         };

@@ -269,7 +269,9 @@ export const ALL_INTERNSHIPS = [
     "channel": "@tbank_team",
     "directionId": "frontend",
     "subTrackId": "react",
-    "url": "https://fintech.tbank.ru/start/?direction=frontend",
+    "url": "https://fintech.tbank.ru/start/frontend/",
+    "applyUrl": "https://fintech.tbank.ru/start/frontend/",
+    "sourceChannel": "@tbank_team",
     "description": "Ищем начинающего фронтенд-разработчика в команду Финтех-сервисов. Вы будете создавать современные пользовательские интерфейсы для миллионов клиентов экосистемы.",
     "tags": [
       "React",
@@ -290,7 +292,9 @@ export const ALL_INTERNSHIPS = [
     "channel": "@yandex_intern",
     "directionId": "backend",
     "subTrackId": "python",
-    "url": "https://yandex.ru/jobs/vacancies/?search=python",
+    "url": "https://yandex.ru/jobs/pages/internship-backend",
+    "applyUrl": "https://yandex.ru/jobs/pages/internship-backend",
+    "sourceChannel": "@yandex_intern",
     "description": "Стажировка в сервисах Яндекс Маркета или Поиска. Реальные задачи масштабирования высоконагруженных микросервисов с менторской поддержкой.",
     "tags": [
       "Python 3.12",
@@ -311,7 +315,9 @@ export const ALL_INTERNSHIPS = [
     "channel": "@ozon_tech_career",
     "directionId": "backend",
     "subTrackId": "golang",
-    "url": "https://job.ozon.ru/it/vacancies/?search=golang",
+    "url": "https://job.ozon.ru/it/camp/golang/",
+    "applyUrl": "https://job.ozon.ru/it/camp/golang/",
+    "sourceChannel": "@ozon_tech_career",
     "description": "Команда логистики Ozon ищет стажёра на Go. Мы обрабатываем миллионы заказов в сутки, используя современный стек микросервисов на Go и gRPC.",
     "tags": [
       "Go",
@@ -332,7 +338,9 @@ export const ALL_INTERNSHIPS = [
     "channel": "@sber_careers",
     "directionId": "data_science",
     "subTrackId": "ml",
-    "url": "https://sbergraduate.ru/sberseasons-moscow/?direction=ml",
+    "url": "https://sbergraduate.ru/sberseasons-moscow/ml/",
+    "applyUrl": "https://sbergraduate.ru/sberseasons-moscow/ml/",
+    "sourceChannel": "@sber_careers",
     "description": "Исследования и внедрение ML-моделей в продукты экосистемы Сбера. Работа с передовыми генеративными сетями и табличными данными.",
     "tags": [
       "Python",
@@ -353,7 +361,9 @@ export const ALL_INTERNSHIPS = [
     "channel": "@avito_tech",
     "directionId": "mobile",
     "subTrackId": "android",
-    "url": "https://career.avito.com/vacancies/?search=android",
+    "url": "https://career.avito.com/vacancies/razrabotka/20805/",
+    "applyUrl": "https://career.avito.com/vacancies/razrabotka/20805/",
+    "sourceChannel": "@avito_tech",
     "description": "Разработка фичей для мобильного приложения Авито с десятками миллионов пользователей. Чистая архитектура, дизайн-система и лучшие инженерные практики.",
     "tags": [
       "Kotlin",
@@ -374,7 +384,9 @@ export const ALL_INTERNSHIPS = [
     "channel": "@vk_team",
     "directionId": "qa",
     "subTrackId": "auto_qa",
-    "url": "https://internship.vk.company/internship?direction=web",
+    "url": "https://internship.vk.company/internship/qa",
+    "applyUrl": "https://internship.vk.company/internship/qa",
+    "sourceChannel": "@vk_team",
     "description": "Автоматизация тестирования сервисов сообществ и видео в VK. Вы будете создавать надежные автотесты для веба и REST API.",
     "tags": [
       "Python",
@@ -395,7 +407,9 @@ export const ALL_INTERNSHIPS = [
     "channel": "@sber_careers",
     "directionId": "devops",
     "subTrackId": "cicd_docker",
-    "url": "https://sbergraduate.ru/sberseasons-moscow/?direction=java",
+    "url": "https://sbergraduate.ru/sberseasons-moscow/devops/",
+    "applyUrl": "https://sbergraduate.ru/sberseasons-moscow/devops/",
+    "sourceChannel": "@sber_careers",
     "description": "Автоматизация сборки и развертывания облачных сервисов Сбера в программе SberSeasons. Практика на реальной высоконагруженной инфраструктуре с персональным ментором.",
     "tags": [
       "Linux",
@@ -416,7 +430,9 @@ export const ALL_INTERNSHIPS = [
     "channel": "@sber_careers",
     "directionId": "backend",
     "subTrackId": "java",
-    "url": "https://sbergraduate.ru/sberseasons-moscow/?direction=devops",
+    "url": "https://sbergraduate.ru/sberseasons-moscow/java/",
+    "applyUrl": "https://sbergraduate.ru/sberseasons-moscow/java/",
+    "sourceChannel": "@sber_careers",
     "description": "Разработка микросервисов процессинга и цифровой платформы Сбера в рамках стажировки SberSeasons. Обучение под крылом Senior-инженеров.",
     "tags": [
       "Java 21",
@@ -437,7 +453,9 @@ export const ALL_INTERNSHIPS = [
     "channel": "@KonturTech",
     "directionId": "frontend",
     "subTrackId": "angular",
-    "url": "https://kontur.ru/career/vacancies?search=react",
+    "url": "https://kontur.ru/career/vacancies/intern-frontend",
+    "applyUrl": "https://kontur.ru/career/vacancies/intern-frontend",
+    "sourceChannel": "@KonturTech",
     "description": "Разработка веб-сервисов электронного документооборота и бухгалтерии Контура, которыми пользуются миллионы предпринимателей.",
     "tags": [
       "Angular 18",
@@ -458,7 +476,9 @@ export const ALL_INTERNSHIPS = [
     "channel": "@tbank_team",
     "directionId": "data_science",
     "subTrackId": "analytics",
-    "url": "https://fintech.tbank.ru/start/?direction=backend_python",
+    "url": "https://fintech.tbank.ru/start/analytics/",
+    "applyUrl": "https://fintech.tbank.ru/start/analytics/",
+    "sourceChannel": "@tbank_team",
     "description": "Анализ пользовательских сценариев в мобильном банке, поиск точек роста конверсий и проведение честных A/B-экспериментов.",
     "tags": [
       "SQL",
@@ -479,7 +499,9 @@ export const ALL_INTERNSHIPS = [
     "channel": "@yandex_intern",
     "directionId": "mobile",
     "subTrackId": "ios",
-    "url": "https://yandex.ru/jobs/vacancies/?search=go",
+    "url": "https://yandex.ru/jobs/pages/internship-mobile",
+    "applyUrl": "https://yandex.ru/jobs/pages/internship-mobile",
+    "sourceChannel": "@yandex_intern",
     "description": "Разработка супераппа Яндекс Go (Такси, Доставка, Самокаты). Работа с плавной анимацией карты, высокими требованиями к отзывчивости UI.",
     "tags": [
       "Swift 6",
@@ -500,7 +522,9 @@ export const ALL_INTERNSHIPS = [
     "channel": "@ozon_tech_career",
     "directionId": "mobile",
     "subTrackId": "flutter",
-    "url": "https://job.ozon.ru/it/vacancies/?search=csharp",
+    "url": "https://job.ozon.ru/it/camp/mobile/",
+    "applyUrl": "https://job.ozon.ru/it/camp/mobile/",
+    "sourceChannel": "@ozon_tech_career",
     "description": "Разработка кроссплатформенных приложений для продавцов Ozon Seller и операторов ПВЗ на Flutter.",
     "tags": [
       "Flutter",
@@ -521,7 +545,9 @@ export const ALL_INTERNSHIPS = [
     "channel": "@sber_careers",
     "directionId": "qa",
     "subTrackId": "manual_qa",
-    "url": "https://sbergraduate.ru/sberseasons-moscow/?direction=python",
+    "url": "https://sbergraduate.ru/sberseasons-moscow/qa/",
+    "applyUrl": "https://sbergraduate.ru/sberseasons-moscow/qa/",
+    "sourceChannel": "@sber_careers",
     "description": "Ручное тестирование веб-версии и мобильного банка СберБизнес. Анализ документации, поиск уязвимостей в бизнес-логике и составление баг-репортов.",
     "tags": [
       "Тест-дизайн",
@@ -542,7 +568,9 @@ export const ALL_INTERNSHIPS = [
     "channel": "@vk_team",
     "directionId": "backend",
     "subTrackId": "nodejs",
-    "url": "https://internship.vk.company/internship?direction=mobile",
+    "url": "https://internship.vk.company/internship/backend",
+    "applyUrl": "https://internship.vk.company/internship/backend",
+    "sourceChannel": "@vk_team",
     "description": "Разработка микросервисов стриминга и каталога музыки. Асинхронные очереди, кэширование метаданных треков и плейлистов.",
     "tags": [
       "Node.js",
@@ -563,7 +591,9 @@ export const ALL_INTERNSHIPS = [
     "channel": "@avito_tech",
     "directionId": "devops",
     "subTrackId": "k8s_iac",
-    "url": "https://career.avito.com/vacancies/?search=golang",
+    "url": "https://career.avito.com/vacancies/razrabotka/20803/",
+    "applyUrl": "https://career.avito.com/vacancies/razrabotka/20803/",
+    "sourceChannel": "@avito_tech",
     "description": "Команда Core Platform в Авито. Мы развиваем внутреннюю платформу разработки на базе K8s, обслуживающую сотни микросервисов.",
     "tags": [
       "Kubernetes",
@@ -584,7 +614,9 @@ export const ALL_INTERNSHIPS = [
     "channel": "@tbank_team",
     "directionId": "frontend",
     "subTrackId": "vue",
-    "url": "https://fintech.tbank.ru/start/?direction=qa",
+    "url": "https://fintech.tbank.ru/start/frontend/",
+    "applyUrl": "https://fintech.tbank.ru/start/frontend/",
+    "sourceChannel": "@tbank_team",
     "description": "Разработка административных панелей и партнерских кабинетов банка на современном Vue 3.",
     "tags": [
       "Vue 3",
@@ -605,7 +637,9 @@ export const ALL_INTERNSHIPS = [
     "channel": "@yandex_intern",
     "directionId": "data_science",
     "subTrackId": "ml",
-    "url": "https://yandex.ru/jobs/vacancies/?search=ml",
+    "url": "https://yandex.ru/jobs/pages/internship-ml",
+    "applyUrl": "https://yandex.ru/jobs/pages/internship-ml",
+    "sourceChannel": "@yandex_intern",
     "description": "Участие в обучении и дообучении языковых моделей YandexGPT. Настройка пайплайнов RAG, оценка качества генерации и файнтюнинг.",
     "tags": [
       "PyTorch",
@@ -626,7 +660,9 @@ export const ALL_INTERNSHIPS = [
     "channel": "@KonturTech",
     "directionId": "backend",
     "subTrackId": "golang",
-    "url": "https://kontur.ru/career/vacancies?search=qa",
+    "url": "https://kontur.ru/career/vacancies/intern-backend",
+    "applyUrl": "https://kontur.ru/career/vacancies/intern-backend",
+    "sourceChannel": "@KonturTech",
     "description": "Разработка масштабируемых сервисов Контур.Фокус и Контур.Диадок. Чистая архитектура, code review от признанных экспертов.",
     "tags": [
       "Go",
@@ -647,7 +683,9 @@ export const ALL_INTERNSHIPS = [
     "channel": "@t1career",
     "directionId": "backend",
     "subTrackId": "java",
-    "url": "https://career.t1.ru/vacancies/?search=java",
+    "url": "https://career.t1.ru/vacancies/java-developer",
+    "applyUrl": "https://career.t1.ru/vacancies/java-developer",
+    "sourceChannel": "@t1career",
     "description": "Обучение и стажировка в Открытой школе Т1 с переходом в штат. Разработка надежных Enterprise-сервисов для крупнейших корпоративных заказчиков.",
     "tags": [
       "Java 21",
@@ -668,7 +706,9 @@ export const ALL_INTERNSHIPS = [
     "channel": "@t1career",
     "directionId": "devops",
     "subTrackId": "cicd_docker",
-    "url": "https://career.t1.ru/vacancies/?search=devops",
+    "url": "https://career.t1.ru/vacancies/devops-engineer",
+    "applyUrl": "https://career.t1.ru/vacancies/devops-engineer",
+    "sourceChannel": "@t1career",
     "description": "Поддержка и автоматизация инфраструктуры масштабируемых облачных решений Т1 Облако.",
     "tags": [
       "Linux",
@@ -689,7 +729,9 @@ export const ALL_INTERNSHIPS = [
     "channel": "@t1career",
     "directionId": "qa",
     "subTrackId": "auto_qa",
-    "url": "https://career.t1.ru/vacancies/?search=qa",
+    "url": "https://career.t1.ru/vacancies/qa-automation",
+    "applyUrl": "https://career.t1.ru/vacancies/qa-automation",
+    "sourceChannel": "@t1career",
     "description": "Автоматизация тестирования банковских и интеграционных платформ группы Т1.",
     "tags": [
       "QA Automation",
@@ -710,7 +752,9 @@ export const ALL_INTERNSHIPS = [
     "channel": "@Life_in_Directum",
     "directionId": "frontend",
     "subTrackId": "react",
-    "url": "https://career.directum.ru/vacancy?search=react",
+    "url": "https://career.directum.ru/vacancy/web-developer",
+    "applyUrl": "https://career.directum.ru/vacancy/web-developer",
+    "sourceChannel": "@Life_in_Directum",
     "description": "Разработка веб-клиента флагманской платформы управления цифровыми процессами и документами Directum RX в Ижевске.",
     "tags": [
       "React",
@@ -732,7 +776,9 @@ export const ALL_INTERNSHIPS = [
     "channel": "@Life_in_Directum",
     "directionId": "backend",
     "subTrackId": "java",
-    "url": "https://career.directum.ru/vacancy?search=csharp",
+    "url": "https://career.directum.ru/vacancy/backend-csharp",
+    "applyUrl": "https://career.directum.ru/vacancy/backend-csharp",
+    "sourceChannel": "@Life_in_Directum",
     "description": "Разработка масштабируемого бэкенда интеллектуальной системы управления документами Directum RX. Микросервисы, асинхронная обработка и AI-модули.",
     "tags": [
       "C#",
@@ -755,7 +801,9 @@ export const ALL_INTERNSHIPS = [
     "channel": "@Life_in_Directum",
     "directionId": "qa",
     "subTrackId": "manual_qa",
-    "url": "https://career.directum.ru/vacancy?search=qa",
+    "url": "https://career.directum.ru/vacancy/qa-engineer",
+    "applyUrl": "https://career.directum.ru/vacancy/qa-engineer",
+    "sourceChannel": "@Life_in_Directum",
     "description": "Тестирование веб- и десктоп-клиентов Directum RX, поиск дефектов в бизнес-процессах электронного документооборота.",
     "tags": [
       "Manual QA",
@@ -777,7 +825,9 @@ export const ALL_INTERNSHIPS = [
     "channel": "@KonturTech",
     "directionId": "frontend",
     "subTrackId": "react",
-    "url": "https://kontur.ru/career/vacancies?search=backend",
+    "url": "https://kontur.ru/career/vacancies/intern-frontend",
+    "applyUrl": "https://kontur.ru/career/vacancies/intern-frontend",
+    "sourceChannel": "@KonturTech",
     "description": "Оплачиваемая стажировка Контур.Старт 2026 с индивидуальным наставником. Разработка современных интерфейсов для экосистемы Контура.",
     "tags": [
       "React",
@@ -798,7 +848,9 @@ export const ALL_INTERNSHIPS = [
     "channel": "@KonturTech",
     "directionId": "backend",
     "subTrackId": "python",
-    "url": "https://kontur.ru/career/vacancies?search=csharp",
+    "url": "https://kontur.ru/career/vacancies/intern-backend",
+    "applyUrl": "https://kontur.ru/career/vacancies/intern-backend",
+    "sourceChannel": "@KonturTech",
     "description": "Программа стажировки Контур.Старт для начинающих бэкендеров. Решение реальных бизнес-задач под менторством Senior-разработчиков.",
     "tags": [
       "Python",
@@ -819,7 +871,9 @@ export const ALL_INTERNSHIPS = [
     "channel": "@tbank_team",
     "directionId": "backend",
     "subTrackId": "python",
-    "url": "https://fintech.tbank.ru/start/?direction=backend_go",
+    "url": "https://fintech.tbank.ru/start/backend/",
+    "applyUrl": "https://fintech.tbank.ru/start/backend/",
+    "sourceChannel": "@tbank_team",
     "description": "Разработка ключевых сервисов процессинга и кредитных конвейеров банка. Высокая нагрузка и строгие требования к надежности.",
     "tags": [
       "Python 3.12",
@@ -840,7 +894,9 @@ export const ALL_INTERNSHIPS = [
     "channel": "@tbank_team",
     "directionId": "devops",
     "subTrackId": "k8s_iac",
-    "url": "https://fintech.tbank.ru/start/?direction=backend_java",
+    "url": "https://fintech.tbank.ru/start/sre/",
+    "applyUrl": "https://fintech.tbank.ru/start/sre/",
+    "sourceChannel": "@tbank_team",
     "description": "Обеспечение бесперебойной работы критических сервисов Т-Банка. Автоматизация развертывания и мониторинга сотен микросервисов.",
     "tags": [
       "Kubernetes",
@@ -861,7 +917,9 @@ export const ALL_INTERNSHIPS = [
     "channel": "@ozon_tech_career",
     "directionId": "frontend",
     "subTrackId": "react",
-    "url": "https://job.ozon.ru/it/vacancies/?search=frontend",
+    "url": "https://job.ozon.ru/it/camp/frontend/",
+    "applyUrl": "https://job.ozon.ru/it/camp/frontend/",
+    "sourceChannel": "@ozon_tech_career",
     "description": "Оплачиваемая стажировка Ozon Camp 2026 в командах маркетплейса. Разработка высоконагруженных витрин, чекаута и кабинетов продавцов.",
     "tags": [
       "React 19",
@@ -882,7 +940,9 @@ export const ALL_INTERNSHIPS = [
     "channel": "@ozon_tech_career",
     "directionId": "qa",
     "subTrackId": "auto_qa",
-    "url": "https://job.ozon.ru/it/vacancies/?search=qa",
+    "url": "https://job.ozon.ru/it/camp/qa/",
+    "applyUrl": "https://job.ozon.ru/it/camp/qa/",
+    "sourceChannel": "@ozon_tech_career",
     "description": "Автоматизация тестирования высоконагруженных микросервисов логистики Ozon. Работа с протоколами gRPC, очередями Kafka и базами PostgreSQL.",
     "tags": [
       "QA Auto",
@@ -904,7 +964,9 @@ export const ALL_INTERNSHIPS = [
     "channel": "@avito_tech",
     "directionId": "frontend",
     "subTrackId": "react",
-    "url": "https://career.avito.com/vacancies/?search=qa",
+    "url": "https://career.avito.com/vacancies/razrabotka/20808/",
+    "applyUrl": "https://career.avito.com/vacancies/razrabotka/20808/",
+    "sourceChannel": "@avito_tech",
     "description": "Программа стажировки Авито Старт: разработка ключевых разделов Avito.ru с миллионной аудиторией. Дизайн-система, микрофронтенды и высокие стандарты качества.",
     "tags": [
       "React",
@@ -925,7 +987,9 @@ export const ALL_INTERNSHIPS = [
     "channel": "@avito_tech",
     "directionId": "backend",
     "subTrackId": "python",
-    "url": "https://career.avito.com/vacancies/?search=analytics",
+    "url": "https://career.avito.com/vacancies/razrabotka/20812/",
+    "applyUrl": "https://career.avito.com/vacancies/razrabotka/20812/",
+    "sourceChannel": "@avito_tech",
     "description": "Разработка распределенных микросервисов поиска и рекомендаций Авито. Решение алгоритмических задач и обработка терабайтов данных под руководством Senior ментора.",
     "tags": [
       "Python 3.12",
@@ -946,7 +1010,9 @@ export const ALL_INTERNSHIPS = [
     "channel": "@vk_team",
     "directionId": "frontend",
     "subTrackId": "react",
-    "url": "https://internship.vk.company/internship?direction=data",
+    "url": "https://internship.vk.company/internship/web",
+    "applyUrl": "https://internship.vk.company/internship/web",
+    "sourceChannel": "@vk_team",
     "description": "Оплачиваемая стажировка VK Team: создание веб-интерфейсов ВКонтакте, VK Видео и VK Мессенджера на стеке React, TypeScript и библиотеки VKUI.",
     "tags": [
       "React",
@@ -967,7 +1033,9 @@ export const ALL_INTERNSHIPS = [
     "channel": "@vk_team",
     "directionId": "data_science",
     "subTrackId": "ml",
-    "url": "https://internship.vk.company/internship?direction=qa",
+    "url": "https://internship.vk.company/internship/data",
+    "applyUrl": "https://internship.vk.company/internship/data",
+    "sourceChannel": "@vk_team",
     "description": "Разработка рекомендательных систем ленты, клипов и музыки ВКонтакте. Обучение моделей ранжирования на огромных графах социальных связей.",
     "tags": [
       "Python",
@@ -989,7 +1057,9 @@ export const ALL_INTERNSHIPS = [
     "channel": "@tbank_team",
     "directionId": "backend",
     "subTrackId": "golang",
-    "url": "https://fintech.tbank.ru/start/?direction=devops",
+    "url": "https://fintech.tbank.ru/start/backend/",
+    "applyUrl": "https://fintech.tbank.ru/start/backend/",
+    "sourceChannel": "@tbank_team",
     "description": "Разработка высокопроизводительных микросервисов платежного контура Т-Банка. Экстремальные нагрузки, строгая отказоустойчивость и менторская программа.",
     "tags": [
       "Go",
@@ -1010,7 +1080,9 @@ export const ALL_INTERNSHIPS = [
     "channel": "@tbank_team",
     "directionId": "qa",
     "subTrackId": "auto_qa",
-    "url": "https://fintech.tbank.ru/start/?direction=analytics",
+    "url": "https://fintech.tbank.ru/start/qa/",
+    "applyUrl": "https://fintech.tbank.ru/start/qa/",
+    "sourceChannel": "@tbank_team",
     "description": "Автоматизация тестирования банковских платформ, инвестиций и мобильного банка. Создание надежных автотестов и интеграция в CI/CD.",
     "tags": [
       "QA Automation",
@@ -1031,7 +1103,9 @@ export const ALL_INTERNSHIPS = [
     "channel": "@KonturTech",
     "directionId": "qa",
     "subTrackId": "manual_qa",
-    "url": "https://kontur.ru/career/vacancies?search=стажер",
+    "url": "https://kontur.ru/career/vacancies/intern-qa",
+    "applyUrl": "https://kontur.ru/career/vacancies/intern-qa",
+    "sourceChannel": "@KonturTech",
     "description": "Программа стажировки Контур.Старт 2026 для инженеров по тестированию. Тестирование веб-сервисов Диадок, Фокус и Бухгалтерия с персональным наставником.",
     "tags": [
       "Контур.Старт",
@@ -1052,7 +1126,9 @@ export const ALL_INTERNSHIPS = [
     "channel": "@Life_in_Directum",
     "directionId": "backend",
     "subTrackId": "java",
-    "url": "https://career.directum.ru/vacancy?search=стажер",
+    "url": "https://career.directum.ru/lead_product_ownerRX",
+    "applyUrl": "https://career.directum.ru/lead_product_ownerRX",
+    "sourceChannel": "@Life_in_Directum",
     "description": "Разработка ядра интеллектуальной платформы управления цифровыми процессами и документами Directum RX в Ижевске. AI-сервисы, распределенная архитектура.",
     "tags": [
       "Directum RX",
@@ -1074,7 +1150,9 @@ export const ALL_INTERNSHIPS = [
     "channel": "@tbank_team",
     "directionId": "backend",
     "subTrackId": "java",
-    "url": "https://fintech.tbank.ru/start/?direction=mobile",
+    "url": "https://fintech.tbank.ru/start/backend/",
+    "applyUrl": "https://fintech.tbank.ru/start/backend/",
+    "sourceChannel": "@tbank_team",
     "description": "Оплачиваемая финтех-стажировка Т-Банк Старт: разработка отказоустойчивых бэкенд-микросервисов на Java 21, Spring Boot 3 и Kafka для платежных и расчетных систем с ментором.",
     "tags": [
       "Java 21",
@@ -1095,7 +1173,9 @@ export const ALL_INTERNSHIPS = [
     "channel": "@yandex_intern",
     "directionId": "frontend",
     "subTrackId": "react",
-    "url": "https://yandex.ru/jobs/vacancies/?search=frontend",
+    "url": "https://yandex.ru/jobs/pages/internship-frontend",
+    "applyUrl": "https://yandex.ru/jobs/pages/internship-frontend",
+    "sourceChannel": "@yandex_intern",
     "description": "Оплачиваемая стажировка в Яндексе (Young Con): разработка сложных интерфейсов сервисов Поиска, Маркета и Go на React, TypeScript, SSR и микрофронтендах.",
     "tags": [
       "React",
@@ -1116,7 +1196,9 @@ export const ALL_INTERNSHIPS = [
     "channel": "@ozon_tech_career",
     "directionId": "backend",
     "subTrackId": "java",
-    "url": "https://job.ozon.ru/it/vacancies/?search=стажер",
+    "url": "https://job.ozon.ru/it/camp/csharp/",
+    "applyUrl": "https://job.ozon.ru/it/camp/csharp/",
+    "sourceChannel": "@ozon_tech_career",
     "description": "Программа Ozon Camp: разработка высоконагруженных распределенных сервисов финансовой платформы и фулфилмента на C# и .NET 8 с персональным наставником.",
     "tags": [
       "C#",
@@ -1138,7 +1220,9 @@ export const ALL_INTERNSHIPS = [
     "channel": "@avito_tech",
     "directionId": "data_science",
     "subTrackId": "analytics",
-    "url": "https://career.avito.com/vacancies/?search=frontend",
+    "url": "https://career.avito.com/vacancies/analitika-dannykh/20816/",
+    "applyUrl": "https://career.avito.com/vacancies/analitika-dannykh/20816/",
+    "sourceChannel": "@avito_tech",
     "description": "Оплачиваемая программа стажировки Авито Старт для аналитиков данных: анализ пользовательского поведения, проведение A/B тестов, расчет продуктовых метрик и дашборды.",
     "tags": [
       "SQL",
@@ -1159,7 +1243,9 @@ export const ALL_INTERNSHIPS = [
     "channel": "@vk_team",
     "directionId": "mobile",
     "subTrackId": "android",
-    "url": "https://internship.vk.company/internship?direction=backend",
+    "url": "https://internship.vk.company/internship/mobile",
+    "applyUrl": "https://internship.vk.company/internship/mobile",
+    "sourceChannel": "@vk_team",
     "description": "Официальная программа стажировок VK Team: разработка ключевых фичей мобильных приложений ВКонтакте, VK Музыка и VK Видео на Kotlin и Swift под менторством экспертов.",
     "tags": [
       "Android",
@@ -2433,6 +2519,76 @@ export async function parseCareerWebsites() {
     console.warn('[Parser] Ошибка парсинга career.directum.ru:', err.message);
   }
 
+  
+  // 1.1 Avito Career Portal (direct vacancy links)
+  try {
+    const res = await fetch('https://career.avito.com/vacancies/?search=стажер', {
+      headers: {
+        'User-Agent':
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+      },
+      signal: AbortSignal.timeout(4000),
+    });
+
+    if (res.ok) {
+      const html = await res.text();
+      const items = [...html.matchAll(/<a[^>]+href="(\/vacancies\/[a-zA-Z0-9_-]+\/\d+\/?)"[^>]*>([\s\S]*?)<\/a>/g)];
+      let count = 0;
+      const seen = new Set();
+      for (const it of items) {
+        const rawTitle = it[2].replace(/<[^>]+>/g, '').trim();
+        const href = it[1];
+        if (!rawTitle || seen.has(href)) continue;
+        seen.add(href);
+
+        const titleLower = rawTitle.toLowerCase();
+        const isIT =
+          titleLower.includes('developer') ||
+          titleLower.includes('разработчик') ||
+          titleLower.includes('инженер') ||
+          titleLower.includes('engineer') ||
+          titleLower.includes('scientist') ||
+          titleLower.includes('аналитик') ||
+          titleLower.includes('qa') ||
+          titleLower.includes('sre') ||
+          titleLower.includes('dbaas') ||
+          titleLower.includes('стаж');
+
+        if (!isIT) continue;
+        count++;
+
+        const directAvitoUrl = href.startsWith('http') ? href : `https://career.avito.com${href}`;
+        const { directionId, subTrackId } = detectVacancyTrack(rawTitle);
+        const numId = href.replace(/[^0-9]/g, '') || Math.random().toString(36).slice(2, 7);
+
+        parsed.push({
+          id: `site-avito-${numId}`,
+          companyId: 'avito',
+          company: 'Авито',
+          title: rawTitle,
+          salary: 'от 75 000 до 105 000 ₽',
+          format: 'Гибрид',
+          location: 'Москва / Санкт-Петербург / Удаленно',
+          channel: 'career.avito.com',
+          sourceChannel: 'career.avito.com',
+          directionId,
+          subTrackId,
+          url: directAvitoUrl,
+          applyUrl: directAvitoUrl,
+          description: `Прямая вакансия Avito Tech: участие в развитии сервисов объявлений Авито, современный стек и сильная инженерная культура.`,
+          tags: ['Авито', 'Avito Tech', subTrackId.toUpperCase()],
+          sourceType: 'portal',
+        });
+        if (count >= 5) break;
+      }
+      if (count > 0) {
+        console.log(`[Parser] career.avito.com — спарсено ${count} прямых вакансий`);
+      }
+    }
+  } catch (err) {
+    console.warn('[Parser] Ошибка парсинга career.avito.com:', err.message);
+  }
+
   // 2. Open Search / REST API for key employers on hh.ru without authorization
   const hhEmployers = [
     { id: '8620', companyId: 'directum', company: 'Directum', defaultCity: 'Ижевск' },
@@ -2652,7 +2808,7 @@ export async function getActiveInternships(forceRefresh = false) {
       const mapped = data.map((item) => {
         const comp = findCompanyByQuery(item.company) || {};
         const rawUrl = item.source_url || item.url || GITHUB_PAGES_URL;
-        const directUrl = resolveApplyUrl(rawUrl, item.company);
+        const directUrl = resolveApplyUrl(rawUrl, item.company, item.source_name);
         return {
           id: String(item.id),
           companyId: comp.id || item.company_id || 'other',
