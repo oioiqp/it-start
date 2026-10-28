@@ -19,13 +19,18 @@ import {
   autoDetectChatIdFromUpdates,
   getSavedBotToken,
   saveBotToken,
-  sendTelegramMessage,
   triggerHaptic,
   isTelegramWebApp,
 } from '../lib/telegram';
-import { saveLocalSubscription } from '../lib/storage';
-import { getSavedVkToken, sendVkMessage, getVkBotDialogUrl, getSavedVkPeerId, saveVkPeerId } from '../lib/vk';
+import {
+  saveLocalSubscription,
+} from '../lib/storage';
+import { getVkBotDialogUrl, getSavedVkPeerId } from '../lib/vk';
 import { useScrollLock } from '../lib/useScrollLock';
+import {
+  saveUnifiedSubscription,
+  sendUnifiedTestNotification,
+} from '../services/subscriptionService';
 
 export type NotificationPlatform = 'vk' | 'telegram';
 
@@ -257,65 +262,25 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
     setIsLoading(true);
     setStatusMessage(null);
 
-    if (platform === 'vk') {
-      const cleanPeer = currentId.replace(/^vk_/, '');
-      const testText = `🔥 Тестовое уведомление IT-Старт ВКонтакте!\n\nВы успешно подключили уведомления в сервисе IT-Старт.\nВыбранные направления: ${selectedDirections.join(', ')}\nВетки: ${selectedSubTracks.join(', ')}\n\nКак только появится новая стажировка под ваш стек, вы получите мгновенный пуш!`;
-      const vkToken = getSavedVkToken();
-
-      let delivered = false;
-      if (vkToken) {
-        const res = await sendVkMessage(cleanPeer, testText, vkToken);
-        if (res.success) {
-          delivered = true;
-        }
-      }
-
-      if (!delivered) {
-        // Try server-side delivery via Render /notify
-        try {
-          const srvRes = await fetch('https://it-start-bot.onrender.com/notify', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              chatId: `vk_${cleanPeer}`,
-              text: testText,
-              platform: 'vk',
-            }),
-          });
-          if (srvRes.ok) {
-            const data = await srvRes.json();
-            if (data.success) {
-              delivered = true;
-            }
-          }
-        } catch {}
-      }
-
-      setIsLoading(false);
-      setStatusMessage({
-        type: 'success',
-        text: delivered
-          ? 'Тестовое уведомление отправлено в VK! Проверьте диалог с сообществом.'
-          : 'Уведомления ВКонтакте активны! Чтобы бот мог писать вам в личные сообщения, откройте диалог с ботом и отправьте /subscribe.',
-      });
-      triggerHaptic('success');
-      confetti({ particleCount: 60, spread: 60 });
-      return;
-    }
-
-    // Telegram Mode
-    if (botTokenInput.trim()) {
+    if (platform === 'telegram' && botTokenInput.trim()) {
       saveBotToken(botTokenInput.trim());
     }
 
-    const testText = `<b>🚀 Тестовое уведомление от @${TELEGRAM_BOT_USERNAME}!</b>\n\nВы успешно подключили уведомления в сервисе <b>IT-Старт</b>.\n\nВыбранные направления: ${selectedDirections.join(', ')}\nВетки: ${selectedSubTracks.join(', ')}\n\nКак только появится новая стажировка под ваш стек, вы получите мгновенный пуш!`;
-    const res = await sendTelegramMessage(currentId, testText, botTokenInput.trim() || undefined);
+    const res = await sendUnifiedTestNotification({
+      platform,
+      id: currentId,
+      directions: selectedDirections,
+      subTracks: selectedSubTracks,
+    });
+
     setIsLoading(false);
 
     if (res.success) {
       setStatusMessage({
         type: 'success',
-        text: 'Тестовое уведомление отправлено! Проверьте диалог с ботом @' + TELEGRAM_BOT_USERNAME + '.',
+        text: platform === 'vk'
+          ? 'Тестовое уведомление отправлено в VK! Проверьте диалог с сообществом.'
+          : 'Тестовое уведомление отправлено! Проверьте диалог с ботом @' + TELEGRAM_BOT_USERNAME + '.',
       });
       triggerHaptic('success');
       confetti({ particleCount: 60, spread: 60 });
@@ -358,54 +323,36 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
       } catch {}
     }
 
-    const cleanPeerId = currentId.replace(/^vk_/, '');
-    const targetChatId = platform === 'vk' ? `vk_${cleanPeerId}` : currentId;
-
-    const subData: TelegramSubscription = {
-      chat_id: targetChatId,
+    const saveRes = await saveUnifiedSubscription({
+      platform,
+      id: currentId,
       username: currentUsername,
-      first_name: currentFirstName,
+      firstName: currentFirstName,
       directions: selectedDirections,
-      sub_tracks: selectedSubTracks,
-      is_active: true,
-      created_at: new Date().toISOString(),
-    };
-
-    if (platform === 'vk') {
-      saveVkPeerId(cleanPeerId);
-    }
-    saveLocalSubscription(subData);
-    await saveSubscriptionToSupabase(subData);
-
-    // Optional server sync if online
-    try {
-      fetch('https://it-start-bot.onrender.com/subscribe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chatId: targetChatId,
-          username: currentUsername,
-          firstName: currentFirstName,
-          directions: selectedDirections,
-          sub_tracks: selectedSubTracks,
-          platform,
-        }),
-      }).catch(() => {});
-    } catch {}
-
-    setIsLoading(false);
-    triggerHaptic('success');
-    confetti({ particleCount: 90, spread: 70 });
-
-    onSubscriptionSaved(subData);
-    setStatusMessage({
-      type: 'success',
-      text: `Подписка успешно сохранена! Уведомления ${platform === 'vk' ? 'ВКонтакте' : 'в Telegram'} активированы.`,
+      subTracks: selectedSubTracks,
     });
 
-    setTimeout(() => {
-      onClose();
-    }, 1800);
+    setIsLoading(false);
+
+    if (saveRes.success) {
+      triggerHaptic('success');
+      confetti({ particleCount: 90, spread: 70 });
+
+      onSubscriptionSaved(saveRes.subscription);
+      setStatusMessage({
+        type: 'success',
+        text: `Подписка успешно сохранена! Уведомления ${platform === 'vk' ? 'ВКонтакте' : 'в Telegram'} активированы.`,
+      });
+
+      setTimeout(() => {
+        onClose();
+      }, 1800);
+    } else {
+      setStatusMessage({
+        type: 'error',
+        text: saveRes.error || 'Ошибка при сохранении подписки.',
+      });
+    }
   };
 
   const isClientInVk = Boolean(vkUser || isVk);

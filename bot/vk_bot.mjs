@@ -92,10 +92,19 @@ if (process.env.NODE_ENV !== 'test') {
 }
 
 // Configuration
+const isDirectCli =
+  typeof process !== 'undefined' &&
+  Boolean(process.argv?.[1]) &&
+  (process.argv[1].endsWith('vk_bot.mjs') || process.argv[1].endsWith('vk_bot.js'));
+
 export const VK_BOT_TOKEN =
   process.env.VK_BOT_TOKEN ||
   process.env.VK_GROUP_TOKEN ||
-  (process.argv[2] && !process.argv[2].startsWith('-') ? process.argv[2] : '');
+  (process.argv?.[2] && process.argv[2].startsWith('vk1.a.')
+    ? process.argv[2]
+    : isDirectCli && process.argv?.[2] && !process.argv[2].startsWith('-')
+    ? process.argv[2]
+    : '');
 
 export const VK_GROUP_ID = process.env.VK_GROUP_ID || '242573933';
 export const VK_APP_ID = process.env.VK_APP_ID || '54857681';
@@ -560,6 +569,112 @@ export async function unregisterVkSubscriber(peerId) {
 }
 
 /**
+ * Check if a user has allowed messages from the VK community
+ * Method: messages.isMessagesFromGroupAllowed
+ */
+export async function isMessagesFromGroupAllowed(userId, groupId = VK_GROUP_ID, token = VK_BOT_TOKEN) {
+  const cleanUserId = Number(String(userId).replace(/^vk_/, '')) || String(userId).replace(/^vk_/, '');
+  const cleanGroupId = Number(String(groupId).replace(/^-/, '')) || String(groupId).replace(/^-/, '');
+
+  const tokenToUse =
+    token ||
+    VK_BOT_TOKEN ||
+    process.env.VK_BOT_TOKEN ||
+    process.env.VK_GROUP_TOKEN ||
+    '';
+
+  if (!tokenToUse) {
+    return { ok: true, is_allowed: true, mock: true };
+  }
+
+  const res = await callVk(
+    'messages.isMessagesFromGroupAllowed',
+    {
+      group_id: cleanGroupId,
+      user_id: cleanUserId,
+    },
+    tokenToUse
+  );
+
+  if (res.ok && res.result) {
+    const isAllowed = res.result.is_allowed === 1;
+    return { ok: true, is_allowed: isAllowed, raw: res.result };
+  }
+
+  return { ok: false, is_allowed: false, error: res.error };
+}
+
+/**
+ * Send a notification message to a VK user / subscriber
+ * Handles: peer_id normalization, HTML tag stripping, random_id generation,
+ * interactive keyboard, permissions check and friendly Russian error mapping.
+ */
+export async function sendVkNotification(peerId, text, options = {}, token = VK_BOT_TOKEN) {
+  const cleanPeerId = Number(String(peerId).replace(/^vk_/, '')) || String(peerId).replace(/^vk_/, '');
+  if (!cleanPeerId) {
+    return { ok: false, error: 'Не указан корректный peer_id получателя' };
+  }
+
+  const tokenToUse =
+    token ||
+    VK_BOT_TOKEN ||
+    process.env.VK_BOT_TOKEN ||
+    process.env.VK_GROUP_TOKEN ||
+    '';
+
+  // Optional permission check before sending
+  if (options.checkPermission && tokenToUse) {
+    const perm = await isMessagesFromGroupAllowed(cleanPeerId, options.group_id || VK_GROUP_ID, tokenToUse);
+    if (perm.ok && perm.is_allowed === false) {
+      return {
+        ok: false,
+        error: 'Пользователь еще не разрешил сообщения от группы ВКонтакте. Перейдите в диалог с ботом и отправьте /subscribe.',
+        code: 901,
+      };
+    }
+  }
+
+  const cleanMessage = cleanHtmlForVk(text);
+  const randomId = options.random_id || Math.floor(Math.random() * 2147483647);
+  const keyboard = options.keyboard !== undefined ? options.keyboard : createVkKeyboard({
+    inline: true,
+    buttons: [
+      [
+        { label: '🚀 Открыть в Mini App', app_id: VK_APP_ID },
+        ...(options.applyUrl ? [{ label: '🔗 Откликнуться', link: options.applyUrl }] : [{ label: '🌐 Веб-версия', link: RENDER_URL }]),
+      ],
+      [
+        { label: '💼 Каталог вакансий', payload: { cmd: 'vacancies' }, color: 'primary' },
+        { label: '🔔 Настройки подписки', payload: { cmd: 'subscribe' }, color: 'secondary' },
+      ],
+    ],
+  });
+
+  const res = await callVk(
+    'messages.send',
+    {
+      peer_id: cleanPeerId,
+      random_id: randomId,
+      message: cleanMessage,
+      ...(keyboard ? { keyboard } : {}),
+    },
+    tokenToUse
+  );
+
+  if (res.ok) {
+    return { ok: true, messageId: res.result };
+  }
+
+  const errCode = res.error?.error_code;
+  let friendlyError = res.error?.error_msg || String(res.error || 'Ошибка отправки');
+  if (errCode === 901 || errCode === 902) {
+    friendlyError = 'Пользователь еще не разрешил сообщения от сообщества ВКонтакте. Перейдите в диалог с ботом и отправьте /subscribe.';
+  }
+
+  return { ok: false, error: friendlyError, errorCode: errCode };
+}
+
+/**
  * Get all active VK subscribers
  */
 export async function getVkSubscribers() {
@@ -570,12 +685,16 @@ export async function getVkSubscribers() {
         for (const row of data) {
           if (String(row.chat_id).startsWith('vk_')) {
             const pid = String(row.chat_id).replace(/^vk_/, '');
+            const dirs = Array.isArray(row.directions) && row.directions.length > 0
+              ? row.directions
+              : ['frontend', 'backend', 'mobile', 'qa', 'devops', 'data_science'];
+            const tracks = Array.isArray(row.sub_tracks) ? row.sub_tracks : [];
             vkSubscribers.set(pid, {
               peer_id: pid,
               first_name: row.first_name || 'Пользователь VK',
               username: row.username || '',
-              directions: row.directions || ['frontend', 'backend', 'mobile', 'qa', 'devops', 'data_science'],
-              sub_tracks: row.sub_tracks || [],
+              directions: dirs,
+              sub_tracks: tracks,
               subscribed_at: row.updated_at || new Date().toISOString(),
               is_active: true,
             });
@@ -645,31 +764,31 @@ export async function notifyVkSubscribers(vacancies = [], token = VK_BOT_TOKEN) 
         `🎯 В IT-Старт уже подготовлен персональный план вопросов для этого направления!\n` +
         `🔗 Откликнуться: ${applyUrl}`;
 
-      const keyboard = createVkKeyboard({
-        inline: true,
-        buttons: [
-          [
-            { label: '🚀 Открыть в Mini App', app_id: VK_APP_ID },
-            { label: '🔗 Откликнуться', link: applyUrl },
-          ],
-          [
-            { label: '💼 Каталог вакансий', payload: { cmd: 'vacancies' }, color: 'primary' },
-            { label: '🔔 Настройки подписки', payload: { cmd: 'subscribe' }, color: 'secondary' },
-          ],
-        ],
-      });
-
-      await callVk(
-        'messages.send',
+      const res = await sendVkNotification(
+        cleanPeerId,
+        msg,
         {
-          peer_id: cleanPeerId,
-          random_id: Math.floor(Math.random() * 2147483647),
-          message: msg,
-          keyboard,
+          applyUrl,
+          keyboard: createVkKeyboard({
+            inline: true,
+            buttons: [
+              [
+                { label: '🚀 Открыть в Mini App', app_id: VK_APP_ID },
+                { label: '🔗 Откликнуться', link: applyUrl },
+              ],
+              [
+                { label: '💼 Каталог вакансий', payload: { cmd: 'vacancies' }, color: 'primary' },
+                { label: '🔔 Настройки подписки', payload: { cmd: 'subscribe' }, color: 'secondary' },
+              ],
+            ],
+          }),
         },
         token
       );
-      sentCount++;
+
+      if (res.ok) {
+        sentCount++;
+      }
     }
   }
 
@@ -1198,9 +1317,11 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
     textClean === 'peer_id' ||
     textClean === 'айди'
   ) {
-    const isSubscribed = vkSubscribers.has(String(peerId));
+    await getVkSubscribers();
+    const cleanId = String(peerId).replace(/^vk_/, '');
+    const isSubscribed = vkSubscribers.has(cleanId) && vkSubscribers.get(cleanId)?.is_active;
     const text =
-      `🆔 Ваш идентификатор ВКонтакте (Peer ID): ${peerId}\n` +
+      `🆔 Ваш идентификатор ВКонтакте (Peer ID): ${cleanId}\n` +
       `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
       `Этот ID используется ботом IT-Старт для отправки персональных пуш-уведомлений о новых стажировках по вашему стеку.\n\n` +
       `🔔 Статус подписки: ${isSubscribed ? '✅ Активна (уведомления включены)' : '❌ Не активна (отправьте /subscribe для включения)'}\n` +
@@ -1294,6 +1415,8 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
     textClean === 'состояние' ||
     textClean === 'сервер'
   ) {
+    await getVkSubscribers();
+    const activeSubCount = Array.from(vkSubscribers.values()).filter((s) => s.is_active).length;
     const text =
       `⚡ Статус сервиса IT-Старт & VK Bot\n` +
       `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
@@ -1302,9 +1425,9 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
       `📡 Источников в мониторинге: ${ALL_TARGET_TG_CHANNELS.length + CAREER_WEBSITES_DATA.length} ` +
       `(${ALL_TARGET_TG_CHANNELS.length} каналов + ${CAREER_WEBSITES_DATA.length} сайтов)\n` +
       `🏢 Отслеживаемых компаний: ${COMPANIES_DATA.length}\n` +
-      `👥 Активных подписчиков в VK: ${vkSubscribers.size}\n` +
+      `👥 Активных подписчиков в VK: ${activeSubCount}\n` +
       `🕒 Последнее сканирование: ${LAST_SCAN_STATUS.lastScanAt ? new Date(LAST_SCAN_STATUS.lastScanAt).toLocaleTimeString('ru-RU') : 'недавно'}\n` +
-      `💾 База данных: Supabase PostgreSQL (public.internships)\n\n` +
+      `💾 База данных: Supabase PostgreSQL (public.internships, public.tg_subscriptions)\n\n` +
       `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
       `🚀 VK Mini App: https://vk.com/app${VK_APP_ID}\n` +
       `🌐 Веб-версия без VPN: ${RENDER_URL}`;
@@ -1536,6 +1659,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
  * Return current runtime status of VK Bot
  */
 export function getVkBotStatus() {
+  const activeSubs = Array.from(vkSubscribers.values()).filter((s) => s.is_active).length;
   return {
     bot: 'IT-Старт VK Бот',
     apiBase: VK_API_BASE,
@@ -1543,7 +1667,7 @@ export function getVkBotStatus() {
     status: isPollingActive ? 'active' : VK_BOT_TOKEN ? 'configured' : 'fallback',
     mode: VK_BOT_TOKEN ? 'live' : 'fallback',
     uptime: process.uptime(),
-    subscribersCount: vkSubscribers.size,
+    subscribersCount: activeSubs,
     commandsCount: 12,
     channelsCount: ALL_TARGET_TG_CHANNELS.length,
     websitesCount: CAREER_WEBSITES_DATA.length,
@@ -1674,6 +1798,27 @@ export async function startVkBot(token = VK_BOT_TOKEN, options = {}) {
                 }
                 if (msg) {
                   await handleVkMessage(msg, tokenToUse);
+                }
+              } else if (upd.type === 'message_allow') {
+                const userId = upd.object?.user_id;
+                if (userId) {
+                  console.log(`[VK Bot] 🔔 Пользователь ${userId} разрешил сообщения сообщества`);
+                  await registerVkSubscriber(userId, { first_name: 'Пользователь VK' });
+                  await sendVkNotification(
+                    userId,
+                    `🎉 Спасибо за подключение уведомлений IT-Старт!\n` +
+                    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+                    `Теперь вы первыми узнаете о новых оплачиваемых стажировках в Т1, Контур, Т-Банк, Directum, Яндекс, Ozon, Сбер, Авито и VK.\n\n` +
+                    `Настройте интересующие направления кнопкой ниже или отправьте «Стажировки» для просмотра каталога!`,
+                    {},
+                    tokenToUse
+                  );
+                }
+              } else if (upd.type === 'message_deny') {
+                const userId = upd.object?.user_id;
+                if (userId) {
+                  console.log(`[VK Bot] 🔕 Пользователь ${userId} запретил сообщения сообщества`);
+                  await unregisterVkSubscriber(userId);
                 }
               }
             }

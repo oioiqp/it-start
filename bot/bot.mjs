@@ -1480,7 +1480,7 @@ const server = http.createServer(async (req, res) => {
         const isVkTarget = platform === 'vk' || String(chatId).startsWith('vk_');
 
         if (isVkTarget) {
-          const { callVk, createVkKeyboard, VK_APP_ID, cleanHtmlForVk } = await import('./vk_bot.mjs');
+          const { sendVkNotification, createVkKeyboard, VK_APP_ID } = await import('./vk_bot.mjs');
           const cleanPeerId = String(chatId).replace(/^vk_/, '');
           const keyboard = createVkKeyboard({
             inline: true,
@@ -1491,19 +1491,14 @@ const server = http.createServer(async (req, res) => {
               ],
             ],
           });
-          const vkRes = await callVk('messages.send', {
-            peer_id: cleanPeerId,
-            random_id: Math.floor(Math.random() * 2147483647),
-            message: cleanHtmlForVk(text),
-            keyboard,
-          });
+          const vkRes = await sendVkNotification(cleanPeerId, text, { keyboard, checkPermission: false });
 
           res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
           res.end(
             JSON.stringify({
               success: vkRes.ok,
-              messageId: vkRes.result,
-              error: vkRes.error?.error_msg || vkRes.error,
+              messageId: vkRes.messageId,
+              error: vkRes.error,
             })
           );
           return;

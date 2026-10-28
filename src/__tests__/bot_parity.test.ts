@@ -522,5 +522,65 @@ describe('Bot Parity & Comprehensive Functionality Tests (Telegram & VKontakte)'
         vkBot.vkSubscribers.set(k, v);
       }
     });
+
+    it('verifies isMessagesFromGroupAllowed and sendVkNotification helpers', async () => {
+      // 1. isMessagesFromGroupAllowed
+      const allowedRes = await vkBot.isMessagesFromGroupAllowed('vk_123456');
+      expect(allowedRes.ok).toBe(true);
+      expect(typeof allowedRes.is_allowed).toBe('boolean');
+
+      // 2. sendVkNotification without token in test mode
+      const sendRes = await vkBot.sendVkNotification('vk_123456', '<b>Жирный текст</b> и ссылка <a href="https://example.com">Тут</a>');
+      expect(sendRes.ok).toBe(true);
+      expect(sendRes.messageId).toBeDefined();
+
+      // 3. sendVkNotification validates empty peer_id
+      const emptyRes = await vkBot.sendVkNotification('', 'Тест');
+      expect(emptyRes.ok).toBe(false);
+      expect(emptyRes.error).toBeDefined();
+    });
+
+    it('verifies that subscribers with empty or null directions receive all vacancies', async () => {
+      const savedSubs = new Map(vkBot.vkSubscribers);
+      vkBot.vkSubscribers.clear();
+      vkBot.clearVkNotifiedCache();
+
+      // Register subscriber with empty directions array
+      await vkBot.registerVkSubscriber('112233', {
+        first_name: 'Всеядный Студент',
+        directions: [],
+        sub_tracks: [],
+      });
+
+      const anyVac = {
+        id: 'vac-all-101',
+        company: 'Ozon',
+        title: 'Стажёр Аналитик',
+        salary: '100 000 ₽',
+        format: 'Удаленно',
+        directionId: 'data_science',
+      };
+
+      const deliveredCount = await vkBot.notifyVkSubscribers([anyVac]);
+      expect(deliveredCount).toBeGreaterThanOrEqual(1);
+
+      // Restore subscribers
+      vkBot.vkSubscribers.clear();
+      for (const [k, v] of savedSubs.entries()) {
+        vkBot.vkSubscribers.set(k, v);
+      }
+    });
+
+    it('validates /id and /status commands reflect active subscribers correctly', async () => {
+      // Ensure /id and /status succeed
+      const idRes = await vkBot.handleVkMessage({ peer_id: 123456, text: '/id' });
+      expect(idRes.ok).toBe(true);
+      expect(idRes.reply.message).toContain('Ваш идентификатор ВКонтакте');
+
+      const statusRes = await vkBot.handleVkMessage({ peer_id: 123456, text: '/status' });
+      expect(statusRes.ok).toBe(true);
+      expect(statusRes.reply.message).toContain('Статус сервиса IT-Старт');
+      expect(statusRes.reply.message).toContain('Активных подписчиков в VK');
+    });
   });
 });

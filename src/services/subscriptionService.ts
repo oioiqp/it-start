@@ -169,15 +169,28 @@ export async function sendUnifiedTestNotification(
         const data = await res.json();
         if (data.success) {
           return { success: true, messageId: data.messageId };
+        } else {
+          return {
+            success: false,
+            error:
+              data.error ||
+              'VK API отклонил отправку: пользователь еще не разрешил сообщения от группы. Перейдите в диалог с сообществом и отправьте /subscribe.',
+          };
         }
+      } else {
+        return {
+          success: false,
+          error: `Сервер уведомлений вернул статус: ${res.statusText || res.status}`,
+        };
       }
-    } catch {}
-
-    // Если токен не настроен на клиенте и сервер недоступен, подписка зафиксирована в Supabase
-    return {
-      success: true,
-      messageId: Date.now(),
-    };
+    } catch {
+      // Offline fallback: if server is unreachable
+      return {
+        success: false,
+        error:
+          'Сервер уведомлений временно недоступен (пробуждение 30–50с). Подписка сохранена в базе Supabase — перейдите в диалог с сообществом ВКонтакте и отправьте /subscribe.',
+      };
+    }
   }
 
   // Telegram
