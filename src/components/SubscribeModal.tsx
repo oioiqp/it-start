@@ -25,7 +25,7 @@ import {
 import {
   saveLocalSubscription,
 } from '../lib/storage';
-import { getVkBotDialogUrl, getSavedVkPeerId } from '../lib/vk';
+import { getVkBotDialogUrl, getSavedVkPeerId, autoDetectVkPeerId } from '../lib/vk';
 import { useScrollLock } from '../lib/useScrollLock';
 import {
   saveUnifiedSubscription,
@@ -109,6 +109,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
   );
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isDetecting, setIsDetecting] = useState<boolean>(false);
+  const [isDetectingVk, setIsDetectingVk] = useState<boolean>(false);
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
 
   // Lock background scroll on mobile and desktop while modal is open
@@ -243,6 +244,30 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
       setStatusMessage({
         type: 'error',
         text: result.error || 'Не удалось найти Chat ID автоматически. Откройте диалог с ботом выше, отправьте /start и повторите!',
+      });
+    }
+  };
+
+  const handleAutoDetectVk = async () => {
+    setIsDetectingVk(true);
+    setStatusMessage(null);
+    triggerHaptic('medium');
+
+    const result = await autoDetectVkPeerId();
+    setIsDetectingVk(false);
+
+    if (result.success && result.peerId) {
+      setVkPeerId(String(result.peerId));
+      if (result.fullName) setVkFullName(result.fullName);
+      setStatusMessage({
+        type: 'success',
+        text: `VK ID успешно определен: ${result.peerId}${result.fullName ? ` (${result.fullName})` : ''}! Подписка синхронизирована.`,
+      });
+      triggerHaptic('success');
+    } else {
+      setStatusMessage({
+        type: 'error',
+        text: result.error || 'Не удалось определить VK ID автоматически. Откройте диалог с сообществом ВКонтакте, отправьте любое сообщение и повторите!',
       });
     }
   };
@@ -534,34 +559,51 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
 
                 {/* Subtle manual entry for desktop web (folded by default, no ugly prompts) */}
                 {!vkUser && (
-                  <details className="text-xs pt-0.5">
+                  <details className="text-xs pt-0.5" open={!vkPeerId ? true : undefined}>
                     <summary className="text-[11px] text-neutral-400 hover:text-neutral-600 dark:text-neutral-500 cursor-pointer select-none inline-flex items-center gap-1">
                       <span>Настроить ID вручную</span>
                     </summary>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
-                      <div>
-                        <label className="block text-[11px] font-medium mb-1 text-neutral-600">
-                          Ваш VK ID
-                        </label>
-                        <input
-                          type="text"
-                          value={vkPeerId}
-                          onChange={(e) => setVkPeerId(e.target.value)}
-                          placeholder="например 482655491"
-                          className="w-full px-3 py-2 rounded-xl text-xs transition-colors focus:outline-none liquid-glass-pill focus:bg-white/60 text-neutral-900 placeholder:text-neutral-400 border border-neutral-200/80"
-                        />
+                    <div className="space-y-2 pt-2">
+                      <div className="flex items-center justify-between gap-2 flex-wrap">
+                        <button
+                          type="button"
+                          onClick={handleAutoDetectVk}
+                          disabled={isDetectingVk}
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium bg-blue-500/10 hover:bg-blue-500/20 text-blue-700 dark:text-blue-300 transition-colors disabled:opacity-50 cursor-pointer"
+                        >
+                          <RefreshCw className={`w-3 h-3 ${isDetectingVk ? 'animate-spin' : ''}`} />
+                          <span>Определить VK ID автоматически</span>
+                        </button>
+                        <span className="text-[10px] text-neutral-400">
+                          {vkPeerId ? 'ID определен' : 'После отправки сообщения боту'}
+                        </span>
                       </div>
-                      <div>
-                        <label className="block text-[11px] font-medium mb-1 text-neutral-600">
-                          Имя в профиле ВКонтакте
-                        </label>
-                        <input
-                          type="text"
-                          value={vkFullName}
-                          onChange={(e) => setVkFullName(e.target.value)}
-                          placeholder="Имя Фамилия"
-                          className="w-full px-3 py-2 rounded-xl text-xs transition-colors focus:outline-none liquid-glass-pill focus:bg-white/60 text-neutral-900 placeholder:text-neutral-400 border border-neutral-200/80"
-                        />
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div>
+                          <label className="block text-[11px] font-medium mb-1 text-neutral-600">
+                            Ваш VK ID
+                          </label>
+                          <input
+                            type="text"
+                            value={vkPeerId}
+                            onChange={(e) => setVkPeerId(e.target.value)}
+                            placeholder="например 482655491"
+                            className="w-full px-3 py-2 rounded-xl text-xs transition-colors focus:outline-none liquid-glass-pill focus:bg-white/60 text-neutral-900 placeholder:text-neutral-400 border border-neutral-200/80"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-medium mb-1 text-neutral-600">
+                            Имя в профиле ВКонтакте
+                          </label>
+                          <input
+                            type="text"
+                            value={vkFullName}
+                            onChange={(e) => setVkFullName(e.target.value)}
+                            placeholder="Имя Фамилия"
+                            className="w-full px-3 py-2 rounded-xl text-xs transition-colors focus:outline-none liquid-glass-pill focus:bg-white/60 text-neutral-900 placeholder:text-neutral-400 border border-neutral-200/80"
+                          />
+                        </div>
                       </div>
                     </div>
                   </details>

@@ -231,3 +231,45 @@ export async function sendVkMessage(
     };
   }
 }
+
+/**
+ * Auto-detect VK Peer ID from recent bot conversations on Render
+ */
+export async function autoDetectVkPeerId(): Promise<{
+  success: boolean;
+  peerId?: string | number;
+  firstName?: string;
+  fullName?: string;
+  error?: string;
+}> {
+  try {
+    const serverUrl = 'https://it-start-bot.onrender.com';
+    const res = await fetch(`${serverUrl}/vk/latest-user`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data.ok && data.peerId) {
+        saveVkPeerId(String(data.peerId));
+        return {
+          success: true,
+          peerId: data.peerId,
+          firstName: data.firstName,
+          fullName: data.fullName,
+        };
+      }
+    }
+  } catch {}
+
+  const saved = getSavedVkPeerId();
+  if (saved) {
+    return {
+      success: true,
+      peerId: saved,
+      firstName: 'Пользователь VK',
+    };
+  }
+
+  return {
+    success: false,
+    error: 'Не удалось определить VK ID автоматически. Откройте диалог с сообществом ВКонтакте (vk.com/im?sel=-242573933), отправьте любое сообщение и повторите попытку!',
+  };
+}

@@ -675,16 +675,125 @@ export async function sendVkNotification(peerId, text, options = {}, token = VK_
 }
 
 /**
+ * Synchronize subscribers from recent VK conversations (discovers active dialogues)
+ */
+export async function syncSubscribersFromVkConversations(token = VK_BOT_TOKEN) {
+  const tokenToUse =
+    token ||
+    VK_BOT_TOKEN ||
+    process.env.VK_BOT_TOKEN ||
+    process.env.VK_GROUP_TOKEN ||
+    '';
+
+  if (!tokenToUse) return 0;
+
+  try {
+    const res = await callVk('messages.getConversations', { count: 100 }, tokenToUse);
+    if (!res.ok || !res.result || !Array.isArray(res.result.items)) {
+      return 0;
+    }
+
+    let syncedCount = 0;
+    for (const item of res.result.items) {
+      const conv = item.conversation;
+      if (!conv) continue;
+      const peer = conv.peer;
+      const canWrite = conv.can_write?.allowed;
+
+      if (peer && peer.type === 'user' && peer.id > 0 && canWrite) {
+        const idStr = String(peer.id);
+        const existing = vkSubscribers.get(idStr);
+        if (!existing || !existing.is_active) {
+          console.log(`[VK Bot] 🔍 Обнаружен активный диалог с пользователем VK ${idStr}, регистрируем подписку...`);
+          await registerVkSubscriber(peer.id, {
+            first_name: 'Пользователь VK',
+          });
+          syncedCount++;
+        }
+      }
+    }
+    if (syncedCount > 0) {
+      console.log(`[VK Bot] ✅ Синхронизировано ${syncedCount} пользователей из активных диалогов VK.`);
+    }
+    return syncedCount;
+  } catch (err) {
+    console.warn('[VK Bot] syncSubscribersFromVkConversations warning:', err.message);
+    return 0;
+  }
+}
+
+/**
+ * Get latest active VK user for automatic ID detection in browser
+ */
+export async function getLatestVkUser(token = VK_BOT_TOKEN) {
+  const tokenToUse =
+    token ||
+    VK_BOT_TOKEN ||
+    process.env.VK_BOT_TOKEN ||
+    process.env.VK_GROUP_TOKEN ||
+    '';
+
+  if (tokenToUse) {
+    try {
+      const res = await callVk('messages.getConversations', { count: 10 }, tokenToUse);
+      if (res.ok && res.result && Array.isArray(res.result.items)) {
+        for (const item of res.result.items) {
+          const peer = item.conversation?.peer;
+          if (peer && peer.type === 'user' && peer.id > 0) {
+            let firstName = 'Пользователь VK';
+            let lastName = '';
+            try {
+              const uRes = await callVk('users.get', { user_ids: peer.id }, tokenToUse);
+              if (uRes.ok && Array.isArray(uRes.result) && uRes.result[0]) {
+                firstName = uRes.result[0].first_name || firstName;
+                lastName = uRes.result[0].last_name || '';
+              }
+            } catch {}
+
+            return {
+              ok: true,
+              peerId: peer.id,
+              firstName,
+              lastName,
+              fullName: `${firstName} ${lastName}`.trim(),
+            };
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('[VK Bot] getLatestVkUser VK API warning:', e.message);
+    }
+  }
+
+  const subs = Array.from(vkSubscribers.values()).filter((s) => s.is_active);
+  if (subs.length > 0) {
+    const latest = subs[subs.length - 1];
+    return {
+      ok: true,
+      peerId: Number(latest.peer_id) || latest.peer_id,
+      firstName: latest.first_name || 'Пользователь VK',
+      fullName: latest.first_name || 'Пользователь VK',
+    };
+  }
+
+  return { ok: false, error: 'Пока нет входящих диалогов от пользователей VK' };
+}
+
+/**
  * Get all active VK subscribers
  */
 export async function getVkSubscribers() {
   if (supabase && process.env.NODE_ENV !== 'test') {
     try {
-      const { data } = await supabase.from('tg_subscriptions').select('*').eq('is_active', true);
+      const { data, error } = await supabase.from('tg_subscriptions').select('*').eq('is_active', true);
+      if (error) {
+        console.warn('[VK Bot] Supabase error in getVkSubscribers:', error.message);
+      }
       if (data && Array.isArray(data)) {
         for (const row of data) {
-          if (String(row.chat_id).startsWith('vk_')) {
-            const pid = String(row.chat_id).replace(/^vk_/, '');
+          const rawChatId = String(row.chat_id || '').trim();
+          if (rawChatId.startsWith('vk_')) {
+            const pid = rawChatId.replace(/^vk_/, '');
             const dirs = Array.isArray(row.directions) && row.directions.length > 0
               ? row.directions
               : ['frontend', 'backend', 'mobile', 'qa', 'devops', 'data_science'];
@@ -701,7 +810,9 @@ export async function getVkSubscribers() {
           }
         }
       }
-    } catch {}
+    } catch (e) {
+      console.warn('[VK Bot] Exception in getVkSubscribers:', e.message);
+    }
   }
   return Array.from(vkSubscribers.values()).filter((s) => s.is_active);
 }
@@ -714,43 +825,64 @@ export function clearVkNotifiedCache() {
 }
 
 /**
- * Notify all VK subscribers about newly parsed vacancies
+ * Notify all VK subscribers about matching vacancies from monitoring
  */
 export async function notifyVkSubscribers(vacancies = [], token = VK_BOT_TOKEN) {
   if (!vacancies || vacancies.length === 0) return 0;
   const subscribers = await getVkSubscribers();
-  if (subscribers.length === 0) return 0;
+  if (subscribers.length === 0) {
+    console.log('[VK Notifier] Нет активных VK-подписчиков для рассылки.');
+    return 0;
+  }
 
+  console.log(`[VK Notifier] Рассылка по ${subscribers.length} активным VK-подписчикам (кандидатов: ${vacancies.length})...`);
   let sentCount = 0;
-  const sample = vacancies.slice(0, 3);
 
   for (const sub of subscribers) {
+    const cleanPeerId = Number(String(sub.peer_id).replace(/^vk_/, '')) || String(sub.peer_id).replace(/^vk_/, '');
+    if (!cleanPeerId) continue;
+
     const subDirs = Array.isArray(sub.directions) ? sub.directions : [];
     const subTracks = Array.isArray(sub.sub_tracks) ? sub.sub_tracks : [];
 
-    for (const vac of sample) {
-      if (!vac) continue;
-
+    // Filter vacancies matching this subscriber's preferences
+    const matching = vacancies.filter((vac) => {
+      if (!vac) return false;
       const vacDir = vac.directionId || vac.direction;
       const vacSub = vac.subTrackId || vac.sub_track;
 
-      // Filter by subscriber's preferences (if preferences are set and vacancy specifies direction/track)
-      if (vacDir && subDirs.length > 0 && !subDirs.includes(vacDir)) {
-        continue;
-      }
-      if (vacSub && subTracks.length > 0 && !subTracks.includes(vacSub)) {
-        continue;
-      }
+      // If subscriber has no direction preferences set, or vacancy specifies no direction/track, match all
+      if (subDirs.length === 0 && subTracks.length === 0) return true;
+      if (!vacDir && !vacSub) return true;
 
-      // Avoid spamming subscriber with same vacancy
-      const dedupeKey = `${sub.peer_id}_${vac.id || vac.title || vac.url}`;
-      if (notifiedVkKeys.has(dedupeKey)) {
-        continue;
+      const dirMatch = vacDir ? subDirs.includes(vacDir) : false;
+      const trackMatch = vacSub ? subTracks.includes(vacSub) : false;
+
+      if (vacDir && vacSub) {
+        return dirMatch || trackMatch;
       }
+      if (vacDir) {
+        return subDirs.length === 0 || dirMatch;
+      }
+      if (vacSub) {
+        return subTracks.length === 0 || trackMatch;
+      }
+      return true;
+    });
+
+    // Send up to 2 unnotified matching vacancies per subscriber
+    let sentForSub = 0;
+    for (const vac of matching) {
+      if (sentForSub >= 2) break;
+
+      const dedupeKey = `${cleanPeerId}_${vac.id || vac.title || vac.url}`;
+      if (notifiedVkKeys.has(dedupeKey)) continue;
+
       notifiedVkKeys.add(dedupeKey);
 
-      const cleanPeerId = Number(String(sub.peer_id).replace(/^vk_/, '')) || String(sub.peer_id).replace(/^vk_/, '');
-      const tagsStr = Array.isArray(vac.tags) && vac.tags.length > 0 ? vac.tags.slice(0, 4).join(' • ') : 'Junior / Стажировка';
+      const tagsStr = Array.isArray(vac.tags) && vac.tags.length > 0
+        ? vac.tags.slice(0, 4).join(' • ')
+        : 'Junior / Стажировка';
       const isWeb = vac.sourceType === 'portal' || vac.sourceType === 'website';
       const sourceLabel = isWeb ? 'Карьерный сайт' : 'Telegram-канал';
       const sourceChannel = vac.sourceChannel || vac.channel || (isWeb ? 'Сайт работодателя' : 'Telegram-канал');
@@ -769,30 +901,38 @@ export async function notifyVkSubscribers(vacancies = [], token = VK_BOT_TOKEN) 
         `🎯 В IT-Старт уже подготовлен персональный план вопросов для этого направления!\n` +
         `🔗 Откликнуться: ${applyUrl}`;
 
-      const res = await sendVkNotification(
-        cleanPeerId,
-        msg,
-        {
-          applyUrl,
-          keyboard: createVkKeyboard({
-            inline: true,
-            buttons: [
-              [
-                { label: '🚀 Открыть в Mini App', app_id: VK_APP_ID },
-                { label: actionLabel, link: applyUrl },
+      try {
+        const res = await sendVkNotification(
+          cleanPeerId,
+          msg,
+          {
+            applyUrl,
+            keyboard: createVkKeyboard({
+              inline: true,
+              buttons: [
+                [
+                  { label: '🚀 Открыть в Mini App', app_id: VK_APP_ID },
+                  { label: actionLabel, link: applyUrl },
+                ],
+                [
+                  { label: '💼 Каталог вакансий', payload: { cmd: 'vacancies' }, color: 'primary' },
+                  { label: '🔔 Настройки подписки', payload: { cmd: 'subscribe' }, color: 'secondary' },
+                ],
               ],
-              [
-                { label: '💼 Каталог вакансий', payload: { cmd: 'vacancies' }, color: 'primary' },
-                { label: '🔔 Настройки подписки', payload: { cmd: 'subscribe' }, color: 'secondary' },
-              ],
-            ],
-          }),
-        },
-        token
-      );
+            }),
+          },
+          token
+        );
 
-      if (res.ok) {
-        sentCount++;
+        if (res.ok) {
+          sentForSub++;
+          sentCount++;
+          console.log(`[VK Notifier] ✅ Пуш доставлен подписчику vk_${cleanPeerId} (${vac.company} — ${vac.title})`);
+        } else {
+          console.warn(`[VK Notifier] ⚠️ Не удалось отправить пуш vk_${cleanPeerId}: ${res.error || 'Unknown'}`);
+        }
+      } catch (sendErr) {
+        console.error(`[VK Notifier] ❌ Ошибка отправки пуша vk_${cleanPeerId}:`, sendErr.message);
       }
     }
   }
@@ -878,6 +1018,25 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
     rawInput.object?.user_id;
 
   if (!peerId) return { ok: false, error: 'Missing peer_id' };
+
+  // Auto-register user as active subscriber on ANY incoming message or event if not yet active
+  const cleanPeerIdStr = String(peerId).replace(/^vk_/, '');
+  const existingSub = vkSubscribers.get(cleanPeerIdStr);
+  if (!existingSub || !existingSub.is_active) {
+    const firstName =
+      message.from?.first_name ||
+      rawInput.from?.first_name ||
+      rawInput.first_name ||
+      'Пользователь VK';
+    const username =
+      message.from?.username ||
+      rawInput.from?.username ||
+      rawInput.username ||
+      '';
+    registerVkSubscriber(peerId, { first_name: firstName, username }).catch((e) =>
+      console.warn('[VK Bot Auto-Sub]', e.message)
+    );
+  }
 
   // Acknowledge inline callback button event to dismiss loading spinner in VK app
   const eventId = message.event_id || rawInput.event_id || rawInput.object?.event_id;
@@ -1665,12 +1824,19 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
  */
 export function getVkBotStatus() {
   const activeSubs = Array.from(vkSubscribers.values()).filter((s) => s.is_active).length;
+  const tokenToUse =
+    VK_BOT_TOKEN ||
+    process.env.VK_BOT_TOKEN ||
+    process.env.VK_GROUP_TOKEN ||
+    '';
+
   return {
     bot: 'IT-Старт VK Бот',
     apiBase: VK_API_BASE,
     version: VK_API_VERSION,
-    status: isPollingActive ? 'active' : VK_BOT_TOKEN ? 'configured' : 'fallback',
-    mode: VK_BOT_TOKEN ? 'live' : 'fallback',
+    status: isPollingActive ? 'active' : tokenToUse ? 'configured' : 'fallback',
+    mode: tokenToUse ? 'live' : 'fallback',
+    tokenConfigured: Boolean(tokenToUse),
     uptime: process.uptime(),
     subscribersCount: activeSubs,
     commandsCount: 12,
@@ -1678,7 +1844,9 @@ export function getVkBotStatus() {
     websitesCount: CAREER_WEBSITES_DATA.length,
     companiesCount: COMPANIES_DATA.length,
     lastScanAt: LAST_SCAN_STATUS.lastScanAt,
+    sentPushesVk: LAST_SCAN_STATUS.sentPushesVk || 0,
     renderUrl: RENDER_URL,
+    groupId: VK_GROUP_ID,
     communityUrl: VK_COMMUNITY_URL,
     lastActive: new Date().toISOString(),
   };
@@ -1748,10 +1916,20 @@ export async function startVkBot(token = VK_BOT_TOKEN, options = {}) {
     let ts = '';
 
     const getLongPollServer = async () => {
-      // Ensure Bots Long Poll settings are activated with message_new and message_event
+      // Ensure Bots Long Poll settings are activated with all messaging events
       await callVk(
         'groups.setLongPollSettings',
-        { group_id: groupId, enabled: 1, message_new: 1, message_event: 1, message_reply: 1, api_version: '5.199' },
+        {
+          group_id: groupId,
+          enabled: 1,
+          message_new: 1,
+          message_event: 1,
+          message_reply: 1,
+          message_allow: 1,
+          message_deny: 1,
+          message_edit: 1,
+          api_version: '5.199',
+        },
         tokenToUse
       ).catch(() => {});
 
@@ -1771,6 +1949,11 @@ export async function startVkBot(token = VK_BOT_TOKEN, options = {}) {
     };
 
     let serverReady = await getLongPollServer();
+
+    // Automatically discover any existing dialogues with users from VK API
+    await syncSubscribersFromVkConversations(tokenToUse).catch((err) => {
+      console.warn('[VK Bot] Ошибка синхронизации диалогов при старте:', err.message);
+    });
 
     while (isPollingActive) {
       if (!serverReady) {

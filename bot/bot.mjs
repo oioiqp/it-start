@@ -1519,6 +1519,12 @@ const server = http.createServer(async (req, res) => {
   }
 
   if (urlPath === '/status') {
+    let vkInfo = { status: 'standby', bot: 'IT-Старт VK Бот' };
+    try {
+      const { getVkBotStatus } = await import('./vk_bot.mjs');
+      vkInfo = getVkBotStatus();
+    } catch {}
+
     res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
     res.end(
       JSON.stringify({
@@ -1529,6 +1535,7 @@ const server = http.createServer(async (req, res) => {
         channelsCount: ALL_TARGET_TG_CHANNELS.length,
         websitesCount: CAREER_WEBSITES_DATA.length,
         lastScan: LAST_SCAN_STATUS,
+        vk: vkInfo,
       })
     );
     return;
@@ -1568,8 +1575,14 @@ const server = http.createServer(async (req, res) => {
         const actionLabel = actionButton?.text || (directUrl?.includes('t.me') ? '🔗 Открыть пост' : '🔗 Откликнуться');
 
         if (isVkTarget) {
-          const { sendVkNotification, createVkKeyboard, VK_APP_ID } = await import('./vk_bot.mjs');
+          const { sendVkNotification, createVkKeyboard, VK_APP_ID, registerVkSubscriber } = await import('./vk_bot.mjs');
           const cleanPeerId = String(chatId).replace(/^vk_/, '');
+
+          // Auto-register VK subscriber so future monitoring pushes also deliver
+          registerVkSubscriber(cleanPeerId, { first_name: 'Пользователь VK' }).catch((e) =>
+            console.warn('[Notify Auto-Sub]', e.message)
+          );
+
           const keyboard = createVkKeyboard({
             inline: true,
             buttons: [
@@ -1587,6 +1600,7 @@ const server = http.createServer(async (req, res) => {
               success: vkRes.ok,
               messageId: vkRes.messageId,
               error: vkRes.error,
+              errorCode: vkRes.errorCode,
             })
           );
           return;
@@ -1636,7 +1650,7 @@ const server = http.createServer(async (req, res) => {
         const isVkTarget = platform === 'vk' || String(chatId).startsWith('vk_');
 
         if (isVkTarget) {
-          const { registerVkSubscriber } = await import('./vk_bot.mjs');
+          const { registerVkSubscriber, sendVkNotification } = await import('./vk_bot.mjs');
           const cleanPeerId = String(chatId).replace(/^vk_/, '');
           const sub = await registerVkSubscriber(cleanPeerId, {
             username,
@@ -1644,6 +1658,15 @@ const server = http.createServer(async (req, res) => {
             directions,
             sub_tracks,
           });
+
+          // Deliver immediate confirmation push in VK if user has permitted messages
+          sendVkNotification(
+            cleanPeerId,
+            `🎉 Уведомления IT-Старт ВКонтакте успешно активированы!\n` +
+            `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+            `Вы первыми узнаете о новых оплачиваемых стажировках от ведущих работодателей под ваш стек.`
+          ).catch(() => {});
+
           res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
           res.end(JSON.stringify({ success: true, subscriber: sub }));
           return;
@@ -1672,6 +1695,32 @@ const server = http.createServer(async (req, res) => {
       res.end(JSON.stringify(getVkBotStatus()));
     } catch {
       res.end(JSON.stringify({ status: 'standby', bot: 'IT-Старт VK Бот' }));
+    }
+    return;
+  }
+
+  if (urlPath === '/vk/latest-user') {
+    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+    try {
+      const { getLatestVkUser } = await import('./vk_bot.mjs');
+      const latest = await getLatestVkUser();
+      res.end(JSON.stringify(latest));
+    } catch (err) {
+      res.end(JSON.stringify({ ok: false, error: err.message }));
+    }
+    return;
+  }
+
+  if (urlPath === '/vk/check-permission') {
+    const parsedUrl = new URL(req.url, 'http://localhost');
+    const userId = parsedUrl.searchParams.get('user_id');
+    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+    try {
+      const { isMessagesFromGroupAllowed } = await import('./vk_bot.mjs');
+      const result = await isMessagesFromGroupAllowed(userId);
+      res.end(JSON.stringify(result));
+    } catch (err) {
+      res.end(JSON.stringify({ ok: false, error: err.message }));
     }
     return;
   }
@@ -2917,7 +2966,8 @@ export async function scanChannelsAndSyncSupabase(notifySubscribers = true) {
   }
 
   // 4. Match subscribers from `public.tg_subscriptions` and send notifications
-  let sentPushes = 0;
+  let sentPushesTg = 0;
+  let sentPushesVk = 0;
   if (notifySubscribers && BOT_TOKEN) {
     try {
       let subs = [];
@@ -2985,7 +3035,7 @@ export async function scanChannelsAndSyncSupabase(notifySubscribers = true) {
                   ],
                 },
               });
-              sentPushes++;
+              sentPushesTg++;
               console.log(`[Parser] Пуш отправлен подписчику ${sub.chat_id} (${item.company})`);
             }
           }
@@ -2999,16 +3049,21 @@ export async function scanChannelsAndSyncSupabase(notifySubscribers = true) {
   // 5. Match and notify subscribers in VK
   if (notifySubscribers) {
     try {
-      const { notifyVkSubscribers } = await import('./vk_bot.mjs');
-      const vkPushes = await notifyVkSubscribers(newlyParsed.length > 0 ? newlyParsed : allToSync.slice(0, 2));
-      if (vkPushes > 0) {
-        console.log(`[Parser] Отправлено ${vkPushes} уведомлений подписчикам в VK.`);
-        sentPushes += vkPushes;
+      const { notifyVkSubscribers, syncSubscribersFromVkConversations, VK_BOT_TOKEN } = await import('./vk_bot.mjs');
+      if (VK_BOT_TOKEN || process.env.VK_BOT_TOKEN || process.env.VK_GROUP_TOKEN) {
+        await syncSubscribersFromVkConversations().catch(() => {});
       }
-    } catch {
-      // Graceful fallback if VK bot module is absent
+      const vkCandidates = newlyParsed.length > 0 ? newlyParsed : allToSync;
+      sentPushesVk = await notifyVkSubscribers(vkCandidates);
+      if (sentPushesVk > 0) {
+        console.log(`[Parser] ✅ Отправлено ${sentPushesVk} уведомлений подписчикам в VK.`);
+      }
+    } catch (err) {
+      console.error('[Parser] ❌ Ошибка рассылки уведомлений ВКонтакте:', err.message);
     }
   }
+
+  const sentPushes = sentPushesTg + sentPushesVk;
 
   // Update in-memory scan statistics
   LAST_SCAN_STATUS.lastScanAt = new Date().toISOString();
@@ -3016,12 +3071,16 @@ export async function scanChannelsAndSyncSupabase(notifySubscribers = true) {
   LAST_SCAN_STATUS.websitesChecked = CAREER_WEBSITES_DATA.length;
   LAST_SCAN_STATUS.parsedCount = newlyParsed.length;
   LAST_SCAN_STATUS.savedCount = savedCount;
+  LAST_SCAN_STATUS.sentPushesTg = sentPushesTg;
+  LAST_SCAN_STATUS.sentPushesVk = sentPushesVk;
   LAST_SCAN_STATUS.sentPushes = sentPushes;
   LAST_SCAN_STATUS.totalActive = allToSync.length;
 
   return {
     savedCount,
     sentPushes,
+    sentPushesTg,
+    sentPushesVk,
     channelsChecked: ALL_TARGET_TG_CHANNELS.length,
     websitesChecked: CAREER_WEBSITES_DATA.length,
     parsedCount: newlyParsed.length,
@@ -4181,9 +4240,9 @@ process.on('SIGTERM', () => {
 });
 
 const isDirectRun =
-  process.argv[1] &&
+  Boolean(process.argv[1]) &&
   !process.argv[1].includes('vk_bot') &&
-  (process.argv[1].endsWith('bot.mjs') || process.argv[1].endsWith('bot.js'));
+  (process.argv[1].endsWith('bot.mjs') || process.argv[1].endsWith('bot.js') || process.argv[1].includes('bot'));
 
 if (isDirectRun && process.env.NODE_ENV !== 'test') {
   if (BOT_TOKEN) {
@@ -4199,11 +4258,11 @@ if (isDirectRun && process.env.NODE_ENV !== 'test') {
   }
 }
 
-// Start VK bot concurrently when --all is passed or VK token is provided in bot.mjs
+// Start VK bot concurrently unless explicitly disabled via --no-vk
 if (
   isDirectRun &&
   process.env.NODE_ENV !== 'test' &&
-  (process.env.VK_BOT_TOKEN || process.env.VK_GROUP_TOKEN || process.argv.includes('--all') || process.argv.includes('--vk'))
+  !process.argv.includes('--no-vk')
 ) {
   import('./vk_bot.mjs')
     .then(({ startVkBot }) => {

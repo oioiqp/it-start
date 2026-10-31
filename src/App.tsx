@@ -57,6 +57,7 @@ import {
   type VkLaunchParams,
 } from './lib/vkBridge';
 import { VK_COMMUNITY_URL, saveVkPeerId } from './lib/vk';
+import { RENDER_URL } from './services/subscriptionService';
 
 export function App() {
   // Navigation
@@ -189,6 +190,20 @@ export function App() {
         saveLocalSubscription(autoSub);
         setCurrentSubscription(autoSub);
         saveSubscriptionToSupabase(autoSub);
+
+        const serverUrl = RENDER_URL.endsWith('/') ? RENDER_URL.slice(0, -1) : RENDER_URL;
+        fetch(`${serverUrl}/subscribe`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chatId: vkKey,
+            username: autoSub.username,
+            firstName: autoSub.first_name,
+            directions: autoSub.directions,
+            sub_tracks: autoSub.sub_tracks,
+            platform: 'vk',
+          }),
+        }).catch(() => {});
       }
     };
 
