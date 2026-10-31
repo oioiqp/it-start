@@ -640,7 +640,7 @@ export const INITIAL_PARSED_POSTS: ParsedChannelPost[] = [
     snippet: 'Стажировка в инфраструктурных командах Т-Банка: управление кластерами Kubernetes, автоматизация пайплайнов развертывания и обеспечение высокой доступности сервисов.',
     publishedAt: '2026-03-29T11:45:00.000Z',
     sourceType: 'website',
-    url: 'https://fintech.tbank.ru/start/?direction=sre',
+    url: 'https://fintech.tbank.ru/start/sre/',
   },
 
   // --- Яндекс ---

@@ -35,9 +35,10 @@ import {
   DIRECTION_ALIASES,
   DIRECTION_TITLES,
   resolveDirectionByQuery,
+  formatSalary,
 } from './bot.mjs';
 
-export { ALL_INTERNSHIPS, SEED_INTERNSHIPS, PORTAL_FALLBACK_VACANCIES, DIRECTION_ALIASES, DIRECTION_TITLES, resolveDirectionByQuery };
+export { ALL_INTERNSHIPS, SEED_INTERNSHIPS, PORTAL_FALLBACK_VACANCIES, DIRECTION_ALIASES, DIRECTION_TITLES, resolveDirectionByQuery, formatSalary };
 
 // Auto-load .env configuration if present
 function autoLoadEnv() {
@@ -332,7 +333,7 @@ export function formatVkVacancyMessage(item) {
   return (
     `💼 ${item.company} — ${item.title}\n` +
     `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
-    `💰 Зарплата: ${item.salary || 'По договоренности'}\n` +
+    `💰 Зарплата: ${formatSalary(item.salary)}\n` +
     `📍 Формат: ${item.format || 'Удаленно'} | ${item.location || item.city || 'РФ'}\n` +
     `📢 Источник: ${item.sourceChannel || item.channel || 'IT-Старт'}\n` +
     (tagsStr ? `🏷 Стек: ${tagsStr}\n` : '') +
@@ -361,7 +362,7 @@ export function formatVkVacanciesList(items = [], title = 'Актуальные 
     const verifiedApplyUrl = item.applyUrl || item.url || RENDER_URL;
     const channel = item.sourceChannel || item.channel || '@t1career';
     text += `[${idx + 1}] 🏢 ${item.company} — ${item.title}\n`;
-    text += `   💰 ${item.salary || 'По договоренности'} | 📍 ${item.format || 'Удаленно'} (${item.location || item.city || 'РФ'})\n`;
+    text += `   💰 ${formatSalary(item.salary)} | 📍 ${item.format || 'Удаленно'} (${item.location || item.city || 'РФ'})\n`;
     if (Array.isArray(item.tags) && item.tags.length > 0) {
       text += `   🏷 Стек: ${item.tags.slice(0, 4).join(' • ')}\n`;
     }
@@ -923,7 +924,7 @@ export async function notifyVkSubscribers(vacancies = [], token = VK_BOT_TOKEN) 
         `🔥 Новая стажировка из мониторинга работодателей!\n` +
         `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
         `💼 ${vac.company} — ${vac.title}\n` +
-        `💰 Зарплата: ${vac.salary || 'По договоренности'}\n` +
+        `💰 Зарплата: ${formatSalary(vac.salary)}\n` +
         `📍 Формат: ${vac.format || 'Удаленно'} | ${vac.location || vac.city || 'РФ'}\n` +
         `🏷 Стек: ${tagsStr}\n` +
         `📢 Источник: ${sourceChannel} (${sourceLabel})\n` +
@@ -1002,7 +1003,7 @@ export async function sendVkCompanyDetails(peerId, targetCompany, token = VK_BOT
     text += `🔥 Открытые позиции (${companyVacancies.length}):\n`;
     companyVacancies.slice(0, 5).forEach((v, idx) => {
       text += `\n[${idx + 1}] 💼 ${v.title}\n`;
-      text += `   💰 ${v.salary || 'По договоренности'} | 📍 ${v.format || 'Удаленно'}\n`;
+      text += `   💰 ${formatSalary(v.salary)} | 📍 ${v.format || 'Удаленно'}\n`;
       text += `   🔗 ${v.applyUrl || v.url || RENDER_URL}\n`;
     });
   } else {

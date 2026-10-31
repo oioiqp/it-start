@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Internship, TelegramSubscription, UserProgress } from '../types';
-import { resolveApplyUrl, resolveChannelHandle } from './vacancyUrl';
+import { resolveApplyUrl, resolveChannelHandle, formatSalary, isStrictVacancyPost } from './vacancyUrl';
 
 export const SUPABASE_URL = 'https://pmgsymacvhzsixbpndsn.supabase.co';
 export const SUPABASE_ANON_KEY =
@@ -57,7 +57,10 @@ export async function fetchInternshipsFromSupabase(): Promise<Internship[] | nul
     }
 
     if (data && data.length > 0) {
-      const items = data.map((item: any) => {
+      const validRows = data.filter((item: any) =>
+        isStrictVacancyPost(item.title || '', item.description || '')
+      );
+      const items = validRows.map((item: any) => {
         const parseArray = (val: any, fallback: string[]): string[] => {
           if (Array.isArray(val)) return val;
           if (typeof val === 'string') {
@@ -82,6 +85,9 @@ export async function fetchInternshipsFromSupabase(): Promise<Internship[] | nul
           'Участие в код-ревью и командных синка',
         ];
 
+        const directionId = item.direction || item.direction_id || 'backend';
+        const subTrackId = item.sub_track || item.sub_track_id || 'python';
+
         return {
           id: String(item.id),
           title: item.title,
@@ -89,16 +95,16 @@ export async function fetchInternshipsFromSupabase(): Promise<Internship[] | nul
           companyLogo: item.company_logo || '',
           location: item.city || item.location || 'Москва / Удаленно',
           format: item.format || 'Удаленно',
-          salary: item.salary || 'По договоренности',
-          directionId: item.direction || item.direction_id,
-          subTrackId: item.sub_track || item.sub_track_id,
+          salary: formatSalary(item.salary),
+          directionId,
+          subTrackId,
           tags: parseArray(item.tags, [(item.sub_track || 'Junior').toUpperCase()]),
           description: item.description || '',
           requirements: parseArray(item.requirements, defaultRequirements),
           responsibilities: parseArray(item.responsibilities, defaultResponsibilities),
           sourceChannel: resolveChannelHandle(item.source_name || item.source_channel, item.company),
           sourceType: (item.source_type || 'telegram') as 'telegram' | 'portal',
-          applyUrl: resolveApplyUrl(item.source_url || item.apply_url, item.company, item.source_name || item.source_channel),
+          applyUrl: resolveApplyUrl(item.source_url || item.apply_url, item.company, item.source_name || item.source_channel, directionId),
           publishedAt: item.published_at || new Date().toISOString(),
           isHot: Boolean(item.is_hot),
         };

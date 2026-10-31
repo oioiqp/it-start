@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import type { Internship, Question, RoadmapTopic, UserProgress } from '../types';
 import { triggerHaptic } from '../lib/telegram';
-import { resolveApplyUrl, resolveChannelHandle, getCompanyMonogram } from '../lib/vacancyUrl';
+import { resolveApplyUrl, resolveChannelHandle, getCompanyMonogram, formatSalary } from '../lib/vacancyUrl';
 
 interface InternshipCardProps {
   internship: Internship;
@@ -97,7 +97,7 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
           {/* Salary Glass Pill */}
           <div className="text-right shrink-0">
             <span className="px-3 py-1 rounded-full text-xs sm:text-sm font-bold block liquid-glass-pill text-neutral-900 dark:text-white tracking-tight">
-              {internship.salary}
+              {formatSalary(internship.salary)}
             </span>
             <span className="text-[10px] font-medium text-neutral-500 dark:text-neutral-400 block mt-0.5 pr-1">
               оплата
@@ -155,7 +155,7 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
         {/* Source and Actions */}
         <div className="flex items-center justify-between gap-2">
           {(() => {
-            const verifiedApplyUrl = resolveApplyUrl(internship.applyUrl, internship.company, internship.sourceChannel);
+            const verifiedApplyUrl = resolveApplyUrl(internship.applyUrl, internship.company, internship.sourceChannel, internship.directionId);
             const verifiedChannel = resolveChannelHandle(internship.sourceChannel, internship.company);
             const cleanChannel = verifiedChannel.replace(/^@/, '');
             const isTg = verifiedChannel.startsWith('@');

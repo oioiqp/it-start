@@ -32,7 +32,7 @@ async function checkUrl(url) {
       finalUrl: res.url,
       ok: res.status >= 200 && res.status < 400,
     };
-  } catch (err) {
+  } catch {
     // Retry once with 8s timeout
     try {
       const res = await fetch(url, {

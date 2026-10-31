@@ -1,174 +1,113 @@
 [
   {
-    "url": "https://www.tbank.ru/career/it/",
+    "url": "https://fintech.tbank.ru/start/frontend/",
     "sources": [
       "Официальный портал (tbank)",
-      "Официальный портал (tbank it)"
+      "SEED: int-1 (Т-Банк (Тинькофф))",
+      "SEED: int-16 (Т-Банк (Тинькофф))",
+      "BOT_ALL: int-1 (Т-Банк (Тинькофф))",
+      "BOT_ALL: int-16 (Т-Банк (Тинькофф))"
     ],
-    "status": 200,
-    "finalUrl": "https://www.tbank.ru/career/vacancies/all/samara/?direction=finansy-bezopasnost-i-yurisprudenciya&direction=it-razrabotka&direction=analitika-i-dannye&direction=produkt-i-marketing",
-    "ok": true
+    "status": "ERR",
+    "finalUrl": "fetch failed",
+    "ok": false
   },
   {
-    "url": "https://kontur.ru/career/vacancies",
+    "url": "https://kontur.ru/career/vacancies/intern-frontend",
     "sources": [
       "Официальный портал (kontur)",
       "SEED: int-9 (СКБ Контур)",
-      "SEED: int-18 (СКБ Контур)",
       "SEED: int-25 (Контур)",
-      "SEED: int-26 (Контур)",
-      "SEED: int-37 (Контур)",
       "BOT_ALL: int-9 (СКБ Контур)",
-      "BOT_ALL: int-18 (СКБ Контур)",
       "BOT_ALL: int-25 (Контур)",
-      "BOT_ALL: int-26 (Контур)",
-      "BOT_ALL: int-37 (Контур)",
-      "BOT_FALLBACK: site-kontur-start-fe (СКБ Контур)",
-      "CHANNELS_POST: scan-kontur-fe (Контур)",
-      "CHANNELS_POST: scan-kontur-be (Контур)"
+      "BOT_FALLBACK: site-kontur-start-fe (СКБ Контур)"
     ],
     "status": "ERR",
-    "finalUrl": "fetch failed",
+    "finalUrl": "The operation was aborted due to timeout",
     "ok": false
   },
   {
-    "url": "https://career.directum.ru/vacancy",
+    "url": "https://career.directum.ru/vacancy/web-developer",
     "sources": [
       "Официальный портал (directum)",
       "SEED: int-22 (Directum)",
-      "SEED: int-23 (Directum)",
-      "SEED: int-24 (Directum)",
-      "SEED: int-38 (Directum)",
       "BOT_ALL: int-22 (Directum)",
-      "BOT_ALL: int-23 (Directum)",
-      "BOT_ALL: int-24 (Directum)",
-      "BOT_ALL: int-38 (Directum)",
-      "BOT_FALLBACK: site-directum-rx-web (Directum)",
-      "CHANNELS_POST: scan-directum-web (Directum)",
-      "CHANNELS_POST: scan-directum-qa (Directum)"
+      "BOT_FALLBACK: site-directum-rx-web (Directum)"
     ],
-    "status": 200,
-    "finalUrl": "https://career.directum.ru/vacancy",
-    "ok": true
+    "status": 404,
+    "finalUrl": "https://career.directum.ru/vacancy/web-developer",
+    "ok": false
   },
   {
-    "url": "https://career.t1.ru/",
+    "url": "https://career.t1.ru/vacancies/java-developer",
     "sources": [
       "Официальный портал (t1)",
       "SEED: int-19 (Холдинг Т1)",
-      "SEED: int-20 (Холдинг Т1)",
-      "SEED: int-21 (Холдинг Т1)",
       "BOT_ALL: int-19 (Холдинг Т1)",
-      "BOT_ALL: int-20 (Холдинг Т1)",
-      "BOT_ALL: int-21 (Холдинг Т1)",
-      "BOT_FALLBACK: site-t1-school-java (Холдинг Т1)",
-      "CHANNELS_POST: scan-t1-java (Холдинг Т1)",
-      "CHANNELS_POST: scan-t1-devops (Холдинг Т1)"
+      "BOT_FALLBACK: site-t1-school-java (Холдинг Т1)"
     ],
-    "status": 200,
-    "finalUrl": "https://career.t1.ru/",
-    "ok": true
+    "status": 404,
+    "finalUrl": "https://career.t1.ru/vacancies/java-developer",
+    "ok": false
   },
   {
-    "url": "https://yandex.ru/jobs/",
+    "url": "https://yandex.ru/jobs/pages/internship-backend",
     "sources": [
       "Официальный портал (yandex)",
       "SEED: int-2 (Яндекс)",
-      "SEED: int-11 (Яндекс (Яндекс Go))",
-      "SEED: int-17 (Яндекс (Yandex GPT))",
-      "SEED: int-40 (Яндекс)",
       "BOT_ALL: int-2 (Яндекс)",
-      "BOT_ALL: int-11 (Яндекс (Яндекс Go))",
-      "BOT_ALL: int-17 (Яндекс (Yandex GPT))",
-      "BOT_ALL: int-40 (Яндекс)",
-      "BOT_FALLBACK: site-yandex-backend (Яндекс)",
-      "CHANNELS_POST: scan-yandex-be (Яндекс)"
+      "BOT_FALLBACK: site-yandex-backend (Яндекс)"
     ],
-    "status": 200,
-    "finalUrl": "https://yandex.ru/jobs/",
-    "ok": true
+    "status": 404,
+    "finalUrl": "https://yandex.ru/jobs/pages/internship-backend",
+    "ok": false
   },
   {
-    "url": "https://job.ozon.ru/it/",
+    "url": "https://job.ozon.ru/it/camp/golang/",
     "sources": [
       "Официальный портал (ozon)",
       "SEED: int-3 (Ozon Tech)",
-      "SEED: int-12 (Ozon Tech)",
-      "SEED: int-29 (Ozon Tech)",
-      "SEED: int-30 (Ozon Tech)",
-      "SEED: int-41 (Ozon Tech)",
       "BOT_ALL: int-3 (Ozon Tech)",
-      "BOT_ALL: int-12 (Ozon Tech)",
-      "BOT_ALL: int-29 (Ozon Tech)",
-      "BOT_ALL: int-30 (Ozon Tech)",
-      "BOT_ALL: int-41 (Ozon Tech)",
-      "BOT_FALLBACK: site-ozon-golang (Ozon Tech)",
-      "CHANNELS_POST: scan-ozon-go (Ozon Tech)"
+      "BOT_FALLBACK: site-ozon-golang (Ozon Tech)"
     ],
     "status": "ERR",
     "finalUrl": "fetch failed",
     "ok": false
   },
   {
-    "url": "https://sbergraduate.ru/",
+    "url": "https://sbergraduate.ru/sberseasons-moscow/ml/",
     "sources": [
       "Официальный портал (sber)",
       "SEED: int-4 (Сбер (Sber AI))",
-      "SEED: int-7 (Сбер (SberSeasons))",
-      "SEED: int-8 (Сбер (SberSeasons))",
-      "SEED: int-13 (Сбер (Сбербанк))",
       "BOT_ALL: int-4 (Сбер (Sber AI))",
-      "BOT_ALL: int-7 (Сбер (SberSeasons))",
-      "BOT_ALL: int-8 (Сбер (SberSeasons))",
-      "BOT_ALL: int-13 (Сбер (Сбербанк))",
-      "BOT_FALLBACK: site-sber-ml (Сбер)",
-      "CHANNELS_POST: scan-sber-ml (Сбер)"
+      "BOT_FALLBACK: site-sber-ml (Сбер)"
     ],
     "status": "ERR",
     "finalUrl": "fetch failed",
     "ok": false
   },
   {
-    "url": "https://career.avito.com/",
+    "url": "https://career.avito.com/vacancies/razrabotka/20803/",
     "sources": [
       "Официальный портал (avito)",
-      "SEED: int-5 (Avito Tech)",
       "SEED: int-15 (Avito Tech)",
-      "SEED: int-31 (Avito Tech)",
-      "SEED: int-32 (Avito Tech)",
-      "SEED: int-42 (Avito Tech)",
-      "BOT_ALL: int-5 (Avito Tech)",
-      "BOT_ALL: int-15 (Avito Tech)",
-      "BOT_ALL: int-31 (Avito Tech)",
-      "BOT_ALL: int-32 (Avito Tech)",
-      "BOT_ALL: int-42 (Avito Tech)",
-      "BOT_FALLBACK: site-avito-mobile (Авито)",
-      "CHANNELS_POST: scan-avito-mobile (Avito Tech)"
+      "BOT_ALL: int-15 (Avito Tech)"
     ],
     "status": 200,
-    "finalUrl": "https://career.avito.com/",
+    "finalUrl": "https://career.avito.com/vacancies/razrabotka/20803/",
     "ok": true
   },
   {
-    "url": "https://internship.vk.company/",
+    "url": "https://internship.vk.company/internship/web",
     "sources": [
       "Официальный портал (vk)",
-      "SEED: int-6 (VK (ВКонтакте))",
-      "SEED: int-14 (VK (ВКонтакте Музыка))",
       "SEED: int-33 (VK (ВКонтакте))",
-      "SEED: int-34 (VK (ВКонтакте))",
-      "SEED: int-43 (VK (ВКонтакте))",
-      "BOT_ALL: int-6 (VK (ВКонтакте))",
-      "BOT_ALL: int-14 (VK (ВКонтакте Музыка))",
       "BOT_ALL: int-33 (VK (ВКонтакте))",
-      "BOT_ALL: int-34 (VK (ВКонтакте))",
-      "BOT_ALL: int-43 (VK (ВКонтакте))",
-      "BOT_FALLBACK: site-vk-team-web (VK)",
-      "CHANNELS_POST: scan-vk-qa (VK)"
+      "BOT_FALLBACK: site-vk-team-web (VK)"
     ],
-    "status": 200,
-    "finalUrl": "https://internship.vk.company/",
-    "ok": true
+    "status": 404,
+    "finalUrl": "https://internship.vk.company/internship/web",
+    "ok": false
   },
   {
     "url": "https://kontur.ru/career",
@@ -180,6 +119,15 @@
     "ok": false
   },
   {
+    "url": "https://www.tbank.ru/career/it/",
+    "sources": [
+      "Официальный портал (tbank it)"
+    ],
+    "status": 200,
+    "finalUrl": "https://www.tbank.ru/career/vacancies/all/samara/?direction=finansy-bezopasnost-i-yurisprudenciya&direction=it-razrabotka&direction=analitika-i-dannye&direction=produkt-i-marketing",
+    "ok": true
+  },
+  {
     "url": "https://t1.ru/school/",
     "sources": [
       "Официальный портал (t1 school)"
@@ -189,27 +137,249 @@
     "ok": false
   },
   {
-    "url": "https://fintech.tbank.ru/start/",
+    "url": "https://career.avito.com/vacancies/razrabotka/20805/",
     "sources": [
-      "SEED: int-1 (Т-Банк (Тинькофф))",
+      "SEED: int-5 (Avito Tech)",
+      "BOT_ALL: int-5 (Avito Tech)",
+      "BOT_FALLBACK: site-avito-mobile (Авито)"
+    ],
+    "status": 404,
+    "finalUrl": "https://career.avito.com/vacancies/razrabotka/20805/",
+    "ok": false
+  },
+  {
+    "url": "https://internship.vk.company/internship/qa",
+    "sources": [
+      "SEED: int-6 (VK (ВКонтакте))",
+      "BOT_ALL: int-6 (VK (ВКонтакте))"
+    ],
+    "status": 404,
+    "finalUrl": "https://internship.vk.company/internship/qa",
+    "ok": false
+  },
+  {
+    "url": "https://sbergraduate.ru/sberseasons-moscow/devops/",
+    "sources": [
+      "SEED: int-7 (Сбер (SberSeasons))",
+      "BOT_ALL: int-7 (Сбер (SberSeasons))"
+    ],
+    "status": "ERR",
+    "finalUrl": "fetch failed",
+    "ok": false
+  },
+  {
+    "url": "https://sbergraduate.ru/sberseasons-moscow/java/",
+    "sources": [
+      "SEED: int-8 (Сбер (SberSeasons))",
+      "BOT_ALL: int-8 (Сбер (SberSeasons))"
+    ],
+    "status": "ERR",
+    "finalUrl": "fetch failed",
+    "ok": false
+  },
+  {
+    "url": "https://fintech.tbank.ru/start/analytics/",
+    "sources": [
       "SEED: int-10 (Т-Банк (Тинькофф))",
-      "SEED: int-16 (Т-Банк (Тинькофф))",
+      "BOT_ALL: int-10 (Т-Банк (Тинькофф))"
+    ],
+    "status": "ERR",
+    "finalUrl": "fetch failed",
+    "ok": false
+  },
+  {
+    "url": "https://yandex.ru/jobs/pages/internship-mobile",
+    "sources": [
+      "SEED: int-11 (Яндекс (Яндекс Go))",
+      "BOT_ALL: int-11 (Яндекс (Яндекс Go))"
+    ],
+    "status": 404,
+    "finalUrl": "https://yandex.ru/jobs/pages/internship-mobile",
+    "ok": false
+  },
+  {
+    "url": "https://job.ozon.ru/it/camp/mobile/",
+    "sources": [
+      "SEED: int-12 (Ozon Tech)",
+      "BOT_ALL: int-12 (Ozon Tech)"
+    ],
+    "status": "ERR",
+    "finalUrl": "fetch failed",
+    "ok": false
+  },
+  {
+    "url": "https://sbergraduate.ru/sberseasons-moscow/qa/",
+    "sources": [
+      "SEED: int-13 (Сбер (Сбербанк))",
+      "BOT_ALL: int-13 (Сбер (Сбербанк))"
+    ],
+    "status": "ERR",
+    "finalUrl": "fetch failed",
+    "ok": false
+  },
+  {
+    "url": "https://internship.vk.company/internship/backend",
+    "sources": [
+      "SEED: int-14 (VK (ВКонтакте Музыка))",
+      "BOT_ALL: int-14 (VK (ВКонтакте Музыка))"
+    ],
+    "status": 404,
+    "finalUrl": "https://internship.vk.company/internship/backend",
+    "ok": false
+  },
+  {
+    "url": "https://yandex.ru/jobs/pages/internship-ml",
+    "sources": [
+      "SEED: int-17 (Яндекс (Yandex GPT))",
+      "BOT_ALL: int-17 (Яндекс (Yandex GPT))"
+    ],
+    "status": 404,
+    "finalUrl": "https://yandex.ru/jobs/pages/internship-ml",
+    "ok": false
+  },
+  {
+    "url": "https://kontur.ru/career/vacancies/intern-backend",
+    "sources": [
+      "SEED: int-18 (СКБ Контур)",
+      "SEED: int-26 (Контур)",
+      "BOT_ALL: int-18 (СКБ Контур)",
+      "BOT_ALL: int-26 (Контур)"
+    ],
+    "status": "ERR",
+    "finalUrl": "fetch failed",
+    "ok": false
+  },
+  {
+    "url": "https://career.t1.ru/vacancies/devops-engineer",
+    "sources": [
+      "SEED: int-20 (Холдинг Т1)",
+      "BOT_ALL: int-20 (Холдинг Т1)"
+    ],
+    "status": 404,
+    "finalUrl": "https://career.t1.ru/vacancies/devops-engineer",
+    "ok": false
+  },
+  {
+    "url": "https://career.t1.ru/vacancies/qa-automation",
+    "sources": [
+      "SEED: int-21 (Холдинг Т1)",
+      "BOT_ALL: int-21 (Холдинг Т1)"
+    ],
+    "status": 404,
+    "finalUrl": "https://career.t1.ru/vacancies/qa-automation",
+    "ok": false
+  },
+  {
+    "url": "https://career.directum.ru/vacancy/backend-csharp",
+    "sources": [
+      "SEED: int-23 (Directum)",
+      "BOT_ALL: int-23 (Directum)"
+    ],
+    "status": 404,
+    "finalUrl": "https://career.directum.ru/vacancy/backend-csharp",
+    "ok": false
+  },
+  {
+    "url": "https://career.directum.ru/vacancy/qa-engineer",
+    "sources": [
+      "SEED: int-24 (Directum)",
+      "BOT_ALL: int-24 (Directum)"
+    ],
+    "status": 404,
+    "finalUrl": "https://career.directum.ru/vacancy/qa-engineer",
+    "ok": false
+  },
+  {
+    "url": "https://fintech.tbank.ru/start/backend/",
+    "sources": [
       "SEED: int-27 (Т-Банк)",
-      "SEED: int-28 (Т-Банк)",
       "SEED: int-35 (Т-Банк)",
-      "SEED: int-36 (Т-Банк)",
       "SEED: int-39 (Т-Банк)",
-      "BOT_ALL: int-1 (Т-Банк (Тинькофф))",
-      "BOT_ALL: int-10 (Т-Банк (Тинькофф))",
-      "BOT_ALL: int-16 (Т-Банк (Тинькофф))",
       "BOT_ALL: int-27 (Т-Банк)",
-      "BOT_ALL: int-28 (Т-Банк)",
       "BOT_ALL: int-35 (Т-Банк)",
-      "BOT_ALL: int-36 (Т-Банк)",
-      "BOT_ALL: int-39 (Т-Банк)",
+      "BOT_ALL: int-39 (Т-Банк)"
+    ],
+    "status": "ERR",
+    "finalUrl": "fetch failed",
+    "ok": false
+  },
+  {
+    "url": "https://fintech.tbank.ru/start/sre/",
+    "sources": [
+      "SEED: int-28 (Т-Банк)",
+      "BOT_ALL: int-28 (Т-Банк)",
       "BOT_FALLBACK: site-tbank-start-sre (Т-Банк)",
-      "CHANNELS_POST: scan-tbank-fe (Т-Банк)",
       "CHANNELS_POST: scan-tbank-sre (Т-Банк)"
+    ],
+    "status": "ERR",
+    "finalUrl": "fetch failed",
+    "ok": false
+  },
+  {
+    "url": "https://job.ozon.ru/it/camp/frontend/",
+    "sources": [
+      "SEED: int-29 (Ozon Tech)",
+      "BOT_ALL: int-29 (Ozon Tech)"
+    ],
+    "status": "ERR",
+    "finalUrl": "fetch failed",
+    "ok": false
+  },
+  {
+    "url": "https://job.ozon.ru/it/camp/qa/",
+    "sources": [
+      "SEED: int-30 (Ozon Tech)",
+      "BOT_ALL: int-30 (Ozon Tech)"
+    ],
+    "status": "ERR",
+    "finalUrl": "fetch failed",
+    "ok": false
+  },
+  {
+    "url": "https://career.avito.com/vacancies/razrabotka/20808/",
+    "sources": [
+      "SEED: int-31 (Avito Tech)",
+      "BOT_ALL: int-31 (Avito Tech)"
+    ],
+    "status": 404,
+    "finalUrl": "https://career.avito.com/vacancies/razrabotka/20808/",
+    "ok": false
+  },
+  {
+    "url": "https://career.avito.com/vacancies/razrabotka/20812/",
+    "sources": [
+      "SEED: int-32 (Avito Tech)",
+      "BOT_ALL: int-32 (Avito Tech)"
+    ],
+    "status": 200,
+    "finalUrl": "https://career.avito.com/vacancies/razrabotka/20812/",
+    "ok": true
+  },
+  {
+    "url": "https://internship.vk.company/internship/data",
+    "sources": [
+      "SEED: int-34 (VK (ВКонтакте))",
+      "BOT_ALL: int-34 (VK (ВКонтакте))"
+    ],
+    "status": 404,
+    "finalUrl": "https://internship.vk.company/internship/data",
+    "ok": false
+  },
+  {
+    "url": "https://fintech.tbank.ru/start/qa/",
+    "sources": [
+      "SEED: int-36 (Т-Банк)",
+      "BOT_ALL: int-36 (Т-Банк)"
+    ],
+    "status": "ERR",
+    "finalUrl": "fetch failed",
+    "ok": false
+  },
+  {
+    "url": "https://kontur.ru/career/vacancies/intern-qa",
+    "sources": [
+      "SEED: int-37 (Контур)",
+      "BOT_ALL: int-37 (Контур)"
     ],
     "status": "ERR",
     "finalUrl": "fetch failed",
@@ -218,10 +388,160 @@
   {
     "url": "https://career.directum.ru/lead_product_ownerRX",
     "sources": [
+      "SEED: int-38 (Directum)",
+      "BOT_ALL: int-38 (Directum)",
       "CHANNELS_POST: scan-directum-site-rx (Directum)"
     ],
-    "status": 200,
+    "status": 404,
     "finalUrl": "https://career.directum.ru/lead_product_ownerRX",
+    "ok": false
+  },
+  {
+    "url": "https://yandex.ru/jobs/pages/internship-frontend",
+    "sources": [
+      "SEED: int-40 (Яндекс)",
+      "BOT_ALL: int-40 (Яндекс)"
+    ],
+    "status": 404,
+    "finalUrl": "https://yandex.ru/jobs/pages/internship-frontend",
+    "ok": false
+  },
+  {
+    "url": "https://job.ozon.ru/it/camp/csharp/",
+    "sources": [
+      "SEED: int-41 (Ozon Tech)",
+      "BOT_ALL: int-41 (Ozon Tech)"
+    ],
+    "status": "ERR",
+    "finalUrl": "fetch failed",
+    "ok": false
+  },
+  {
+    "url": "https://career.avito.com/vacancies/analitika-dannykh/20816/",
+    "sources": [
+      "SEED: int-42 (Avito Tech)",
+      "BOT_ALL: int-42 (Avito Tech)"
+    ],
+    "status": 200,
+    "finalUrl": "https://career.avito.com/vacancies/analitika-dannykh/20816/",
+    "ok": true
+  },
+  {
+    "url": "https://internship.vk.company/internship/mobile",
+    "sources": [
+      "SEED: int-43 (VK (ВКонтакте))",
+      "BOT_ALL: int-43 (VK (ВКонтакте))"
+    ],
+    "status": 404,
+    "finalUrl": "https://internship.vk.company/internship/mobile",
+    "ok": false
+  },
+  {
+    "url": "https://t.me/t1career/264",
+    "sources": [
+      "CHANNELS_POST: scan-t1-java (Холдинг Т1)"
+    ],
+    "status": 200,
+    "finalUrl": "https://t.me/t1career/264",
+    "ok": true
+  },
+  {
+    "url": "https://t.me/t1career/265",
+    "sources": [
+      "CHANNELS_POST: scan-t1-devops (Холдинг Т1)"
+    ],
+    "status": 200,
+    "finalUrl": "https://t.me/t1career/265",
+    "ok": true
+  },
+  {
+    "url": "https://t.me/KonturTech/481",
+    "sources": [
+      "CHANNELS_POST: scan-kontur-fe (Контур)"
+    ],
+    "status": 200,
+    "finalUrl": "https://t.me/KonturTech/481",
+    "ok": true
+  },
+  {
+    "url": "https://t.me/KonturTech/482",
+    "sources": [
+      "CHANNELS_POST: scan-kontur-be (Контур)"
+    ],
+    "status": 200,
+    "finalUrl": "https://t.me/KonturTech/482",
+    "ok": true
+  },
+  {
+    "url": "https://t.me/Life_in_Directum/312",
+    "sources": [
+      "CHANNELS_POST: scan-directum-web (Directum)"
+    ],
+    "status": 200,
+    "finalUrl": "https://t.me/Life_in_Directum/312",
+    "ok": true
+  },
+  {
+    "url": "https://t.me/Life_in_Directum/315",
+    "sources": [
+      "CHANNELS_POST: scan-directum-qa (Directum)"
+    ],
+    "status": 200,
+    "finalUrl": "https://t.me/Life_in_Directum/315",
+    "ok": true
+  },
+  {
+    "url": "https://t.me/tbank_team/1432",
+    "sources": [
+      "CHANNELS_POST: scan-tbank-fe (Т-Банк)"
+    ],
+    "status": 200,
+    "finalUrl": "https://t.me/tbank_team/1432",
+    "ok": true
+  },
+  {
+    "url": "https://t.me/yandex_intern/684",
+    "sources": [
+      "CHANNELS_POST: scan-yandex-be (Яндекс)"
+    ],
+    "status": 200,
+    "finalUrl": "https://t.me/yandex_intern/684",
+    "ok": true
+  },
+  {
+    "url": "https://t.me/ozon_tech_career/512",
+    "sources": [
+      "CHANNELS_POST: scan-ozon-go (Ozon Tech)"
+    ],
+    "status": 200,
+    "finalUrl": "https://t.me/ozon_tech_career/512",
+    "ok": true
+  },
+  {
+    "url": "https://t.me/sber_careers/318",
+    "sources": [
+      "CHANNELS_POST: scan-sber-ml (Сбер)"
+    ],
+    "status": 200,
+    "finalUrl": "https://t.me/sber_careers/318",
+    "ok": true
+  },
+  {
+    "url": "https://t.me/avito_tech/745",
+    "sources": [
+      "CHANNELS_POST: scan-avito-mobile (Avito Tech)"
+    ],
+    "status": 200,
+    "finalUrl": "https://t.me/avito_tech/745",
+    "ok": true
+  },
+  {
+    "url": "https://t.me/vk_team/621",
+    "sources": [
+      "CHANNELS_POST: scan-vk-qa (VK)"
+    ],
+    "status": 200,
+    "finalUrl": "https://t.me/vk_team/621",
     "ok": true
   },
   {

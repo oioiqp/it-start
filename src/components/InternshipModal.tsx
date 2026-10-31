@@ -19,7 +19,7 @@ import {
 import confetti from 'canvas-confetti';
 import type { Internship, Question, RoadmapTopic, UserProgress } from '../types';
 import { triggerHaptic } from '../lib/telegram';
-import { resolveApplyUrl, resolveChannelHandle, getCompanyMonogram } from '../lib/vacancyUrl';
+import { resolveApplyUrl, resolveChannelHandle, getCompanyMonogram, formatSalary } from '../lib/vacancyUrl';
 import { useScrollLock } from '../lib/useScrollLock';
 
 interface InternshipModalProps {
@@ -206,7 +206,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
 
           <div className="flex flex-wrap items-center gap-2 mt-2">
             <span className="text-xs font-semibold px-2.5 py-1 rounded-full liquid-glass-pill text-neutral-800 dark:text-neutral-200">
-              {internship.salary}
+              {formatSalary(internship.salary)}
             </span>
             {(() => {
               const verifiedChannel = resolveChannelHandle(internship.sourceChannel, internship.company);
@@ -558,7 +558,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
           </div>
 
           {(() => {
-            const verifiedApplyUrl = resolveApplyUrl(internship.applyUrl, internship.company, internship.sourceChannel);
+            const verifiedApplyUrl = resolveApplyUrl(internship.applyUrl, internship.company, internship.sourceChannel, internship.directionId);
             const isTgPost = verifiedApplyUrl.includes('t.me/');
             return (
               <a

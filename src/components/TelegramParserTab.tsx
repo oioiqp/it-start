@@ -23,6 +23,7 @@ import {
 import confetti from 'canvas-confetti';
 import type { DirectionId, Internship, SubTrackId, TelegramSubscription, TelegramUser } from '../types';
 import { DIRECTIONS } from '../data/directions';
+import { formatSalary, resolveApplyUrl, resolveChannelHandle, isStrictVacancyPost } from '../lib/vacancyUrl';
 import {
   addInternshipToSupabase,
   fetchInternshipsFromSupabase,
@@ -56,7 +57,6 @@ import {
   VK_BOT_NAME,
 } from '../lib/vk';
 import { saveLocalSubscription } from '../lib/storage';
-import { resolveApplyUrl, resolveChannelHandle } from '../lib/vacancyUrl';
 
 interface TelegramParserTabProps {
   telegramUser: TelegramUser | null;
@@ -535,37 +535,46 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
         const res = await fetch(ep, { signal: AbortSignal.timeout(2500) });
         if (res.ok) {
           const json = await res.json();
-          const resVacancies = json.result?.newlyParsed || json.result?.vacancies || [];
-          if (Array.isArray(resVacancies) && resVacancies.length > 0) {
+          const rawVacancies = json.result?.newlyParsed || json.result?.vacancies || [];
+          const resVacancies = Array.isArray(rawVacancies)
+            ? rawVacancies.filter((v: any) => isStrictVacancyPost(v.title || '', v.description || ''))
+            : [];
+          if (resVacancies.length > 0) {
             addLog('success', `Сервер бота (${ep.includes('localhost') ? 'localhost' : 'Render'}) вернул ${resVacancies.length} свежих вакансий!`);
-            newItemsFound = resVacancies.map((v: any) => ({
-              id: String(v.id),
-              channelHandle: v.channel || (v.sourceType === 'portal' ? 'career.site' : '@IT_start_izh_bot'),
-              channelName: v.company,
-              company: v.company,
-              title: v.title,
-              salary: v.salary || 'По договоренности',
-              location: v.location || v.city || 'Москва / Удаленно',
-              format: (v.format as any) || 'Удаленно',
-              directionId: (v.directionId || v.direction || 'backend') as DirectionId,
-              subTrackId: (v.subTrackId || v.sub_track || 'python') as SubTrackId,
-              tags: Array.isArray(v.tags) ? v.tags : [v.company, 'Стажировка'],
-              snippet: v.description || v.title,
-              publishedAt: v.published_at || new Date().toISOString(),
-              sourceType: v.sourceType === 'portal' || v.source_type === 'portal' || v.sourceType === 'website' ? 'website' : 'telegram',
-              url: v.url || v.source_url,
-            }));
+            newItemsFound = resVacancies.map((v: any) => {
+              const dirId = (v.directionId || v.direction || 'backend') as DirectionId;
+              const directUrl = resolveApplyUrl(v.url || v.source_url, v.company, v.channel, dirId);
+              return {
+                id: String(v.id),
+                channelHandle: v.channel || (v.sourceType === 'portal' ? 'career.site' : '@IT_start_izh_bot'),
+                channelName: v.company,
+                company: v.company,
+                title: v.title,
+                salary: formatSalary(v.salary),
+                location: v.location || v.city || 'Москва / Удаленно',
+                format: (v.format as any) || 'Удаленно',
+                directionId: dirId,
+                subTrackId: (v.subTrackId || v.sub_track || 'python') as SubTrackId,
+                tags: Array.isArray(v.tags) ? v.tags : [v.company, 'Стажировка'],
+                snippet: v.description || v.title,
+                publishedAt: v.published_at || new Date().toISOString(),
+                sourceType: v.sourceType === 'portal' || v.source_type === 'portal' || v.sourceType === 'website' ? 'website' : 'telegram',
+                url: directUrl,
+              };
+            });
 
             // Auto-sync into feed
             resVacancies.forEach((v: any) => {
+              const dirId = (v.directionId || v.direction || 'backend') as DirectionId;
+              const directUrl = resolveApplyUrl(v.url || v.source_url, v.company, v.channel, dirId);
               const internship: Internship = {
                 id: String(v.id),
                 title: v.title,
                 company: v.company,
                 location: v.location || v.city || 'Москва / Удаленно',
                 format: (v.format as any) || 'Удаленно',
-                salary: v.salary || 'По договоренности',
-                directionId: (v.directionId || v.direction || 'backend') as DirectionId,
+                salary: formatSalary(v.salary),
+                directionId: dirId,
                 subTrackId: (v.subTrackId || v.sub_track || 'python') as SubTrackId,
                 tags: Array.isArray(v.tags) ? v.tags : [v.company, 'Стажировка'],
                 description: v.description || v.title,
@@ -580,7 +589,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                 ],
                 sourceChannel: v.channel || '@IT_start_izh_bot',
                 sourceType: v.sourceType === 'portal' || v.source_type === 'portal' || v.sourceType === 'website' ? 'portal' : 'telegram',
-                applyUrl: v.url || v.source_url || GITHUB_PAGES_URL,
+                applyUrl: directUrl,
                 publishedAt: v.published_at || new Date().toISOString(),
                 isHot: true,
               };
