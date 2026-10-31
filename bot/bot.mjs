@@ -1586,10 +1586,10 @@ const server = http.createServer(async (req, res) => {
           const keyboard = createVkKeyboard({
             inline: true,
             buttons: [
-              [
-                { label: '🚀 Открыть IT-Старт (Mini App)', app_id: VK_APP_ID },
-                ...(directUrl ? [{ label: actionLabel, link: directUrl }] : [{ label: '🌐 Веб-версия', link: RENDER_URL }]),
-              ],
+              [{ label: '🚀 Открыть в Mini App', app_id: VK_APP_ID }],
+              ...(directUrl
+                ? [[{ label: actionLabel || '🔗 Откликнуться на вакансию', link: directUrl }]]
+                : [[{ label: '🌐 Веб-сайт', link: RENDER_URL }]]),
             ],
           });
           const vkRes = await sendVkNotification(cleanPeerId, text, { keyboard, checkPermission: false, applyUrl: directUrl });
@@ -2048,15 +2048,20 @@ export function getDirectVacancyPortalUrl(companyKey, directionId = undefined, f
 export function formatLocation(item) {
   if (!item) return 'Удаленно';
   const format = (item.format || '').trim();
-  const rawLoc = (item.location || item.city || '').trim();
+  let rawLoc = (item.location || item.city || '').trim();
   if (!rawLoc) return format || 'Удаленно';
   if (!format) return rawLoc;
   if (rawLoc.toLowerCase() === format.toLowerCase()) return format;
+
+  rawLoc = rawLoc.replace(/Санкт-Петербург/gi, 'СПб');
 
   if (rawLoc.includes('/')) {
     const parts = rawLoc.split('/').map((s) => s.trim()).filter(Boolean);
     if (parts.length > 2) {
       return format === 'Удаленно' ? `${format} (РФ)` : `${format} (${parts[0]}+)`;
+    }
+    if (parts.length === 2) {
+      return format === 'Удаленно' ? `${format} (РФ)` : `${format} (${parts.join(', ')})`;
     }
   }
   if (rawLoc.toLowerCase().includes(format.toLowerCase())) {
@@ -4075,7 +4080,7 @@ export async function sendVacancies(chatId, filter = 'all') {
         { text: '🔷 VK', callback_data: 'vacancies:vk' },
       ],
       [
-        { text: '💼 Все вакансии', callback_data: 'vacancies:all' },
+        { text: '💼 Вакансии', callback_data: 'vacancies:all' },
         { text: '🏢 Компании', callback_data: 'companies' },
       ],
       [
@@ -4105,9 +4110,9 @@ export async function sendCompanies(chatId) {
   let text = `🏢 <b>Целевые IT-компании и программы стажировок:</b>\n━━━━━━━━━━━━━━━━━━━━\n\n`;
 
   COMPANIES_DATA.forEach((c, idx) => {
-    text += `<b>${idx + 1}. ${c.name}</b> (${c.shortName})\n`;
-    text += `   🛠 <code>${c.stack}</code>\n`;
-    text += `   📢 ${c.channel}\n\n`;
+    text += `<b>${idx + 1}. 🏢 ${c.name}</b> (${c.shortName})\n`;
+    text += `🛠 <code>${c.stack}</code>\n`;
+    text += `📢 ${c.channel}\n\n`;
   });
 
   text += `━━━━━━━━━━━━━━━━━━━━\n`;
@@ -4133,7 +4138,7 @@ export async function sendCompanies(chatId) {
         { text: '🔷 VK', callback_data: 'company:vk' },
       ],
       [
-        { text: '💼 Все вакансии', callback_data: 'vacancies:all' },
+        { text: '💼 Вакансии', callback_data: 'vacancies:all' },
         { text: '🔔 Подписка', callback_data: 'subscribe' },
       ],
       [
@@ -4184,10 +4189,15 @@ export async function sendCompanyVacancies(chatId, companyId) {
     list.slice(0, 5).forEach((item, idx) => {
       const applyUrl = item.applyUrl || item.url || RENDER_URL;
       const salaryFormatted = formatSalary(item.salary);
-      const loc = item.format || 'Удаленно';
+      const loc = formatLocation(item);
+      const stack = Array.isArray(item.tags) && item.tags.length > 0 ? item.tags.slice(0, 4).join(' • ') : '';
+
       text += `<b>${idx + 1}. ${item.title}</b>\n`;
       text += `💰 <b>${salaryFormatted}</b> | 📍 ${loc}\n`;
-      text += `🔗 <a href="${applyUrl}">Откликнуться →</a>\n`;
+      if (stack) {
+        text += `🏷 <code>${stack}</code>\n`;
+      }
+      text += `🔗 <a href="${applyUrl}"><b>Откликнуться →</b></a>\n`;
       text += `─────────────────────\n`;
     });
   }
@@ -4302,7 +4312,7 @@ export async function sendStatus(chatId) {
   const keyboard = {
     inline_keyboard: [
       [
-        { text: '⚡ Сканировать', callback_data: 'parse' },
+        { text: '⚡ Скан', callback_data: 'parse' },
         { text: '💼 Стажировки', callback_data: 'vacancies:all' },
       ],
       [
@@ -4483,9 +4493,12 @@ export async function sendHelp(chatId) {
     `• /help — Список всех команд\n\n` +
     `━━━━━━━━━━━━━━━━━━━━\n` +
     `🏢 <b>Быстрый переход к работодателям:</b>\n` +
-    `/company_t1, /company_kontur, /company_tbank, /company_directum, /company_yandex, /company_ozon, /company_sber, /company_avito, /company_vk\n\n` +
+    `• /company_t1 • /company_kontur • /company_tbank\n` +
+    `• /company_directum • /company_yandex • /company_ozon\n` +
+    `• /company_sber • /company_avito • /company_vk\n\n` +
     `💻 <b>Быстрый переход по направлениям:</b>\n` +
-    `/frontend, /backend, /mobile, /data_science, /qa, /devops\n\n` +
+    `• /frontend • /backend • /mobile\n` +
+    `• /data_science • /qa • /devops\n\n` +
     `💡 <i>Вы также можете отправить название («яндекс», «т1», «контур», «директум») или стека («фронтенд», «бэкенд»)!</i>\n\n` +
     `🌐 <b>Сайт платформы без VPN:</b> ${RENDER_URL}`;
 

@@ -233,15 +233,20 @@ export function createVkKeyboard(options = {}) {
 export function formatLocation(item) {
   if (!item) return 'Удаленно';
   const format = (item.format || '').trim();
-  const rawLoc = (item.location || item.city || '').trim();
+  let rawLoc = (item.location || item.city || '').trim();
   if (!rawLoc) return format || 'Удаленно';
   if (!format) return rawLoc;
   if (rawLoc.toLowerCase() === format.toLowerCase()) return format;
+
+  rawLoc = rawLoc.replace(/Санкт-Петербург/gi, 'СПб');
 
   if (rawLoc.includes('/')) {
     const parts = rawLoc.split('/').map((s) => s.trim()).filter(Boolean);
     if (parts.length > 2) {
       return format === 'Удаленно' ? `${format} (РФ)` : `${format} (${parts[0]}+)`;
+    }
+    if (parts.length === 2) {
+      return format === 'Удаленно' ? `${format} (РФ)` : `${format} (${parts.join(', ')})`;
     }
   }
   if (rawLoc.toLowerCase().includes(format.toLowerCase())) {
@@ -293,7 +298,7 @@ export const MAIN_VK_KEYBOARD = createVkKeyboard({
     ],
     [
       { label: 'ℹ️ Помощь', payload: { cmd: 'help' }, color: 'secondary' },
-      { label: '⚡ Сканировать', payload: { cmd: 'scan' }, color: 'secondary' },
+      { label: '⚡ Скан', payload: { cmd: 'scan' }, color: 'secondary' },
     ],
   ],
 });
@@ -1023,9 +1028,14 @@ export async function sendVkCompanyDetails(peerId, targetCompany, token = VK_BOT
   if (companyVacancies.length > 0) {
     text += `🔥 Открытые позиции (${companyVacancies.length}):\n`;
     companyVacancies.slice(0, 5).forEach((v, idx) => {
+      const tagsStr = Array.isArray(v.tags) && v.tags.length > 0 ? v.tags.slice(0, 4).join(' • ') : '';
       text += `\n[${idx + 1}] 💼 ${v.title}\n`;
       text += `💰 ${formatSalary(v.salary)} | 📍 ${formatLocation(v)}\n`;
+      if (tagsStr) {
+        text += `🏷 Стек: ${tagsStr}\n`;
+      }
       text += `🔗 ${v.applyUrl || v.url || RENDER_URL}\n`;
+      text += `─────────────────────\n`;
     });
   } else {
     text += `🔍 Сейчас прямых позиций в базе нет, но парсер отслеживает канал ${targetCompany.channel} 24/7!\n`;
@@ -1380,8 +1390,8 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
 
     COMPANIES_DATA.forEach((c, idx) => {
       text += `[${idx + 1}] 🏢 ${c.name} (${c.shortName})\n`;
-      text += `    🛠 Стек: ${c.stack}\n`;
-      text += `    📢 Канал: ${c.channel}\n\n`;
+      text += `🛠 Стек: ${c.stack}\n`;
+      text += `📢 Канал: ${c.channel}\n\n`;
     });
 
     text += `━━━━━━━━━━━━━━━━━━━━\n`;
@@ -1889,7 +1899,14 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
       `• Telegram (/tg) — открыть бота в Telegram\n` +
       `• Помощь (/help) — эта справка\n\n` +
       `━━━━━━━━━━━━━━━━━━━━\n` +
-      `🏢 Быстрый поиск: отправьте название («яндекс», «т1», «контур», «директум») или направление («фронтенд», «бэкенд»)!`;
+      `🏢 Быстрый переход к компании:\n` +
+      `• /company_t1 • /company_kontur • /company_tbank\n` +
+      `• /company_directum • /company_yandex • /company_ozon\n` +
+      `• /company_sber • /company_avito • /company_vk\n\n` +
+      `💻 Быстрый переход по направлениям:\n` +
+      `• /frontend • /backend • /mobile\n` +
+      `• /data_science • /qa • /devops\n\n` +
+      `💡 Быстрый поиск: отправьте название («яндекс», «т1», «контур», «директум») или направление («фронтенд», «бэкенд»)!`;
 
     const reply = {
       peer_id: peerId,
