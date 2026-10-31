@@ -230,12 +230,32 @@ export function createVkKeyboard(options = {}) {
   });
 }
 
+export function formatLocation(item) {
+  if (!item) return 'Удаленно';
+  const format = (item.format || '').trim();
+  const rawLoc = (item.location || item.city || '').trim();
+  if (!rawLoc) return format || 'Удаленно';
+  if (!format) return rawLoc;
+  if (rawLoc.toLowerCase() === format.toLowerCase()) return format;
+
+  if (rawLoc.includes('/')) {
+    const parts = rawLoc.split('/').map((s) => s.trim()).filter(Boolean);
+    if (parts.length > 2) {
+      return format === 'Удаленно' ? `${format} (РФ)` : `${format} (${parts[0]}+)`;
+    }
+  }
+  if (rawLoc.toLowerCase().includes(format.toLowerCase())) {
+    return rawLoc;
+  }
+  return `${format} (${rawLoc})`;
+}
+
 // Predefined Keyboards
 export const MAIN_VK_INLINE_KEYBOARD = createVkKeyboard({
   inline: true,
   buttons: [
     [
-      { label: '🚀 Запустить IT-Старт (Mini App)', app_id: VK_APP_ID },
+      { label: '🚀 Открыть IT-Старт (Mini App)', app_id: VK_APP_ID },
     ],
     [
       { label: '💼 Стажировки', payload: { cmd: 'vacancies' }, color: 'primary' },
@@ -247,7 +267,7 @@ export const MAIN_VK_INLINE_KEYBOARD = createVkKeyboard({
     ],
     [
       { label: '🔔 Подписка', payload: { cmd: 'subscribe' }, color: 'positive' },
-      { label: '🌐 Сайт без VPN', link: RENDER_URL },
+      { label: '🌐 Веб-сайт', link: RENDER_URL },
     ],
   ],
 });
@@ -282,7 +302,7 @@ export const VACANCIES_VK_KEYBOARD = createVkKeyboard({
   inline: true,
   buttons: [
     [
-      { label: '🚀 Запустить IT-Старт (Mini App)', app_id: VK_APP_ID },
+      { label: '🚀 Открыть в Mini App', app_id: VK_APP_ID },
     ],
     [
       { label: '💻 Frontend', payload: { cmd: 'direction', id: 'frontend' }, color: 'primary' },
@@ -298,7 +318,7 @@ export const VACANCIES_VK_KEYBOARD = createVkKeyboard({
     ],
     [
       { label: '🏢 Компании', payload: { cmd: 'companies' }, color: 'primary' },
-      { label: '🌐 Сайт без VPN', link: RENDER_URL },
+      { label: '🌐 Веб-сайт', link: RENDER_URL },
     ],
   ],
 });
@@ -337,7 +357,7 @@ export function formatVkVacancyMessage(item) {
     `💼 ${item.company} — ${item.title}\n` +
     `━━━━━━━━━━━━━━━━━━━━\n` +
     `💰 Зарплата: ${formatSalary(item.salary)}\n` +
-    `📍 Формат: ${item.format || 'Удаленно'} | ${item.location || item.city || 'РФ'}\n` +
+    `📍 Формат: ${formatLocation(item)}\n` +
     `📢 Источник: ${item.sourceChannel || item.channel || 'IT-Старт'}\n` +
     (tagsStr ? `🏷 Стек: ${tagsStr}\n` : '') +
     desc +
@@ -364,14 +384,14 @@ export function formatVkVacanciesList(items = [], title = 'Актуальные 
   slice.forEach((item, idx) => {
     const verifiedApplyUrl = item.applyUrl || item.url || RENDER_URL;
     const channel = item.sourceChannel || item.channel || '@t1career';
-    const loc = item.format ? `${item.format} • ${item.location || item.city || 'РФ'}` : (item.location || item.city || 'РФ');
+    const loc = formatLocation(item);
     text += `[${idx + 1}] 🏢 ${item.company}\n`;
-    text += `    💼 ${item.title}\n`;
-    text += `    💰 ${formatSalary(item.salary)} | 📍 ${loc}\n`;
+    text += `💼 ${item.title}\n`;
+    text += `💰 ${formatSalary(item.salary)} | 📍 ${loc}\n`;
     if (Array.isArray(item.tags) && item.tags.length > 0) {
-      text += `    🏷 Стек: ${item.tags.slice(0, 4).join(' • ')}\n`;
+      text += `🏷 Стек: ${item.tags.slice(0, 4).join(' • ')}\n`;
     }
-    text += `    📢 ${channel}  ➔  ${verifiedApplyUrl}\n`;
+    text += `📢 ${channel}  ➔  ${verifiedApplyUrl}\n`;
     text += '─────────────────────\n';
   });
 
@@ -665,13 +685,11 @@ export async function sendVkNotification(peerId, text, options = {}, token = VK_
   const keyboard = options.keyboard !== undefined ? options.keyboard : createVkKeyboard({
     inline: true,
     buttons: [
+      [{ label: '🚀 Открыть в Mini App', app_id: VK_APP_ID }],
+      ...(options.applyUrl ? [[{ label: '🔗 Откликнуться на вакансию', link: options.applyUrl }]] : []),
       [
-        { label: '🚀 Открыть в Mini App', app_id: VK_APP_ID },
-        ...(options.applyUrl ? [{ label: '🔗 Откликнуться', link: options.applyUrl }] : [{ label: '🌐 Веб-версия', link: RENDER_URL }]),
-      ],
-      [
-        { label: '💼 Каталог вакансий', payload: { cmd: 'vacancies' }, color: 'primary' },
-        { label: '🔔 Настройки подписки', payload: { cmd: 'subscribe' }, color: 'secondary' },
+        { label: '💼 Вакансии', payload: { cmd: 'vacancies' }, color: 'primary' },
+        { label: '🔔 Подписка', payload: { cmd: 'subscribe' }, color: 'secondary' },
       ],
     ],
   });
@@ -927,7 +945,7 @@ export async function notifyVkSubscribers(vacancies = [], token = VK_BOT_TOKEN) 
         `━━━━━━━━━━━━━━━━━━━━\n` +
         `💼 ${vac.company} — ${vac.title}\n` +
         `💰 Зарплата: ${formatSalary(vac.salary)}\n` +
-        `📍 Формат: ${vac.format || 'Удаленно'} | ${vac.location || vac.city || 'РФ'}\n` +
+        `📍 Формат: ${formatLocation(vac)}\n` +
         `🏷 Стек: ${tagsStr}\n` +
         `📢 Источник: ${sourceChannel} (${sourceLabel})\n\n` +
         `🎯 В IT-Старт подготовлен персональный план вопросов для этого направления!\n` +
@@ -943,13 +961,13 @@ export async function notifyVkSubscribers(vacancies = [], token = VK_BOT_TOKEN) 
               inline: true,
               buttons: [
                 [
-                  { label: '🚀 Запустить IT-Старт (Mini App)', app_id: VK_APP_ID },
+                  { label: '🚀 Открыть в Mini App', app_id: VK_APP_ID },
                 ],
                 [
                   { label: isWeb ? '🔗 Откликнуться на сайте' : '🔗 Открыть вакансию', link: applyUrl },
                 ],
                 [
-                  { label: '💼 Все вакансии', payload: { cmd: 'vacancies' }, color: 'primary' },
+                  { label: '💼 Вакансии', payload: { cmd: 'vacancies' }, color: 'primary' },
                   { label: '🔔 Подписка', payload: { cmd: 'subscribe' }, color: 'secondary' },
                 ],
               ],
@@ -1006,8 +1024,8 @@ export async function sendVkCompanyDetails(peerId, targetCompany, token = VK_BOT
     text += `🔥 Открытые позиции (${companyVacancies.length}):\n`;
     companyVacancies.slice(0, 5).forEach((v, idx) => {
       text += `\n[${idx + 1}] 💼 ${v.title}\n`;
-      text += `   💰 ${formatSalary(v.salary)} | 📍 ${v.format || 'Удаленно'}\n`;
-      text += `   🔗 ${v.applyUrl || v.url || RENDER_URL}\n`;
+      text += `💰 ${formatSalary(v.salary)} | 📍 ${formatLocation(v)}\n`;
+      text += `🔗 ${v.applyUrl || v.url || RENDER_URL}\n`;
     });
   } else {
     text += `🔍 Сейчас прямых позиций в базе нет, но парсер отслеживает канал ${targetCompany.channel} 24/7!\n`;
@@ -1021,12 +1039,12 @@ export async function sendVkCompanyDetails(peerId, targetCompany, token = VK_BOT
     buttons: [
       [{ label: '🚀 Открыть в Mini App', app_id: VK_APP_ID }],
       [
-        { label: '💼 Все вакансии', payload: { cmd: 'vacancies' }, color: 'primary' },
-        { label: '🏢 Все компании', payload: { cmd: 'companies' }, color: 'secondary' },
+        { label: '💼 Вакансии', payload: { cmd: 'vacancies' }, color: 'primary' },
+        { label: '🏢 Компании', payload: { cmd: 'companies' }, color: 'secondary' },
       ],
       [
         { label: '🔔 Подписка', payload: { cmd: 'subscribe' }, color: 'positive' },
-        { label: '🌐 Сайт без VPN', link: RENDER_URL },
+        { label: '🌐 Веб-сайт', link: RENDER_URL },
       ],
     ],
   });
@@ -1412,14 +1430,14 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
     const keyboard = createVkKeyboard({
       inline: true,
       buttons: [
-        [{ label: '🚀 Открыть роадмапы (Mini App)', app_id: VK_APP_ID }],
+        [{ label: '🚀 Открыть роадмапы в Mini App', app_id: VK_APP_ID }],
         [
           { label: '💼 Стажировки', payload: { cmd: 'vacancies' }, color: 'primary' },
           { label: '❓ Вопросы', payload: { cmd: 'questions' }, color: 'secondary' },
         ],
         [
           { label: '🔔 Подписка', payload: { cmd: 'subscribe' }, color: 'positive' },
-          { label: '🌐 Сайт без VPN', link: RENDER_URL },
+          { label: '🌐 Веб-сайт', link: RENDER_URL },
         ],
       ],
     });
@@ -1457,14 +1475,14 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
     const keyboard = createVkKeyboard({
       inline: true,
       buttons: [
-        [{ label: '🚀 Запустить тренажёр (Mini App)', app_id: VK_APP_ID }],
+        [{ label: '🚀 Тренажёр в Mini App', app_id: VK_APP_ID }],
         [
           { label: '💼 Стажировки', payload: { cmd: 'vacancies' }, color: 'primary' },
           { label: '🗺 Роадмапы', payload: { cmd: 'roadmaps' }, color: 'secondary' },
         ],
         [
           { label: '🔔 Подписка', payload: { cmd: 'subscribe' }, color: 'positive' },
-          { label: '🌐 Сайт без VPN', link: RENDER_URL },
+          { label: '🌐 Веб-сайт', link: RENDER_URL },
         ],
       ],
     });
@@ -1500,13 +1518,13 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
     const keyboard = createVkKeyboard({
       inline: true,
       buttons: [
-        [{ label: '🚀 Запустить IT-Старт (Mini App)', app_id: VK_APP_ID }],
+        [{ label: '🚀 Открыть IT-Старт (Mini App)', app_id: VK_APP_ID }],
         [
           { label: '💼 Стажировки', payload: { cmd: 'vacancies' }, color: 'primary' },
           { label: '🏢 Компании', payload: { cmd: 'companies' }, color: 'secondary' },
         ],
         [
-          { label: '🌐 Сайт без VPN', link: RENDER_URL },
+          { label: '🌐 Веб-сайт', link: RENDER_URL },
           { label: '🔕 Отписаться', payload: { cmd: 'unsubscribe' }, color: 'negative' },
         ],
       ],
@@ -1539,11 +1557,11 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
       inline: true,
       buttons: [
         [
-          { label: '🔔 Включить подписку', payload: { cmd: 'subscribe' }, color: 'positive' },
+          { label: '🔔 Подписаться', payload: { cmd: 'subscribe' }, color: 'positive' },
           { label: '💼 Стажировки', payload: { cmd: 'vacancies' }, color: 'primary' },
         ],
         [
-          { label: '🚀 Запустить IT-Старт (Mini App)', app_id: VK_APP_ID },
+          { label: '🚀 Открыть Mini App', app_id: VK_APP_ID },
         ],
       ],
     });
@@ -1586,14 +1604,14 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
     const keyboard = createVkKeyboard({
       inline: true,
       buttons: [
-        [{ label: '🚀 Запустить VK Mini App', app_id: VK_APP_ID }],
+        [{ label: '🚀 Открыть VK Mini App', app_id: VK_APP_ID }],
         [
           { label: '💼 Стажировки', payload: { cmd: 'vacancies' }, color: 'primary' },
           { label: isSubscribed ? '🔕 Отписаться' : '🔔 Подписаться', payload: { cmd: isSubscribed ? 'unsubscribe' : 'subscribe' }, color: isSubscribed ? 'secondary' : 'positive' },
         ],
         [
-          { label: '🌐 Сайт без VPN', link: RENDER_URL },
           { label: '🏢 Компании', payload: { cmd: 'companies' }, color: 'secondary' },
+          { label: '🌐 Веб-сайт', link: RENDER_URL },
         ],
       ],
     });
@@ -1652,13 +1670,14 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
     const keyboard = createVkKeyboard({
       inline: true,
       buttons: [
+        [{ label: '🚀 Открыть VK Mini App', app_id: VK_APP_ID }],
         [
-          { label: '💼 Каталог вакансий', payload: { cmd: 'vacancies' }, color: 'primary' },
-          { label: '📊 Статус системы', payload: { cmd: 'status' }, color: 'secondary' },
+          { label: '💼 Вакансии', payload: { cmd: 'vacancies' }, color: 'primary' },
+          { label: '📊 Статус', payload: { cmd: 'status' }, color: 'secondary' },
         ],
         [
-          { label: '🚀 Запустить VK Mini App', app_id: VK_APP_ID },
-          { label: '🌐 Сайт без VPN', link: RENDER_URL },
+          { label: '🏢 Компании', payload: { cmd: 'companies' }, color: 'secondary' },
+          { label: '🌐 Веб-сайт', link: RENDER_URL },
         ],
       ],
     });
@@ -1741,24 +1760,15 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
       `• Тренажёр 55+ вопросов к собеседованию\n` +
       `• Каталог стажировок с умными фильтрами!`;
 
-    const appRow = [];
-    if (VK_APP_ID) {
-      appRow.push({
-        label: '📱 VK Mini App',
-        app_id: Number(VK_APP_ID),
-      });
-    }
-    appRow.push({
-      label: '🌐 Сайт без VPN',
-      link: RENDER_URL,
-    });
-
     const keyboard = createVkKeyboard({
       inline: true,
       buttons: [
-        appRow,
         [
-          { label: '💼 Каталог вакансий', payload: { cmd: 'vacancies' }, color: 'primary' },
+          { label: '📱 VK Mini App', app_id: Number(VK_APP_ID) },
+          { label: '🌐 Веб-сайт', link: RENDER_URL },
+        ],
+        [
+          { label: '💼 Вакансии', payload: { cmd: 'vacancies' }, color: 'primary' },
           { label: '🏢 Компании', payload: { cmd: 'companies' }, color: 'secondary' },
         ],
       ],
@@ -1795,10 +1805,10 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
     const keyboard = createVkKeyboard({
       inline: true,
       buttons: [
-        [{ label: '🚀 Запустить VK Mini App', app_id: VK_APP_ID }],
+        [{ label: '🚀 Открыть VK Mini App', app_id: VK_APP_ID }],
         [
           { label: '🏢 Вакансии VK', payload: { cmd: 'company', id: 'vk' }, color: 'primary' },
-          { label: '🌐 Сайт без VPN', link: RENDER_URL },
+          { label: '🌐 Веб-сайт', link: RENDER_URL },
         ],
       ],
     });
@@ -1840,9 +1850,10 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
       inline: true,
       buttons: [
         [{ label: '💬 Открыть бота в Telegram', link: 'https://t.me/IT_start_izh_bot' }],
+        [{ label: '🚀 Открыть VK Mini App', app_id: VK_APP_ID }],
         [
-          { label: '🚀 Запустить VK Mini App', app_id: VK_APP_ID },
-          { label: '🌐 Сайт без VPN', link: RENDER_URL },
+          { label: '💼 Стажировки', payload: { cmd: 'vacancies' }, color: 'primary' },
+          { label: '🌐 Веб-сайт', link: RENDER_URL },
         ],
       ],
     });

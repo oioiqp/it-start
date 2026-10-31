@@ -1607,10 +1607,8 @@ const server = http.createServer(async (req, res) => {
         }
 
         const tgKeyboard = [
-          [
-            { text: '🚀 Открыть IT-Старт', web_app: { url: WEBAPP_URL } },
-            ...(directUrl ? [{ text: actionLabel, url: directUrl }] : [{ text: '💬 Бот @' + BOT_USERNAME, url: `https://t.me/${BOT_USERNAME}` }]),
-          ],
+          [{ text: '🚀 Открыть IT-Старт', web_app: { url: WEBAPP_URL } }],
+          ...(directUrl ? [[{ text: actionLabel || '🔗 Откликнуться на вакансию', url: directUrl }]] : [[{ text: '💬 Бот @' + BOT_USERNAME, url: `https://t.me/${BOT_USERNAME}` }]]),
         ];
 
         const tgRes = await callTelegram('sendMessage', {
@@ -2045,6 +2043,26 @@ export function getDirectVacancyPortalUrl(companyKey, directionId = undefined, f
     default:
       return fallback;
   }
+}
+
+export function formatLocation(item) {
+  if (!item) return 'Удаленно';
+  const format = (item.format || '').trim();
+  const rawLoc = (item.location || item.city || '').trim();
+  if (!rawLoc) return format || 'Удаленно';
+  if (!format) return rawLoc;
+  if (rawLoc.toLowerCase() === format.toLowerCase()) return format;
+
+  if (rawLoc.includes('/')) {
+    const parts = rawLoc.split('/').map((s) => s.trim()).filter(Boolean);
+    if (parts.length > 2) {
+      return format === 'Удаленно' ? `${format} (РФ)` : `${format} (${parts[0]}+)`;
+    }
+  }
+  if (rawLoc.toLowerCase().includes(format.toLowerCase())) {
+    return rawLoc;
+  }
+  return `${format} (${rawLoc})`;
 }
 
 export function formatSalary(salaryInput) {
@@ -3280,7 +3298,7 @@ export async function scanChannelsAndSyncSupabase(notifySubscribers = true) {
               `━━━━━━━━━━━━━━━━━━━━\n` +
               `🏢 <b>${item.company}</b>\n` +
               `💼 <b>${item.title}</b>\n` +
-              `💰 <b>${item.salary}</b> | 📍 ${item.format}\n` +
+              `💰 <b>${item.salary}</b> | 📍 ${formatLocation(item)}\n` +
               `📢 <code>${sourceChannel}</code> (${sourceLabel})\n\n` +
               `🎯 <i>В IT-Старт подготовлен персональный план вопросов для этого направления!</i>`;
 
@@ -3303,8 +3321,8 @@ export async function scanChannelsAndSyncSupabase(notifySubscribers = true) {
                     },
                   ],
                   [
-                    { text: '💼 Все вакансии', callback_data: 'vacancies:all' },
-                    { text: '🔔 Настройки', callback_data: 'subscribe' },
+                    { text: '💼 Вакансии', callback_data: 'vacancies:all' },
+                    { text: '🔔 Подписка', callback_data: 'subscribe' },
                   ],
                 ],
               },
@@ -3575,10 +3593,10 @@ export async function handleMessage(msg) {
         ],
         [
           { text: '🔔 Подписка', callback_data: 'subscribe' },
-          { text: '⚡ Сканировать', callback_data: 'scan' },
+          { text: '⚡ Скан', callback_data: 'scan' },
         ],
         [
-          { text: '🌐 Сайт без VPN', url: RENDER_URL },
+          { text: '🌐 Веб-сайт', url: RENDER_URL },
           { text: 'ℹ️ Помощь', callback_data: 'help' },
         ],
       ],
@@ -3623,12 +3641,12 @@ export async function handleMessage(msg) {
       reply_markup: {
         inline_keyboard: [
           [
-            { text: '🔔 Включить подписку', callback_data: 'subscribe' },
+            { text: '🔔 Подписаться', callback_data: 'subscribe' },
             { text: '💼 Стажировки', callback_data: 'vacancies:all' },
           ],
           [
             {
-              text: '🚀 Запустить IT-Старт WebApp',
+              text: '🚀 Открыть IT-Старт WebApp',
               web_app: {
                 url: `${WEBAPP_URL}${WEBAPP_URL.includes('?') ? '&' : '?'}tg_chat_id=${chatId}&subscribed=0#tg_chat_id=${chatId}`,
               },
@@ -3789,12 +3807,12 @@ export async function handleMessage(msg) {
       reply_markup: {
         inline_keyboard: [
           [
-            { text: '💬 Открыть бота в VK', url: 'https://vk.com/im?sel=-242573933' },
+            { text: '💬 Бот ВКонтакте', url: 'https://vk.com/im?sel=-242573933' },
             { text: '🚀 VK Mini App', url: 'https://vk.com/app54857681' },
           ],
           [
             { text: '💼 Стажировки', callback_data: 'vacancies:all' },
-            { text: '🌐 Сайт без VPN', url: RENDER_URL },
+            { text: '🌐 Веб-сайт', url: RENDER_URL },
           ],
         ],
       },
@@ -3829,7 +3847,7 @@ export async function handleMessage(msg) {
           [{ text: '🚀 Запустить WebApp', web_app: { url: webAppUrlWithParams } }],
           [
             { text: '💼 Стажировки', callback_data: 'vacancies:all' },
-            { text: '🌐 Сайт без VPN', url: RENDER_URL },
+            { text: '🌐 Веб-сайт', url: RENDER_URL },
           ],
         ],
       },
@@ -3878,7 +3896,7 @@ export async function handleMessage(msg) {
           { text: '❓ Тренажёр', callback_data: 'questions' },
         ],
         [
-          { text: '🌐 Сайт без VPN', url: RENDER_URL },
+          { text: '🌐 Веб-сайт', url: RENDER_URL },
           { text: 'ℹ️ Помощь', callback_data: 'help' },
         ],
       ],
@@ -3920,7 +3938,7 @@ export async function sendSubscribe(chatId, firstName = 'Разработчик'
           { text: '🏢 Компании', callback_data: 'companies' },
         ],
         [
-          { text: '🌐 Сайт без VPN', url: RENDER_URL },
+          { text: '🌐 Веб-сайт', url: RENDER_URL },
           { text: '🔕 Отписаться', callback_data: 'unsubscribe' },
         ],
       ],
@@ -3951,12 +3969,15 @@ export async function sendId(chatId, firstName = 'Разработчик', usern
     reply_markup: {
       inline_keyboard: [
         [
-          { text: '🚀 Запустить WebApp', web_app: { url: webAppUrlWithParams } },
-          { text: '💼 Стажировки', callback_data: 'vacancies:all' },
+          { text: '🚀 Запустить IT-Старт WebApp', web_app: { url: webAppUrlWithParams } },
         ],
         [
+          { text: '💼 Стажировки', callback_data: 'vacancies:all' },
           { text: '🔔 Подписка', callback_data: 'subscribe' },
-          { text: '🌐 Сайт без VPN', url: RENDER_URL },
+        ],
+        [
+          { text: '🏢 Компании', callback_data: 'companies' },
+          { text: '🌐 Веб-сайт', url: RENDER_URL },
         ],
       ],
     },
@@ -4000,7 +4021,7 @@ export async function sendVacancies(chatId, filter = 'all') {
       const channel = item.sourceChannel || item.channel || '@t1career';
       const stack = Array.isArray(item.tags) && item.tags.length > 0 ? item.tags.slice(0, 4).join(' • ') : '';
       const salaryFormatted = formatSalary(item.salary);
-      const loc = item.format ? `${item.format} • ${item.location || item.city || 'РФ'}` : (item.location || item.city || 'РФ');
+      const loc = formatLocation(item);
 
       text += `<b>${idx + 1}. 🏢 ${item.company}</b>\n`;
       text += `💼 <b>${item.title}</b>\n`;
@@ -4055,11 +4076,13 @@ export async function sendVacancies(chatId, filter = 'all') {
       ],
       [
         { text: '💼 Все вакансии', callback_data: 'vacancies:all' },
-        { text: '🏢 Все компании', callback_data: 'companies' },
+        { text: '🏢 Компании', callback_data: 'companies' },
       ],
       [
         { text: '🚀 Открыть в WebApp', web_app: { url: webAppUrlWithParams } },
-        { text: '🌐 Сайт без VPN', url: RENDER_URL },
+      ],
+      [
+        { text: '🌐 Открыть сайт без VPN', url: RENDER_URL },
       ],
     ],
   };
@@ -4095,28 +4118,29 @@ export async function sendCompanies(chatId) {
   const keyboard = {
     inline_keyboard: [
       [
-        { text: '🏢 Холдинг Т1', callback_data: 'company:t1' },
-        { text: '💼 СКБ Контур', callback_data: 'company:kontur' },
-      ],
-      [
+        { text: '🏢 Т1', callback_data: 'company:t1' },
+        { text: '💼 Контур', callback_data: 'company:kontur' },
         { text: '💳 Т-Банк', callback_data: 'company:tbank' },
+      ],
+      [
         { text: '⚡ Directum', callback_data: 'company:directum' },
-      ],
-      [
         { text: '🔍 Яндекс', callback_data: 'company:yandex' },
-        { text: '📦 Ozon Tech', callback_data: 'company:ozon' },
+        { text: '📦 Ozon', callback_data: 'company:ozon' },
       ],
       [
-        { text: '🟢 Сбер AI', callback_data: 'company:sber' },
-        { text: '🟣 Avito Tech', callback_data: 'company:avito' },
-      ],
-      [
+        { text: '🟢 Сбер', callback_data: 'company:sber' },
+        { text: '🟣 Авито', callback_data: 'company:avito' },
         { text: '🔷 VK', callback_data: 'company:vk' },
+      ],
+      [
         { text: '💼 Все вакансии', callback_data: 'vacancies:all' },
+        { text: '🔔 Подписка', callback_data: 'subscribe' },
       ],
       [
         { text: '🚀 Смотреть в WebApp', web_app: { url: webAppUrlWithParams } },
-        { text: '🌐 Сайт без VPN', url: RENDER_URL },
+      ],
+      [
+        { text: '🌐 Веб-сайт без VPN', url: RENDER_URL },
       ],
     ],
   };
@@ -4177,11 +4201,13 @@ export async function sendCompanyVacancies(chatId, companyId) {
       ],
       [
         { text: '🚀 Открыть в WebApp', web_app: { url: webAppUrlWithParams } },
-        { text: '🌐 Сайт без VPN', url: RENDER_URL },
       ],
       [
-        { text: '🏢 Все компании', callback_data: 'companies' },
-        { text: '💼 Все вакансии', callback_data: 'vacancies:all' },
+        { text: '🏢 Компании', callback_data: 'companies' },
+        { text: '💼 Вакансии', callback_data: 'vacancies:all' },
+      ],
+      [
+        { text: '🌐 Веб-сайт без VPN', url: RENDER_URL },
       ],
     ],
   };
@@ -4225,12 +4251,14 @@ export async function runManualScan(chatId) {
   const keyboard = {
     inline_keyboard: [
       [
-        { text: '💼 Смотреть вакансии', callback_data: 'vacancies:all' },
-        { text: '📊 Статус системы', callback_data: 'status' },
+        { text: '💼 Вакансии', callback_data: 'vacancies:all' },
+        { text: '📊 Статус', callback_data: 'status' },
       ],
       [
         { text: '🚀 Открыть WebApp', web_app: { url: webAppUrlWithParams } },
-        { text: '🌐 Сайт без VPN', url: RENDER_URL },
+      ],
+      [
+        { text: '🌐 Веб-сайт без VPN', url: RENDER_URL },
       ],
     ],
   };
@@ -4279,7 +4307,9 @@ export async function sendStatus(chatId) {
       ],
       [
         { text: '🚀 Открыть WebApp', web_app: { url: webAppUrlWithParams } },
-        { text: '🌐 Сайт без VPN', url: RENDER_URL },
+      ],
+      [
+        { text: '🌐 Веб-сайт без VPN', url: RENDER_URL },
       ],
     ],
   };
@@ -4301,12 +4331,12 @@ export async function sendRoadmaps(chatId) {
   const text =
     `🗺 <b>Интерактивные Роадмапы IT-Старт:</b>\n` +
     `━━━━━━━━━━━━━━━━━━━━\n` +
-    `1. 💻 <b>Frontend:</b> Веб-сеть, HTML5, CSS Grid, JS ES6+, TS ➔ React, Vue, Angular\n` +
-    `2. ⚙️ <b>Backend:</b> REST API, SQL, HTTP/2, Docker ➔ Python, Go, Java, Node.js\n` +
-    `3. 📱 <b>Mobile:</b> База мобильных ОС ➔ Android (Kotlin), iOS (Swift), Flutter\n` +
-    `4. 🤖 <b>Data Science:</b> Матанализ, Python, SQL ➔ Machine Learning, AI\n` +
-    `5. 🧪 <b>QA:</b> Тест-дизайн, баг-трекинг ➔ Manual QA, Auto QA (Playwright)\n` +
-    `6. ☁️ <b>DevOps:</b> Linux, Баш, Сети ➔ CI/CD, Docker, Kubernetes\n\n` +
+    `1. 💻 <b>Frontend:</b> JS / TS ➔ React, Vue, Angular\n` +
+    `2. ⚙️ <b>Backend:</b> REST, SQL, Docker ➔ Python, Go, Java\n` +
+    `3. 📱 <b>Mobile:</b> Архитектура ➔ Android, iOS, Flutter\n` +
+    `4. 🤖 <b>Data Science:</b> Python, SQL ➔ ML, LLM & AI\n` +
+    `5. 🧪 <b>QA:</b> Тест-дизайн ➔ Manual & Auto (Playwright)\n` +
+    `6. ☁️ <b>DevOps:</b> Linux, CI/CD ➔ Docker & Kubernetes\n\n` +
     `━━━━━━━━━━━━━━━━━━━━\n` +
     `🎯 <i>Интерактивное древо (roadmap.sh style) с чекбоксами навыков и подсчетом прогресса в % доступно в WebApp!</i>`;
 
@@ -4325,8 +4355,8 @@ export async function sendRoadmaps(chatId) {
         { text: '❓ Тренажёр', callback_data: 'questions' },
       ],
       [
-        { text: '🌐 Сайт без VPN', url: RENDER_URL },
-        { text: '🏠 Главное меню', callback_data: 'help' },
+        { text: '🌐 Веб-сайт', url: RENDER_URL },
+        { text: '🏠 Меню', callback_data: 'help' },
       ],
     ],
   };
@@ -4350,16 +4380,15 @@ export async function sendQuestions(chatId) {
   const text =
     `❓ <b>Тренажёр вопросов к собеседованию IT-Старт:</b>\n` +
     `━━━━━━━━━━━━━━━━━━━━\n` +
-    `Интерактивная база из 55+ реальных вопросов топ IT-компаний (Т1, Контур, Т-Банк, Directum, Яндекс, Ozon, Сбер, Авито, VK):\n\n` +
-    `• 💻 <b>Frontend:</b> Event Loop, Microtasks, React Fiber, Reconciler, Virtual DOM\n` +
-    `• ⚙️ <b>Backend:</b> Транзакции & ACID, уровни изоляции PostgreSQL, Goroutines, Spring Scopes\n` +
-    `• 📱 <b>Mobile:</b> Жизненный цикл Activity/Fragment, Coroutines, Swift ARC, Flutter\n` +
-    `• 🧪 <b>QA:</b> Техники тест-дизайна, эквивалентные классы, REST API, Playwright\n` +
-    `• ☁️ <b>DevOps:</b> Docker cgroups/namespaces, CI/CD pipelines, Kubernetes Pods\n` +
-    `• 🤖 <b>Data Science:</b> Gradient Descent, ROC-AUC, Overfitting, SQL Window Functions\n\n` +
-    `🎯 <b>Доступны 2 интерактивных режима:</b>\n` +
-    `1. <i>Флеш-карточки</i> — быстрое повторение ключевых определений\n` +
-    `2. <i>Симуляция интервью</i> — скрытие ответа с самопроверкой после ввода!`;
+    `55+ реальных вопросов от Т1, Контур, Т-Банк, Directum, Яндекс, Ozon, Сбер, Авито, VK:\n\n` +
+    `• 💻 <b>Frontend:</b> Event Loop, Microtasks, React Fiber\n` +
+    `• ⚙️ <b>Backend:</b> ACID, изоляция PostgreSQL, Goroutines\n` +
+    `• 📱 <b>Mobile:</b> Lifecycle, Coroutines, Swift ARC\n` +
+    `• 🧪 <b>QA:</b> Тест-дизайн, REST API, Playwright\n` +
+    `• ☁️ <b>DevOps:</b> Docker cgroups, CI/CD, Kubernetes\n` +
+    `• 🤖 <b>Data Science:</b> Gradient Descent, ROC-AUC, SQL\n\n` +
+    `━━━━━━━━━━━━━━━━━━━━\n` +
+    `🎯 <b>Доступны 2 режима:</b> флеш-карточки и симуляция интервью со скрытием ответа!`;
 
   const keyboard = {
     inline_keyboard: [
@@ -4371,7 +4400,7 @@ export async function sendQuestions(chatId) {
         { text: '🗺 Роадмапы', callback_data: 'roadmaps' },
       ],
       [
-        { text: '🌐 Сайт без VPN', url: RENDER_URL },
+        { text: '🌐 Веб-сайт', url: RENDER_URL },
         { text: '🔔 Подписка', callback_data: 'subscribe' },
       ],
     ],
@@ -4439,27 +4468,26 @@ export async function sendHelp(chatId) {
   const text =
     `ℹ️ <b>Команды бота @${BOT_USERNAME}:</b>\n` +
     `━━━━━━━━━━━━━━━━━━━━\n` +
-    `• /start — Главное меню и запуск WebApp\n` +
-    `• /vacancies — Каталог стажировок с фильтром по направлениям (<code>/vacancies frontend</code>) или компаниям (<code>/vacancies t1</code>)\n` +
-    `• /companies — Список целевых IT-компаний и каналов\n` +
-    `• /roadmaps — Роадмапы по 6 направлениям разработки\n` +
-    `• /questions — Тренажёр вопросов к собеседованию\n` +
-    `• /subscribe — Включить персональные пуш-уведомления о стажировках\n` +
-    `• /unsubscribe — Отключить получение уведомлений\n` +
-    `• /id (или /myid) — Узнать свой Telegram Chat ID\n` +
-    `• /status — Статус парсера, источников и сервера бота\n` +
-    `• /scan (или /sync, /parse) — Принудительное сканирование каналов и сайтов\n` +
-    `• /site — Ссылка на веб-платформу IT-Старт без VPN\n` +
-    `• /vk — Официальный бот и сообщество ВКонтакте\n` +
-    `• /tg (или /telegram) — Информация о Telegram-боте и WebApp\n` +
-    `• /help — Список всех доступных команд\n\n` +
+    `• /start — Главное меню и WebApp\n` +
+    `• /vacancies — Каталог стажировок\n` +
+    `• /companies — Список IT-работодателей\n` +
+    `• /roadmaps — Карты развития (6 треков)\n` +
+    `• /questions — 55+ вопросов собеседования\n` +
+    `• /subscribe — Включить пуши вакансий\n` +
+    `• /unsubscribe — Отключить пуши\n` +
+    `• /status — Состояние парсера и базы\n` +
+    `• /id — Ваш Telegram Chat ID\n` +
+    `• /scan — Запуск сканирования\n` +
+    `• /site — Веб-платформа без VPN\n` +
+    `• /vk — Официальный бот ВКонтакте\n` +
+    `• /help — Список всех команд\n\n` +
     `━━━━━━━━━━━━━━━━━━━━\n` +
-    `🏢 <b>Команды быстрого перехода к компаниям:</b>\n` +
+    `🏢 <b>Быстрый переход к работодателям:</b>\n` +
     `/company_t1, /company_kontur, /company_tbank, /company_directum, /company_yandex, /company_ozon, /company_sber, /company_avito, /company_vk\n\n` +
-    `💻 <b>Команды по направлениям:</b>\n` +
+    `💻 <b>Быстрый переход по направлениям:</b>\n` +
     `/frontend, /backend, /mobile, /data_science, /qa, /devops\n\n` +
-    `💡 <i>Вы также можете просто отправить боту название компании (например: «директум», «t1», «тбанк», «контур») или стека («фронтенд», «бэкенд», «девопс»), и бот сразу покажет подходящие стажировки!</i>\n\n` +
-    `🌐 <b>Сайт платформы (без VPN):</b> ${RENDER_URL}`;
+    `💡 <i>Вы также можете отправить название («яндекс», «т1», «контур», «директум») или стека («фронтенд», «бэкенд»)!</i>\n\n` +
+    `🌐 <b>Сайт платформы без VPN:</b> ${RENDER_URL}`;
 
   const keyboard = {
     inline_keyboard: [
@@ -4476,7 +4504,7 @@ export async function sendHelp(chatId) {
       ],
       [
         { text: '🔔 Подписка', callback_data: 'subscribe' },
-        { text: '🌐 Сайт без VPN', url: RENDER_URL },
+        { text: '🌐 Веб-сайт', url: RENDER_URL },
       ],
     ],
   };
