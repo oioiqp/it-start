@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ru" class="light">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- VK Mini App Ultra-Fast Init Dispatch (iOS WKWebView, Android Bridge, Desktop Web) -->
+    <script>
+      (function() {
+        try {
+          // iOS WKWebView (нативный клиент VK на iPhone / iPad)
+          if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.VKWebAppInit) {
+            window.webkit.messageHandlers.VKWebAppInit.postMessage({});
+          }
+          // Android WebView (нативный клиент VK на Android)
+          if (window.AndroidBridge && typeof window.AndroidBridge.VKWebAppInit === 'function') {
+            window.AndroidBridge.VKWebAppInit(JSON.stringify({}));
+          }
+          // Desktop Web / Mobile Web Iframe (vk.com, vk.ru, m.vk.com)
+          if (window.parent && window.parent !== window) {
+            window.parent.postMessage({ handler: 'VKWebAppInit', params: {}, type: 'vk-connect' }, '*');
+            window.parent.postMessage({ type: 'vk-connect', data: { handler: 'VKWebAppInit', params: {} } }, '*');
+          }
+        } catch (e) {}
+      })();
+    </script>
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#ccd3e0" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="IT-Старт" />
+    <meta name="description" content="IT-Старт: агрегатор стажировок и Junior-вакансий с интерактивными роадмапами, базой вопросов и уведомлениями в Telegram и ВКонтакте" />
+    <title>IT-Старт | Стажировки, Роадмапы, Telegram & VK Боты</title>
+    <!-- Inline Light Mode Initialization -->
+    <script>
+      (function() {
+        try {
+          document.documentElement.classList.add('light');
+          document.documentElement.classList.remove('dark');
+          localStorage.setItem('it_start_theme', 'light');
+        } catch (e) {}
+      })();
+    </script>
+    <!-- Telegram Mini App Official WebApp Script -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script type="module" crossorigin src="./assets/index-BgES7PRi.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/rolldown-runtime-WkwZ5CU-.js">
+    <link rel="modulepreload" crossorigin href="./assets/vendor-icons-teqUZ8Z1.js">
+    <link rel="modulepreload" crossorigin href="./assets/vendor-react-MjarHA6-.js">
+    <link rel="modulepreload" crossorigin href="./assets/vendor-supabase-1yby8ldT.js">
+    <link rel="modulepreload" crossorigin href="./assets/vendor-vk-NSow72zy.js">
+    <link rel="stylesheet" crossorigin href="./assets/index-DwJtGaqx.css">
+  </head>
+  <body class="antialiased selection:bg-neutral-900 selection:text-white">
+    <div id="root"></div>
+  </body>
+</html>
