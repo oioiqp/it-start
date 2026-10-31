@@ -38,7 +38,7 @@ async function main() {
 
     // 2. Validate strict IT vacancy requirements
     const isStrictIT = isStrictVacancyPost(row.title || '', row.description || '');
-    if (!isStrictIT) {
+    if (!isStrictIT && row.id !== 'int-38') {
       console.log(`❌ Нецелевая / спам / не-IT вакансия к удалению: [${row.id}] ${row.company} — ${row.title}`);
       toDelete.push(row.id);
       continue;
@@ -46,19 +46,30 @@ async function main() {
 
     // 3. Normalize salary & URLs
     const formattedSalary = formatSalary(row.salary);
-    const resolvedUrl = resolveApplyUrl(
+    let title = row.title;
+    let resolvedUrl = resolveApplyUrl(
       row.source_url || row.url,
       row.company,
       row.source_name,
       row.direction
     );
 
+    // Specific corrections for historical rows
+    if (row.id === 'int-38') {
+      title = 'Стажёр Backend C# / .NET Developer (Directum RX)';
+      resolvedUrl = 'https://career.directum.ru/vacancy/backend-csharp';
+    } else if (row.id === 'bot-t1-3') {
+      resolvedUrl = 'https://career.t1.ru/vacancies/qa-automation';
+    } else if (row.id === 'hh-3529-138722040') {
+      resolvedUrl = 'https://hh.ru/vacancy/138722040';
+    }
+
     const format = row.format || 'Удаленно';
     const city = row.city || row.location || 'Москва / Удаленно';
 
     validRowsToUpdate.push({
       id: row.id,
-      title: row.title,
+      title,
       company: row.company,
       direction: row.direction || 'backend',
       sub_track: row.sub_track || 'python',
@@ -168,8 +179,13 @@ async function main() {
       !r.source_url ||
       r.source_url.includes('?search=') ||
       r.source_url.includes('?direction=') ||
+      r.source_url.includes('lead_product_owner') ||
       r.source_url === 'https://career.avito.com/' ||
       r.source_url === 'https://career.avito.com' ||
+      r.source_url === 'https://avito.ru/' ||
+      r.source_url === 'https://avito.ru' ||
+      r.source_url === 'https://www.avito.ru/' ||
+      r.source_url === 'https://www.avito.ru' ||
       r.source_url === 'https://hh.ru' ||
       r.source_url === 'https://hh.ru/' ||
       r.source_url === 'https://career.directum.ru/' ||

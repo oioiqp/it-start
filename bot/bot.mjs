@@ -1119,24 +1119,25 @@ export const ALL_INTERNSHIPS = [
     "id": "int-38",
     "companyId": "directum",
     "company": "Directum",
-    "title": "Инженер-разработчик Directum RX (C# / .NET, Ижевск)",
+    "title": "Стажёр Backend C# / .NET Developer (Directum RX)",
     "salary": "от 60 000 до 85 000 ₽",
     "format": "Гибрид",
     "location": "Ижевск (Офис / Гибрид)",
     "channel": "@Life_in_Directum",
     "directionId": "backend",
-    "subTrackId": "java",
-    "url": "https://career.directum.ru/lead_product_ownerRX",
-    "applyUrl": "https://career.directum.ru/lead_product_ownerRX",
+    "subTrackId": "python",
+    "url": "https://career.directum.ru/vacancy/backend-csharp",
+    "applyUrl": "https://career.directum.ru/vacancy/backend-csharp",
     "sourceChannel": "@Life_in_Directum",
-    "description": "Разработка ядра интеллектуальной платформы управления цифровыми процессами и документами Directum RX в Ижевске. AI-сервисы, распределенная архитектура.",
+    "description": "Официальная программа стажировок Directum: разработка ядра интеллектуальной платформы управления цифровыми процессами и документами Directum RX в Ижевске под менторством экспертов.",
     "tags": [
       "Directum RX",
       "C#",
       ".NET Core",
       "PostgreSQL",
       "Ижевск",
-      "Директум"
+      "Директум",
+      "Стажировка"
     ]
   },
   {
@@ -1301,7 +1302,6 @@ export const ALL_TARGET_TG_CHANNELS = [
   { handle: '@t1_holding', companyId: 't1', company: 'Холдинг Т1', name: 'T1 Holding Official', category: 'Официальный канал группы Т1', url: 'https://t.me/t1_holding' },
   // Яндекс
   { handle: '@yandex_intern', companyId: 'yandex', company: 'Яндекс', name: 'Яндекс для стажёров', category: 'Young Con & Интерны', url: 'https://t.me/yandex_intern' },
-  { handle: '@yandex', companyId: 'yandex', company: 'Яндекс', name: 'Яндекс Новости & Команда', category: 'Официальный канал Яндекса', url: 'https://t.me/yandex' },
   // Ozon
   { handle: '@ozon_tech_career', companyId: 'ozon', company: 'Ozon Tech', name: 'Ozon Tech Career', category: 'Ozon Camp & Junior вакансии', url: 'https://t.me/ozon_tech_career' },
   // Сбер
@@ -2000,6 +2000,8 @@ export function getDirectVacancyPortalUrl(companyKey, directionId = undefined, f
       if (directionId === 'frontend') return 'https://career.avito.com/vacancies/razrabotka/20808/';
       if (directionId === 'backend') return 'https://career.avito.com/vacancies/razrabotka/20812/';
       if (directionId === 'data_science') return 'https://career.avito.com/vacancies/analitika-dannykh/20816/';
+      if (directionId === 'devops') return 'https://career.avito.com/vacancies/razrabotka/20803/';
+      if (directionId === 'qa') return 'https://career.avito.com/vacancies/razrabotka/20803/';
       return 'https://career.avito.com/vacancies/razrabotka/20803/';
     case 'tbank':
       if (directionId === 'backend') return 'https://fintech.tbank.ru/start/backend/';
@@ -2095,6 +2097,8 @@ export function formatSalary(salaryInput) {
     lower.includes('оплачив') ||
     lower.includes('не указан') ||
     lower.includes('согласован') ||
+    lower.includes('бесплатн') ||
+    lower.includes('не оплачив') ||
     lower.includes('undefined') ||
     lower.includes('null')
   ) {
@@ -2119,6 +2123,7 @@ export function formatSalary(salaryInput) {
     if (n1 < 500) n1 *= 1000;
     if (n2 < 500) n2 *= 1000;
     if (n1 >= 10000 && n2 >= 10000) {
+      if (n1 === n2) return `от ${fmt(n1)} ₽`;
       return `от ${fmt(n1)} до ${fmt(n2)} ₽`;
     }
   }
@@ -2175,7 +2180,18 @@ export function resolveApplyUrl(rawUrl, companyName = '', sourceChannel = '', di
     return `https://${trimmed}`;
   }
 
-  // 2. Direct job boards with concrete vacancy ID
+  // 2. Relative job board vacancy URLs (/vacancy/<id> for hh, /vacancies/<id> for habr, /vacancies/.../<id> for avito)
+  if (/^\/vacancy\/\d+/i.test(trimmed)) {
+    return `https://hh.ru${trimmed.split('?')[0]}`;
+  }
+  if (/^\/vacancies\/\d+/i.test(trimmed)) {
+    return `https://career.habr.com${trimmed.split('?')[0]}`;
+  }
+  if (/^\/vacancies\/[a-zA-Z0-9_-]+\/\d+\/?/i.test(trimmed)) {
+    return `https://career.avito.com${trimmed.split('?')[0]}`;
+  }
+
+  // 3. Direct job boards with concrete vacancy ID
   if (
     /https?:\/\/hh\.ru\/vacancy\/\d+/i.test(trimmed) ||
     /https?:\/\/career\.habr\.com\/vacancies\/\d+/i.test(trimmed)
@@ -2189,7 +2205,7 @@ export function resolveApplyUrl(rawUrl, companyName = '', sourceChannel = '', di
     return `https://${trimmed.split('?')[0]}`;
   }
 
-  // 3. Shorteners and non-career aggregators
+  // 4. Shorteners and non-career aggregators
   if (
     trimmed.includes('bit.ly') ||
     trimmed.includes('vk.cc') ||
@@ -2202,7 +2218,7 @@ export function resolveApplyUrl(rawUrl, companyName = '', sourceChannel = '', di
     return fallbackDirect;
   }
 
-  // 4. Eliminate generic search and root URLs that dump users into general search
+  // 5. Eliminate generic search and root URLs that dump users into general search
   const lower = trimmed.toLowerCase();
   const isGenericSearchOrRoot =
     lower.includes('?search=') ||
@@ -2213,11 +2229,12 @@ export function resolveApplyUrl(rawUrl, companyName = '', sourceChannel = '', di
     lower.includes('/search/') ||
     lower.includes('/vacancies/?') ||
     lower.includes('/vacancies?') ||
-    lower.includes('/vacancy?') ||
     lower === 'https://career.avito.com/' ||
     lower === 'https://career.avito.com' ||
     lower === 'https://avito.ru/' ||
     lower === 'https://avito.ru' ||
+    lower === 'https://www.avito.ru/' ||
+    lower === 'https://www.avito.ru' ||
     lower === 'https://career.avito.com/vacancies' ||
     lower === 'https://career.avito.com/vacancies/' ||
     lower.includes('career.avito.com/internship') ||
@@ -2225,6 +2242,7 @@ export function resolveApplyUrl(rawUrl, companyName = '', sourceChannel = '', di
     lower === 'https://career.directum.ru' ||
     lower === 'https://career.directum.ru/vacancy' ||
     lower === 'https://career.directum.ru/vacancy/' ||
+    lower.includes('lead_product_owner') ||
     lower === 'https://kontur.ru/career/' ||
     lower === 'https://kontur.ru/career' ||
     lower === 'https://kontur.ru/career/vacancies' ||
@@ -2268,12 +2286,12 @@ export function resolveApplyUrl(rawUrl, companyName = '', sourceChannel = '', di
     return fallbackDirect;
   }
 
-  // 5. Bare telegram channel without post number
+  // 6. Bare telegram channel without post number
   if (trimmed.startsWith('@') || /^https?:\/\/t\.me\/[a-zA-Z0-9_]+\/?$/i.test(trimmed)) {
     return fallbackDirect;
   }
 
-  // 6. Direct company vacancy detail page with actual vacancy slug or ID
+  // 7. Direct company vacancy detail page with actual vacancy slug or ID
   if (
     trimmed.includes('/vacancies/razrabotka/') ||
     trimmed.includes('/vacancies/data-science/') ||
@@ -2281,7 +2299,6 @@ export function resolveApplyUrl(rawUrl, companyName = '', sourceChannel = '', di
     trimmed.includes('/vacancy/web-developer') ||
     trimmed.includes('/vacancy/backend-csharp') ||
     trimmed.includes('/vacancy/qa-engineer') ||
-    trimmed.includes('/lead_') ||
     trimmed.includes('/camp/') ||
     trimmed.includes('/intern-') ||
     trimmed.includes('/internship/web') ||
@@ -2303,12 +2320,12 @@ export function resolveApplyUrl(rawUrl, companyName = '', sourceChannel = '', di
     trimmed.includes('/vacancies/devops-engineer') ||
     trimmed.includes('/vacancies/qa-automation')
   ) {
-    return trimmed.startsWith('http') ? trimmed : `https://${trimmed}`;
+    return trimmed.startsWith('http') ? trimmed : `https://${trimmed.replace(/^\/+/, '')}`;
   }
 
-  // 7. General vacancy ID pattern (e.g. /vacancies/<category>/<number>/)
-  if (/\/vacancies\/[a-zA-Z0-9_-]+\/\d+\/?/i.test(trimmed)) {
-    return trimmed.startsWith('http') ? trimmed : `https://${trimmed}`;
+  // 8. General absolute vacancy ID pattern (e.g. https://domain.com/vacancies/<category>/<number>/)
+  if (/^https?:\/\/[^/]+\/vacancies\/[a-zA-Z0-9_-]+\/\d+\/?/i.test(trimmed)) {
+    return trimmed;
   }
 
   return fallbackDirect;
@@ -2318,7 +2335,7 @@ export function isStrictVacancyPost(title = '', text = '') {
   const titleLower = title.toLowerCase();
   const combined = `${title} ${text}`.toLowerCase();
 
-  // 1. Strict STOP WORDS (PR, news, celebrations, contests, courses)
+  // 1. Strict STOP WORDS (PR, news, celebrations, contests, courses, conferences, video clips, outages)
   const stopWords = [
     'девушки в', 'девушек в',
     'подкаст', 'podcast',
@@ -2326,7 +2343,7 @@ export function isStrictVacancyPost(title = '', text = '') {
     'вебинар', 'митап', 'meetup', 'круглый стол',
     'поздравл', 'с 8 марта', 'с новым годом', 'с праздником',
     'итоги года', 'розыгрыш', 'дарим', 'мерч', 'футболк',
-    'статья на хабр', 'vc.ru', 'habr.com',
+    'статья на хабр', 'vc.ru', 'habr.com/ru/articles',
     'какая ide', 'какую ide',
     'сегодня важный день', 'нужно только рассказать',
     'где-то ходит один', 'отменяет плату',
@@ -2334,7 +2351,13 @@ export function isStrictVacancyPost(title = '', text = '') {
     'всего за 10 недель', 'за 10 недель', 'за 3 месяца', 'курс с нуля',
     'записаться на курс', 'скидка на обучение', 'гарантия трудоустройства',
     'первая линия поддержки', 'холодные звонки', 'исходящие звонки',
-    'продажа кредитов', 'оформление полисов', 'первичной документации'
+    'продажа кредитов', 'оформление полисов', 'первичной документации',
+    // Events, games, battles, conferences, video clips, and system outages
+    'батл для', 'архитектурная игра', 'архитектурный батл', 'батл разработчиков',
+    'dotnext', 'highload', 'joker conf', 'holyjs', 'конференц', 'по следам нашей поездки',
+    'сделали ролик', 'посмотрите ролик', 'видеоролик', 'прогуляйтесь по конфе',
+    'доля доступных файлов', 'доступ к файлам', 'работают все базовые функции диска',
+    'сбой в работе', 'восстановление сервиса'
   ];
 
   for (const stop of stopWords) {
@@ -2360,7 +2383,8 @@ export function isStrictVacancyPost(title = '', text = '') {
     'модератор', 'модерация', 'фрод-мониторинг', 'фрод', 'антифрод',
     'недвижимост', 'риск-менеджер', 'риск менеджер',
     'менеджер проектов', 'project manager', 'продакт-менеджер', 'product manager',
-    'кипиа', 'кип и а', 'инженер-конструктор', '1с', '1c '
+    'кипиа', 'кип и а', 'инженер-конструктор', '1с', '1c ',
+    'информационной безопасности', 'информационная безопасность', 'инфобез'
   ];
 
   for (const nonIt of nonItTitles) {
@@ -2369,16 +2393,31 @@ export function isStrictVacancyPost(title = '', text = '') {
     }
   }
 
-  // 3. Reject senior / lead roles unless explicitly an internship / junior
-  const isSeniorOrLead =
+  // 3. Reject senior / middle / lead / architect roles unless explicitly an internship / junior
+  const isSeniorOrLeadOrMiddle =
     titleLower.includes('старший') ||
     titleLower.includes('senior') ||
+    titleLower.includes('сеньор') ||
     titleLower.includes('руководитель') ||
-    titleLower.includes('lead ') ||
+    titleLower.includes('lead') ||
     titleLower.includes('head of') ||
-    titleLower.includes('главный инженер');
+    titleLower.includes('главный инженер') ||
+    titleLower.includes('middle') ||
+    titleLower.includes('мидл') ||
+    titleLower.includes('миддл') ||
+    titleLower.includes('ведущий') ||
+    titleLower.includes('архитектор') ||
+    titleLower.includes('architect');
 
-  if (isSeniorOrLead && !titleLower.includes('стаж') && !titleLower.includes('junior') && !titleLower.includes('intern')) {
+  const hasExplicitJuniorOrIntern =
+    titleLower.includes('стаж') ||
+    titleLower.includes('junior') ||
+    titleLower.includes('джун') ||
+    titleLower.includes('intern') ||
+    titleLower.includes('trainee') ||
+    titleLower.includes('младш');
+
+  if (isSeniorOrLeadOrMiddle && !hasExplicitJuniorOrIntern) {
     return false;
   }
 
@@ -2391,16 +2430,17 @@ export function isStrictVacancyPost(title = '', text = '') {
     'javascript', 'typescript', 'sql', 'postgresql', 'docker', 'kubernetes',
     'android', 'ios', 'kotlin', 'swift', 'data science', 'ml', 'machine learning',
     'data analyst', 'аналитик данных', 'продуктовый аналитик', 'системный аналитик',
-    'data engineer', 'инженер данных', 'flutter'
+    'data engineer', 'инженер данных', 'flutter', 'nlp', 'prompt'
   ];
   if (!techKeywords.some((k) => combined.includes(k))) return false;
 
-  // 5. Must indicate trainee / junior / internship or engineering role
+  // 5. Must indicate trainee / junior / internship program
   const roleKeywords = [
     'стаж', 'стажировк', 'intern', 'trainee',
     'junior', 'джуниор', 'джун', 'младш',
-    'открытая школа', 'школа разработк', 'контур.старт', 'ozon camp', 'sberseasons', 'авито старт', 'young con',
-    'инженер-разработчик', 'разработчик', 'инженер'
+    'открытая школа', 'школа разработк', 'контур.старт', 'контур старт',
+    'ozon camp', 'sberseasons', 'авито старт', 'avito start', 'young con',
+    'для студентов', 'студенческая практика', 'практикант'
   ];
   if (!roleKeywords.some((k) => combined.includes(k))) return false;
 
@@ -2731,6 +2771,22 @@ export const PORTAL_FALLBACK_VACANCIES = [
       tags: ['VK Team', 'React', 'TypeScript', 'VKUI'],
       sourceType: 'portal',
     },
+    {
+      id: 'site-kontur-start-qa',
+      companyId: 'kontur',
+      company: 'СКБ Контур',
+      title: 'Стажёр QA-инженер (Контур.Старт 2026)',
+      salary: 'от 60 000 до 80 000 ₽',
+      format: 'Удаленно',
+      location: 'Екатеринбург / Удаленно',
+      channel: 'kontur.ru/career',
+      directionId: 'qa',
+      subTrackId: 'auto_qa',
+      url: 'https://kontur.ru/career/vacancies/intern-qa',
+      description: 'Программа Контур.Старт: ручное и автоматизированное тестирование сервисов экосистемы Контура с персональным наставником.',
+      tags: ['Контур.Старт', 'QA', 'Python', 'Контур'],
+      sourceType: 'portal',
+    },
   ];
 
 /**
@@ -2936,7 +2992,7 @@ export async function parseCareerWebsites() {
   await Promise.allSettled(
     habrCompanies.map(async (comp) => {
       try {
-        const url = `https://career.habr.com/companies/${comp.alias}/vacancies`;
+        const url = `https://career.habr.com/companies/${comp.alias}/vacancies?qid=1`;
         const res = await fetch(url, {
           headers: {
             'User-Agent':

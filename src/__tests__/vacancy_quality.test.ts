@@ -54,9 +54,13 @@ describe('Vacancy Quality & Link Integrity Verification', () => {
       expect(isStrictVacancyPost('Подкаст про IT карьеру', 'Слушайте новый выпуск')).toBe(false);
       expect(isStrictVacancyPost('Поздравляем с 8 марта!', 'Дарим мерч и подарки')).toBe(false);
       expect(isStrictVacancyPost('Опрос: какую IDE вы используете?', 'Голосуйте в канале')).toBe(false);
+      // Real Telegram news / conference / event / outage posts
+      expect(isStrictVacancyPost('По следам нашей поездки на DotNext ребята сами, без ИИ, сделали ролик...', 'За два дня конференции мы выступили с докладами')).toBe(false);
+      expect(isStrictVacancyPost('Делаем в Новосибирске батл для backend-разработчиков 🎉', 'Kontur Verse — архитектурная игра')).toBe(false);
+      expect(isStrictVacancyPost('В ближайшие дни доля доступных файлов будет увеличиваться . При это...', 'Инженеры Яндекса делают всё возможное')).toBe(false);
     });
 
-    it('rejects non-IT roles (sales, support, legal, accounting, logistics, HR)', () => {
+    it('rejects non-IT roles (sales, support, legal, accounting, logistics, HR, infosec)', () => {
       expect(isStrictVacancyPost('Младший специалист по продажам', 'B2B продажи')).toBe(false);
       expect(isStrictVacancyPost('Оператор call-центра', 'Прием входящих звонков')).toBe(false);
       expect(isStrictVacancyPost('Младший юрист', 'Договорная работа')).toBe(false);
@@ -67,12 +71,22 @@ describe('Vacancy Quality & Link Integrity Verification', () => {
       expect(isStrictVacancyPost('Младший риск-менеджер (недвижимость)', 'Оценка рисков')).toBe(false);
       expect(isStrictVacancyPost('Младший инженер КИПиА', 'Автоматика')).toBe(false);
       expect(isStrictVacancyPost('1С-программист стажер', 'Доработка конфигураций 1С')).toBe(false);
+      expect(isStrictVacancyPost('Инженер по информационной безопасности', 'Защита данных')).toBe(false);
+      expect(isStrictVacancyPost('Младший инженер по информационной безопасности', 'Безопасность')).toBe(false);
     });
 
-    it('rejects senior/lead roles without internship indicator', () => {
+    it('rejects senior/lead/middle roles without internship indicator', () => {
       expect(isStrictVacancyPost('Senior Python Developer', 'Разработка сервисов')).toBe(false);
       expect(isStrictVacancyPost('Старший разработчик React', 'Команда разработки')).toBe(false);
       expect(isStrictVacancyPost('Руководитель группы тестирования', 'Управление QA')).toBe(false);
+      expect(isStrictVacancyPost('Middle Java Developer', 'Разработка бэкенда')).toBe(false);
+      expect(isStrictVacancyPost('Мидл бэкенд разработчик', 'Сервисы')).toBe(false);
+      expect(isStrictVacancyPost('Ведущий инженер по качеству', 'QA')).toBe(false);
+      // General non-internship developer positions without junior/intern keywords
+      expect(isStrictVacancyPost('Scala разработчик', 'Разработка на Scala')).toBe(false);
+      expect(isStrictVacancyPost('Go-разработчик, Товародвижение и коммерция', 'Микросервисы')).toBe(false);
+      expect(isStrictVacancyPost('Бэкенд разработчик Java | Python | Go | C++', 'Высокие нагрузки')).toBe(false);
+      expect(isStrictVacancyPost('Разработчик на Java в команду B2B-платформы Яндекс 360', 'B2B')).toBe(false);
     });
 
     it('accepts legitimate junior / internship engineering roles across 6 directions', () => {
@@ -82,6 +96,7 @@ describe('Vacancy Quality & Link Integrity Verification', () => {
       expect(isStrictVacancyPost('Junior QA Automation', 'Автоматизация тестирования на Java')).toBe(true);
       expect(isStrictVacancyPost('Стажёр DevOps / SRE', 'Kubernetes, CI/CD, Docker')).toBe(true);
       expect(isStrictVacancyPost('Стажёр Data Scientist', 'ML, Python, PyTorch')).toBe(true);
+      expect(isStrictVacancyPost('Стажёр Backend C# / .NET Developer (Directum RX)', 'Разработка ядра платформы')).toBe(true);
     });
   });
 
@@ -97,9 +112,24 @@ describe('Vacancy Quality & Link Integrity Verification', () => {
         .not.toContain('?search=');
     });
 
+    it('resolves relative job board and Avito vacancy URLs properly without triple slashes', () => {
+      expect(resolveApplyUrl('/vacancy/138722040?query=sber', 'Сбер', undefined, 'backend'))
+        .toBe('https://hh.ru/vacancy/138722040');
+      expect(resolveApplyUrl('/vacancies/1000168452', 'Яндекс', undefined, 'backend'))
+        .toBe('https://career.habr.com/vacancies/1000168452');
+      expect(resolveApplyUrl('/vacancies/razrabotka/20805/', 'Авито', undefined, 'mobile'))
+        .toBe('https://career.avito.com/vacancies/razrabotka/20805/');
+    });
+
     it('resolves generic homepages to directional direct portals', () => {
       const avitoDirect = resolveApplyUrl('https://career.avito.com/', 'Авито', undefined, 'mobile');
       expect(avitoDirect).toBe('https://career.avito.com/vacancies/razrabotka/20805/');
+
+      const avitoDevops = resolveApplyUrl('https://career.avito.com', 'Авито', undefined, 'devops');
+      expect(avitoDevops).toBe('https://career.avito.com/vacancies/razrabotka/20803/');
+
+      const avitoSearch = resolveApplyUrl('https://career.avito.com/vacancies/?search=стажер', 'Авито', undefined, 'frontend');
+      expect(avitoSearch).toBe('https://career.avito.com/vacancies/razrabotka/20808/');
 
       const tbankDirect = resolveApplyUrl('https://tbank.ru', 'Т-Банк', undefined, 'frontend');
       expect(tbankDirect).toBe('https://fintech.tbank.ru/start/frontend/');
@@ -112,6 +142,9 @@ describe('Vacancy Quality & Link Integrity Verification', () => {
 
       const directumDirect = resolveApplyUrl('https://career.directum.ru', 'Directum', undefined, 'frontend');
       expect(directumDirect).toBe('https://career.directum.ru/vacancy/web-developer');
+
+      const directumLead = resolveApplyUrl('https://career.directum.ru/lead_product_ownerRX', 'Directum', undefined, 'backend');
+      expect(directumLead).toBe('https://career.directum.ru/vacancy/backend-csharp');
     });
 
     it('preserves valid Telegram post URLs with post IDs', () => {
