@@ -1575,8 +1575,8 @@ const server = http.createServer(async (req, res) => {
         const actionLabel = actionButton?.text || (directUrl?.includes('t.me') ? '🔗 Открыть пост' : '🔗 Откликнуться');
 
         if (isVkTarget) {
-          const { sendVkNotification, createVkKeyboard, VK_APP_ID, registerVkSubscriber } = await import('./vk_bot.mjs');
-          const cleanPeerId = String(chatId).replace(/^vk_/, '');
+          const { sendVkNotification, createVkKeyboard, VK_APP_ID, registerVkSubscriber, cleanVkPeerId } = await import('./vk_bot.mjs');
+          const cleanPeerId = cleanVkPeerId(chatId);
 
           // Auto-register VK subscriber so future monitoring pushes also deliver
           registerVkSubscriber(cleanPeerId, { first_name: 'Пользователь VK' }).catch((e) =>
@@ -1650,8 +1650,8 @@ const server = http.createServer(async (req, res) => {
         const isVkTarget = platform === 'vk' || String(chatId).startsWith('vk_');
 
         if (isVkTarget) {
-          const { registerVkSubscriber, sendVkNotification } = await import('./vk_bot.mjs');
-          const cleanPeerId = String(chatId).replace(/^vk_/, '');
+          const { registerVkSubscriber, sendVkNotification, cleanVkPeerId } = await import('./vk_bot.mjs');
+          const cleanPeerId = cleanVkPeerId(chatId);
           const sub = await registerVkSubscriber(cleanPeerId, {
             username,
             first_name: firstName,
@@ -2998,43 +2998,48 @@ export async function scanChannelsAndSyncSupabase(notifySubscribers = true) {
             (v) => subDirs.includes(v.directionId) || subTracks.includes(v.subTrackId)
           );
 
-          for (const item of matching.slice(0, 2)) {
+          let sentForSub = 0;
+          for (const item of matching) {
+            if (sentForSub >= 2) break;
             const key = `${sub.chat_id}_${item.id}`;
-            if (!notifiedKeys.has(key)) {
-              notifiedKeys.add(key);
+            if (notifiedKeys.has(key)) continue;
 
-              const isWeb = item.sourceType === 'portal' || item.sourceType === 'website';
-              const sourceLabel = isWeb ? 'Карьерный сайт' : 'Telegram-канал';
-              const sourceChannel = item.sourceChannel || item.channel || (isWeb ? 'Сайт работодателя' : 'Telegram-канал');
-              const directApplyUrl = item.applyUrl || item.url || WEBAPP_URL;
+            const isWeb = item.sourceType === 'portal' || item.sourceType === 'website';
+            const sourceLabel = isWeb ? 'Карьерный сайт' : 'Telegram-канал';
+            const sourceChannel = item.sourceChannel || item.channel || (isWeb ? 'Сайт работодателя' : 'Telegram-канал');
+            const directApplyUrl = item.applyUrl || item.url || WEBAPP_URL;
 
-              const pushText =
-                `🔥 <b>Новая стажировка из мониторинга ${isWeb ? 'карьерных сайтов' : 'Telegram-каналов'}!</b>\n\n` +
-                `🏢 <b>${item.company}</b> — <b>${item.title}</b>\n` +
-                `💰 Зарплата: <b>${item.salary}</b> | 📍 Формат: <b>${item.format}</b>\n` +
-                `📢 Источник: <code>${sourceChannel}</code> (${sourceLabel})\n` +
-                `🔗 Ссылка на вакансию: <a href="${directApplyUrl}">Перейти к отклику</a>\n\n` +
-                `🎯 <i>В IT-Старт уже подготовлен персональный план вопросов для этого направления!</i>`;
+            const pushText =
+              `🔥 <b>Новая стажировка из мониторинга ${isWeb ? 'карьерных сайтов' : 'Telegram-каналов'}!</b>\n\n` +
+              `🏢 <b>${item.company}</b> — <b>${item.title}</b>\n` +
+              `💰 Зарплата: <b>${item.salary}</b> | 📍 Формат: <b>${item.format}</b>\n` +
+              `📢 Источник: <code>${sourceChannel}</code> (${sourceLabel})\n` +
+              `🔗 Ссылка на вакансию: <a href="${directApplyUrl}">Перейти к отклику</a>\n\n` +
+              `🎯 <i>В IT-Старт уже подготовлен персональный план вопросов для этого направления!</i>`;
 
-              await callTelegram('sendMessage', {
-                chat_id: sub.chat_id,
-                text: pushText,
-                parse_mode: 'HTML',
-                reply_markup: {
-                  inline_keyboard: [
-                    [
-                      {
-                        text: '🚀 Открыть в WebApp',
-                        web_app: { url: WEBAPP_URL },
-                      },
-                      {
-                        text: isWeb ? '🔗 Откликнуться на сайте' : '🔗 Открыть пост с вакансией',
-                        url: directApplyUrl,
-                      },
-                    ],
+            const sendRes = await callTelegram('sendMessage', {
+              chat_id: sub.chat_id,
+              text: pushText,
+              parse_mode: 'HTML',
+              reply_markup: {
+                inline_keyboard: [
+                  [
+                    {
+                      text: '🚀 Открыть в WebApp',
+                      web_app: { url: WEBAPP_URL },
+                    },
+                    {
+                      text: isWeb ? '🔗 Откликнуться на сайте' : '🔗 Открыть пост с вакансией',
+                      url: directApplyUrl,
+                    },
                   ],
-                },
-              });
+                ],
+              },
+            });
+
+            if (sendRes.ok) {
+              notifiedKeys.add(key);
+              sentForSub++;
               sentPushesTg++;
               console.log(`[Parser] Пуш отправлен подписчику ${sub.chat_id} (${item.company})`);
             }
@@ -3046,14 +3051,14 @@ export async function scanChannelsAndSyncSupabase(notifySubscribers = true) {
     }
   }
 
-  // 5. Match and notify subscribers in VK
+  // 5. Match and notify subscribers in VK (full parity with Telegram using allToSync)
   if (notifySubscribers) {
     try {
       const { notifyVkSubscribers, syncSubscribersFromVkConversations, VK_BOT_TOKEN } = await import('./vk_bot.mjs');
       if (VK_BOT_TOKEN || process.env.VK_BOT_TOKEN || process.env.VK_GROUP_TOKEN) {
         await syncSubscribersFromVkConversations().catch(() => {});
       }
-      const vkCandidates = newlyParsed.length > 0 ? newlyParsed : allToSync;
+      const vkCandidates = allToSync;
       sentPushesVk = await notifyVkSubscribers(vkCandidates);
       if (sentPushesVk > 0) {
         console.log(`[Parser] ✅ Отправлено ${sentPushesVk} уведомлений подписчикам в VK.`);
@@ -3130,7 +3135,7 @@ export async function registerTgSubscriber(chatId, meta = {}) {
     username: meta.username || '',
     first_name: meta.first_name || 'Пользователь Telegram',
     directions: meta.directions || ['frontend', 'backend', 'mobile', 'qa', 'devops', 'data_science'],
-    sub_tracks: meta.sub_tracks || ['react', 'python', 'nodejs', 'golang', 'qa_auto', 'devops_cloud'],
+    sub_tracks: meta.sub_tracks || ['react', 'python', 'nodejs', 'golang', 'auto_qa', 'cicd_docker'],
     is_active: true,
     updated_at: new Date().toISOString(),
   };
@@ -4190,15 +4195,15 @@ async function pollUpdates() {
   console.log(`🚀 Бот @${BOT_USERNAME} успешно запущен в режиме Long Polling!`);
   console.log(`Нажмите Ctrl+C для остановки.\n`);
 
-  // Initial channel sync on startup (delayed by 3s to let HTTP server start)
+  // Initial channel sync on startup (delayed by 4s to let HTTP server start)
   setTimeout(() => {
-    scanChannelsAndSyncSupabase(false).catch((e) => console.warn('[Startup Sync]', e.message));
-  }, 3000);
+    scanChannelsAndSyncSupabase(true).catch((e) => console.warn('[Startup Sync]', e.message));
+  }, 4000);
 
-  // Periodic channel tracking every 30 minutes
+  // Periodic channel tracking every 15 minutes (ensures active monitoring within Render lifecycle)
   setInterval(() => {
     scanChannelsAndSyncSupabase(true).catch((e) => console.warn('[Periodic Sync]', e.message));
-  }, 30 * 60 * 1000);
+  }, 15 * 60 * 1000);
 
   while (isRunning) {
     try {
@@ -4250,11 +4255,11 @@ if (isDirectRun && process.env.NODE_ENV !== 'test') {
   } else {
     // When running without Telegram token, still schedule background vacancy monitoring
     setTimeout(() => {
-      scanChannelsAndSyncSupabase(false).catch((e) => console.warn('[Startup Sync]', e.message));
-    }, 3000);
+      scanChannelsAndSyncSupabase(true).catch((e) => console.warn('[Startup Sync]', e.message));
+    }, 4000);
     setInterval(() => {
       scanChannelsAndSyncSupabase(true).catch((e) => console.warn('[Periodic Sync]', e.message));
-    }, 30 * 60 * 1000);
+    }, 15 * 60 * 1000);
   }
 }
 

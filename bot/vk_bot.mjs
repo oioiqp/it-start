@@ -412,6 +412,28 @@ export function keyboardToTextMenu(keyboard) {
 }
 
 /**
+ * Normalize and extract numeric VK Peer / User ID
+ * Supports: 482655491, vk_482655491, id482655491, https://vk.com/id482655491, vk.com/id482655491
+ */
+export function cleanVkPeerId(raw) {
+  if (raw === undefined || raw === null) return '';
+  const str = String(raw).trim();
+  let cleaned = str.replace(/^vk_/i, '').trim();
+  const urlMatch = cleaned.match(/(?:(?:https?:\/\/)?(?:m\.)?vk\.com\/(?:id)?)?(\d+)/i);
+  if (urlMatch && urlMatch[1] && /^\d+$/.test(urlMatch[1])) {
+    return Number(urlMatch[1]);
+  }
+  if (/^id\d+$/i.test(cleaned)) {
+    return Number(cleaned.replace(/^id/i, ''));
+  }
+  const digits = cleaned.replace(/[^0-9-]/g, '');
+  if (/^-?\d+$/.test(digits) && digits.length >= 4) {
+    return Number(digits);
+  }
+  return /^-?\d+$/.test(cleaned) ? Number(cleaned) : cleaned;
+}
+
+/**
  * Send request to VK API
  */
 export async function callVk(method, params = {}, token = VK_BOT_TOKEN) {
@@ -424,12 +446,10 @@ export async function callVk(method, params = {}, token = VK_BOT_TOKEN) {
 
   const cleanParams = { ...params };
   if (cleanParams.peer_id !== undefined && cleanParams.peer_id !== null) {
-    const raw = String(cleanParams.peer_id).replace(/^vk_/, '');
-    cleanParams.peer_id = /^-?\d+$/.test(raw) ? Number(raw) : raw;
+    cleanParams.peer_id = cleanVkPeerId(cleanParams.peer_id);
   }
   if (cleanParams.user_id !== undefined && cleanParams.user_id !== null) {
-    const raw = String(cleanParams.user_id).replace(/^vk_/, '');
-    cleanParams.user_id = /^-?\d+$/.test(raw) ? Number(raw) : raw;
+    cleanParams.user_id = cleanVkPeerId(cleanParams.user_id);
   }
   if (method === 'messages.send' && !cleanParams.random_id) {
     cleanParams.random_id = Math.floor(Math.random() * 2147483647);
@@ -517,13 +537,14 @@ export async function callVk(method, params = {}, token = VK_BOT_TOKEN) {
  * Register a user as a VK push subscriber (synced with Supabase & in-memory)
  */
 export async function registerVkSubscriber(peerId, meta = {}) {
-  const id = String(peerId).replace(/^vk_/, '');
+  const cleanId = cleanVkPeerId(peerId);
+  const id = String(cleanId);
   const sub = {
     peer_id: id,
     first_name: meta.first_name || 'Пользователь VK',
     username: meta.username || '',
     directions: meta.directions || ['frontend', 'backend', 'mobile', 'qa', 'devops', 'data_science'],
-    sub_tracks: meta.sub_tracks || ['react', 'python', 'nodejs', 'golang', 'qa_auto', 'devops_cloud'],
+    sub_tracks: meta.sub_tracks || ['react', 'python', 'nodejs', 'golang', 'auto_qa', 'cicd_docker'],
     subscribed_at: new Date().toISOString(),
     is_active: true,
   };
@@ -553,7 +574,7 @@ export async function registerVkSubscriber(peerId, meta = {}) {
  * Unregister a VK push subscriber
  */
 export async function unregisterVkSubscriber(peerId) {
-  const id = String(peerId).replace(/^vk_/, '');
+  const id = String(cleanVkPeerId(peerId));
   const deleted = vkSubscribers.delete(id);
 
   try {
@@ -573,7 +594,7 @@ export async function unregisterVkSubscriber(peerId) {
  * Method: messages.isMessagesFromGroupAllowed
  */
 export async function isMessagesFromGroupAllowed(userId, groupId = VK_GROUP_ID, token = VK_BOT_TOKEN) {
-  const cleanUserId = Number(String(userId).replace(/^vk_/, '')) || String(userId).replace(/^vk_/, '');
+  const cleanUserId = cleanVkPeerId(userId);
   const cleanGroupId = Number(String(groupId).replace(/^-/, '')) || String(groupId).replace(/^-/, '');
 
   const tokenToUse =
@@ -610,7 +631,7 @@ export async function isMessagesFromGroupAllowed(userId, groupId = VK_GROUP_ID, 
  * interactive keyboard, permissions check and friendly Russian error mapping.
  */
 export async function sendVkNotification(peerId, text, options = {}, token = VK_BOT_TOKEN) {
-  const cleanPeerId = Number(String(peerId).replace(/^vk_/, '')) || String(peerId).replace(/^vk_/, '');
+  const cleanPeerId = cleanVkPeerId(peerId);
   if (!cleanPeerId) {
     return { ok: false, error: 'Не указан корректный peer_id получателя' };
   }
@@ -790,14 +811,20 @@ export async function getVkSubscribers() {
         console.warn('[VK Bot] Supabase error in getVkSubscribers:', error.message);
       }
       if (data && Array.isArray(data)) {
+        const activeIds = new Set();
         for (const row of data) {
           const rawChatId = String(row.chat_id || '').trim();
           if (rawChatId.startsWith('vk_')) {
-            const pid = rawChatId.replace(/^vk_/, '');
+            const cleanId = cleanVkPeerId(rawChatId);
+            const pid = String(cleanId);
+            if (!pid) continue;
+            activeIds.add(pid);
             const dirs = Array.isArray(row.directions) && row.directions.length > 0
               ? row.directions
               : ['frontend', 'backend', 'mobile', 'qa', 'devops', 'data_science'];
-            const tracks = Array.isArray(row.sub_tracks) ? row.sub_tracks : [];
+            const tracks = Array.isArray(row.sub_tracks) && row.sub_tracks.length > 0
+              ? row.sub_tracks
+              : ['react', 'python', 'nodejs', 'golang', 'auto_qa', 'cicd_docker'];
             vkSubscribers.set(pid, {
               peer_id: pid,
               first_name: row.first_name || 'Пользователь VK',
@@ -807,6 +834,11 @@ export async function getVkSubscribers() {
               subscribed_at: row.updated_at || new Date().toISOString(),
               is_active: true,
             });
+          }
+        }
+        for (const [pid, sub] of vkSubscribers.entries()) {
+          if (!activeIds.has(pid)) {
+            sub.is_active = false;
           }
         }
       }
@@ -839,7 +871,7 @@ export async function notifyVkSubscribers(vacancies = [], token = VK_BOT_TOKEN) 
   let sentCount = 0;
 
   for (const sub of subscribers) {
-    const cleanPeerId = Number(String(sub.peer_id).replace(/^vk_/, '')) || String(sub.peer_id).replace(/^vk_/, '');
+    const cleanPeerId = cleanVkPeerId(sub.peer_id);
     if (!cleanPeerId) continue;
 
     const subDirs = Array.isArray(sub.directions) ? sub.directions : [];
@@ -877,8 +909,6 @@ export async function notifyVkSubscribers(vacancies = [], token = VK_BOT_TOKEN) 
 
       const dedupeKey = `${cleanPeerId}_${vac.id || vac.title || vac.url}`;
       if (notifiedVkKeys.has(dedupeKey)) continue;
-
-      notifiedVkKeys.add(dedupeKey);
 
       const tagsStr = Array.isArray(vac.tags) && vac.tags.length > 0
         ? vac.tags.slice(0, 4).join(' • ')
@@ -925,11 +955,16 @@ export async function notifyVkSubscribers(vacancies = [], token = VK_BOT_TOKEN) 
         );
 
         if (res.ok) {
+          notifiedVkKeys.add(dedupeKey);
           sentForSub++;
           sentCount++;
           console.log(`[VK Notifier] ✅ Пуш доставлен подписчику vk_${cleanPeerId} (${vac.company} — ${vac.title})`);
         } else {
           console.warn(`[VK Notifier] ⚠️ Не удалось отправить пуш vk_${cleanPeerId}: ${res.error || 'Unknown'}`);
+          if (res.errorCode === 901 || res.errorCode === 902) {
+            // User hasn't allowed messages; break to avoid wasting rate limit on subsequent vacancies
+            break;
+          }
         }
       } catch (sendErr) {
         console.error(`[VK Notifier] ❌ Ошибка отправки пуша vk_${cleanPeerId}:`, sendErr.message);

@@ -161,11 +161,13 @@ export async function sendVkMessage(
     };
   }
 
-  const cleanPeerId = String(peerId).trim().replace(/^vk_/, '');
+  const rawStr = String(peerId).trim().replace(/^vk_/i, '');
+  const idMatch = rawStr.match(/(?:(?:https?:\/\/)?(?:m\.)?vk\.com\/(?:id)?)?(\d+)/i);
+  const cleanPeerId = idMatch && idMatch[1] ? idMatch[1] : rawStr.replace(/^id/i, '');
   if (!cleanPeerId) {
     return {
       success: false,
-      error: 'Укажите Peer ID (ID пользователя или беседы ВКонтакте).',
+      error: 'Укажите корректный Peer ID (числовой ID пользователя или беседы ВКонтакте).',
     };
   }
 
@@ -216,14 +218,31 @@ export async function sendVkMessage(
       messageId: typeof data.response === 'number' ? data.response : data.response?.[0]?.message_id || 1,
     };
   } catch (err: any) {
-    // In browser with CORS restrictions on api.vk.com directly, provide friendly feedback
-    if (err.message && err.message.includes('Failed to fetch')) {
-      return {
-        success: true,
-        messageId: Date.now(),
-        error: 'Отправка через клиентский запрос выполнена. При прямом вызове из браузера используйте серверный запуск (npm run bot:vk) для обхода CORS.',
-      };
-    }
+    // In browser with CORS restrictions on direct api.vk.com, proxy through Render server
+    try {
+      const renderRes = await fetch('https://it-start-bot.onrender.com/notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chatId: `vk_${cleanPeerId}`,
+          text,
+          platform: 'vk',
+        }),
+      });
+      if (renderRes.ok) {
+        const renderData = await renderRes.json();
+        if (renderData.success) {
+          return {
+            success: true,
+            messageId: renderData.messageId,
+          };
+        }
+        return {
+          success: false,
+          error: renderData.error || 'Ошибка отправки через сервер уведомлений',
+        };
+      }
+    } catch {}
 
     return {
       success: false,

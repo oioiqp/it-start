@@ -30,6 +30,7 @@ import { useScrollLock } from '../lib/useScrollLock';
 import {
   saveUnifiedSubscription,
   sendUnifiedTestNotification,
+  extractVkUserId,
 } from '../services/subscriptionService';
 
 export type NotificationPlatform = 'vk' | 'telegram';
@@ -273,8 +274,8 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
   };
 
   const handleTestNotification = async () => {
-    const currentId = platform === 'vk' ? vkPeerId.trim() : tgChatId.trim();
-    if (!currentId) {
+    const rawId = platform === 'vk' ? vkPeerId.trim() : tgChatId.trim();
+    if (!rawId) {
       setStatusMessage({
         type: 'error',
         text: platform === 'vk'
@@ -282,6 +283,17 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
           : 'Сначала откройте диалог с ботом выше или настройте ID вручную',
       });
       return;
+    }
+
+    const currentId = platform === 'vk' ? extractVkUserId(rawId) : rawId;
+    if (platform === 'vk') {
+      if (currentId !== vkPeerId) setVkPeerId(currentId);
+      // If inside VK Mini App, request native community messages permission
+      if (isVk || vkUser) {
+        try {
+          await requestVkNotificationsPermission(242573933);
+        } catch {}
+      }
     }
 
     setIsLoading(true);
@@ -319,7 +331,11 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
 
   const handleSaveSubscription = async (e: React.FormEvent) => {
     e.preventDefault();
-    const currentId = platform === 'vk' ? vkPeerId.trim() : tgChatId.trim();
+    const rawId = platform === 'vk' ? vkPeerId.trim() : tgChatId.trim();
+    const currentId = platform === 'vk' ? extractVkUserId(rawId) : rawId;
+    if (platform === 'vk' && currentId !== vkPeerId) {
+      setVkPeerId(currentId);
+    }
     const currentUsername = platform === 'vk' ? vkFullName.trim() : tgUsername.trim();
     const currentFirstName = platform === 'vk' ? (vkUser?.first_name || vkFullName.trim()) : tgFirstName.trim();
 

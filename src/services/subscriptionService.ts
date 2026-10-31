@@ -35,19 +35,42 @@ export interface TestNotificationParams {
 }
 
 /**
+ * Извлечь чистый числовой ID пользователя ВКонтакте
+ * Поддерживает форматы: 482655491, vk_482655491, id482655491,
+ * https://vk.com/id482655491, vk.com/id482655491, @id482655491
+ */
+export function extractVkUserId(id: string | number): string {
+  const raw = String(id || '').trim();
+  if (!raw) return '';
+  let cleaned = raw.replace(/^vk_/i, '').trim();
+  const urlMatch = cleaned.match(/(?:(?:https?:\/\/)?(?:m\.)?vk\.com\/(?:id|write)?)?(\d+)/i);
+  if (urlMatch && urlMatch[1] && /^\d+$/.test(urlMatch[1])) {
+    return urlMatch[1];
+  }
+  if (/^id\d+$/i.test(cleaned)) {
+    return cleaned.replace(/^id/i, '');
+  }
+  const digits = cleaned.replace(/[^0-9]/g, '');
+  if (digits.length >= 4) {
+    return digits;
+  }
+  return cleaned;
+}
+
+/**
  * Нормализовать ID для хранения в Supabase (добавляет префикс vk_ для ВКонтакте)
  */
 export function normalizeVkChatId(id: string | number): string {
-  const raw = String(id).trim();
-  if (!raw) return '';
-  return raw.startsWith('vk_') ? raw : `vk_${raw}`;
+  const clean = extractVkUserId(id);
+  if (!clean) return '';
+  return `vk_${clean}`;
 }
 
 /**
  * Очистить ID от префикса vk_ для вызовов VK API
  */
 export function stripVkPrefix(id: string | number): string {
-  return String(id).trim().replace(/^vk_/, '');
+  return extractVkUserId(id);
 }
 
 /**
@@ -144,15 +167,7 @@ export async function sendUnifiedTestNotification(
       `Ветки: ${tracksStr}\n\n` +
       `Как только появится новая проверенная стажировка под ваш стек, вы получите мгновенный пуш!`;
 
-    const vkToken = getSavedVkToken();
-    if (vkToken) {
-      const res = await sendVkMessage(cleanPeerId, testText, vkToken);
-      if (res.success) {
-        return { success: true, messageId: res.messageId };
-      }
-    }
-
-    // Попытка отправить через сервер Render
+    // 1. Приоритетная отправка через серверный процесс Render (официальный токен бота, обход CORS)
     const serverUrl = RENDER_URL.endsWith('/') ? RENDER_URL.slice(0, -1) : RENDER_URL;
     try {
       const res = await fetch(`${serverUrl}/notify`, {
@@ -174,7 +189,7 @@ export async function sendUnifiedTestNotification(
             success: false,
             error:
               data.error ||
-              'VK API отклонил отправку: пользователь еще не разрешил сообщения от группы. Перейдите в диалог с сообществом и отправьте /subscribe.',
+              'VK API отклонил отправку: пользователь еще не разрешил сообщения от группы. Перейдите в диалог с сообществом (https://vk.com/im?sel=-242573933) и отправьте любое сообщение.',
           };
         }
       } else {
@@ -184,11 +199,18 @@ export async function sendUnifiedTestNotification(
         };
       }
     } catch {
-      // Offline fallback: if server is unreachable
+      // 2. Резервный вызов через сохраненный токен при отсутствии связи с Render
+      const vkToken = getSavedVkToken();
+      if (vkToken) {
+        const res = await sendVkMessage(cleanPeerId, testText, vkToken);
+        if (res.success) {
+          return { success: true, messageId: res.messageId };
+        }
+      }
       return {
         success: false,
         error:
-          'Сервер уведомлений временно недоступен (пробуждение 30–50с). Подписка сохранена в базе Supabase — перейдите в диалог с сообществом ВКонтакте и отправьте /subscribe.',
+          'Сервер уведомлений временно недоступен (пробуждение 30–50с). Подписка сохранена в базе Supabase — перейдите в диалог с сообществом ВКонтакте (https://vk.com/im?sel=-242573933) и отправьте любое сообщение.',
       };
     }
   }
