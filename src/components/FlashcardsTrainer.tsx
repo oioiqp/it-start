@@ -145,7 +145,7 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
         <div className="my-auto">
           {!isFlipped ? (
             <div className="space-y-4 animate-in fade-in zoom-in-95 duration-200">
-              <span className="text-xs font-semibold uppercase tracking-wider block text-neutral-500">
+              <span className="text-xs font-semibold block text-neutral-500">
                 Вопрос собеседования:
               </span>
               <h3 className="text-lg sm:text-xl font-bold leading-snug font-sans text-neutral-950 break-words">
@@ -157,7 +157,7 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
             </div>
           ) : (
             <div className="space-y-4 animate-in fade-in zoom-in-95 duration-200">
-              <span className="text-xs font-semibold uppercase tracking-wider block text-emerald-800">
+              <span className="text-xs font-semibold block text-emerald-800">
                 Развернутый эталонный ответ:
               </span>
               <p className="text-sm leading-relaxed p-4 rounded-2xl liquid-glass-subtle text-neutral-900 break-words">

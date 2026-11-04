@@ -134,19 +134,19 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
   const getStatusBadge = () => {
     if (readinessPercent >= 80) {
       return {
-        label: 'Готов к собеседованию! 🔥',
-        color: 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 dark:bg-emerald-500/15 dark:text-emerald-400 dark:border-emerald-500/30',
+        label: 'Готов к собеседованию',
+        color: 'bg-emerald-500/10 text-emerald-700 border border-emerald-500/20 dark:bg-emerald-500/15 dark:text-emerald-400 dark:border-emerald-500/30',
       };
     }
     if (readinessPercent >= 40) {
       return {
-        label: 'В активной подготовке 🚀',
+        label: 'В активной подготовке',
         color: 'bg-neutral-100 text-neutral-800 border border-neutral-200/80 dark:bg-white/[0.06] dark:text-neutral-200 dark:border-white/10',
       };
     }
     return {
-      label: 'Начальный уровень 📚',
-      color: 'bg-amber-500/10 text-amber-600 border border-amber-500/20 dark:bg-amber-500/15 dark:text-amber-400 dark:border-amber-500/30',
+      label: 'Начальный уровень',
+      color: 'bg-amber-500/10 text-amber-700 border border-amber-500/20 dark:bg-amber-500/15 dark:text-amber-400 dark:border-amber-500/30',
     };
   };
 
@@ -274,25 +274,25 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
               <span className="text-xs text-neutral-600 dark:text-neutral-400">
                 Изучено {totalCompleted} из {totalItems} тем и профильных вопросов
               </span>
-              <span className="text-2xl font-bold text-neutral-900 dark:text-white">{readinessPercent}%</span>
+              <span className="text-2xl font-bold tabular-nums text-neutral-900 dark:text-white">{readinessPercent}%</span>
             </div>
 
             <div className="w-full h-2 rounded-full overflow-hidden bg-black/5 dark:bg-white/10">
               <div
-                className="h-full rounded-full transition-all duration-500 bg-neutral-800 dark:bg-neutral-200"
+                className="h-full rounded-full transition-all duration-300 bg-neutral-900 dark:bg-neutral-100"
                 style={{ width: `${readinessPercent}%` }}
               />
             </div>
 
             <p className="text-xs mt-2 text-neutral-500 dark:text-neutral-400">
-              💡 Отмечайте изученные разделы и вопросы прямо в этом окне — ваш прогресс сохраняется синхронно в базе данных!
+              Отмечайте изученные разделы и вопросы прямо в этом окне — ваш прогресс сохраняется синхронно в базе данных.
             </p>
           </div>
 
           {/* Section 1: Required Roadmap Steps */}
           <div>
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold uppercase tracking-wider flex items-center gap-2 font-sans text-neutral-900 dark:text-white">
+              <h3 className="text-sm font-semibold flex items-center gap-2 font-sans text-neutral-900 dark:text-white">
                 <Map className="w-4 h-4 text-neutral-500 dark:text-neutral-400" />
                 Этапы роадмапа для вакансии ({completedTopicsCount}/{relevantTopics.length})
               </h3>
@@ -412,7 +412,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
           {/* Section 2: Profile Interview Questions */}
           <div>
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold uppercase tracking-wider flex items-center gap-2 text-neutral-900 dark:text-white">
+              <h3 className="text-sm font-semibold flex items-center gap-2 text-neutral-900 dark:text-white">
                 <HelpCircle className="w-4 h-4 text-neutral-500 dark:text-neutral-400" />
                 Профильные вопросы собеседования ({completedQuestionsCount}/{relevantQuestions.length})
               </h3>

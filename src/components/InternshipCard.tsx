@@ -96,7 +96,7 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
 
           {/* Salary Glass Pill */}
           <div className="text-right shrink-0">
-            <span className="px-3 py-1 rounded-full text-xs sm:text-sm font-bold block liquid-glass-pill text-neutral-900 dark:text-white tracking-tight">
+            <span className="px-3 py-1 rounded-full text-xs sm:text-sm font-semibold tabular-nums block liquid-glass-pill text-neutral-900 dark:text-white tracking-tight">
               {formatSalary(internship.salary)}
             </span>
             <span className="text-[10px] font-medium text-neutral-500 dark:text-neutral-400 block mt-0.5 pr-1">
@@ -106,7 +106,7 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
         </div>
 
         {/* Position Title */}
-        <h3 className="text-sm sm:text-base font-bold transition-colors tracking-tight line-clamp-2 mb-2 text-neutral-950 group-hover:text-black dark:text-white dark:group-hover:text-neutral-100 font-sans">
+        <h3 className="text-sm sm:text-base font-semibold transition-colors tracking-tight line-clamp-2 mb-2 text-neutral-950 group-hover:text-black dark:text-white dark:group-hover:text-neutral-100 font-sans">
           {internship.title}
         </h3>
 
@@ -140,13 +140,13 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
           <div className="flex items-center justify-between text-[11px] mb-1.5">
             <span className="flex items-center gap-1.5 text-neutral-600 dark:text-neutral-400 font-medium">
               <Sparkles className="w-3 h-3 text-neutral-400 dark:text-neutral-500" />
-              Готовность к стеку:
+              Готовность к стеку
             </span>
-            <span className="font-bold text-neutral-900 dark:text-white">{readinessPercent}%</span>
+            <span className="font-semibold tabular-nums text-neutral-900 dark:text-white">{readinessPercent}%</span>
           </div>
           <div className="w-full h-1.5 rounded-full overflow-hidden bg-black/5 dark:bg-white/10">
             <div
-              className="h-full rounded-full transition-all duration-500 bg-neutral-800 dark:bg-neutral-200"
+              className="h-full rounded-full transition-all duration-300 bg-neutral-900 dark:bg-neutral-100"
               style={{ width: `${readinessPercent}%` }}
             />
           </div>

@@ -121,7 +121,7 @@ export function App() {
     root.classList.remove('dark');
     document.body.classList.add('light');
     document.body.classList.remove('dark');
-    if (metaThemeColor) metaThemeColor.setAttribute('content', '#dbe0ea');
+    if (metaThemeColor) metaThemeColor.setAttribute('content', '#f8fafc');
     saveLocalTheme('light');
   }, []);
 
@@ -429,20 +429,11 @@ export function App() {
   });
 
   return (
-    <div className="min-h-screen flex flex-col relative light bg-[#dbe0ea] text-neutral-900 liquid-ambient selection:bg-neutral-950 selection:text-white">
-      {/* Soft atmospheric diffused ambient light for frosted glass */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0 select-none">
-        {/* Top subtle sheen */}
-        <div className="absolute top-0 inset-x-0 h-[360px] bg-gradient-to-b from-white/70 via-white/20 to-transparent pointer-events-none" />
+    <div className="min-h-screen flex flex-col relative light bg-[#f8fafc] text-neutral-900 liquid-ambient selection:bg-neutral-950 selection:text-white">
+      {/* Quiet Canvas Background */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0 select-none bg-[#f8fafc]" />
 
-        {/* Ambient diffusion spheres - soft optical glow for Apple Liquid Glass refraction */}
-        <div className="absolute -top-[10%] -right-[5%] w-[320px] h-[320px] sm:w-[900px] sm:h-[900px] rounded-full bg-gradient-to-br from-white/70 via-slate-200/50 to-blue-200/30 blur-[40px] sm:blur-[90px] transform-gpu pointer-events-none" />
-        <div className="absolute top-[20%] -left-[10%] w-[300px] h-[300px] sm:w-[850px] sm:h-[850px] rounded-full bg-gradient-to-tr from-slate-300/40 via-zinc-200/30 to-slate-200/35 blur-[40px] sm:blur-[90px] transform-gpu pointer-events-none" />
-        <div className="hidden sm:block absolute top-[50%] -right-[6%] w-[600px] h-[600px] sm:w-[800px] sm:h-[800px] rounded-full bg-gradient-to-bl from-zinc-200/40 via-slate-200/25 to-slate-300/25 blur-[90px] transform-gpu pointer-events-none" />
-        <div className="hidden sm:block absolute -bottom-[8%] left-[8%] w-[620px] h-[620px] sm:w-[850px] sm:h-[850px] rounded-full bg-gradient-to-tr from-slate-300/30 via-zinc-200/25 to-slate-200/25 blur-[90px] transform-gpu pointer-events-none" />
-      </div>
-
-      {/* Content Layer floating on top of ambient canvas */}
+      {/* Content Layer floating on top of canvas */}
       <div className="relative z-10 flex flex-col min-h-screen">
         {/* Navbar */}
         <Navbar
@@ -564,20 +555,20 @@ export function App() {
             )}
 
             {/* Ambient typography watermark behind cards - guaranteed single line */}
-            <div className="absolute inset-x-0 -top-4 sm:-top-6 h-48 sm:h-96 flex items-center justify-center -z-10 pointer-events-none overflow-hidden select-none opacity-[0.035] blur-[0.5px]">
-              <span className="text-4xl sm:text-[120px] md:text-[160px] lg:text-[190px] font-black tracking-widest uppercase select-none leading-none text-slate-800 dark:text-white whitespace-nowrap shrink-0">
+            <div className="absolute inset-x-0 -top-4 sm:-top-6 h-48 sm:h-96 flex items-center justify-center -z-10 pointer-events-none overflow-hidden select-none opacity-[0.02]">
+              <span className="text-4xl sm:text-[120px] md:text-[160px] lg:text-[190px] font-bold tracking-widest uppercase select-none leading-none text-slate-800 dark:text-white whitespace-nowrap shrink-0">
                 IT&#8209;СТАРТ
               </span>
             </div>
 
-            {/* Hero Header - Apple Liquid Glass Minimalist */}
+            {/* Hero Header */}
             <div className="relative pt-2 sm:pt-6 pb-2 text-center space-y-2 select-none">
-              <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold liquid-glass-pill text-neutral-800 dark:text-neutral-200">
-                <span className="w-1.5 h-1.5 rounded-full bg-neutral-600 dark:bg-neutral-400" />
-                <span className="hidden sm:inline">IT Start Web • Агрегатор стажировок IT-компаний РФ</span>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium liquid-glass-pill text-neutral-700 dark:text-neutral-300">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                <span className="hidden sm:inline">IT Start Web • Каталог стажировок IT-компаний РФ</span>
                 <span className="sm:hidden">IT-Старт • Проверенные IT-стажировки</span>
               </div>
-              <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight font-sans text-neutral-900 dark:text-white">
+              <h1 className="text-2xl sm:text-4xl md:text-5xl font-semibold tracking-tight font-sans text-neutral-900 dark:text-white">
                 Агрегатор IT-стажировок
               </h1>
               <p className="text-xs sm:text-sm font-normal leading-relaxed max-w-xl mx-auto text-neutral-600 dark:text-neutral-300">
@@ -749,10 +740,10 @@ export function App() {
               <div className={`space-y-3.5 pt-3 border-t border-black/5 dark:border-white/5 ${isMobileFiltersOpen ? 'block' : 'hidden sm:block'}`}>
                 {/* Company Filter */}
                 <div className="space-y-1.5">
-                  <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-neutral-600 dark:text-neutral-400">
+                  <div className="flex items-center justify-between text-xs font-semibold text-neutral-700 dark:text-neutral-300">
                     <span className="flex items-center gap-1.5">
-                      <Building2 className="w-3.5 h-3.5 text-neutral-600 dark:text-neutral-400" />
-                      Работодатель (Топ IT-компании):
+                      <Building2 className="w-3.5 h-3.5 text-neutral-500" />
+                      Работодатель (топ IT-компании):
                     </span>
                     {selectedCompany !== 'all' && (
                       <button
@@ -806,7 +797,7 @@ export function App() {
                 {/* Sub-tracks if direction chosen */}
                 {selectedDirection !== 'all' && (
                   <div className="space-y-1.5 pt-2 border-t border-black/5 dark:border-white/5">
-                    <div className="text-[11px] font-bold uppercase tracking-wider text-neutral-600 dark:text-neutral-400">
+                    <div className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
                       Специализация:
                     </div>
                     <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 touch-pan-x overscroll-x-contain">
@@ -1058,7 +1049,7 @@ export function App() {
             </span>
             <span>•</span>
             <span className="text-[10px] px-2.5 py-0.5 rounded-full font-medium liquid-glass-pill text-neutral-700 dark:text-neutral-200">
-              Liquid Glass iOS
+              React • TypeScript • Tailwind
             </span>
             {isVk && (
               <>

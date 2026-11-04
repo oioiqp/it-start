@@ -165,7 +165,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
       <div className="rounded-[28px] sm:rounded-[32px] p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all duration-300 liquid-glass">
         <div>
           <div className="flex items-center gap-2 mb-1.5">
-            <span className="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
+            <span className="text-xs font-semibold text-neutral-600 dark:text-neutral-400">
               Специализированная ветка
             </span>
             <span className="text-xs text-neutral-400 dark:text-neutral-500">• roadmap.sh style</span>
@@ -199,13 +199,13 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
               <Trophy className="w-4 h-4 text-amber-500" />
               Прогресс роадмапа:
             </span>
-            <span className="font-bold text-neutral-900 dark:text-white">
+            <span className="font-semibold tabular-nums text-neutral-900 dark:text-white">
               {completedInTrack} из {allVisibleTopics.length} ({trackProgressPercent}%)
             </span>
           </div>
           <div className="w-full h-2 rounded-full overflow-hidden bg-black/5 dark:bg-white/10">
             <div
-              className="h-full rounded-full transition-all duration-500 bg-neutral-800 dark:bg-neutral-200"
+              className="h-full rounded-full transition-all duration-300 bg-neutral-900 dark:bg-neutral-100"
               style={{ width: `${trackProgressPercent}%` }}
             />
           </div>
@@ -218,7 +218,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
         <div className="relative">
           {/* Header of Core Section */}
           <div className="flex items-center gap-3 mb-6">
-            <div className="px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider liquid-glass-pill text-neutral-800 dark:text-neutral-200">
+            <div className="px-3.5 py-1 rounded-full text-xs font-semibold liquid-glass-pill text-neutral-800 dark:text-neutral-200">
               {currentDirection.coreTitle}
             </div>
             <div className="h-px flex-1 bg-neutral-200 dark:bg-white/10"></div>
