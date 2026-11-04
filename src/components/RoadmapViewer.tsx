@@ -131,7 +131,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
   return (
     <div className="space-y-6">
       {/* Direction Tabs (6 Main Directions) */}
-      <div className="rounded-[28px] sm:rounded-[32px] p-3 sm:p-4 transition-all duration-300 liquid-glass">
+      <div className="rounded-2xl sm:rounded-3xl p-3 sm:p-4 transition-all duration-300 liquid-glass">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
           {DIRECTIONS.map((dir) => {
             const isSelected = dir.id === selectedDirectionId;
@@ -162,10 +162,10 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
       </div>
 
       {/* Sub-track switcher & Track progress header */}
-      <div className="rounded-[28px] sm:rounded-[32px] p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all duration-300 liquid-glass">
+      <div className="rounded-2xl sm:rounded-3xl p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all duration-300 liquid-glass">
         <div>
           <div className="flex items-center gap-2 mb-1.5">
-            <span className="text-xs font-semibold text-neutral-600 dark:text-neutral-400">
+            <span className="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
               Специализированная ветка
             </span>
             <span className="text-xs text-neutral-400 dark:text-neutral-500">• roadmap.sh style</span>
@@ -199,13 +199,13 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
               <Trophy className="w-4 h-4 text-amber-500" />
               Прогресс роадмапа:
             </span>
-            <span className="font-semibold tabular-nums text-neutral-900 dark:text-white">
+            <span className="font-bold text-neutral-900 dark:text-white">
               {completedInTrack} из {allVisibleTopics.length} ({trackProgressPercent}%)
             </span>
           </div>
           <div className="w-full h-2 rounded-full overflow-hidden bg-black/5 dark:bg-white/10">
             <div
-              className="h-full rounded-full transition-all duration-300 bg-neutral-900 dark:bg-neutral-100"
+              className="h-full rounded-full transition-all duration-500 bg-neutral-800 dark:bg-neutral-200"
               style={{ width: `${trackProgressPercent}%` }}
             />
           </div>
@@ -218,7 +218,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
         <div className="relative">
           {/* Header of Core Section */}
           <div className="flex items-center gap-3 mb-6">
-            <div className="px-3.5 py-1 rounded-full text-xs font-semibold liquid-glass-pill text-neutral-800 dark:text-neutral-200">
+            <div className="px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider liquid-glass-pill text-neutral-800 dark:text-neutral-200">
               {currentDirection.coreTitle}
             </div>
             <div className="h-px flex-1 bg-neutral-200 dark:bg-white/10"></div>
@@ -253,7 +253,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
 
                   {/* Node Card */}
                   <div
-                    className={`p-4 sm:p-6 rounded-[28px] transition-all duration-300 ${
+                    className={`p-4 sm:p-6 rounded-2xl sm:rounded-3xl transition-all duration-300 ${
                       isDone
                         ? 'bg-emerald-500/10 border border-emerald-500/25 dark:bg-emerald-500/15 dark:border-emerald-500/35 liquid-glass-interactive'
                         : 'liquid-glass liquid-glass-interactive'
@@ -316,7 +316,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
 
                     {/* Interactive Subtopics Checklist */}
                     <div className="space-y-2 mb-3.5">
-                      <span className="text-[11px] font-medium block text-neutral-500 dark:text-neutral-400">
+                      <span className="text-[11px] font-medium uppercase tracking-wider block text-neutral-500 dark:text-neutral-400">
                         Ключевые темы (отметьте галочками):
                       </span>
                       <div className="grid grid-cols-1 gap-1.5">
@@ -409,7 +409,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
             <div className="absolute -left-4 sm:-left-6 top-10 w-4 sm:w-6 h-0.5 -translate-y-1/2 z-10 bg-neutral-300 dark:bg-white/15"></div>
 
             {/* Fork Card */}
-            <div className="p-5 sm:p-6 rounded-[28px] transition-colors space-y-4 liquid-glass">
+            <div className="p-5 sm:p-6 rounded-2xl sm:rounded-3xl transition-colors space-y-4 liquid-glass">
               <div className="flex items-center gap-2.5 flex-wrap">
                 <span className="px-3.5 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 shadow-xs
                   bg-neutral-900 text-white dark:bg-white dark:text-neutral-950"
@@ -483,7 +483,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
         <div className="relative">
           {/* Header of Sub-Track Section */}
           <div className="flex items-center gap-3 mb-6">
-            <div className="px-3 py-1 rounded-md text-xs font-medium liquid-glass-pill text-neutral-800 dark:text-neutral-200">
+            <div className="px-3.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wider liquid-glass-pill text-neutral-800 dark:text-neutral-200">
               Ветка: {currentDirection.subTracks.find((s) => s.id === validSubTrack)?.name}
             </div>
             <div className="h-px flex-1 bg-neutral-200 dark:bg-white/10"></div>
@@ -519,7 +519,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
 
                   {/* Node Card */}
                   <div
-                    className={`p-4 sm:p-6 rounded-[28px] transition-all duration-300 ${
+                    className={`p-4 sm:p-6 rounded-2xl sm:rounded-3xl transition-all duration-300 ${
                       isDone
                         ? 'bg-emerald-500/10 border border-emerald-500/25 dark:bg-emerald-500/15 dark:border-emerald-500/35 liquid-glass-interactive'
                         : 'liquid-glass liquid-glass-interactive'
@@ -585,7 +585,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
 
                     {/* Interactive Subtopics Checklist */}
                     <div className="space-y-2 mb-3.5">
-                      <span className="text-[11px] font-medium block text-neutral-500 dark:text-neutral-400">
+                      <span className="text-[11px] font-medium uppercase tracking-wider block text-neutral-500 dark:text-neutral-400">
                         Ключевые темы специализации (отметьте галочками):
                       </span>
                       <div className="grid grid-cols-1 gap-1.5">

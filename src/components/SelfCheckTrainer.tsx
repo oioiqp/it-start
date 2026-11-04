@@ -10,6 +10,7 @@ import {
   RefreshCw,
   Code,
   Check,
+  Sparkles,
   HelpCircle,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
@@ -126,10 +127,10 @@ export const SelfCheckTrainer: React.FC<SelfCheckTrainerProps> = ({
 
   if (!currentCard || deck.length === 0) {
     return (
-      <div className="p-8 text-center rounded-[32px] transition-colors liquid-glass">
+      <div className="p-8 text-center rounded-2xl sm:rounded-3xl transition-colors liquid-glass">
         <HelpCircle className="w-12 h-12 mx-auto mb-3 text-neutral-400 dark:text-neutral-500" />
-        <h3 className="text-base font-bold mb-1 font-sans text-neutral-900 dark:text-white">Вопросы не найдены</h3>
-        <p className="text-xs text-neutral-500 dark:text-neutral-400">
+        <h3 className="text-base font-bold mb-1 font-sans text-neutral-900 dark:text-white leading-snug">Вопросы не найдены</h3>
+        <p className="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed">
           Попробуйте выбрать другое направление или сбросить фильтры.
         </p>
       </div>
@@ -142,7 +143,7 @@ export const SelfCheckTrainer: React.FC<SelfCheckTrainerProps> = ({
   return (
     <div className="max-w-3xl mx-auto space-y-4">
       {/* Top Header & Navigation */}
-      <div className="rounded-[28px] sm:rounded-[32px] p-3 sm:p-4 flex items-center justify-between gap-3 transition-colors liquid-glass flex-wrap">
+      <div className="rounded-2xl sm:rounded-3xl p-3 sm:p-4 flex items-center justify-between gap-3 transition-colors liquid-glass flex-wrap">
         <div className="flex items-center gap-2 text-xs">
           <span className="text-neutral-600 dark:text-neutral-400">
             Вопрос <strong className="text-neutral-900 dark:text-white">{currentIndex + 1}</strong> из {deck.length}
@@ -181,7 +182,7 @@ export const SelfCheckTrainer: React.FC<SelfCheckTrainerProps> = ({
       </div>
 
       {/* Question Card */}
-      <div className="rounded-[28px] sm:rounded-[32px] p-4 sm:p-7 space-y-4 sm:space-y-5 transition-colors liquid-glass">
+      <div className="rounded-2xl sm:rounded-3xl p-4 sm:p-7 space-y-4 sm:space-y-5 transition-colors liquid-glass">
         {/* Badges */}
         <div className="flex items-center justify-between gap-2 flex-wrap">
           <div className="flex items-center gap-2 flex-wrap">
@@ -301,7 +302,7 @@ export const SelfCheckTrainer: React.FC<SelfCheckTrainerProps> = ({
             {/* User's typed answer */}
             {currentAnswer.trim() ? (
               <div className="p-4 rounded-2xl space-y-1 transition-colors liquid-glass-subtle">
-                <span className="text-[11px] font-medium block text-neutral-500 dark:text-neutral-400">
+                <span className="text-[11px] font-semibold block uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                   Ваш ответ:
                 </span>
                 <p className="text-xs sm:text-sm whitespace-pre-wrap text-neutral-800 dark:text-neutral-200">
@@ -315,9 +316,9 @@ export const SelfCheckTrainer: React.FC<SelfCheckTrainerProps> = ({
             )}
 
             {/* Reference Official Answer */}
-            <div className="p-4 sm:p-5 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 dark:bg-emerald-500/15 shadow-xs space-y-1.5 transition-colors">
-              <span className="text-[11px] font-semibold flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400">
-                <CheckCircle2 className="w-3.5 h-3.5" />
+            <div className="p-4 sm:p-5 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 dark:bg-emerald-500/15 backdrop-blur-sm sm:backdrop-blur-xl shadow-xs space-y-1.5 transition-colors">
+              <span className="text-[11px] font-semibold flex items-center gap-1.5 uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
+                <Sparkles className="w-3.5 h-3.5" />
                 Эталонный ответ:
               </span>
               <p className="text-xs sm:text-sm leading-relaxed text-neutral-800 dark:text-neutral-200">
@@ -327,7 +328,7 @@ export const SelfCheckTrainer: React.FC<SelfCheckTrainerProps> = ({
 
             {/* Key Takeaways */}
             <div className="p-4 rounded-2xl space-y-1.5 transition-colors liquid-glass-subtle">
-              <span className="text-[11px] font-medium block text-neutral-500 dark:text-neutral-400">
+              <span className="text-[11px] font-semibold uppercase tracking-wider block text-neutral-500 dark:text-neutral-400">
                 Ключевые тезисы для проверки:
               </span>
               <ul className="text-xs space-y-1 list-disc list-inside text-neutral-600 dark:text-neutral-400">

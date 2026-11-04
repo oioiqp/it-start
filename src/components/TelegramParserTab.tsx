@@ -1833,7 +1833,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
         {/* VK BOT COMMANDS CHEAT SHEET */}
         <div className="pt-2 space-y-3">
           <div className="flex items-center justify-between">
-            <h4 className="text-xs font-semibold text-neutral-700 dark:text-neutral-300 flex items-center gap-1.5">
+            <h4 className="text-xs font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider flex items-center gap-1.5">
               <Terminal className="w-3.5 h-3.5 text-neutral-500" />
               Команды VK-бота (нажмите для просмотра ответа):
             </h4>
@@ -1989,12 +1989,12 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                 <span className="sm:hidden">
                   {isPublishing
                     ? 'Публикация в TG & VK...'
-                    : 'Опубликовать стажировку и разослать пуши'}
+                    : 'Опубликовать стажировку и разослать пуши 🚀'}
                 </span>
                 <span className="hidden sm:inline">
                   {isPublishing
                     ? 'Публикация и рассылка уведомлений в Telegram & VK...'
-                    : 'Опубликовать стажировку и разослать уведомления в Telegram & VK'}
+                    : 'Опубликовать стажировку и разослать уведомления в Telegram & VK 🚀'}
                 </span>
               </span>
             </button>

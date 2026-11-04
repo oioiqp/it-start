@@ -121,7 +121,7 @@ export function App() {
     root.classList.remove('dark');
     document.body.classList.add('light');
     document.body.classList.remove('dark');
-    if (metaThemeColor) metaThemeColor.setAttribute('content', '#f8fafc');
+    if (metaThemeColor) metaThemeColor.setAttribute('content', '#dbe0ea');
     saveLocalTheme('light');
   }, []);
 
@@ -429,11 +429,20 @@ export function App() {
   });
 
   return (
-    <div className="min-h-screen flex flex-col relative light bg-[#f8fafc] text-neutral-900 liquid-ambient selection:bg-neutral-950 selection:text-white">
-      {/* Quiet Canvas Background */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0 select-none bg-[#f8fafc]" />
+    <div className="min-h-screen flex flex-col relative light bg-[#dbe0ea] text-neutral-900 liquid-ambient selection:bg-neutral-950 selection:text-white">
+      {/* Soft atmospheric diffused ambient light for frosted glass */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0 select-none">
+        {/* Top subtle sheen */}
+        <div className="absolute top-0 inset-x-0 h-[360px] bg-gradient-to-b from-white/70 via-white/20 to-transparent pointer-events-none" />
 
-      {/* Content Layer floating on top of canvas */}
+        {/* Ambient diffusion spheres - soft optical glow for Apple Liquid Glass refraction */}
+        <div className="absolute -top-[10%] -right-[5%] w-[320px] h-[320px] sm:w-[900px] sm:h-[900px] rounded-full bg-gradient-to-br from-white/70 via-slate-200/50 to-blue-200/30 blur-[40px] sm:blur-[90px] transform-gpu pointer-events-none" />
+        <div className="absolute top-[20%] -left-[10%] w-[300px] h-[300px] sm:w-[850px] sm:h-[850px] rounded-full bg-gradient-to-tr from-slate-300/40 via-zinc-200/30 to-slate-200/35 blur-[40px] sm:blur-[90px] transform-gpu pointer-events-none" />
+        <div className="hidden sm:block absolute top-[50%] -right-[6%] w-[600px] h-[600px] sm:w-[800px] sm:h-[800px] rounded-full bg-gradient-to-bl from-zinc-200/40 via-slate-200/25 to-slate-300/25 blur-[90px] transform-gpu pointer-events-none" />
+        <div className="hidden sm:block absolute -bottom-[8%] left-[8%] w-[620px] h-[620px] sm:w-[850px] sm:h-[850px] rounded-full bg-gradient-to-tr from-slate-300/30 via-zinc-200/25 to-slate-200/25 blur-[90px] transform-gpu pointer-events-none" />
+      </div>
+
+      {/* Content Layer floating on top of ambient canvas */}
       <div className="relative z-10 flex flex-col min-h-screen">
         {/* Navbar */}
         <Navbar
@@ -514,7 +523,7 @@ export function App() {
                       className="w-8 h-8 rounded-full object-cover border border-sky-500/30 shrink-0 shadow-xs"
                     />
                   ) : (
-                    <div className="w-8 h-8 rounded-full bg-sky-600 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-sky-600 to-blue-500 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
                       {telegramUser.first_name ? telegramUser.first_name.slice(0, 2).toUpperCase() : 'TG'}
                     </div>
                   )}
@@ -555,49 +564,29 @@ export function App() {
             )}
 
             {/* Ambient typography watermark behind cards - guaranteed single line */}
-            <div className="absolute inset-x-0 -top-4 sm:-top-6 h-48 sm:h-96 flex items-center justify-center -z-10 pointer-events-none overflow-hidden select-none opacity-[0.02]">
-              <span className="text-4xl sm:text-[120px] md:text-[160px] lg:text-[190px] font-bold tracking-widest uppercase select-none leading-none text-slate-800 dark:text-white whitespace-nowrap shrink-0">
+            <div className="absolute inset-x-0 -top-4 sm:-top-6 h-48 sm:h-96 flex items-center justify-center -z-10 pointer-events-none overflow-hidden select-none opacity-[0.035] blur-[0.5px]">
+              <span className="text-4xl sm:text-[120px] md:text-[160px] lg:text-[190px] font-black tracking-widest uppercase select-none leading-none text-slate-800 dark:text-white whitespace-nowrap shrink-0">
                 IT&#8209;СТАРТ
               </span>
             </div>
 
-            {/* Hero Header */}
-            <div className="relative pt-2 sm:pt-6 pb-2 text-center space-y-3 select-none">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium liquid-glass-pill text-neutral-700 dark:text-neutral-300">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                <span className="hidden sm:inline">IT Start Web • Каталог стажировок IT-компаний РФ</span>
+            {/* Hero Header - Apple Liquid Glass Minimalist */}
+            <div className="relative pt-2 sm:pt-6 pb-2 text-center space-y-2 select-none">
+              <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold liquid-glass-pill text-neutral-800 dark:text-neutral-200">
+                <span className="w-1.5 h-1.5 rounded-full bg-neutral-600 dark:bg-neutral-400" />
+                <span className="hidden sm:inline">IT Start Web • Агрегатор стажировок IT-компаний РФ</span>
                 <span className="sm:hidden">IT-Старт • Проверенные IT-стажировки</span>
               </div>
-              <h1 className="text-2xl sm:text-4xl md:text-5xl font-semibold tracking-tight font-sans text-neutral-900 dark:text-white">
+              <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight font-sans text-neutral-900 dark:text-white leading-tight">
                 Агрегатор IT-стажировок
               </h1>
               <p className="text-xs sm:text-sm font-normal leading-relaxed max-w-xl mx-auto text-neutral-600 dark:text-neutral-300">
-                Проверенные программы стажировок ведущих IT-компаний • Интерактивные роадмапы • 55+ вопросов с собеседований
+                100% реальные вакансии • Роадмапы • 55+ вопросов к собеседованиям
               </p>
-
-              {/* Product Craft: Tangible live metrics strip */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 max-w-2xl mx-auto pt-2">
-                <div className="p-3 rounded-2xl liquid-glass-subtle text-center">
-                  <div className="text-lg sm:text-2xl font-semibold tabular-nums text-neutral-950 dark:text-white">{internships.length}</div>
-                  <div className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5">открытых вакансий</div>
-                </div>
-                <div className="p-3 rounded-2xl liquid-glass-subtle text-center">
-                  <div className="text-lg sm:text-2xl font-semibold tabular-nums text-neutral-950 dark:text-white">{TARGET_COMPANIES.length}</div>
-                  <div className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5">топ-работодателей</div>
-                </div>
-                <div className="p-3 rounded-2xl liquid-glass-subtle text-center">
-                  <div className="text-lg sm:text-2xl font-semibold tabular-nums text-neutral-950 dark:text-white">{DIRECTIONS.length}</div>
-                  <div className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5">направлений стека</div>
-                </div>
-                <div className="p-3 rounded-2xl liquid-glass-subtle text-center">
-                  <div className="text-lg sm:text-2xl font-semibold tabular-nums text-neutral-950 dark:text-white">{QUESTIONS.length}</div>
-                  <div className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5">вопросов с разбором</div>
-                </div>
-              </div>
             </div>
 
             {/* Filter and Search Panel - Mobile-First Liquid Glass Capsule */}
-            <div className="rounded-[24px] sm:rounded-[32px] p-4 sm:p-6 space-y-3 sm:space-y-4 liquid-glass">
+            <div className="rounded-2xl sm:rounded-3xl p-4 sm:p-6 space-y-3 sm:space-y-4 liquid-glass">
               {/* Row 1: Search & Filter Toggles */}
               <div className="flex items-center gap-2">
                 <div className="relative flex-1 min-w-0 group">
@@ -760,10 +749,10 @@ export function App() {
               <div className={`space-y-3.5 pt-3 border-t border-black/5 dark:border-white/5 ${isMobileFiltersOpen ? 'block' : 'hidden sm:block'}`}>
                 {/* Company Filter */}
                 <div className="space-y-1.5">
-                  <div className="flex items-center justify-between text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                  <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-neutral-600 dark:text-neutral-400">
                     <span className="flex items-center gap-1.5">
-                      <Building2 className="w-3.5 h-3.5 text-neutral-500" />
-                      Работодатель (топ IT-компании):
+                      <Building2 className="w-3.5 h-3.5 text-neutral-600 dark:text-neutral-400" />
+                      Работодатель (Топ IT-компании):
                     </span>
                     {selectedCompany !== 'all' && (
                       <button
@@ -817,7 +806,7 @@ export function App() {
                 {/* Sub-tracks if direction chosen */}
                 {selectedDirection !== 'all' && (
                   <div className="space-y-1.5 pt-2 border-t border-black/5 dark:border-white/5">
-                    <div className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                    <div className="text-[11px] font-bold uppercase tracking-wider text-neutral-600 dark:text-neutral-400">
                       Специализация:
                     </div>
                     <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 touch-pan-x overscroll-x-contain">
@@ -914,13 +903,13 @@ export function App() {
               </div>
 
               {filteredInternships.length === 0 ? (
-                <div className="p-12 text-center rounded-[28px] sm:rounded-[32px] space-y-3 liquid-glass text-neutral-700 dark:text-neutral-300">
+                <div className="p-8 sm:p-12 text-center rounded-2xl sm:rounded-3xl space-y-3 liquid-glass text-neutral-700 dark:text-neutral-300">
                   <Briefcase className="w-12 h-12 text-neutral-400 dark:text-neutral-500 mx-auto" />
-                  <h3 className="text-base font-bold text-neutral-900 dark:text-white font-sans">
+                  <h3 className="text-base font-bold text-neutral-900 dark:text-white font-sans leading-snug">
                     Стажировки по заданным фильтрам не найдены
                   </h3>
-                  <p className="text-xs text-neutral-500 dark:text-neutral-400 max-w-md mx-auto">
-                    Попробуйте сбросить фильтры или добавьте новую вакансию в симуляторе парсера.
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400 max-w-md mx-auto leading-relaxed">
+                    Попробуйте сбросить фильтры или добавьте новую вакансию в симуляторе парсера!
                   </p>
                   <button
                     onClick={() => {
@@ -1026,9 +1015,9 @@ export function App() {
               IT
             </div>
             <div>
-              <span className="font-semibold text-neutral-900 dark:text-neutral-100 font-sans">IT-Старт © 2026</span>
+              <span className="font-bold text-neutral-900 dark:text-neutral-100 font-sans">IT-Старт © 2026</span>
               <p className="text-[11px] text-neutral-500 dark:text-neutral-400">
-                Каталог IT-стажировок • Роадмапы • Telegram и VK боты
+                100% реальные IT-стажировки • Роадмапы • Telegram & VK Боты
               </p>
             </div>
           </div>
@@ -1069,7 +1058,7 @@ export function App() {
             </span>
             <span>•</span>
             <span className="text-[10px] px-2.5 py-0.5 rounded-full font-medium liquid-glass-pill text-neutral-700 dark:text-neutral-200">
-              React • TypeScript • Tailwind
+              Liquid Glass iOS
             </span>
             {isVk && (
               <>

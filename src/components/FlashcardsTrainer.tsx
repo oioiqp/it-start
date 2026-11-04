@@ -84,10 +84,10 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
 
   if (!currentCard || deck.length === 0) {
     return (
-      <div className="p-8 text-center rounded-[28px] sm:rounded-[32px] transition-all liquid-glass text-neutral-800">
+      <div className="p-8 text-center rounded-2xl sm:rounded-3xl transition-all liquid-glass text-neutral-800">
         <HelpCircle className="w-12 h-12 mx-auto mb-3 text-neutral-400" />
-        <h3 className="text-lg font-bold mb-1 font-sans text-neutral-950">Вопросы не найдены</h3>
-        <p className="text-xs text-neutral-500">
+        <h3 className="text-lg font-bold mb-1 font-sans text-neutral-950 leading-snug">Вопросы не найдены</h3>
+        <p className="text-xs text-neutral-500 leading-relaxed">
           Попробуйте сбросить фильтры направления или ветки в панели выше.
         </p>
       </div>
@@ -106,9 +106,8 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
             Карточка {currentIndex + 1} из {deck.length}
           </span>
           {isLearned && (
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-medium text-[11px] bg-emerald-500/15 text-emerald-800 border border-emerald-500/20">
-              <CheckCircle2 className="w-3 h-3" />
-              <span>Изучено</span>
+            <span className="px-2.5 py-0.5 rounded-full font-medium text-[11px] bg-emerald-500/15 text-emerald-800 border border-emerald-500/20">
+              Изучено ✓
             </span>
           )}
           {isRepeat && (
@@ -130,7 +129,7 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
       {/* Flashcard interactive body */}
       <div
         onClick={handleFlip}
-        className="relative min-h-[340px] p-4 sm:p-8 rounded-[28px] sm:rounded-[32px] cursor-pointer select-none transition-all flex flex-col justify-between group liquid-glass liquid-glass-interactive overflow-hidden"
+        className="relative min-h-[340px] p-4 sm:p-8 rounded-2xl sm:rounded-3xl cursor-pointer select-none transition-all flex flex-col justify-between group liquid-glass liquid-glass-interactive overflow-hidden"
       >
         {/* Top Badges */}
         <div className="flex items-center justify-between gap-2 mb-4">
@@ -146,7 +145,7 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
         <div className="my-auto">
           {!isFlipped ? (
             <div className="space-y-4 animate-in fade-in zoom-in-95 duration-200">
-              <span className="text-xs font-semibold block text-neutral-500">
+              <span className="text-xs font-semibold uppercase tracking-wider block text-neutral-500">
                 Вопрос собеседования:
               </span>
               <h3 className="text-lg sm:text-xl font-bold leading-snug font-sans text-neutral-950 break-words">
@@ -158,7 +157,7 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
             </div>
           ) : (
             <div className="space-y-4 animate-in fade-in zoom-in-95 duration-200">
-              <span className="text-xs font-semibold block text-emerald-800">
+              <span className="text-xs font-semibold uppercase tracking-wider block text-emerald-800">
                 Развернутый эталонный ответ:
               </span>
               <p className="text-sm leading-relaxed p-4 rounded-2xl liquid-glass-subtle text-neutral-900 break-words">

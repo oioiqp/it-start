@@ -102,7 +102,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
   return (
     <div className="space-y-6">
       {/* Top Banner & Stats - Apple Minimalist Liquid Glass */}
-      <div className="rounded-[28px] sm:rounded-[32px] p-4 sm:p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-all duration-300 liquid-glass">
+      <div className="rounded-2xl sm:rounded-3xl p-4 sm:p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-all duration-300 liquid-glass">
         <div>
           <div className="flex items-center gap-2 mb-1 flex-wrap">
             <h2 className="text-lg sm:text-xl font-bold tracking-tight flex items-center gap-2 font-sans text-neutral-900 dark:text-white">
@@ -167,7 +167,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
       </div>
 
       {/* Filters Bar */}
-      <div className="rounded-[28px] sm:rounded-[32px] p-4 sm:p-5 space-y-3.5 transition-all duration-300 liquid-glass">
+      <div className="rounded-2xl sm:rounded-3xl p-4 sm:p-5 space-y-3.5 transition-all duration-300 liquid-glass">
         {/* Row 1: Search + Status tabs */}
         <div className="flex flex-col sm:flex-row items-center gap-3">
           <div className="relative w-full sm:flex-1 min-w-0">
@@ -303,10 +303,10 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
       ) : (
         <div className="space-y-3">
           {filteredQuestions.length === 0 ? (
-            <div className="p-8 text-center rounded-[32px] sm:rounded-[36px] transition-colors liquid-glass">
+            <div className="p-8 text-center rounded-2xl sm:rounded-3xl transition-colors liquid-glass">
               <SlidersHorizontal className="w-10 h-10 mx-auto mb-2 text-neutral-400 dark:text-neutral-500" />
-              <h3 className="text-base font-bold mb-1 font-sans text-neutral-900 dark:text-white">Ничего не найдено</h3>
-              <p className="text-xs text-neutral-500 dark:text-neutral-400">
+              <h3 className="text-base font-bold mb-1 font-sans text-neutral-900 dark:text-white leading-snug">Ничего не найдено</h3>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed">
                 Попробуйте изменить поисковый запрос или сбросить фильтры.
               </p>
             </div>
@@ -321,7 +321,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
               return (
                 <div
                   key={q.id}
-                  className={`rounded-[28px] border transition-all duration-300 ${
+                  className={`rounded-2xl sm:rounded-3xl border transition-all duration-300 ${
                     isCompleted
                       ? 'bg-emerald-500/10 border-emerald-500/25 dark:bg-emerald-500/15 dark:border-emerald-500/35 liquid-glass-interactive'
                       : isRepeat
@@ -363,14 +363,14 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                           )}
                         </div>
 
-                        <h3 className="text-sm sm:text-base font-semibold transition-colors font-sans
+                        <h3 className="text-sm sm:text-base font-semibold transition-colors font-sans leading-snug
                           text-neutral-900 group-hover:text-neutral-700
                           dark:text-white dark:group-hover:text-neutral-200"
                         >
                           {q.title}
                         </h3>
 
-                        <p className="text-xs mt-1.5 line-clamp-2 text-neutral-600 dark:text-neutral-400">
+                        <p className="text-xs mt-1.5 line-clamp-2 leading-relaxed text-neutral-600 dark:text-neutral-400">
                           {q.question}
                         </p>
                       </div>
@@ -458,11 +458,11 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                           {userAnswer.trim() && (
                             <div className="p-3.5 rounded-2xl liquid-glass-pill text-xs shadow-xs">
                               <div className="flex items-center justify-between mb-1">
-                                <strong className="text-[11px] font-semibold text-neutral-600">Ваш ответ:</strong>
+                                <strong className="text-[11px] uppercase tracking-wider text-neutral-600 font-bold">Ваш ответ:</strong>
                                 <button
                                   type="button"
                                   onClick={() => setInlineChecked((prev) => ({ ...prev, [q.id]: false }))}
-                                  className="text-[10px] font-medium flex items-center gap-1 text-neutral-600 hover:text-black transition-colors"
+                                  className="text-[10px] font-bold flex items-center gap-1 text-neutral-600 hover:text-black transition-colors"
                                 >
                                   <RefreshCw className="w-3 h-3" />
                                   Изменить
@@ -480,7 +480,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
 
                           {/* Key Takeaways */}
                           <div className="space-y-1.5">
-                            <span className="text-xs font-semibold block text-neutral-700">
+                            <span className="text-xs font-bold uppercase tracking-wider block text-neutral-700">
                               Что важно запомнить:
                             </span>
                             <ul className="text-xs space-y-1 list-disc list-inside text-neutral-700">
@@ -520,7 +520,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                           }`}
                         >
                           <CheckCircle2 className="w-3.5 h-3.5" />
-                          <span>{isCompleted ? 'Изучено' : 'Отметить изученным'}</span>
+                          <span>{isCompleted ? 'Изучено ✓' : 'Отметить изученным'}</span>
                         </button>
                       </div>
                     </div>

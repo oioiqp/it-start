@@ -134,19 +134,19 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
   const getStatusBadge = () => {
     if (readinessPercent >= 80) {
       return {
-        label: 'Готов к собеседованию',
-        color: 'bg-emerald-500/10 text-emerald-700 border border-emerald-500/20 dark:bg-emerald-500/15 dark:text-emerald-400 dark:border-emerald-500/30',
+        label: 'Готов к собеседованию! 🔥',
+        color: 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 dark:bg-emerald-500/15 dark:text-emerald-400 dark:border-emerald-500/30',
       };
     }
     if (readinessPercent >= 40) {
       return {
-        label: 'В активной подготовке',
+        label: 'В активной подготовке 🚀',
         color: 'bg-neutral-100 text-neutral-800 border border-neutral-200/80 dark:bg-white/[0.06] dark:text-neutral-200 dark:border-white/10',
       };
     }
     return {
-      label: 'Начальный уровень',
-      color: 'bg-amber-500/10 text-amber-700 border border-amber-500/20 dark:bg-amber-500/15 dark:text-amber-400 dark:border-amber-500/30',
+      label: 'Начальный уровень 📚',
+      color: 'bg-amber-500/10 text-amber-600 border border-amber-500/20 dark:bg-amber-500/15 dark:text-amber-400 dark:border-amber-500/30',
     };
   };
 
@@ -164,7 +164,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
       }}
     >
       <div
-        className="relative w-full max-w-3xl rounded-[24px] sm:rounded-[32px] p-4 sm:p-8 my-auto sm:my-8 max-h-[92vh] sm:max-h-[90vh] flex flex-col modal-enter-animation liquid-glass-modal text-neutral-900 dark:text-neutral-100 overflow-hidden shadow-2xl"
+        className="relative w-full max-w-3xl rounded-2xl sm:rounded-3xl p-4 sm:p-8 my-auto sm:my-8 max-h-[92vh] sm:max-h-[90vh] flex flex-col modal-enter-animation liquid-glass-modal text-neutral-900 dark:text-neutral-100 overflow-hidden shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
@@ -198,7 +198,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                   {internship.format}
                 </span>
               </div>
-              <h2 className="text-lg sm:text-2xl font-bold tracking-tight text-neutral-900 dark:text-white font-sans break-words">
+              <h2 className="text-lg sm:text-2xl font-bold tracking-tight text-neutral-900 dark:text-white font-sans break-words leading-snug">
                 План подготовки: {internship.title}
               </h2>
             </div>
@@ -274,25 +274,25 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
               <span className="text-xs text-neutral-600 dark:text-neutral-400">
                 Изучено {totalCompleted} из {totalItems} тем и профильных вопросов
               </span>
-              <span className="text-2xl font-bold tabular-nums text-neutral-900 dark:text-white">{readinessPercent}%</span>
+              <span className="text-2xl font-bold text-neutral-900 dark:text-white">{readinessPercent}%</span>
             </div>
 
             <div className="w-full h-2 rounded-full overflow-hidden bg-black/5 dark:bg-white/10">
               <div
-                className="h-full rounded-full transition-all duration-300 bg-neutral-900 dark:bg-neutral-100"
+                className="h-full rounded-full transition-all duration-500 bg-neutral-800 dark:bg-neutral-200"
                 style={{ width: `${readinessPercent}%` }}
               />
             </div>
 
             <p className="text-xs mt-2 text-neutral-500 dark:text-neutral-400">
-              Отмечайте изученные разделы и вопросы прямо в этом окне — ваш прогресс сохраняется синхронно в базе данных.
+              💡 Отмечайте изученные разделы и вопросы прямо в этом окне — ваш прогресс сохраняется синхронно в базе данных!
             </p>
           </div>
 
           {/* Section 1: Required Roadmap Steps */}
           <div>
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold flex items-center gap-2 font-sans text-neutral-900 dark:text-white">
+              <h3 className="text-sm font-semibold uppercase tracking-wider flex items-center gap-2 font-sans text-neutral-900 dark:text-white">
                 <Map className="w-4 h-4 text-neutral-500 dark:text-neutral-400" />
                 Этапы роадмапа для вакансии ({completedTopicsCount}/{relevantTopics.length})
               </h3>
@@ -326,16 +326,16 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                         </button>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-sm font-semibold text-neutral-900 dark:text-white font-sans break-words">{topic.title}</span>
-                            <span className="text-[10px] font-medium px-2 py-0.5 rounded-md liquid-glass-pill text-neutral-700 dark:text-neutral-200">
+                            <span className="text-sm font-semibold text-neutral-900 dark:text-white font-sans break-words leading-snug">{topic.title}</span>
+                            <span className="text-[10px] uppercase font-semibold px-2 py-0.5 rounded-full liquid-glass-pill text-neutral-700 dark:text-neutral-200">
                               {topic.category === 'core' ? 'База' : 'Стек'}
                             </span>
-                            <span className="text-[10px] px-2 py-0.5 rounded-md font-medium liquid-glass-pill text-neutral-700 dark:text-neutral-200">
+                            <span className="text-[10px] px-2 py-0.5 rounded-full liquid-glass-pill text-neutral-700 dark:text-neutral-200">
                               {topic.difficulty}
                             </span>
                           </div>
-                          <p className="text-xs text-neutral-600 dark:text-neutral-300 mt-1">{topic.description}</p>
-                          <div className="mt-2 text-[11px] p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-800 dark:text-amber-300">
+                          <p className="text-xs text-neutral-600 dark:text-neutral-300 mt-1 leading-relaxed">{topic.description}</p>
+                          <div className="mt-2 text-[11px] p-2.5 sm:p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-800 dark:text-amber-300 leading-relaxed">
                             <strong>Совет для интервью:</strong> {topic.interviewTip}
                           </div>
                         </div>
@@ -372,7 +372,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
 
                     {topic.subtopics && topic.subtopics.length > 0 && (
                       <div className="pt-2 border-t border-black/5 dark:border-white/5">
-                        <div className="text-[11px] font-medium mb-2 text-neutral-500 dark:text-neutral-400">
+                        <div className="text-[11px] font-medium uppercase tracking-wider mb-2 text-neutral-500 dark:text-neutral-400">
                           Ключевые подтемы (отметьте изученные):
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
@@ -412,7 +412,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
           {/* Section 2: Profile Interview Questions */}
           <div>
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold flex items-center gap-2 text-neutral-900 dark:text-white">
+              <h3 className="text-sm font-semibold uppercase tracking-wider flex items-center gap-2 text-neutral-900 dark:text-white">
                 <HelpCircle className="w-4 h-4 text-neutral-500 dark:text-neutral-400" />
                 Профильные вопросы собеседования ({completedQuestionsCount}/{relevantQuestions.length})
               </h3>
@@ -454,8 +454,8 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                             </span>
                             <span className="text-neutral-500 dark:text-neutral-400">{q.difficulty}</span>
                           </div>
-                          <h4 className="text-sm font-semibold text-neutral-900 dark:text-white font-sans break-words">{q.title}</h4>
-                          <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1 break-words">{q.question}</p>
+                          <h4 className="text-sm font-semibold text-neutral-900 dark:text-white font-sans break-words leading-snug">{q.title}</h4>
+                          <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1 break-words leading-relaxed">{q.question}</p>
                         </div>
                       </div>
 
