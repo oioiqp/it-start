@@ -66,12 +66,12 @@ export const Navbar: React.FC<NavbarProps> = ({
           title="IT-Старт Главная"
         >
           <div
-            className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center font-bold text-xs tracking-tight transition-transform duration-200 group-hover:scale-105 shadow-xs
+            className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center font-bold text-xs tracking-tight shadow-xs
               bg-neutral-900 text-white dark:bg-white dark:text-black"
           >
             IT
           </div>
-          <span className="text-xs sm:text-sm font-bold tracking-tight hidden sm:inline text-neutral-900 dark:text-white">
+          <span className="text-xs sm:text-sm font-semibold tracking-tight hidden sm:inline text-neutral-900 dark:text-white">
             IT-Старт
           </span>
         </div>
@@ -88,10 +88,10 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 key={tab.id}
                 onClick={() => handleTabClick(tab.id)}
-                className={`flex items-center gap-1.5 px-2 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 active:scale-95 shrink-0 ${
+                className={`flex items-center gap-1.5 px-2 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs font-medium whitespace-nowrap transition-colors duration-150 active:scale-[0.98] shrink-0 ${
                   isActive
                     ? 'bg-neutral-900 text-white shadow-xs dark:bg-white dark:text-black'
-                    : 'text-neutral-700 hover:text-neutral-950 hover:bg-white/40 dark:text-neutral-300 dark:hover:text-white dark:hover:bg-white/10'
+                    : 'text-neutral-700 hover:text-neutral-950 hover:bg-black/[0.04] dark:text-neutral-300 dark:hover:text-white dark:hover:bg-white/10'
                 }`}
                 title={tab.label}
               >
@@ -136,7 +136,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   triggerHaptic('medium');
                   onOpenSubscribeModal();
                 }}
-                className="flex items-center gap-1 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full font-semibold text-xs transition-transform duration-150 active:scale-95 shadow-xs shrink-0 bg-neutral-900 hover:bg-black text-white dark:bg-white dark:text-neutral-900 cursor-pointer"
+                className="flex items-center gap-1 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full font-medium text-xs transition-transform duration-150 active:scale-[0.98] shadow-xs shrink-0 bg-neutral-900 hover:bg-black text-white dark:bg-white dark:text-neutral-900 cursor-pointer"
                 title={`VK: ${vkUser.first_name || ''} • Уведомления`}
               >
                 <Bot className="w-3.5 h-3.5" />
@@ -172,7 +172,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   triggerHaptic('medium');
                   onOpenSubscribeModal();
                 }}
-                className="flex items-center gap-1 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full font-semibold text-xs transition-transform duration-150 active:scale-95 shadow-xs shrink-0 bg-neutral-900 hover:bg-black text-white dark:bg-white dark:text-neutral-900 cursor-pointer"
+                className="flex items-center gap-1 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full font-medium text-xs transition-transform duration-150 active:scale-[0.98] shadow-xs shrink-0 bg-neutral-900 hover:bg-black text-white dark:bg-white dark:text-neutral-900 cursor-pointer"
                 title={`Telegram: ${telegramUser.first_name || ''} • Уведомления`}
               >
                 <Send className="w-3.5 h-3.5 text-sky-400" />
@@ -185,7 +185,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 triggerHaptic('medium');
                 onOpenSubscribeModal();
               }}
-              className="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-full font-semibold text-xs transition-transform duration-150 active:scale-95 shadow-xs shrink-0 bg-neutral-900 hover:bg-black text-white cursor-pointer"
+              className="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-full font-medium text-xs transition-transform duration-150 active:scale-[0.98] shadow-xs shrink-0 bg-neutral-900 hover:bg-black text-white cursor-pointer"
               title="Боты и уведомления"
             >
               <Bot className="w-3.5 h-3.5" />

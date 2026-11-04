@@ -316,7 +316,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
 
                     {/* Interactive Subtopics Checklist */}
                     <div className="space-y-2 mb-3.5">
-                      <span className="text-[11px] font-medium uppercase tracking-wider block text-neutral-500 dark:text-neutral-400">
+                      <span className="text-[11px] font-medium block text-neutral-500 dark:text-neutral-400">
                         Ключевые темы (отметьте галочками):
                       </span>
                       <div className="grid grid-cols-1 gap-1.5">
@@ -483,7 +483,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
         <div className="relative">
           {/* Header of Sub-Track Section */}
           <div className="flex items-center gap-3 mb-6">
-            <div className="px-3.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wider liquid-glass-pill text-neutral-800 dark:text-neutral-200">
+            <div className="px-3 py-1 rounded-md text-xs font-medium liquid-glass-pill text-neutral-800 dark:text-neutral-200">
               Ветка: {currentDirection.subTracks.find((s) => s.id === validSubTrack)?.name}
             </div>
             <div className="h-px flex-1 bg-neutral-200 dark:bg-white/10"></div>
@@ -585,7 +585,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
 
                     {/* Interactive Subtopics Checklist */}
                     <div className="space-y-2 mb-3.5">
-                      <span className="text-[11px] font-medium uppercase tracking-wider block text-neutral-500 dark:text-neutral-400">
+                      <span className="text-[11px] font-medium block text-neutral-500 dark:text-neutral-400">
                         Ключевые темы специализации (отметьте галочками):
                       </span>
                       <div className="grid grid-cols-1 gap-1.5">

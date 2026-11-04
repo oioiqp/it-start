@@ -10,7 +10,6 @@ import {
   RefreshCw,
   Code,
   Check,
-  Sparkles,
   HelpCircle,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
@@ -302,7 +301,7 @@ export const SelfCheckTrainer: React.FC<SelfCheckTrainerProps> = ({
             {/* User's typed answer */}
             {currentAnswer.trim() ? (
               <div className="p-4 rounded-2xl space-y-1 transition-colors liquid-glass-subtle">
-                <span className="text-[11px] font-semibold block uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
+                <span className="text-[11px] font-medium block text-neutral-500 dark:text-neutral-400">
                   Ваш ответ:
                 </span>
                 <p className="text-xs sm:text-sm whitespace-pre-wrap text-neutral-800 dark:text-neutral-200">
@@ -316,9 +315,9 @@ export const SelfCheckTrainer: React.FC<SelfCheckTrainerProps> = ({
             )}
 
             {/* Reference Official Answer */}
-            <div className="p-4 sm:p-5 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 dark:bg-emerald-500/15 backdrop-blur-sm sm:backdrop-blur-xl shadow-xs space-y-1.5 transition-colors">
-              <span className="text-[11px] font-semibold flex items-center gap-1.5 uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
-                <Sparkles className="w-3.5 h-3.5" />
+            <div className="p-4 sm:p-5 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 dark:bg-emerald-500/15 shadow-xs space-y-1.5 transition-colors">
+              <span className="text-[11px] font-semibold flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400">
+                <CheckCircle2 className="w-3.5 h-3.5" />
                 Эталонный ответ:
               </span>
               <p className="text-xs sm:text-sm leading-relaxed text-neutral-800 dark:text-neutral-200">
@@ -328,7 +327,7 @@ export const SelfCheckTrainer: React.FC<SelfCheckTrainerProps> = ({
 
             {/* Key Takeaways */}
             <div className="p-4 rounded-2xl space-y-1.5 transition-colors liquid-glass-subtle">
-              <span className="text-[11px] font-semibold uppercase tracking-wider block text-neutral-500 dark:text-neutral-400">
+              <span className="text-[11px] font-medium block text-neutral-500 dark:text-neutral-400">
                 Ключевые тезисы для проверки:
               </span>
               <ul className="text-xs space-y-1 list-disc list-inside text-neutral-600 dark:text-neutral-400">

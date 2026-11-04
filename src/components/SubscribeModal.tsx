@@ -262,13 +262,13 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
       if (result.fullName) setVkFullName(result.fullName);
       setStatusMessage({
         type: 'success',
-        text: `VK ID успешно определен: ${result.peerId}${result.fullName ? ` (${result.fullName})` : ''}! Подписка синхронизирована.`,
+        text: `VK ID успешно определен: ${result.peerId}${result.fullName ? ` (${result.fullName})` : ''}. Подписка синхронизирована.`,
       });
       triggerHaptic('success');
     } else {
       setStatusMessage({
         type: 'error',
-        text: result.error || 'Не удалось определить VK ID автоматически. Откройте диалог с сообществом ВКонтакте, отправьте любое сообщение и повторите!',
+        text: result.error || 'Не удалось определить VK ID автоматически. Откройте диалог с сообществом ВКонтакте, отправьте любое сообщение и повторите попытку.',
       });
     }
   };
@@ -316,8 +316,8 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
       setStatusMessage({
         type: 'success',
         text: platform === 'vk'
-          ? 'Тестовое уведомление отправлено в VK! Проверьте диалог с сообществом.'
-          : 'Тестовое уведомление отправлено! Проверьте диалог с ботом @' + TELEGRAM_BOT_USERNAME + '.',
+          ? 'Тестовое уведомление отправлено в VK. Проверьте диалог с сообществом.'
+          : 'Тестовое уведомление отправлено. Проверьте диалог с ботом @' + TELEGRAM_BOT_USERNAME + '.',
       });
       triggerHaptic('success');
       confetti({ particleCount: 60, spread: 60 });
@@ -382,7 +382,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
       onSubscriptionSaved(saveRes.subscription);
       setStatusMessage({
         type: 'success',
-        text: `Подписка успешно сохранена! Уведомления ${platform === 'vk' ? 'ВКонтакте' : 'в Telegram'} активированы.`,
+        text: `Подписка успешно сохранена. Уведомления ${platform === 'vk' ? 'ВКонтакте' : 'в Telegram'} активированы.`,
       });
 
       setTimeout(() => {
@@ -662,7 +662,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
                           className="w-8 h-8 rounded-full object-cover border border-sky-500/30 shrink-0 shadow-xs"
                         />
                       ) : (
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-sky-600 to-blue-500 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
+                        <div className="w-8 h-8 rounded-full bg-sky-600 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
                           {telegramUser.first_name ? telegramUser.first_name.slice(0, 2).toUpperCase() : 'TG'}
                         </div>
                       )}
@@ -686,7 +686,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
                 ) : tgChatId ? (
                   <div className="flex items-center justify-between p-2.5 rounded-xl bg-white/60 dark:bg-black/20 border border-neutral-200/80">
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-sky-600 to-blue-500 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
+                      <div className="w-8 h-8 rounded-full bg-sky-600 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
                         TG
                       </div>
                       <div className="min-w-0">

@@ -458,11 +458,11 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                           {userAnswer.trim() && (
                             <div className="p-3.5 rounded-2xl liquid-glass-pill text-xs shadow-xs">
                               <div className="flex items-center justify-between mb-1">
-                                <strong className="text-[11px] uppercase tracking-wider text-neutral-600 font-bold">Ваш ответ:</strong>
+                                <strong className="text-[11px] font-semibold text-neutral-600">Ваш ответ:</strong>
                                 <button
                                   type="button"
                                   onClick={() => setInlineChecked((prev) => ({ ...prev, [q.id]: false }))}
-                                  className="text-[10px] font-bold flex items-center gap-1 text-neutral-600 hover:text-black transition-colors"
+                                  className="text-[10px] font-medium flex items-center gap-1 text-neutral-600 hover:text-black transition-colors"
                                 >
                                   <RefreshCw className="w-3 h-3" />
                                   Изменить
@@ -480,7 +480,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
 
                           {/* Key Takeaways */}
                           <div className="space-y-1.5">
-                            <span className="text-xs font-bold uppercase tracking-wider block text-neutral-700">
+                            <span className="text-xs font-semibold block text-neutral-700">
                               Что важно запомнить:
                             </span>
                             <ul className="text-xs space-y-1 list-disc list-inside text-neutral-700">
@@ -520,7 +520,7 @@ export const QuestionsViewer: React.FC<QuestionsViewerProps> = ({
                           }`}
                         >
                           <CheckCircle2 className="w-3.5 h-3.5" />
-                          <span>{isCompleted ? 'Изучено ✓' : 'Отметить изученным'}</span>
+                          <span>{isCompleted ? 'Изучено' : 'Отметить изученным'}</span>
                         </button>
                       </div>
                     </div>

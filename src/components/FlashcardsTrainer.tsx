@@ -106,8 +106,9 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
             Карточка {currentIndex + 1} из {deck.length}
           </span>
           {isLearned && (
-            <span className="px-2.5 py-0.5 rounded-full font-medium text-[11px] bg-emerald-500/15 text-emerald-800 border border-emerald-500/20">
-              Изучено ✓
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-medium text-[11px] bg-emerald-500/15 text-emerald-800 border border-emerald-500/20">
+              <CheckCircle2 className="w-3 h-3" />
+              <span>Изучено</span>
             </span>
           )}
           {isRepeat && (

@@ -514,7 +514,7 @@ export function App() {
                       className="w-8 h-8 rounded-full object-cover border border-sky-500/30 shrink-0 shadow-xs"
                     />
                   ) : (
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-sky-600 to-blue-500 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
+                    <div className="w-8 h-8 rounded-full bg-sky-600 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
                       {telegramUser.first_name ? telegramUser.first_name.slice(0, 2).toUpperCase() : 'TG'}
                     </div>
                   )}
@@ -562,7 +562,7 @@ export function App() {
             </div>
 
             {/* Hero Header */}
-            <div className="relative pt-2 sm:pt-6 pb-2 text-center space-y-2 select-none">
+            <div className="relative pt-2 sm:pt-6 pb-2 text-center space-y-3 select-none">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium liquid-glass-pill text-neutral-700 dark:text-neutral-300">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                 <span className="hidden sm:inline">IT Start Web • Каталог стажировок IT-компаний РФ</span>
@@ -572,8 +572,28 @@ export function App() {
                 Агрегатор IT-стажировок
               </h1>
               <p className="text-xs sm:text-sm font-normal leading-relaxed max-w-xl mx-auto text-neutral-600 dark:text-neutral-300">
-                100% реальные вакансии • Роадмапы • 55+ вопросов к собеседованиям
+                Проверенные программы стажировок ведущих IT-компаний • Интерактивные роадмапы • 55+ вопросов с собеседований
               </p>
+
+              {/* Product Craft: Tangible live metrics strip */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 max-w-2xl mx-auto pt-2">
+                <div className="p-3 rounded-2xl liquid-glass-subtle text-center">
+                  <div className="text-lg sm:text-2xl font-semibold tabular-nums text-neutral-950 dark:text-white">{internships.length}</div>
+                  <div className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5">открытых вакансий</div>
+                </div>
+                <div className="p-3 rounded-2xl liquid-glass-subtle text-center">
+                  <div className="text-lg sm:text-2xl font-semibold tabular-nums text-neutral-950 dark:text-white">{TARGET_COMPANIES.length}</div>
+                  <div className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5">топ-работодателей</div>
+                </div>
+                <div className="p-3 rounded-2xl liquid-glass-subtle text-center">
+                  <div className="text-lg sm:text-2xl font-semibold tabular-nums text-neutral-950 dark:text-white">{DIRECTIONS.length}</div>
+                  <div className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5">направлений стека</div>
+                </div>
+                <div className="p-3 rounded-2xl liquid-glass-subtle text-center">
+                  <div className="text-lg sm:text-2xl font-semibold tabular-nums text-neutral-950 dark:text-white">{QUESTIONS.length}</div>
+                  <div className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5">вопросов с разбором</div>
+                </div>
+              </div>
             </div>
 
             {/* Filter and Search Panel - Mobile-First Liquid Glass Capsule */}
@@ -900,7 +920,7 @@ export function App() {
                     Стажировки по заданным фильтрам не найдены
                   </h3>
                   <p className="text-xs text-neutral-500 dark:text-neutral-400 max-w-md mx-auto">
-                    Попробуйте сбросить фильтры или добавьте новую вакансию в симуляторе парсера!
+                    Попробуйте сбросить фильтры или добавьте новую вакансию в симуляторе парсера.
                   </p>
                   <button
                     onClick={() => {
@@ -1006,9 +1026,9 @@ export function App() {
               IT
             </div>
             <div>
-              <span className="font-bold text-neutral-900 dark:text-neutral-100 font-sans">IT-Старт © 2026</span>
+              <span className="font-semibold text-neutral-900 dark:text-neutral-100 font-sans">IT-Старт © 2026</span>
               <p className="text-[11px] text-neutral-500 dark:text-neutral-400">
-                100% реальные IT-стажировки • Роадмапы • Telegram & VK Боты
+                Каталог IT-стажировок • Роадмапы • Telegram и VK боты
               </p>
             </div>
           </div>

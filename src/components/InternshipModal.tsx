@@ -327,10 +327,10 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2 flex-wrap">
                             <span className="text-sm font-semibold text-neutral-900 dark:text-white font-sans break-words">{topic.title}</span>
-                            <span className="text-[10px] uppercase font-semibold px-2 py-0.5 rounded-full liquid-glass-pill text-neutral-700 dark:text-neutral-200">
+                            <span className="text-[10px] font-medium px-2 py-0.5 rounded-md liquid-glass-pill text-neutral-700 dark:text-neutral-200">
                               {topic.category === 'core' ? 'База' : 'Стек'}
                             </span>
-                            <span className="text-[10px] px-2 py-0.5 rounded-full liquid-glass-pill text-neutral-700 dark:text-neutral-200">
+                            <span className="text-[10px] px-2 py-0.5 rounded-md font-medium liquid-glass-pill text-neutral-700 dark:text-neutral-200">
                               {topic.difficulty}
                             </span>
                           </div>
@@ -372,7 +372,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
 
                     {topic.subtopics && topic.subtopics.length > 0 && (
                       <div className="pt-2 border-t border-black/5 dark:border-white/5">
-                        <div className="text-[11px] font-medium uppercase tracking-wider mb-2 text-neutral-500 dark:text-neutral-400">
+                        <div className="text-[11px] font-medium mb-2 text-neutral-500 dark:text-neutral-400">
                           Ключевые подтемы (отметьте изученные):
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
