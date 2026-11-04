@@ -959,7 +959,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
   return (
     <div className="space-y-8">
       {/* Tab Header Banner */}
-      <div className="rounded-[28px] sm:rounded-[32px] p-6 sm:p-8 space-y-5 transition-all duration-300 liquid-glass">
+      <div className="rounded-2xl sm:rounded-3xl p-6 sm:p-8 space-y-5 transition-all duration-300 liquid-glass">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-2 flex-wrap">
@@ -977,7 +977,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
                 Live Мониторинг
               </span>
             </div>
-            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-neutral-950 dark:text-white">
+            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-neutral-950 dark:text-white leading-snug">
               Интеграция с Telegram & ВКонтакте, Трекер каналов и Сервер ботов
             </h2>
             <p className="text-xs sm:text-sm mt-1.5 max-w-3xl leading-relaxed text-neutral-600 dark:text-neutral-400">
@@ -1022,7 +1022,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
       </div>
 
       {/* SECTION: INTERACTIVE TELEGRAM CHANNELS & WEBSITES MONITOR */}
-      <div className="liquid-glass rounded-[28px] sm:rounded-[32px] p-4 sm:p-8 space-y-6 transition-all duration-300">
+      <div className="liquid-glass rounded-2xl sm:rounded-3xl p-4 sm:p-8 space-y-6 transition-all duration-300">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-neutral-200/80 dark:border-white/10">
           <div>
             <div className="flex items-center gap-2 mb-1 flex-wrap">
@@ -1401,14 +1401,14 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
       {/* TWO COLUMNS: BOT TOKEN & TELEGRAM SUBSCRIPTION */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* BLOCK 1: BOT TOKEN SETTINGS */}
-        <div className="liquid-glass rounded-[28px] sm:rounded-[32px] p-6 sm:p-7 transition-all duration-300 flex flex-col justify-between">
+        <div className="liquid-glass rounded-2xl sm:rounded-3xl p-6 sm:p-7 transition-all duration-300 flex flex-col justify-between">
           <div>
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-2xl bg-neutral-100 dark:bg-white/[0.06] border border-neutral-200/60 dark:border-white/10 text-neutral-800 dark:text-neutral-200 flex items-center justify-center">
                 <Key className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-neutral-950 dark:text-white">
+                <h3 className="text-base font-bold text-neutral-950 dark:text-white leading-snug">
                   Настройка Bot Token от @BotFather
                 </h3>
                 <p className="text-xs text-neutral-500 dark:text-neutral-400">
@@ -1476,13 +1476,13 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
         </div>
 
         {/* BLOCK 2: SUBSCRIPTION & AUTO-DETECT */}
-        <div className="liquid-glass rounded-[28px] sm:rounded-[32px] p-6 sm:p-7 transition-all duration-300">
+        <div className="liquid-glass rounded-2xl sm:rounded-3xl p-6 sm:p-7 transition-all duration-300">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 rounded-2xl bg-neutral-100 dark:bg-white/[0.06] border border-neutral-200/60 dark:border-white/10 text-neutral-800 dark:text-neutral-200 flex items-center justify-center">
               <Bell className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-neutral-950 dark:text-white">
+              <h3 className="text-base font-bold text-neutral-950 dark:text-white leading-snug">
                 Подписка на уведомления в Telegram
               </h3>
               <p className="text-xs text-neutral-500 dark:text-neutral-400">
@@ -1617,7 +1617,7 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
       </div>
 
       {/* SECTION: VKONTAKTE (VK) BOT & VK MINI APP */}
-      <div className="liquid-glass rounded-[28px] sm:rounded-[32px] p-6 sm:p-8 space-y-6 transition-all duration-300">
+      <div className="liquid-glass rounded-2xl sm:rounded-3xl p-6 sm:p-8 space-y-6 transition-all duration-300">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-neutral-200/80 dark:border-white/10">
           <div>
             <div className="flex items-center gap-2 mb-2 flex-wrap">
@@ -1887,14 +1887,14 @@ export const TelegramParserTab: React.FC<TelegramParserTabProps> = ({
       </div>
 
       {/* BLOCK 3: SIMULATOR OF TELEGRAM CHANNEL PARSER */}
-      <div className="liquid-glass rounded-[28px] sm:rounded-[32px] p-6 sm:p-8 space-y-6 transition-all duration-300">
+      <div className="liquid-glass rounded-2xl sm:rounded-3xl p-6 sm:p-8 space-y-6 transition-all duration-300">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-4 border-b border-neutral-200/80 dark:border-white/10">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-neutral-100 dark:bg-white/[0.06] border border-neutral-200/60 dark:border-white/10 text-neutral-800 dark:text-neutral-200 flex items-center justify-center">
               <PlusCircle className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-neutral-950 dark:text-white flex items-center gap-2">
+              <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-neutral-950 dark:text-white flex items-center gap-2 leading-snug">
                 Симулятор парсера вакансий & Пуш-рассылка
                 <Flame className="w-4 h-4 text-amber-500" />
               </h3>

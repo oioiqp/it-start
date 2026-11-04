@@ -435,10 +435,10 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
             {platform === 'vk' ? <Bot className="w-5 h-5" /> : <Bell className="w-5 h-5" />}
           </div>
           <div className="min-w-0">
-            <h2 className="text-lg font-bold font-sans text-neutral-950 truncate">
+            <h2 className="text-lg font-bold font-sans text-neutral-950 dark:text-white truncate leading-snug">
               {platform === 'vk' ? 'Уведомления ВКонтакте' : 'Уведомления в Telegram'}
             </h2>
-            <p className="text-xs text-neutral-600 truncate">
+            <p className="text-xs text-neutral-600 dark:text-neutral-300 truncate leading-relaxed">
               {platform === 'vk'
                 ? 'Мгновенные пуши о новых стажировках от официального VK-бота IT-Старт'
                 : `Мгновенные пуши о новых стажировках от бота @${TELEGRAM_BOT_USERNAME}`}

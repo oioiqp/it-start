@@ -471,8 +471,8 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
 
                     {isExpanded && (
                       <div className="px-4 pb-4 pt-2 border-t space-y-3 border-black/5 dark:border-white/5 liquid-glass-subtle rounded-b-2xl">
-                        <div className="text-xs leading-relaxed p-3.5 rounded-xl liquid-glass-pill text-neutral-900 break-words">
-                          <span className="font-bold text-emerald-700 block mb-1">Эталонный ответ:</span>
+                        <div className="text-xs leading-relaxed p-3.5 rounded-xl liquid-glass-pill text-neutral-900 dark:text-neutral-100 break-words">
+                          <span className="font-bold text-emerald-700 dark:text-emerald-400 block mb-1">Эталонный ответ:</span>
                           {q.answer}
                         </div>
 
@@ -488,10 +488,10 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                         )}
 
                         <div className="space-y-1">
-                          <span className="text-[11px] font-bold text-neutral-700 block">Главные тезисы:</span>
-                          <ul className="list-disc list-inside text-xs space-y-1 text-neutral-700">
+                          <span className="text-[11px] font-bold text-neutral-700 dark:text-neutral-300 block">Главные тезисы:</span>
+                          <ul className="list-disc list-inside text-xs space-y-1 text-neutral-700 dark:text-neutral-300">
                             {q.keyTakeaways.map((point, idx) => (
-                              <li key={idx}>{point}</li>
+                              <li key={idx} className="leading-relaxed">{point}</li>
                             ))}
                           </ul>
                         </div>
