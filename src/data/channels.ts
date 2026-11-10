@@ -587,7 +587,7 @@ export const INITIAL_PARSED_POSTS: ParsedChannelPost[] = [
     snippet: 'Вакансия с официального карьерного портала Directum в Ижевске: развитие архитектуры Directum RX, проектирование бизнес-процессов и интеграция с корпоративными сервисами.',
     publishedAt: '2026-03-29T16:20:00.000Z',
     sourceType: 'website',
-    url: 'https://career.directum.ru/lead_product_ownerRX',
+    url: 'https://career.directum.ru/vacancy/',
   },
   {
     id: 'scan-directum-qa',

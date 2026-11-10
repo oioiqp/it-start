@@ -6,13 +6,13 @@ import type { DirectionId, SubTrackId } from '../types';
 export const COMPANY_OFFICIAL_PORTALS: Record<string, string> = {
   tbank: 'https://fintech.tbank.ru/start/frontend/',
   kontur: 'https://kontur.ru/career/vacancies/intern-frontend',
-  directum: 'https://career.directum.ru/vacancy/web-developer',
-  t1: 'https://career.t1.ru/vacancies/java-developer',
-  yandex: 'https://yandex.ru/jobs/pages/internship-backend',
+  directum: 'https://career.directum.ru/vacancy/',
+  t1: 'https://career.t1.ru/vacancies/',
+  yandex: 'https://yandex.ru/yaintern/internship/',
   ozon: 'https://job.ozon.ru/it/camp/golang/',
   sber: 'https://sbergraduate.ru/sberseasons-moscow/ml/',
   avito: 'https://career.avito.com/vacancies/razrabotka/20803/',
-  vk: 'https://internship.vk.company/internship/web',
+  vk: 'https://internship.vk.company/internship/',
 };
 
 /**
@@ -98,10 +98,11 @@ export function getDirectVacancyPortalUrl(
       if (directionId === 'qa') return 'https://career.t1.ru/vacancies/qa-automation';
       return 'https://career.t1.ru/vacancies/java-developer';
     case 'yandex':
-      if (directionId === 'frontend') return 'https://yandex.ru/jobs/pages/internship-frontend';
-      if (directionId === 'mobile') return 'https://yandex.ru/jobs/pages/internship-mobile';
-      if (directionId === 'data_science') return 'https://yandex.ru/jobs/pages/internship-ml';
-      return 'https://yandex.ru/jobs/pages/internship-backend';
+      if (directionId === 'frontend') return 'https://yandex.ru/yaintern/frontend/';
+      if (directionId === 'mobile') return 'https://yandex.ru/yaintern/mobile/';
+      if (directionId === 'data_science') return 'https://yandex.ru/yaintern/ml/';
+      if (directionId === 'devops') return 'https://yandex.ru/yaintern/devops/';
+      return 'https://yandex.ru/yaintern/backend/';
     case 'ozon':
       if (directionId === 'frontend') return 'https://job.ozon.ru/it/camp/frontend/';
       if (directionId === 'qa') return 'https://job.ozon.ru/it/camp/qa/';
@@ -113,11 +114,7 @@ export function getDirectVacancyPortalUrl(
       if (directionId === 'qa') return 'https://sbergraduate.ru/sberseasons-moscow/qa/';
       return 'https://sbergraduate.ru/sberseasons-moscow/ml/';
     case 'vk':
-      if (directionId === 'backend') return 'https://internship.vk.company/internship/backend';
-      if (directionId === 'qa') return 'https://internship.vk.company/internship/qa';
-      if (directionId === 'data_science') return 'https://internship.vk.company/internship/data';
-      if (directionId === 'mobile') return 'https://internship.vk.company/internship/mobile';
-      return 'https://internship.vk.company/internship/web';
+      return 'https://internship.vk.company/internship/';
     default:
       return fallback;
   }
@@ -224,8 +221,6 @@ export function resolveApplyUrl(
     // Directum generic
     lower === 'https://career.directum.ru/' ||
     lower === 'https://career.directum.ru' ||
-    lower === 'https://career.directum.ru/vacancy' ||
-    lower === 'https://career.directum.ru/vacancy/' ||
     lower.includes('lead_product_owner') ||
     // Kontur generic
     lower === 'https://kontur.ru/career/' ||
@@ -235,8 +230,6 @@ export function resolveApplyUrl(
     // T1 generic
     lower === 'https://career.t1.ru/' ||
     lower === 'https://career.t1.ru' ||
-    lower === 'https://career.t1.ru/vacancies' ||
-    lower === 'https://career.t1.ru/vacancies/' ||
     lower.includes('t1.ru/school') ||
     // Yandex generic
     lower === 'https://yandex.ru/jobs/' ||
@@ -264,8 +257,6 @@ export function resolveApplyUrl(
     // VK generic
     lower === 'https://internship.vk.company/' ||
     lower === 'https://internship.vk.company' ||
-    lower === 'https://internship.vk.company/internship' ||
-    lower === 'https://internship.vk.company/internship/' ||
     // HH generic
     lower === 'https://hh.ru' ||
     lower === 'https://hh.ru/' ||
@@ -286,6 +277,11 @@ export function resolveApplyUrl(
 
   // 7. Direct company vacancy detail page with actual vacancy slug or ID
   if (
+    trimmed.includes('/yaintern/') ||
+    trimmed.includes('career.directum.ru/vacancy') ||
+    trimmed.includes('career.t1.ru/vacancies') ||
+    trimmed.includes('internship.vk.company/internship') ||
+    trimmed.includes('internship.vk.company/vacancy') ||
     trimmed.includes('/vacancies/razrabotka/') ||
     trimmed.includes('/vacancies/data-science/') ||
     trimmed.includes('/vacancies/analitika-dannykh/') ||

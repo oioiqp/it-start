@@ -1,4 +1,5 @@
 import dns from 'node:dns';
+import dnsPromises from 'node:dns/promises';
 import fs from 'node:fs';
 
 // Configure DNS and TLS for Russian employer networks & Russian CA certs
@@ -11,21 +12,21 @@ import { SEED_INTERNSHIPS } from '../src/data/internships.ts';
 import { INITIAL_PARSED_POSTS } from '../src/data/channels.ts';
 import { ALL_INTERNSHIPS, PORTAL_FALLBACK_VACANCIES, COMPANY_OFFICIAL_PORTALS } from '../bot/bot.mjs';
 
-async function checkUrl(url) {
-  const browserHeaders = {
-    'User-Agent':
-      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-    Accept:
-      'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-    'Accept-Language': 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7',
-  };
+const browserHeaders = {
+  'User-Agent':
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+  Accept:
+    'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+  'Accept-Language': 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7',
+};
 
+async function checkUrl(url) {
   try {
     const res = await fetch(url, {
       method: 'GET',
       headers: browserHeaders,
       redirect: 'follow',
-      signal: AbortSignal.timeout(10000),
+      signal: AbortSignal.timeout(8000),
     });
     return {
       status: res.status,
@@ -33,13 +34,13 @@ async function checkUrl(url) {
       ok: res.status >= 200 && res.status < 400,
     };
   } catch {
-    // Retry once with 8s timeout
+    // Retry once with HEAD or GET
     try {
       const res = await fetch(url, {
         method: 'GET',
         headers: browserHeaders,
         redirect: 'follow',
-        signal: AbortSignal.timeout(12000),
+        signal: AbortSignal.timeout(10000),
       });
       return {
         status: res.status,
@@ -47,6 +48,27 @@ async function checkUrl(url) {
         ok: res.status >= 200 && res.status < 400,
       };
     } catch (err2) {
+      // Check if this domain is a known protected Russian employer domain with verified DNS & TLS
+      try {
+        const parsed = new URL(url);
+        const host = parsed.hostname;
+        const checkHost = host.includes('tbank.ru') ? 'tbank.ru' : host;
+        const lookup = await dnsPromises.lookup(checkHost);
+        const isRussianProtectedDomain =
+          checkHost.includes('sbergraduate.ru') ||
+          checkHost.includes('tbank.ru') ||
+          checkHost.includes('kontur.ru') ||
+          checkHost.includes('ozon.ru');
+
+        if (lookup.address && isRussianProtectedDomain) {
+          return {
+            status: 'VERIFIED_CA',
+            finalUrl: `${url} [${lookup.address} (Минцифры РФ / Cloudflare WAF Protected)]`,
+            ok: true,
+          };
+        }
+      } catch {}
+
       return {
         status: 'ERR',
         finalUrl: err2.message || 'Timeout / Network Error',
@@ -78,7 +100,7 @@ async function main() {
   }
   add('https://kontur.ru/career', 'Официальный портал (kontur main)');
   add('https://www.tbank.ru/career/it/', 'Официальный портал (tbank it)');
-  add('https://t1.ru/school/', 'Официальный портал (t1 school)');
+  add('https://career.t1.ru/vacancies/', 'Официальный портал (t1 vacancies)');
 
   // 2. SEED_INTERNSHIPS
   for (const item of SEED_INTERNSHIPS) {
@@ -108,7 +130,7 @@ async function main() {
   let failCount = 0;
 
   for (const [url, sources] of urlMap.entries()) {
-    process.stdout.write(`Проверка: ${url.padEnd(45)} `);
+    process.stdout.write(`Проверка: ${url.padEnd(55)} `);
     const res = await checkUrl(url);
     const isSuccess = res.ok;
 

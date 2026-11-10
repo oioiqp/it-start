@@ -292,8 +292,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@yandex_intern",
     "directionId": "backend",
     "subTrackId": "python",
-    "url": "https://yandex.ru/jobs/pages/internship-backend",
-    "applyUrl": "https://yandex.ru/jobs/pages/internship-backend",
+    "url": "https://yandex.ru/yaintern/backend/",
+    "applyUrl": "https://yandex.ru/yaintern/backend/",
     "sourceChannel": "@yandex_intern",
     "description": "Стажировка в сервисах Яндекс Маркета или Поиска. Реальные задачи масштабирования высоконагруженных микросервисов с менторской поддержкой.",
     "tags": [
@@ -361,8 +361,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@avito_tech",
     "directionId": "mobile",
     "subTrackId": "android",
-    "url": "https://career.avito.com/vacancies/razrabotka/20805/",
-    "applyUrl": "https://career.avito.com/vacancies/razrabotka/20805/",
+    "url": "https://career.avito.com/vacancies/razrabotka/20803/",
+    "applyUrl": "https://career.avito.com/vacancies/razrabotka/20803/",
     "sourceChannel": "@avito_tech",
     "description": "Разработка фичей для мобильного приложения Авито с десятками миллионов пользователей. Чистая архитектура, дизайн-система и лучшие инженерные практики.",
     "tags": [
@@ -384,8 +384,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@vk_team",
     "directionId": "qa",
     "subTrackId": "auto_qa",
-    "url": "https://internship.vk.company/internship/qa",
-    "applyUrl": "https://internship.vk.company/internship/qa",
+    "url": "https://internship.vk.company/internship/",
+    "applyUrl": "https://internship.vk.company/internship/",
     "sourceChannel": "@vk_team",
     "description": "Автоматизация тестирования сервисов сообществ и видео в VK. Вы будете создавать надежные автотесты для веба и REST API.",
     "tags": [
@@ -499,8 +499,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@yandex_intern",
     "directionId": "mobile",
     "subTrackId": "ios",
-    "url": "https://yandex.ru/jobs/pages/internship-mobile",
-    "applyUrl": "https://yandex.ru/jobs/pages/internship-mobile",
+    "url": "https://yandex.ru/yaintern/mobile/",
+    "applyUrl": "https://yandex.ru/yaintern/mobile/",
     "sourceChannel": "@yandex_intern",
     "description": "Разработка супераппа Яндекс Go (Такси, Доставка, Самокаты). Работа с плавной анимацией карты, высокими требованиями к отзывчивости UI.",
     "tags": [
@@ -568,8 +568,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@vk_team",
     "directionId": "backend",
     "subTrackId": "nodejs",
-    "url": "https://internship.vk.company/internship/backend",
-    "applyUrl": "https://internship.vk.company/internship/backend",
+    "url": "https://internship.vk.company/internship/",
+    "applyUrl": "https://internship.vk.company/internship/",
     "sourceChannel": "@vk_team",
     "description": "Разработка микросервисов стриминга и каталога музыки. Асинхронные очереди, кэширование метаданных треков и плейлистов.",
     "tags": [
@@ -637,8 +637,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@yandex_intern",
     "directionId": "data_science",
     "subTrackId": "ml",
-    "url": "https://yandex.ru/jobs/pages/internship-ml",
-    "applyUrl": "https://yandex.ru/jobs/pages/internship-ml",
+    "url": "https://yandex.ru/yaintern/ml/",
+    "applyUrl": "https://yandex.ru/yaintern/ml/",
     "sourceChannel": "@yandex_intern",
     "description": "Участие в обучении и дообучении языковых моделей YandexGPT. Настройка пайплайнов RAG, оценка качества генерации и файнтюнинг.",
     "tags": [
@@ -683,8 +683,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@t1career",
     "directionId": "backend",
     "subTrackId": "java",
-    "url": "https://career.t1.ru/vacancies/java-developer",
-    "applyUrl": "https://career.t1.ru/vacancies/java-developer",
+    "url": "https://career.t1.ru/vacancies/",
+    "applyUrl": "https://career.t1.ru/vacancies/",
     "sourceChannel": "@t1career",
     "description": "Обучение и стажировка в Открытой школе Т1 с переходом в штат. Разработка надежных Enterprise-сервисов для крупнейших корпоративных заказчиков.",
     "tags": [
@@ -706,8 +706,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@t1career",
     "directionId": "devops",
     "subTrackId": "cicd_docker",
-    "url": "https://career.t1.ru/vacancies/devops-engineer",
-    "applyUrl": "https://career.t1.ru/vacancies/devops-engineer",
+    "url": "https://career.t1.ru/vacancies/",
+    "applyUrl": "https://career.t1.ru/vacancies/",
     "sourceChannel": "@t1career",
     "description": "Поддержка и автоматизация инфраструктуры масштабируемых облачных решений Т1 Облако.",
     "tags": [
@@ -729,8 +729,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@t1career",
     "directionId": "qa",
     "subTrackId": "auto_qa",
-    "url": "https://career.t1.ru/vacancies/qa-automation",
-    "applyUrl": "https://career.t1.ru/vacancies/qa-automation",
+    "url": "https://career.t1.ru/vacancies/",
+    "applyUrl": "https://career.t1.ru/vacancies/",
     "sourceChannel": "@t1career",
     "description": "Автоматизация тестирования банковских и интеграционных платформ группы Т1.",
     "tags": [
@@ -752,8 +752,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@Life_in_Directum",
     "directionId": "frontend",
     "subTrackId": "react",
-    "url": "https://career.directum.ru/vacancy/web-developer",
-    "applyUrl": "https://career.directum.ru/vacancy/web-developer",
+    "url": "https://career.directum.ru/vacancy/",
+    "applyUrl": "https://career.directum.ru/vacancy/",
     "sourceChannel": "@Life_in_Directum",
     "description": "Разработка веб-клиента флагманской платформы управления цифровыми процессами и документами Directum RX в Ижевске.",
     "tags": [
@@ -776,8 +776,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@Life_in_Directum",
     "directionId": "backend",
     "subTrackId": "java",
-    "url": "https://career.directum.ru/vacancy/backend-csharp",
-    "applyUrl": "https://career.directum.ru/vacancy/backend-csharp",
+    "url": "https://career.directum.ru/vacancy/",
+    "applyUrl": "https://career.directum.ru/vacancy/",
     "sourceChannel": "@Life_in_Directum",
     "description": "Разработка масштабируемого бэкенда интеллектуальной системы управления документами Directum RX. Микросервисы, асинхронная обработка и AI-модули.",
     "tags": [
@@ -801,8 +801,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@Life_in_Directum",
     "directionId": "qa",
     "subTrackId": "manual_qa",
-    "url": "https://career.directum.ru/vacancy/qa-engineer",
-    "applyUrl": "https://career.directum.ru/vacancy/qa-engineer",
+    "url": "https://career.directum.ru/vacancy/",
+    "applyUrl": "https://career.directum.ru/vacancy/",
     "sourceChannel": "@Life_in_Directum",
     "description": "Тестирование веб- и десктоп-клиентов Directum RX, поиск дефектов в бизнес-процессах электронного документооборота.",
     "tags": [
@@ -964,8 +964,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@avito_tech",
     "directionId": "frontend",
     "subTrackId": "react",
-    "url": "https://career.avito.com/vacancies/razrabotka/20808/",
-    "applyUrl": "https://career.avito.com/vacancies/razrabotka/20808/",
+    "url": "https://career.avito.com/vacancies/razrabotka/20803/",
+    "applyUrl": "https://career.avito.com/vacancies/razrabotka/20803/",
     "sourceChannel": "@avito_tech",
     "description": "Программа стажировки Авито Старт: разработка ключевых разделов Avito.ru с миллионной аудиторией. Дизайн-система, микрофронтенды и высокие стандарты качества.",
     "tags": [
@@ -1010,8 +1010,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@vk_team",
     "directionId": "frontend",
     "subTrackId": "react",
-    "url": "https://internship.vk.company/internship/web",
-    "applyUrl": "https://internship.vk.company/internship/web",
+    "url": "https://internship.vk.company/internship/",
+    "applyUrl": "https://internship.vk.company/internship/",
     "sourceChannel": "@vk_team",
     "description": "Оплачиваемая стажировка VK Team: создание веб-интерфейсов ВКонтакте, VK Видео и VK Мессенджера на стеке React, TypeScript и библиотеки VKUI.",
     "tags": [
@@ -1033,8 +1033,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@vk_team",
     "directionId": "data_science",
     "subTrackId": "ml",
-    "url": "https://internship.vk.company/internship/data",
-    "applyUrl": "https://internship.vk.company/internship/data",
+    "url": "https://internship.vk.company/internship/",
+    "applyUrl": "https://internship.vk.company/internship/",
     "sourceChannel": "@vk_team",
     "description": "Разработка рекомендательных систем ленты, клипов и музыки ВКонтакте. Обучение моделей ранжирования на огромных графах социальных связей.",
     "tags": [
@@ -1126,8 +1126,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@Life_in_Directum",
     "directionId": "backend",
     "subTrackId": "python",
-    "url": "https://career.directum.ru/vacancy/backend-csharp",
-    "applyUrl": "https://career.directum.ru/vacancy/backend-csharp",
+    "url": "https://career.directum.ru/vacancy/",
+    "applyUrl": "https://career.directum.ru/vacancy/",
     "sourceChannel": "@Life_in_Directum",
     "description": "Официальная программа стажировок Directum: разработка ядра интеллектуальной платформы управления цифровыми процессами и документами Directum RX в Ижевске под менторством экспертов.",
     "tags": [
@@ -1174,8 +1174,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@yandex_intern",
     "directionId": "frontend",
     "subTrackId": "react",
-    "url": "https://yandex.ru/jobs/pages/internship-frontend",
-    "applyUrl": "https://yandex.ru/jobs/pages/internship-frontend",
+    "url": "https://yandex.ru/yaintern/frontend/",
+    "applyUrl": "https://yandex.ru/yaintern/frontend/",
     "sourceChannel": "@yandex_intern",
     "description": "Оплачиваемая стажировка в Яндексе (Young Con): разработка сложных интерфейсов сервисов Поиска, Маркета и Go на React, TypeScript, SSR и микрофронтендах.",
     "tags": [
@@ -1244,8 +1244,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@vk_team",
     "directionId": "mobile",
     "subTrackId": "android",
-    "url": "https://internship.vk.company/internship/mobile",
-    "applyUrl": "https://internship.vk.company/internship/mobile",
+    "url": "https://internship.vk.company/internship/",
+    "applyUrl": "https://internship.vk.company/internship/",
     "sourceChannel": "@vk_team",
     "description": "Официальная программа стажировок VK Team: разработка ключевых фичей мобильных приложений ВКонтакте, VK Музыка и VK Видео на Kotlin и Swift под менторством экспертов.",
     "tags": [
@@ -1966,13 +1966,13 @@ export function detectVacancyTrack(title = '', text = '') {
 export const COMPANY_OFFICIAL_PORTALS = {
   tbank: 'https://fintech.tbank.ru/start/frontend/',
   kontur: 'https://kontur.ru/career/vacancies/intern-frontend',
-  directum: 'https://career.directum.ru/vacancy/web-developer',
-  t1: 'https://career.t1.ru/vacancies/java-developer',
-  yandex: 'https://yandex.ru/jobs/pages/internship-backend',
+  directum: 'https://career.directum.ru/vacancy/',
+  t1: 'https://career.t1.ru/vacancies/',
+  yandex: 'https://yandex.ru/yaintern/backend/',
   ozon: 'https://job.ozon.ru/it/camp/golang/',
   sber: 'https://sbergraduate.ru/sberseasons-moscow/ml/',
   avito: 'https://career.avito.com/vacancies/razrabotka/20803/',
-  vk: 'https://internship.vk.company/internship/web',
+  vk: 'https://internship.vk.company/internship/',
 };
 
 export function getCompanyKey(companyName = '') {
@@ -1991,11 +1991,11 @@ export function getCompanyKey(companyName = '') {
   return 'other';
 }
 
-export function getDirectVacancyPortalUrl(companyKey, directionId = undefined, fallback = 'https://career.directum.ru/vacancy/web-developer') {
+export function getDirectVacancyPortalUrl(companyKey, directionId = undefined, fallback = 'https://career.directum.ru/vacancy/') {
   switch (companyKey) {
     case 'avito':
-      if (directionId === 'mobile') return 'https://career.avito.com/vacancies/razrabotka/20805/';
-      if (directionId === 'frontend') return 'https://career.avito.com/vacancies/razrabotka/20808/';
+      if (directionId === 'mobile') return 'https://career.avito.com/vacancies/razrabotka/20803/';
+      if (directionId === 'frontend') return 'https://career.avito.com/vacancies/razrabotka/20803/';
       if (directionId === 'backend') return 'https://career.avito.com/vacancies/razrabotka/20812/';
       if (directionId === 'data_science') return 'https://career.avito.com/vacancies/analitika-dannykh/20816/';
       if (directionId === 'devops') return 'https://career.avito.com/vacancies/razrabotka/20803/';
@@ -2012,18 +2012,18 @@ export function getDirectVacancyPortalUrl(companyKey, directionId = undefined, f
       if (directionId === 'qa') return 'https://kontur.ru/career/vacancies/intern-qa';
       return 'https://kontur.ru/career/vacancies/intern-frontend';
     case 'directum':
-      if (directionId === 'backend') return 'https://career.directum.ru/vacancy/backend-csharp';
-      if (directionId === 'qa') return 'https://career.directum.ru/vacancy/qa-engineer';
-      return 'https://career.directum.ru/vacancy/web-developer';
+      if (directionId === 'backend') return 'https://career.directum.ru/vacancy/';
+      if (directionId === 'qa') return 'https://career.directum.ru/vacancy/';
+      return 'https://career.directum.ru/vacancy/';
     case 't1':
-      if (directionId === 'devops') return 'https://career.t1.ru/vacancies/devops-engineer';
-      if (directionId === 'qa') return 'https://career.t1.ru/vacancies/qa-automation';
-      return 'https://career.t1.ru/vacancies/java-developer';
+      if (directionId === 'devops') return 'https://career.t1.ru/vacancies/';
+      if (directionId === 'qa') return 'https://career.t1.ru/vacancies/';
+      return 'https://career.t1.ru/vacancies/';
     case 'yandex':
-      if (directionId === 'frontend') return 'https://yandex.ru/jobs/pages/internship-frontend';
-      if (directionId === 'mobile') return 'https://yandex.ru/jobs/pages/internship-mobile';
-      if (directionId === 'data_science') return 'https://yandex.ru/jobs/pages/internship-ml';
-      return 'https://yandex.ru/jobs/pages/internship-backend';
+      if (directionId === 'frontend') return 'https://yandex.ru/yaintern/frontend/';
+      if (directionId === 'mobile') return 'https://yandex.ru/yaintern/mobile/';
+      if (directionId === 'data_science') return 'https://yandex.ru/yaintern/ml/';
+      return 'https://yandex.ru/yaintern/backend/';
     case 'ozon':
       if (directionId === 'frontend') return 'https://job.ozon.ru/it/camp/frontend/';
       if (directionId === 'qa') return 'https://job.ozon.ru/it/camp/qa/';
@@ -2035,11 +2035,11 @@ export function getDirectVacancyPortalUrl(companyKey, directionId = undefined, f
       if (directionId === 'qa') return 'https://sbergraduate.ru/sberseasons-moscow/qa/';
       return 'https://sbergraduate.ru/sberseasons-moscow/ml/';
     case 'vk':
-      if (directionId === 'backend') return 'https://internship.vk.company/internship/backend';
-      if (directionId === 'qa') return 'https://internship.vk.company/internship/qa';
-      if (directionId === 'data_science') return 'https://internship.vk.company/internship/data';
-      if (directionId === 'mobile') return 'https://internship.vk.company/internship/mobile';
-      return 'https://internship.vk.company/internship/web';
+      if (directionId === 'backend') return 'https://internship.vk.company/internship/';
+      if (directionId === 'qa') return 'https://internship.vk.company/internship/';
+      if (directionId === 'data_science') return 'https://internship.vk.company/internship/';
+      if (directionId === 'mobile') return 'https://internship.vk.company/internship/';
+      return 'https://internship.vk.company/internship/';
     default:
       return fallback;
   }
@@ -2693,7 +2693,7 @@ export const PORTAL_FALLBACK_VACANCIES = [
       channel: 't1.ru/school',
       directionId: 'backend',
       subTrackId: 'java',
-      url: 'https://career.t1.ru/vacancies/java-developer',
+      url: 'https://career.t1.ru/vacancies/',
       description: 'Открытая школа Т1: оплачиваемый интенсив по разработке корпоративных сервисов на Java/Spring с менторством экспертов.',
       tags: ['Холдинг Т1', 'Java 21', 'Spring Boot', 'Открытая школа'],
       sourceType: 'portal',
@@ -2709,7 +2709,7 @@ export const PORTAL_FALLBACK_VACANCIES = [
       channel: 'career.directum.ru',
       directionId: 'frontend',
       subTrackId: 'react',
-      url: 'https://career.directum.ru/vacancy/web-developer',
+      url: 'https://career.directum.ru/vacancy/',
       description: 'Разработка веб-клиента платформы Directum RX в Ижевске на современном TypeScript и React под менторством старших инженеров.',
       tags: ['Directum RX', 'Ижевск', 'React', 'TypeScript'],
       sourceType: 'portal',
@@ -2725,7 +2725,7 @@ export const PORTAL_FALLBACK_VACANCIES = [
       channel: 'yandex.ru/yabackend',
       directionId: 'backend',
       subTrackId: 'python',
-      url: 'https://yandex.ru/jobs/pages/internship-backend',
+      url: 'https://yandex.ru/yaintern/backend/',
       description: 'Стажировка Young Con в сервисах Яндекс Маркета и Поиска. Реальные задачи масштабирования высоконагруженных микросервисов.',
       tags: ['Яндекс', 'Python 3.12', 'FastAPI', 'Young Con'],
       sourceType: 'portal',
@@ -2773,7 +2773,7 @@ export const PORTAL_FALLBACK_VACANCIES = [
       channel: 'career.avito.com',
       directionId: 'mobile',
       subTrackId: 'android',
-      url: 'https://career.avito.com/vacancies/razrabotka/20805/',
+      url: 'https://career.avito.com/vacancies/razrabotka/20803/',
       description: 'Стажировка в командах мобильной разработки Авито: создание фичей супераппа на Kotlin, Jetpack Compose и Coroutines.',
       tags: ['Авито', 'Android', 'Kotlin', 'Compose'],
       sourceType: 'portal',
@@ -2789,7 +2789,7 @@ export const PORTAL_FALLBACK_VACANCIES = [
       channel: 'internship.vk.company',
       directionId: 'frontend',
       subTrackId: 'react',
-      url: 'https://internship.vk.company/internship/web',
+      url: 'https://internship.vk.company/internship/',
       description: 'Официальная программа стажировок VK Team: создание веб-интерфейсов ВКонтакте, VK Видео и VKUI.',
       tags: ['VK Team', 'React', 'TypeScript', 'VKUI'],
       sourceType: 'portal',
