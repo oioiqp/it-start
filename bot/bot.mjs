@@ -269,8 +269,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@tbank_team",
     "directionId": "frontend",
     "subTrackId": "react",
-    "url": "https://fintech.tbank.ru/start/frontend/",
-    "applyUrl": "https://fintech.tbank.ru/start/frontend/",
+    "url": "https://education.tbank.ru/start/frontend/",
+    "applyUrl": "https://education.tbank.ru/start/frontend/",
     "sourceChannel": "@tbank_team",
     "description": "Ищем начинающего фронтенд-разработчика в команду Финтех-сервисов. Вы будете создавать современные пользовательские интерфейсы для миллионов клиентов экосистемы.",
     "tags": [
@@ -476,8 +476,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@tbank_team",
     "directionId": "data_science",
     "subTrackId": "analytics",
-    "url": "https://fintech.tbank.ru/start/analytics/",
-    "applyUrl": "https://fintech.tbank.ru/start/analytics/",
+    "url": "https://education.tbank.ru/start/analyst/",
+    "applyUrl": "https://education.tbank.ru/start/analyst/",
     "sourceChannel": "@tbank_team",
     "description": "Анализ пользовательских сценариев в мобильном банке, поиск точек роста конверсий и проведение честных A/B-экспериментов.",
     "tags": [
@@ -614,8 +614,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@tbank_team",
     "directionId": "frontend",
     "subTrackId": "vue",
-    "url": "https://fintech.tbank.ru/start/frontend/",
-    "applyUrl": "https://fintech.tbank.ru/start/frontend/",
+    "url": "https://education.tbank.ru/start/frontend/",
+    "applyUrl": "https://education.tbank.ru/start/frontend/",
     "sourceChannel": "@tbank_team",
     "description": "Разработка административных панелей и партнерских кабинетов банка на современном Vue 3.",
     "tags": [
@@ -871,8 +871,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@tbank_team",
     "directionId": "backend",
     "subTrackId": "python",
-    "url": "https://fintech.tbank.ru/start/backend/",
-    "applyUrl": "https://fintech.tbank.ru/start/backend/",
+    "url": "https://education.tbank.ru/start/",
+    "applyUrl": "https://education.tbank.ru/start/",
     "sourceChannel": "@tbank_team",
     "description": "Разработка ключевых сервисов процессинга и кредитных конвейеров банка. Высокая нагрузка и строгие требования к надежности.",
     "tags": [
@@ -894,8 +894,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@tbank_team",
     "directionId": "devops",
     "subTrackId": "k8s_iac",
-    "url": "https://fintech.tbank.ru/start/sre/",
-    "applyUrl": "https://fintech.tbank.ru/start/sre/",
+    "url": "https://education.tbank.ru/start/",
+    "applyUrl": "https://education.tbank.ru/start/",
     "sourceChannel": "@tbank_team",
     "description": "Обеспечение бесперебойной работы критических сервисов Т-Банка. Автоматизация развертывания и мониторинга сотен микросервисов.",
     "tags": [
@@ -1057,8 +1057,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@tbank_team",
     "directionId": "backend",
     "subTrackId": "golang",
-    "url": "https://fintech.tbank.ru/start/backend/",
-    "applyUrl": "https://fintech.tbank.ru/start/backend/",
+    "url": "https://education.tbank.ru/start/",
+    "applyUrl": "https://education.tbank.ru/start/",
     "sourceChannel": "@tbank_team",
     "description": "Разработка высокопроизводительных микросервисов платежного контура Т-Банка. Экстремальные нагрузки, строгая отказоустойчивость и менторская программа.",
     "tags": [
@@ -1080,8 +1080,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@tbank_team",
     "directionId": "qa",
     "subTrackId": "auto_qa",
-    "url": "https://fintech.tbank.ru/start/qa/",
-    "applyUrl": "https://fintech.tbank.ru/start/qa/",
+    "url": "https://education.tbank.ru/start/",
+    "applyUrl": "https://education.tbank.ru/start/",
     "sourceChannel": "@tbank_team",
     "description": "Автоматизация тестирования банковских платформ, инвестиций и мобильного банка. Создание надежных автотестов и интеграция в CI/CD.",
     "tags": [
@@ -1151,8 +1151,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@tbank_team",
     "directionId": "backend",
     "subTrackId": "java",
-    "url": "https://fintech.tbank.ru/start/backend/",
-    "applyUrl": "https://fintech.tbank.ru/start/backend/",
+    "url": "https://education.tbank.ru/start/",
+    "applyUrl": "https://education.tbank.ru/start/",
     "sourceChannel": "@tbank_team",
     "description": "Оплачиваемая финтех-стажировка Т-Банк Старт: разработка отказоустойчивых бэкенд-микросервисов на Java 21, Spring Boot 3 и Kafka для платежных и расчетных систем с ментором.",
     "tags": [
@@ -1344,7 +1344,7 @@ export const CAREER_WEBSITES_DATA = [
     companyId: 'tbank',
     company: 'Т-Банк',
     name: 'Т-Банк Финтех Старт',
-    url: 'https://fintech.tbank.ru/start/',
+    url: 'https://education.tbank.ru/start/',
     category: 'Официальные стажировки Т-Банка',
     type: 'direct_site',
     city: 'Москва / Удаленно',
@@ -1964,7 +1964,7 @@ export function detectVacancyTrack(title = '', text = '') {
 }
 
 export const COMPANY_OFFICIAL_PORTALS = {
-  tbank: 'https://fintech.tbank.ru/start/frontend/',
+  tbank: 'https://education.tbank.ru/start/',
   kontur: 'https://kontur.ru/career/vacancies/intern-frontend',
   directum: 'https://career.directum.ru/vacancy/',
   t1: 'https://career.t1.ru/vacancies/',
@@ -2002,11 +2002,9 @@ export function getDirectVacancyPortalUrl(companyKey, directionId = undefined, f
       if (directionId === 'qa') return 'https://career.avito.com/vacancies/razrabotka/20803/';
       return 'https://career.avito.com/vacancies/razrabotka/20803/';
     case 'tbank':
-      if (directionId === 'backend') return 'https://fintech.tbank.ru/start/backend/';
-      if (directionId === 'qa') return 'https://fintech.tbank.ru/start/qa/';
-      if (directionId === 'devops') return 'https://fintech.tbank.ru/start/sre/';
-      if (directionId === 'data_science') return 'https://fintech.tbank.ru/start/analytics/';
-      return 'https://fintech.tbank.ru/start/frontend/';
+      if (directionId === 'frontend') return 'https://education.tbank.ru/start/frontend/';
+      if (directionId === 'data_science') return 'https://education.tbank.ru/start/analyst/';
+      return 'https://education.tbank.ru/start/';
     case 'kontur':
       if (directionId === 'backend') return 'https://kontur.ru/career/vacancies/intern-backend';
       if (directionId === 'qa') return 'https://kontur.ru/career/vacancies/intern-qa';
@@ -2023,6 +2021,7 @@ export function getDirectVacancyPortalUrl(companyKey, directionId = undefined, f
       if (directionId === 'frontend') return 'https://yandex.ru/yaintern/frontend/';
       if (directionId === 'mobile') return 'https://yandex.ru/yaintern/mobile/';
       if (directionId === 'data_science') return 'https://yandex.ru/yaintern/ml/';
+      if (directionId === 'devops') return 'https://yandex.ru/yaintern/devops/';
       return 'https://yandex.ru/yaintern/backend/';
     case 'ozon':
       if (directionId === 'frontend') return 'https://job.ozon.ru/it/camp/frontend/';
@@ -2263,8 +2262,6 @@ export function resolveApplyUrl(rawUrl, companyName = '', sourceChannel = '', di
     lower.includes('career.avito.com/internship') ||
     lower === 'https://career.directum.ru/' ||
     lower === 'https://career.directum.ru' ||
-    lower === 'https://career.directum.ru/vacancy' ||
-    lower === 'https://career.directum.ru/vacancy/' ||
     lower.includes('lead_product_owner') ||
     lower === 'https://kontur.ru/career/' ||
     lower === 'https://kontur.ru/career' ||
@@ -2272,8 +2269,6 @@ export function resolveApplyUrl(rawUrl, companyName = '', sourceChannel = '', di
     lower === 'https://kontur.ru/career/vacancies/' ||
     lower === 'https://career.t1.ru/' ||
     lower === 'https://career.t1.ru' ||
-    lower === 'https://career.t1.ru/vacancies' ||
-    lower === 'https://career.t1.ru/vacancies/' ||
     lower.includes('t1.ru/school') ||
     lower === 'https://yandex.ru/jobs/' ||
     lower === 'https://yandex.ru/jobs' ||
@@ -2286,21 +2281,44 @@ export function resolveApplyUrl(rawUrl, companyName = '', sourceChannel = '', di
     lower === 'https://sbergraduate.ru' ||
     lower === 'https://sbergraduate.ru/sberseasons-moscow/' ||
     lower === 'https://sbergraduate.ru/sberseasons-moscow' ||
+    // Obsolete & 404 employer links that must be rerouted to live verified portals
+    lower.includes('education.tbank.ru/start/sre') ||
+    lower.includes('fintech.tbank.ru') ||
+    lower.includes('/vacancy/web-developer') ||
+    lower.includes('/vacancy/backend-csharp') ||
+    lower.includes('/vacancy/qa-engineer') ||
+    lower.includes('/vacancies/java-developer') ||
+    lower.includes('/vacancies/devops-engineer') ||
+    lower.includes('/vacancies/qa-automation') ||
+    lower.includes('/vacancies/razrabotka/20805') ||
+    lower.includes('/vacancies/razrabotka/20808') ||
+    lower.includes('/internship/web') ||
+    lower.includes('/internship/backend') ||
+    lower.includes('/internship/qa') ||
+    lower.includes('/internship/data') ||
+    lower.includes('/internship/mobile') ||
+    lower.includes('yandex.ru/jobs/pages/internship') ||
+    // T-Bank generic
+    lower === 'https://education.tbank.ru' ||
+    lower === 'https://education.tbank.ru/' ||
+    lower === 'https://education.tbank.ru/start' ||
+    lower === 'https://education.tbank.ru/start/' ||
     lower === 'https://fintech.tbank.ru' ||
     lower === 'https://fintech.tbank.ru/' ||
     lower === 'https://fintech.tbank.ru/start' ||
-    lower === 'https://fintech.tbank.ru/start/' ||
+    lower === 'https://education.tbank.ru/start/' ||
     lower === 'https://www.tbank.ru/career/it/' ||
     lower === 'https://www.tbank.ru/career/it' ||
     lower === 'https://tbank.ru/career/it/' ||
     lower === 'https://tbank.ru/career/it' ||
+    // VK generic
     lower === 'https://internship.vk.company/' ||
     lower === 'https://internship.vk.company' ||
-    lower === 'https://internship.vk.company/internship' ||
-    lower === 'https://internship.vk.company/internship/' ||
+    // HH generic
     lower === 'https://hh.ru' ||
     lower === 'https://hh.ru/' ||
     lower.startsWith('https://hh.ru/search') ||
+    // Habr generic
     lower === 'https://career.habr.com' ||
     lower === 'https://career.habr.com/' ||
     lower.startsWith('https://career.habr.com/companies/');
@@ -2316,32 +2334,21 @@ export function resolveApplyUrl(rawUrl, companyName = '', sourceChannel = '', di
 
   // 7. Direct company vacancy detail page with actual vacancy slug or ID
   if (
+    trimmed.includes('/yaintern/') ||
+    trimmed.includes('career.directum.ru/vacancy') ||
+    trimmed.includes('career.t1.ru/vacancies') ||
+    trimmed.includes('internship.vk.company/internship') ||
+    trimmed.includes('internship.vk.company/vacancy') ||
+    trimmed.includes('education.tbank.ru/start/') ||
     trimmed.includes('/vacancies/razrabotka/') ||
     trimmed.includes('/vacancies/data-science/') ||
     trimmed.includes('/vacancies/analitika-dannykh/') ||
-    trimmed.includes('/vacancy/web-developer') ||
-    trimmed.includes('/vacancy/backend-csharp') ||
-    trimmed.includes('/vacancy/qa-engineer') ||
     trimmed.includes('/camp/') ||
     trimmed.includes('/intern-') ||
-    trimmed.includes('/internship/web') ||
-    trimmed.includes('/internship/backend') ||
-    trimmed.includes('/internship/qa') ||
-    trimmed.includes('/internship/data') ||
-    trimmed.includes('/internship/mobile') ||
-    trimmed.includes('/pages/internship-') ||
-    trimmed.includes('/start/frontend/') ||
-    trimmed.includes('/start/backend/') ||
-    trimmed.includes('/start/qa/') ||
-    trimmed.includes('/start/sre/') ||
-    trimmed.includes('/start/analytics/') ||
     trimmed.includes('/sberseasons-moscow/ml/') ||
     trimmed.includes('/sberseasons-moscow/java/') ||
     trimmed.includes('/sberseasons-moscow/devops/') ||
-    trimmed.includes('/sberseasons-moscow/qa/') ||
-    trimmed.includes('/vacancies/java-developer') ||
-    trimmed.includes('/vacancies/devops-engineer') ||
-    trimmed.includes('/vacancies/qa-automation')
+    trimmed.includes('/sberseasons-moscow/qa/')
   ) {
     return trimmed.startsWith('http') ? trimmed : `https://${trimmed.replace(/^\/+/, '')}`;
   }
@@ -2546,6 +2553,7 @@ export async function parseChannelPosts(channelHandle, companyInfo) {
           foundUrl.includes('yandex.ru/jobs/') ||
           foundUrl.includes('career.directum.ru/') ||
           foundUrl.includes('kontur.ru/career/') ||
+          foundUrl.includes('education.tbank.ru/') ||
           foundUrl.includes('fintech.tbank.ru/') ||
           foundUrl.includes('tbank.ru/career/') ||
           foundUrl.includes('career.t1.ru/') ||
@@ -2674,10 +2682,10 @@ export const PORTAL_FALLBACK_VACANCIES = [
       salary: 'от 80 000 до 105 000 ₽',
       format: 'Удаленно',
       location: 'Москва / Удаленно',
-      channel: 'fintech.tbank.ru',
+      channel: 'education.tbank.ru',
       directionId: 'devops',
       subTrackId: 'k8s_iac',
-      url: 'https://fintech.tbank.ru/start/sre/',
+      url: 'https://education.tbank.ru/start/',
       description: 'Финтех-стажировка в инфраструктурных командах Т-Банка: Kubernetes, автоматизация CI/CD и высокая отказоустойчивость.',
       tags: ['Т-Банк', 'Kubernetes', 'Linux', 'SRE'],
       sourceType: 'portal',

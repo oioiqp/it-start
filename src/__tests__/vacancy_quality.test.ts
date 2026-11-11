@@ -106,7 +106,7 @@ describe('Vacancy Quality & Link Integrity Verification', () => {
         .not.toContain('?search=');
       expect(resolveApplyUrl('https://career.t1.ru/vacancies/?search=java', 'Холдинг Т1', undefined, 'backend'))
         .not.toContain('?search=');
-      expect(resolveApplyUrl('https://fintech.tbank.ru/start/?direction=sre', 'Т-Банк', undefined, 'devops'))
+      expect(resolveApplyUrl('https://education.tbank.ru/start/?direction=sre', 'Т-Банк', undefined, 'devops'))
         .not.toContain('?direction=');
       expect(resolveApplyUrl('https://kontur.ru/career/vacancies?search=react', 'Контур', undefined, 'frontend'))
         .not.toContain('?search=');
@@ -117,22 +117,22 @@ describe('Vacancy Quality & Link Integrity Verification', () => {
         .toBe('https://hh.ru/vacancy/138722040');
       expect(resolveApplyUrl('/vacancies/1000168452', 'Яндекс', undefined, 'backend'))
         .toBe('https://career.habr.com/vacancies/1000168452');
-      expect(resolveApplyUrl('/vacancies/razrabotka/20805/', 'Авито', undefined, 'mobile'))
-        .toBe('https://career.avito.com/vacancies/razrabotka/20805/');
+      expect(resolveApplyUrl('/vacancies/razrabotka/20812/', 'Авито', undefined, 'backend'))
+        .toBe('https://career.avito.com/vacancies/razrabotka/20812/');
     });
 
     it('resolves generic homepages to directional direct portals', () => {
       const avitoDirect = resolveApplyUrl('https://career.avito.com/', 'Авито', undefined, 'mobile');
-      expect(avitoDirect).toBe('https://career.avito.com/vacancies/razrabotka/20805/');
+      expect(avitoDirect).toBe('https://career.avito.com/vacancies/razrabotka/20803/');
 
       const avitoDevops = resolveApplyUrl('https://career.avito.com', 'Авито', undefined, 'devops');
       expect(avitoDevops).toBe('https://career.avito.com/vacancies/razrabotka/20803/');
 
       const avitoSearch = resolveApplyUrl('https://career.avito.com/vacancies/?search=стажер', 'Авито', undefined, 'frontend');
-      expect(avitoSearch).toBe('https://career.avito.com/vacancies/razrabotka/20808/');
+      expect(avitoSearch).toBe('https://career.avito.com/vacancies/razrabotka/20803/');
 
       const tbankDirect = resolveApplyUrl('https://tbank.ru', 'Т-Банк', undefined, 'frontend');
-      expect(tbankDirect).toBe('https://fintech.tbank.ru/start/frontend/');
+      expect(tbankDirect).toBe('https://education.tbank.ru/start/frontend/');
 
       const konturDirect = resolveApplyUrl('https://kontur.ru', 'Контур', undefined, 'frontend');
       expect(konturDirect).toBe('https://kontur.ru/career/vacancies/intern-frontend');
@@ -141,10 +141,10 @@ describe('Vacancy Quality & Link Integrity Verification', () => {
       expect(sberDirect).toBe('https://sbergraduate.ru/sberseasons-moscow/ml/');
 
       const directumDirect = resolveApplyUrl('https://career.directum.ru', 'Directum', undefined, 'frontend');
-      expect(directumDirect).toBe('https://career.directum.ru/vacancy/web-developer');
+      expect(directumDirect).toBe('https://career.directum.ru/vacancy/');
 
       const directumLead = resolveApplyUrl('https://career.directum.ru/lead_product_ownerRX', 'Directum', undefined, 'backend');
-      expect(directumLead).toBe('https://career.directum.ru/vacancy/backend-csharp');
+      expect(directumLead).toBe('https://career.directum.ru/vacancy/');
     });
 
     it('preserves valid Telegram post URLs with post IDs', () => {

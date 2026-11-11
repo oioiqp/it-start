@@ -4,11 +4,11 @@ import type { DirectionId, SubTrackId } from '../types';
  * Official verified direct career portals and links for target companies
  */
 export const COMPANY_OFFICIAL_PORTALS: Record<string, string> = {
-  tbank: 'https://fintech.tbank.ru/start/frontend/',
+  tbank: 'https://education.tbank.ru/start/',
   kontur: 'https://kontur.ru/career/vacancies/intern-frontend',
   directum: 'https://career.directum.ru/vacancy/',
   t1: 'https://career.t1.ru/vacancies/',
-  yandex: 'https://yandex.ru/yaintern/internship/',
+  yandex: 'https://yandex.ru/yaintern/backend/',
   ozon: 'https://job.ozon.ru/it/camp/golang/',
   sber: 'https://sbergraduate.ru/sberseasons-moscow/ml/',
   avito: 'https://career.avito.com/vacancies/razrabotka/20803/',
@@ -68,35 +68,33 @@ export function getCompanyMonogram(companyName = ''): string {
 export function getDirectVacancyPortalUrl(
   companyKey: string,
   directionId?: string,
-  fallback = 'https://career.directum.ru/vacancy/web-developer'
+  fallback = 'https://career.directum.ru/vacancy/'
 ): string {
   switch (companyKey) {
     case 'avito':
-      if (directionId === 'mobile') return 'https://career.avito.com/vacancies/razrabotka/20805/';
-      if (directionId === 'frontend') return 'https://career.avito.com/vacancies/razrabotka/20808/';
+      if (directionId === 'mobile') return 'https://career.avito.com/vacancies/razrabotka/20803/';
+      if (directionId === 'frontend') return 'https://career.avito.com/vacancies/razrabotka/20803/';
       if (directionId === 'backend') return 'https://career.avito.com/vacancies/razrabotka/20812/';
       if (directionId === 'data_science') return 'https://career.avito.com/vacancies/analitika-dannykh/20816/';
       if (directionId === 'devops') return 'https://career.avito.com/vacancies/razrabotka/20803/';
       if (directionId === 'qa') return 'https://career.avito.com/vacancies/razrabotka/20803/';
       return 'https://career.avito.com/vacancies/razrabotka/20803/';
     case 'tbank':
-      if (directionId === 'backend') return 'https://fintech.tbank.ru/start/backend/';
-      if (directionId === 'qa') return 'https://fintech.tbank.ru/start/qa/';
-      if (directionId === 'devops') return 'https://fintech.tbank.ru/start/sre/';
-      if (directionId === 'data_science') return 'https://fintech.tbank.ru/start/analytics/';
-      return 'https://fintech.tbank.ru/start/frontend/';
+      if (directionId === 'frontend') return 'https://education.tbank.ru/start/frontend/';
+      if (directionId === 'data_science') return 'https://education.tbank.ru/start/analyst/';
+      return 'https://education.tbank.ru/start/';
     case 'kontur':
       if (directionId === 'backend') return 'https://kontur.ru/career/vacancies/intern-backend';
       if (directionId === 'qa') return 'https://kontur.ru/career/vacancies/intern-qa';
       return 'https://kontur.ru/career/vacancies/intern-frontend';
     case 'directum':
-      if (directionId === 'backend') return 'https://career.directum.ru/vacancy/backend-csharp';
-      if (directionId === 'qa') return 'https://career.directum.ru/vacancy/qa-engineer';
-      return 'https://career.directum.ru/vacancy/web-developer';
+      if (directionId === 'backend') return 'https://career.directum.ru/vacancy/';
+      if (directionId === 'qa') return 'https://career.directum.ru/vacancy/';
+      return 'https://career.directum.ru/vacancy/';
     case 't1':
-      if (directionId === 'devops') return 'https://career.t1.ru/vacancies/devops-engineer';
-      if (directionId === 'qa') return 'https://career.t1.ru/vacancies/qa-automation';
-      return 'https://career.t1.ru/vacancies/java-developer';
+      if (directionId === 'devops') return 'https://career.t1.ru/vacancies/';
+      if (directionId === 'qa') return 'https://career.t1.ru/vacancies/';
+      return 'https://career.t1.ru/vacancies/';
     case 'yandex':
       if (directionId === 'frontend') return 'https://yandex.ru/yaintern/frontend/';
       if (directionId === 'mobile') return 'https://yandex.ru/yaintern/mobile/';
@@ -245,7 +243,28 @@ export function resolveApplyUrl(
     lower === 'https://sbergraduate.ru' ||
     lower === 'https://sbergraduate.ru/sberseasons-moscow/' ||
     lower === 'https://sbergraduate.ru/sberseasons-moscow' ||
+    // Obsolete & 404 employer links that must be rerouted to live verified portals
+    lower.includes('education.tbank.ru/start/sre') ||
+    lower.includes('fintech.tbank.ru') ||
+    lower.includes('/vacancy/web-developer') ||
+    lower.includes('/vacancy/backend-csharp') ||
+    lower.includes('/vacancy/qa-engineer') ||
+    lower.includes('/vacancies/java-developer') ||
+    lower.includes('/vacancies/devops-engineer') ||
+    lower.includes('/vacancies/qa-automation') ||
+    lower.includes('/vacancies/razrabotka/20805') ||
+    lower.includes('/vacancies/razrabotka/20808') ||
+    lower.includes('/internship/web') ||
+    lower.includes('/internship/backend') ||
+    lower.includes('/internship/qa') ||
+    lower.includes('/internship/data') ||
+    lower.includes('/internship/mobile') ||
+    lower.includes('yandex.ru/jobs/pages/internship') ||
     // T-Bank generic
+    lower === 'https://education.tbank.ru' ||
+    lower === 'https://education.tbank.ru/' ||
+    lower === 'https://education.tbank.ru/start' ||
+    lower === 'https://education.tbank.ru/start/' ||
     lower === 'https://fintech.tbank.ru' ||
     lower === 'https://fintech.tbank.ru/' ||
     lower === 'https://fintech.tbank.ru/start' ||
@@ -282,32 +301,16 @@ export function resolveApplyUrl(
     trimmed.includes('career.t1.ru/vacancies') ||
     trimmed.includes('internship.vk.company/internship') ||
     trimmed.includes('internship.vk.company/vacancy') ||
+    trimmed.includes('education.tbank.ru/start/') ||
     trimmed.includes('/vacancies/razrabotka/') ||
     trimmed.includes('/vacancies/data-science/') ||
     trimmed.includes('/vacancies/analitika-dannykh/') ||
-    trimmed.includes('/vacancy/web-developer') ||
-    trimmed.includes('/vacancy/backend-csharp') ||
-    trimmed.includes('/vacancy/qa-engineer') ||
     trimmed.includes('/camp/') ||
     trimmed.includes('/intern-') ||
-    trimmed.includes('/internship/web') ||
-    trimmed.includes('/internship/backend') ||
-    trimmed.includes('/internship/qa') ||
-    trimmed.includes('/internship/data') ||
-    trimmed.includes('/internship/mobile') ||
-    trimmed.includes('/pages/internship-') ||
-    trimmed.includes('/start/frontend/') ||
-    trimmed.includes('/start/backend/') ||
-    trimmed.includes('/start/qa/') ||
-    trimmed.includes('/start/sre/') ||
-    trimmed.includes('/start/analytics/') ||
     trimmed.includes('/sberseasons-moscow/ml/') ||
     trimmed.includes('/sberseasons-moscow/java/') ||
     trimmed.includes('/sberseasons-moscow/devops/') ||
-    trimmed.includes('/sberseasons-moscow/qa/') ||
-    trimmed.includes('/vacancies/java-developer') ||
-    trimmed.includes('/vacancies/devops-engineer') ||
-    trimmed.includes('/vacancies/qa-automation')
+    trimmed.includes('/sberseasons-moscow/qa/')
   ) {
     return trimmed.startsWith('http') ? trimmed : `https://${trimmed.replace(/^\/+/, '')}`;
   }

@@ -363,7 +363,7 @@ export const MONITORED_WEBSITES_LIST: MonitoredWebsite[] = [
     id: 'site-tbank',
     name: 'Т-Банк Финтех Старт',
     company: 'Т-Банк',
-    url: 'https://fintech.tbank.ru/start/',
+    url: 'https://education.tbank.ru/start/',
     category: 'Официальные стажировки Т-Банка',
     status: 'active',
     vacanciesCount: 38,
@@ -627,7 +627,7 @@ export const INITIAL_PARSED_POSTS: ParsedChannelPost[] = [
   },
   {
     id: 'scan-tbank-sre',
-    channelHandle: 'fintech.tbank.ru',
+    channelHandle: 'education.tbank.ru',
     channelName: 'Т-Банк Финтех Старт',
     company: 'Т-Банк',
     title: 'Стажёр Site Reliability Engineer / DevOps',
@@ -640,7 +640,7 @@ export const INITIAL_PARSED_POSTS: ParsedChannelPost[] = [
     snippet: 'Стажировка в инфраструктурных командах Т-Банка: управление кластерами Kubernetes, автоматизация пайплайнов развертывания и обеспечение высокой доступности сервисов.',
     publishedAt: '2026-03-29T11:45:00.000Z',
     sourceType: 'website',
-    url: 'https://fintech.tbank.ru/start/sre/',
+    url: 'https://education.tbank.ru/start/',
   },
 
   // --- Яндекс ---

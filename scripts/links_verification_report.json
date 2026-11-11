@@ -1,15 +1,23 @@
 [
   {
-    "url": "https://fintech.tbank.ru/start/frontend/",
+    "url": "https://education.tbank.ru/start/",
     "sources": [
       "Официальный портал (tbank)",
-      "SEED: int-1 (Т-Банк (Тинькофф))",
-      "SEED: int-16 (Т-Банк (Тинькофф))",
-      "BOT_ALL: int-1 (Т-Банк (Тинькофф))",
-      "BOT_ALL: int-16 (Т-Банк (Тинькофф))"
+      "SEED: int-27 (Т-Банк)",
+      "SEED: int-28 (Т-Банк)",
+      "SEED: int-35 (Т-Банк)",
+      "SEED: int-36 (Т-Банк)",
+      "SEED: int-39 (Т-Банк)",
+      "BOT_ALL: int-27 (Т-Банк)",
+      "BOT_ALL: int-28 (Т-Банк)",
+      "BOT_ALL: int-35 (Т-Банк)",
+      "BOT_ALL: int-36 (Т-Банк)",
+      "BOT_ALL: int-39 (Т-Банк)",
+      "BOT_FALLBACK: site-tbank-start-sre (Т-Банк)",
+      "CHANNELS_POST: scan-tbank-sre (Т-Банк)"
     ],
-    "status": "VERIFIED_CA",
-    "finalUrl": "https://fintech.tbank.ru/start/frontend/ [178.130.128.27 (Минцифры РФ / Cloudflare WAF Protected)]",
+    "status": 200,
+    "finalUrl": "https://education.tbank.ru/start/",
     "ok": true
   },
   {
@@ -153,6 +161,18 @@
     "ok": true
   },
   {
+    "url": "https://education.tbank.ru/start/frontend/",
+    "sources": [
+      "SEED: int-1 (Т-Банк (Тинькофф))",
+      "SEED: int-16 (Т-Банк (Тинькофф))",
+      "BOT_ALL: int-1 (Т-Банк (Тинькофф))",
+      "BOT_ALL: int-16 (Т-Банк (Тинькофф))"
+    ],
+    "status": 200,
+    "finalUrl": "https://education.tbank.ru/start/frontend/",
+    "ok": true
+  },
+  {
     "url": "https://sbergraduate.ru/sberseasons-moscow/devops/",
     "sources": [
       "SEED: int-7 (Сбер (SberSeasons))",
@@ -173,13 +193,13 @@
     "ok": true
   },
   {
-    "url": "https://fintech.tbank.ru/start/analytics/",
+    "url": "https://education.tbank.ru/start/analyst/",
     "sources": [
       "SEED: int-10 (Т-Банк (Тинькофф))",
       "BOT_ALL: int-10 (Т-Банк (Тинькофф))"
     ],
-    "status": "VERIFIED_CA",
-    "finalUrl": "https://fintech.tbank.ru/start/analytics/ [178.130.128.27 (Минцифры РФ / Cloudflare WAF Protected)]",
+    "status": 200,
+    "finalUrl": "https://education.tbank.ru/start/analyst/",
     "ok": true
   },
   {
@@ -235,32 +255,6 @@
     "ok": true
   },
   {
-    "url": "https://fintech.tbank.ru/start/backend/",
-    "sources": [
-      "SEED: int-27 (Т-Банк)",
-      "SEED: int-35 (Т-Банк)",
-      "SEED: int-39 (Т-Банк)",
-      "BOT_ALL: int-27 (Т-Банк)",
-      "BOT_ALL: int-35 (Т-Банк)",
-      "BOT_ALL: int-39 (Т-Банк)"
-    ],
-    "status": "VERIFIED_CA",
-    "finalUrl": "https://fintech.tbank.ru/start/backend/ [178.130.128.27 (Минцифры РФ / Cloudflare WAF Protected)]",
-    "ok": true
-  },
-  {
-    "url": "https://fintech.tbank.ru/start/sre/",
-    "sources": [
-      "SEED: int-28 (Т-Банк)",
-      "BOT_ALL: int-28 (Т-Банк)",
-      "BOT_FALLBACK: site-tbank-start-sre (Т-Банк)",
-      "CHANNELS_POST: scan-tbank-sre (Т-Банк)"
-    ],
-    "status": "VERIFIED_CA",
-    "finalUrl": "https://fintech.tbank.ru/start/sre/ [178.130.128.27 (Минцифры РФ / Cloudflare WAF Protected)]",
-    "ok": true
-  },
-  {
     "url": "https://job.ozon.ru/it/camp/frontend/",
     "sources": [
       "SEED: int-29 (Ozon Tech)",
@@ -288,16 +282,6 @@
     ],
     "status": 200,
     "finalUrl": "https://career.avito.com/vacancies/razrabotka/20812/",
-    "ok": true
-  },
-  {
-    "url": "https://fintech.tbank.ru/start/qa/",
-    "sources": [
-      "SEED: int-36 (Т-Банк)",
-      "BOT_ALL: int-36 (Т-Банк)"
-    ],
-    "status": "VERIFIED_CA",
-    "finalUrl": "https://fintech.tbank.ru/start/qa/ [178.130.128.27 (Минцифры РФ / Cloudflare WAF Protected)]",
     "ok": true
   },
   {

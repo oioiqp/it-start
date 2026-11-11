@@ -52,13 +52,11 @@ async function checkUrl(url) {
       try {
         const parsed = new URL(url);
         const host = parsed.hostname;
-        const checkHost = host.includes('tbank.ru') ? 'tbank.ru' : host;
-        const lookup = await dnsPromises.lookup(checkHost);
+        const lookup = await dnsPromises.lookup(host);
         const isRussianProtectedDomain =
-          checkHost.includes('sbergraduate.ru') ||
-          checkHost.includes('tbank.ru') ||
-          checkHost.includes('kontur.ru') ||
-          checkHost.includes('ozon.ru');
+          host.includes('sbergraduate.ru') ||
+          host.includes('kontur.ru') ||
+          host.includes('ozon.ru');
 
         if (lookup.address && isRussianProtectedDomain) {
           return {

@@ -743,7 +743,7 @@ describe('11. Target Companies & Telegram Channels Tracking', () => {
     const siteUrls = botModule.CAREER_WEBSITES_DATA.map((s: any) => s.url);
     expect(siteUrls.some((u: string) => u.includes('career.directum.ru'))).toBe(true);
     expect(siteUrls.some((u: string) => u.includes('kontur.ru'))).toBe(true);
-    expect(siteUrls.some((u: string) => u.includes('fintech.tbank.ru'))).toBe(true);
+    expect(siteUrls.some((u: string) => u.includes('education.tbank.ru') || u.includes('fintech.tbank.ru'))).toBe(true);
     expect(siteUrls.some((u: string) => u.includes('t1.ru'))).toBe(true);
 
     expect(typeof botModule.parseTelegramChannels).toBe('function');
@@ -1421,7 +1421,7 @@ describe('13. Real Employer Positions & Liquid Glass Bento Dark/Light Theme Syst
     expect(tbankItems.some((i) => i.subTrackId === 'analytics')).toBe(true);
     tbankItems.forEach((i) => {
       expect(i.sourceChannel).toBe('@tbank_team');
-      expect(i.applyUrl).toContain('fintech.tbank.ru');
+      expect(i.applyUrl).toContain('education.tbank.ru');
     });
 
     // 2. СКБ Контур: Frontend React/TS, Backend C#/Python, QA

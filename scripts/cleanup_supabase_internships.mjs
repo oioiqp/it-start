@@ -55,11 +55,23 @@ async function main() {
     );
 
     // Specific corrections for historical rows
-    if (row.id === 'int-38' || row.id === 'bot-directum-1' || row.source_url?.includes('vacancy/web-developer')) {
+    if (
+      row.id === 'int-38' ||
+      row.id === 'bot-directum-1' ||
+      row.id === 'bot-directum-2' ||
+      row.id === 'bot-directum-3' ||
+      row.source_url?.includes('career.directum.ru/vacancy')
+    ) {
       title = row.title || 'Стажёр Backend C# / .NET Developer (Directum RX)';
       resolvedUrl = 'https://career.directum.ru/vacancy/';
-    } else if (row.id === 'bot-t1-3' || row.id === 'bot-t1-1' || row.source_url?.includes('vacancies/java-developer')) {
+    } else if (
+      row.id === 'bot-t1-3' ||
+      row.id === 'bot-t1-1' ||
+      row.source_url?.includes('career.t1.ru/vacancies')
+    ) {
       resolvedUrl = 'https://career.t1.ru/vacancies/';
+    } else if (row.id === 'bot-vk-1' || row.source_url?.includes('internship.vk.company')) {
+      resolvedUrl = 'https://internship.vk.company/internship/';
     } else if (row.id === 'hh-3529-138722040') {
       resolvedUrl = 'https://hh.ru/vacancy/138722040';
     }
