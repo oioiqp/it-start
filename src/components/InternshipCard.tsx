@@ -159,7 +159,7 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
             const verifiedChannel = resolveChannelHandle(internship.sourceChannel, internship.company);
             const cleanChannel = verifiedChannel.replace(/^@/, '');
             const isTg = verifiedChannel.startsWith('@');
-            const isWeb = verifiedChannel.includes('.');
+            const isWeb = !isTg && (verifiedChannel.includes('.') || verifiedChannel.startsWith('http'));
 
             return (
               <>

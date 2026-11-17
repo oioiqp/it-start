@@ -212,7 +212,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
               const verifiedChannel = resolveChannelHandle(internship.sourceChannel, internship.company);
               const cleanChannel = verifiedChannel.replace(/^@/, '');
               const isTg = verifiedChannel.startsWith('@');
-              const isWeb = verifiedChannel.includes('.');
+              const isWeb = !isTg && (verifiedChannel.includes('.') || verifiedChannel.startsWith('http'));
 
               if (isTg) {
                 return (
@@ -221,6 +221,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-xs px-2.5 py-1 rounded-full liquid-glass-pill text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white flex items-center gap-1 transition-colors"
+                    title={`Открыть проверенный Telegram-канал ${verifiedChannel}`}
                   >
                     <Bot className="w-3 h-3 text-neutral-500" />
                     <span>Источник: {verifiedChannel}</span>
@@ -237,6 +238,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-xs px-2.5 py-1 rounded-full liquid-glass-pill text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white flex items-center gap-1 transition-colors"
+                    title={`Открыть карьерный сайт ${verifiedChannel}`}
                   >
                     <Globe className="w-3 h-3 text-neutral-500" />
                     <span>Источник: {verifiedChannel}</span>
@@ -247,7 +249,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
 
               return (
                 <span className="text-xs px-2.5 py-1 rounded-full liquid-glass-pill text-neutral-600 dark:text-neutral-400">
-                  Источник: {internship.sourceChannel}
+                  Источник: {verifiedChannel}
                 </span>
               );
             })()}
@@ -518,7 +520,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
               const verifiedChannel = resolveChannelHandle(internship.sourceChannel, internship.company);
               const cleanChannel = verifiedChannel.replace(/^@/, '');
               const isTg = verifiedChannel.startsWith('@');
-              const isWeb = verifiedChannel.includes('.');
+              const isWeb = !isTg && (verifiedChannel.includes('.') || verifiedChannel.startsWith('http'));
 
               if (isTg) {
                 return (

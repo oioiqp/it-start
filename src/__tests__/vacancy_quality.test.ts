@@ -3,6 +3,7 @@ import {
   formatSalary,
   isStrictVacancyPost,
   resolveApplyUrl,
+  resolveChannelHandle,
   detectVacancyTrack,
 } from '../lib/vacancyUrl';
 import { SEED_INTERNSHIPS } from '../data/internships';
@@ -193,6 +194,55 @@ describe('Vacancy Quality & Link Integrity Verification', () => {
     it('detects Data Science tracks accurately', () => {
       expect(detectVacancyTrack('Стажёр ML / Data Science').directionId).toBe('data_science');
       expect(detectVacancyTrack('Junior Аналитик данных').directionId).toBe('data_science');
+    });
+  });
+
+  describe('5. resolveChannelHandle & target employer parity', () => {
+    it('always maps target employers to their verified official channels regardless of raw input', () => {
+      // 1. Sberbank
+      expect(resolveChannelHandle('hh.ru/3529', 'Сбер')).toBe('@sber_careers');
+      expect(resolveChannelHandle(undefined, 'Сбер (SberSeasons)')).toBe('@sber_careers');
+      expect(resolveChannelHandle('sbergraduate.ru', 'Сбер AI')).toBe('@sber_careers');
+
+      // 2. Avito
+      expect(resolveChannelHandle('career.avito.com', 'Авито')).toBe('@avito_tech');
+      expect(resolveChannelHandle(undefined, 'Avito Tech')).toBe('@avito_tech');
+      expect(resolveChannelHandle('@avito_career', 'Авито')).toBe('@avito_tech');
+
+      // 3. Ozon
+      expect(resolveChannelHandle('hh.ru/2180', 'Ozon Tech')).toBe('@ozon_tech_career');
+      expect(resolveChannelHandle('job.ozon.ru', 'Ozon')).toBe('@ozon_tech_career');
+      expect(resolveChannelHandle(undefined, 'Ozon Tech')).toBe('@ozon_tech_career');
+
+      // 4. VK
+      expect(resolveChannelHandle('internship.vk.company', 'VK')).toBe('@vk_team');
+      expect(resolveChannelHandle(undefined, 'VK (ВКонтакте)')).toBe('@vk_team');
+
+      // 5. Т-Банк
+      expect(resolveChannelHandle('education.tbank.ru', 'Т-Банк')).toBe('@tbank_team');
+      expect(resolveChannelHandle('@tbank_start', 'Т-Банк (Тинькофф)')).toBe('@tbank_team');
+
+      // 6. СКБ Контур
+      expect(resolveChannelHandle('kontur.ru/career', 'СКБ Контур')).toBe('@KonturTech');
+      expect(resolveChannelHandle('kontur_career', 'Контур')).toBe('@KonturTech');
+
+      // 7. Directum
+      expect(resolveChannelHandle('career.directum.ru', 'Directum')).toBe('@Life_in_Directum');
+      expect(resolveChannelHandle(undefined, 'Directum')).toBe('@Life_in_Directum');
+
+      // 8. Холдинг Т1
+      expect(resolveChannelHandle('t1.ru/school', 'Холдинг Т1')).toBe('@t1career');
+      expect(resolveChannelHandle(undefined, 'Холдинг Т1')).toBe('@t1career');
+
+      // 9. Яндекс
+      expect(resolveChannelHandle('yandex.ru/yabackend', 'Яндекс')).toBe('@yandex_intern');
+      expect(resolveChannelHandle(undefined, 'Яндекс')).toBe('@yandex_intern');
+    });
+
+    it('handles external aggregator channels without mangling web domains', () => {
+      expect(resolveChannelHandle('@normrabota', 'IT Channels')).toBe('@normrabota');
+      expect(resolveChannelHandle('hh.ru/other', 'Неизвестная компания')).toBe('@IT_start_izh_bot');
+      expect(resolveChannelHandle(undefined, '')).toBe('@IT_start_izh_bot');
     });
   });
 });

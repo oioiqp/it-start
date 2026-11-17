@@ -36,9 +36,10 @@ import {
   DIRECTION_TITLES,
   resolveDirectionByQuery,
   formatSalary,
+  resolveChannelHandle,
 } from './bot.mjs';
 
-export { ALL_INTERNSHIPS, SEED_INTERNSHIPS, PORTAL_FALLBACK_VACANCIES, DIRECTION_ALIASES, DIRECTION_TITLES, resolveDirectionByQuery, formatSalary };
+export { ALL_INTERNSHIPS, SEED_INTERNSHIPS, PORTAL_FALLBACK_VACANCIES, DIRECTION_ALIASES, DIRECTION_TITLES, resolveDirectionByQuery, formatSalary, resolveChannelHandle };
 
 // Auto-load .env configuration if present
 function autoLoadEnv() {
@@ -358,12 +359,13 @@ export function formatVkVacancyMessage(item) {
   const desc = item.description ? `\n📝 ${item.description.slice(0, 160)}...` : '';
   const url = item.applyUrl || item.url || GITHUB_PAGES_URL;
 
+  const channel = resolveChannelHandle(item.sourceChannel || item.channel, item.company);
   return (
     `💼 ${item.company} — ${item.title}\n` +
     `━━━━━━━━━━━━━━━━━━━━\n` +
     `💰 Зарплата: ${formatSalary(item.salary)}\n` +
     `📍 Формат: ${formatLocation(item)}\n` +
-    `📢 Источник: ${item.sourceChannel || item.channel || 'IT-Старт'}\n` +
+    `📢 Источник: ${channel}\n` +
     (tagsStr ? `🏷 Стек: ${tagsStr}\n` : '') +
     desc +
     `\n\n🔗 Подробнее и отклик: ${url}`
@@ -388,7 +390,7 @@ export function formatVkVacanciesList(items = [], title = 'Актуальные 
 
   slice.forEach((item, idx) => {
     const verifiedApplyUrl = item.applyUrl || item.url || RENDER_URL;
-    const channel = item.sourceChannel || item.channel || '@t1career';
+    const channel = resolveChannelHandle(item.sourceChannel || item.channel, item.company);
     const loc = formatLocation(item);
     text += `[${idx + 1}] 🏢 ${item.company}\n`;
     text += `💼 ${item.title}\n`;
@@ -943,7 +945,7 @@ export async function notifyVkSubscribers(vacancies = [], token = VK_BOT_TOKEN) 
         : 'Junior / Стажировка';
       const isWeb = vac.sourceType === 'portal' || vac.sourceType === 'website';
       const sourceLabel = isWeb ? 'Карьерный сайт' : 'Telegram-канал';
-      const sourceChannel = vac.sourceChannel || vac.channel || (isWeb ? 'Сайт работодателя' : 'Telegram-канал');
+      const sourceChannel = resolveChannelHandle(vac.sourceChannel || vac.channel, vac.company);
       const applyUrl = vac.applyUrl || vac.url || RENDER_URL;
       const msg =
         `🔥 Новая стажировка!\n` +

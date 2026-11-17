@@ -2361,6 +2361,71 @@ export function resolveApplyUrl(rawUrl, companyName = '', sourceChannel = '', di
   return fallbackDirect;
 }
 
+export const COMPANY_OFFICIAL_CHANNELS = {
+  tbank: '@tbank_team',
+  kontur: '@KonturTech',
+  directum: '@Life_in_Directum',
+  t1: '@t1career',
+  yandex: '@yandex_intern',
+  ozon: '@ozon_tech_career',
+  sber: '@sber_careers',
+  avito: '@avito_tech',
+  vk: '@vk_team',
+};
+
+export function resolveChannelHandle(channel, companyName = '') {
+  const compKey = getCompanyKey(companyName);
+  const officialChannel = COMPANY_OFFICIAL_CHANNELS[compKey];
+
+  if (officialChannel) {
+    if (!channel) return officialChannel;
+
+    const clean = String(channel).trim().replace(/^@/, '');
+    const lower = clean.toLowerCase();
+
+    if (compKey === 'tbank' && (lower === 'tbank_start' || lower === 'tinkoff_jobs' || lower === 'tbank_career')) {
+      return '@tbank_team';
+    }
+    if (compKey === 'kontur' && (lower === 'kontur_career' || lower === 'konturtech')) {
+      return '@KonturTech';
+    }
+    if (compKey === 'directum' && (lower === 'directum_career' || lower === 'directum_careers' || lower === 'life_in_directum')) {
+      return '@Life_in_Directum';
+    }
+    if (compKey === 't1' && (lower === 't1_holding' || lower === 't1career')) {
+      return '@t1career';
+    }
+    if (compKey === 'yandex' && (lower === 'yaintern' || lower === 'yandex_jobs' || lower === 'yandex_intern')) {
+      return '@yandex_intern';
+    }
+    if (compKey === 'ozon' && (lower === 'ozontech' || lower === 'ozon_career' || lower === 'ozon_tech_career' || lower === 'ozoncamp')) {
+      return '@ozon_tech_career';
+    }
+    if (compKey === 'sber' && (lower === 'sbercareers' || lower === 'sber_tech' || lower === 'sbergraduate' || lower === 'sber_careers')) {
+      return '@sber_careers';
+    }
+    if (compKey === 'avito' && (lower === 'avito_career' || lower === 'avitocareer' || lower === 'avito_jobs' || lower === 'avito_tech')) {
+      return '@avito_tech';
+    }
+    if (compKey === 'vk' && (lower === 'vkteam' || lower === 'vk_internship' || lower === 'vk_team')) {
+      return '@vk_team';
+    }
+
+    return officialChannel;
+  }
+
+  if (!channel) return '@IT_start_izh_bot';
+
+  const clean = String(channel).trim().replace(/^@/, '');
+  const lower = clean.toLowerCase();
+
+  if (lower.includes('.') || lower.includes('/')) {
+    return '@IT_start_izh_bot';
+  }
+
+  return `@${clean}`;
+}
+
 export function isStrictVacancyPost(title = '', text = '') {
   const titleLower = title.toLowerCase();
   const combined = `${title} ${text}`.toLowerCase();
@@ -2666,7 +2731,8 @@ export const PORTAL_FALLBACK_VACANCIES = [
       salary: 'от 65 000 до 85 000 ₽',
       format: 'Удаленно',
       location: 'Екатеринбург / Удаленно',
-      channel: 'kontur.ru/career',
+      channel: '@KonturTech',
+      sourceChannel: '@KonturTech',
       directionId: 'frontend',
       subTrackId: 'react',
       url: 'https://kontur.ru/career/vacancies/intern-frontend',
@@ -2682,7 +2748,8 @@ export const PORTAL_FALLBACK_VACANCIES = [
       salary: 'от 80 000 до 105 000 ₽',
       format: 'Удаленно',
       location: 'Москва / Удаленно',
-      channel: 'education.tbank.ru',
+      channel: '@tbank_team',
+      sourceChannel: '@tbank_team',
       directionId: 'devops',
       subTrackId: 'k8s_iac',
       url: 'https://education.tbank.ru/start/',
@@ -2698,7 +2765,8 @@ export const PORTAL_FALLBACK_VACANCIES = [
       salary: 'от 70 000 до 90 000 ₽',
       format: 'Удаленно',
       location: 'Москва / Удаленно',
-      channel: 't1.ru/school',
+      channel: '@t1career',
+      sourceChannel: '@t1career',
       directionId: 'backend',
       subTrackId: 'java',
       url: 'https://career.t1.ru/vacancies/',
@@ -2714,7 +2782,8 @@ export const PORTAL_FALLBACK_VACANCIES = [
       salary: 'от 55 000 до 75 000 ₽',
       format: 'Гибрид',
       location: 'Ижевск / Удаленно',
-      channel: 'career.directum.ru',
+      channel: '@Life_in_Directum',
+      sourceChannel: '@Life_in_Directum',
       directionId: 'frontend',
       subTrackId: 'react',
       url: 'https://career.directum.ru/vacancy/',
@@ -2730,7 +2799,8 @@ export const PORTAL_FALLBACK_VACANCIES = [
       salary: 'от 80 000 до 105 000 ₽',
       format: 'Гибрид',
       location: 'Москва / Екатеринбург / Гибрид',
-      channel: 'yandex.ru/yabackend',
+      channel: '@yandex_intern',
+      sourceChannel: '@yandex_intern',
       directionId: 'backend',
       subTrackId: 'python',
       url: 'https://yandex.ru/yaintern/backend/',
@@ -2746,7 +2816,8 @@ export const PORTAL_FALLBACK_VACANCIES = [
       salary: 'от 85 000 до 110 000 ₽',
       format: 'Удаленно',
       location: 'Москва / Удаленно',
-      channel: 'job.ozon.ru',
+      channel: '@ozon_tech_career',
+      sourceChannel: '@ozon_tech_career',
       directionId: 'backend',
       subTrackId: 'golang',
       url: 'https://job.ozon.ru/it/camp/golang/',
@@ -2762,7 +2833,8 @@ export const PORTAL_FALLBACK_VACANCIES = [
       salary: 'от 80 000 до 105 000 ₽',
       format: 'Офис',
       location: 'Москва (Кутузовский)',
-      channel: 'sbergraduate.ru',
+      channel: '@sber_careers',
+      sourceChannel: '@sber_careers',
       directionId: 'data_science',
       subTrackId: 'ml',
       url: 'https://sbergraduate.ru/sberseasons-moscow/ml/',
@@ -2778,7 +2850,8 @@ export const PORTAL_FALLBACK_VACANCIES = [
       salary: 'от 75 000 до 95 000 ₽',
       format: 'Гибрид',
       location: 'Москва / Санкт-Петербург',
-      channel: 'career.avito.com',
+      channel: '@avito_tech',
+      sourceChannel: '@avito_tech',
       directionId: 'mobile',
       subTrackId: 'android',
       url: 'https://career.avito.com/vacancies/razrabotka/20803/',
@@ -2794,7 +2867,8 @@ export const PORTAL_FALLBACK_VACANCIES = [
       salary: 'от 65 000 до 85 000 ₽',
       format: 'Удаленно',
       location: 'Санкт-Петербург / Москва',
-      channel: 'internship.vk.company',
+      channel: '@vk_team',
+      sourceChannel: '@vk_team',
       directionId: 'frontend',
       subTrackId: 'react',
       url: 'https://internship.vk.company/internship/',
@@ -2810,7 +2884,8 @@ export const PORTAL_FALLBACK_VACANCIES = [
       salary: 'от 60 000 до 80 000 ₽',
       format: 'Удаленно',
       location: 'Екатеринбург / Удаленно',
-      channel: 'kontur.ru/career',
+      channel: '@KonturTech',
+      sourceChannel: '@KonturTech',
       directionId: 'qa',
       subTrackId: 'auto_qa',
       url: 'https://kontur.ru/career/vacancies/intern-qa',
@@ -3155,6 +3230,7 @@ export async function getActiveInternships(forceRefresh = false) {
           const rawUrl = item.source_url || item.url || GITHUB_PAGES_URL;
           const directionId = item.direction || item.direction_id || 'backend';
           const directUrl = resolveApplyUrl(rawUrl, item.company, item.source_name, directionId);
+          const verifiedChannel = resolveChannelHandle(item.source_name, item.company);
           return {
             id: String(item.id),
             companyId: comp.id || item.company_id || 'other',
@@ -3163,8 +3239,8 @@ export async function getActiveInternships(forceRefresh = false) {
             salary: formatSalary(item.salary),
             format: item.format || 'Удаленно',
             location: item.city || item.location || 'Москва / Удаленно',
-            channel: item.source_name || '@IT_start_izh_bot',
-            sourceChannel: item.source_name || '@IT_start_izh_bot',
+            channel: verifiedChannel,
+            sourceChannel: verifiedChannel,
             directionId,
             subTrackId: item.sub_track || item.sub_track_id || 'python',
             url: directUrl,
@@ -4038,7 +4114,7 @@ export async function sendVacancies(chatId, filter = 'all') {
   } else {
     list.slice(0, 5).forEach((item, idx) => {
       const applyUrl = item.applyUrl || item.url || RENDER_URL;
-      const channel = item.sourceChannel || item.channel || '@t1career';
+      const channel = resolveChannelHandle(item.sourceChannel || item.channel, item.company);
       const stack = Array.isArray(item.tags) && item.tags.length > 0 ? item.tags.slice(0, 4).join(' • ') : '';
       const salaryFormatted = formatSalary(item.salary);
       const loc = formatLocation(item);

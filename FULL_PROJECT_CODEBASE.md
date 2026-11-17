@@ -1,6 +1,6 @@
 # 📘 IT-Старт — Полная документация и исходный код проекта
 
-> Документ сформирован автоматически: 11.11.2026, 18:36:22
+> Документ сформирован автоматически: 17.11.2026, 11:44:17
 > Проект: **IT-Старт (IT Start)** — Единая экосистема агрегации IT-стажировок, дорожных карт и подготовки к техническим собеседованиям.
 
 ---
@@ -14,9 +14,9 @@
 | 3 | [.gitignore](#-gitignore) | 29 | 0.3 КБ | Конфигурационный или инфраструктурный файл |
 | 4 | [.oxlintrc.json](#-oxlintrc-json) | 10 | 0.3 КБ | Конфигурационный или инфраструктурный файл |
 | 5 | [ARCHITECTURE.md](#architecture-md) | 173 | 20.0 КБ | Конфигурационный или инфраструктурный файл |
-| 6 | [bot/bot.mjs](#bot-bot-mjs) | 4696 | 191.0 КБ | Сервер ботов Telegram и ВКонтакте + парсер |
+| 6 | [bot/bot.mjs](#bot-bot-mjs) | 4772 | 193.6 КБ | Сервер ботов Telegram и ВКонтакте + парсер |
 | 7 | [bot/README.md](#bot-readme-md) | 88 | 7.0 КБ | Сервер ботов Telegram и ВКонтакте + парсер |
-| 8 | [bot/vk_bot.mjs](#bot-vk_bot-mjs) | 2222 | 85.7 КБ | Сервер ботов Telegram и ВКонтакте + парсер |
+| 8 | [bot/vk_bot.mjs](#bot-vk_bot-mjs) | 2224 | 85.8 КБ | Сервер ботов Telegram и ВКонтакте + парсер |
 | 9 | [index.html](#index-html) | 53 | 2.7 КБ | Конфигурационный или инфраструктурный файл |
 | 10 | [package.json](#package-json) | 44 | 1.2 КБ | Зависимости и npm-скрипты проекта |
 | 11 | [public/.nojekyll](#public--nojekyll) | 2 | 0.0 КБ | Конфигурационный или инфраструктурный файл |
@@ -27,7 +27,7 @@
 | 16 | [scripts/check_tbank_links.mjs](#scripts-check_tbank_links-mjs) | 15 | 0.7 КБ | Скрипты сборки, очистки базы и верификации ссылок |
 | 17 | [scripts/check_tbank_tracks.mjs](#scripts-check_tbank_tracks-mjs) | 15 | 0.5 КБ | Скрипты сборки, очистки базы и верификации ссылок |
 | 18 | [scripts/clean_supabase.mjs](#scripts-clean_supabase-mjs) | 204 | 8.4 КБ | Скрипты сборки, очистки базы и верификации ссылок |
-| 19 | [scripts/cleanup_supabase_internships.mjs](#scripts-cleanup_supabase_internships-mjs) | 232 | 9.1 КБ | Скрипты сборки, очистки базы и верификации ссылок |
+| 19 | [scripts/cleanup_supabase_internships.mjs](#scripts-cleanup_supabase_internships-mjs) | 235 | 9.3 КБ | Скрипты сборки, очистки базы и верификации ссылок |
 | 20 | [scripts/generate_icons.cjs](#scripts-generate_icons-cjs) | 211 | 6.6 КБ | Скрипты сборки, очистки базы и верификации ссылок |
 | 21 | [scripts/links_verification_report.json](#scripts-links_verification_report-json) | 445 | 13.4 КБ | Скрипты сборки, очистки базы и верификации ссылок |
 | 22 | [scripts/postbuild.cjs](#scripts-postbuild-cjs) | 12 | 0.4 КБ | Скрипты сборки, очистки базы и верификации ссылок |
@@ -36,12 +36,12 @@
 | 25 | [src/__tests__/app.test.ts](#src-__tests__-app-test-ts) | 1886 | 80.4 КБ | Автоматизированные тесты Vitest |
 | 26 | [src/__tests__/bot_parity.test.ts](#src-__tests__-bot_parity-test-ts) | 587 | 22.8 КБ | Автоматизированные тесты Vitest |
 | 27 | [src/__tests__/responsive_adaptive.test.ts](#src-__tests__-responsive_adaptive-test-ts) | 318 | 12.8 КБ | Автоматизированные тесты Vitest |
-| 28 | [src/__tests__/vacancy_quality.test.ts](#src-__tests__-vacancy_quality-test-ts) | 199 | 13.4 КБ | Автоматизированные тесты Vitest |
+| 28 | [src/__tests__/vacancy_quality.test.ts](#src-__tests__-vacancy_quality-test-ts) | 249 | 16.0 КБ | Автоматизированные тесты Vitest |
 | 29 | [src/App.css](#src-app-css) | 185 | 2.8 КБ | Конфигурационный или инфраструктурный файл |
 | 30 | [src/App.tsx](#src-app-tsx) | 1080 | 53.4 КБ | Главный компонент приложения (роутинг вкладок, состояние) |
 | 31 | [src/components/FlashcardsTrainer.tsx](#src-components-flashcardstrainer-tsx) | 238 | 9.6 КБ | React-компонент пользовательского интерфейса |
-| 32 | [src/components/InternshipCard.tsx](#src-components-internshipcard-tsx) | 227 | 10.7 КБ | React-компонент пользовательского интерфейса |
-| 33 | [src/components/InternshipModal.tsx](#src-components-internshipmodal-tsx) | 582 | 30.0 КБ | React-компонент пользовательского интерфейса |
+| 32 | [src/components/InternshipCard.tsx](#src-components-internshipcard-tsx) | 227 | 10.8 КБ | React-компонент пользовательского интерфейса |
+| 33 | [src/components/InternshipModal.tsx](#src-components-internshipmodal-tsx) | 584 | 30.3 КБ | React-компонент пользовательского интерфейса |
 | 34 | [src/components/Navbar.tsx](#src-components-navbar-tsx) | 200 | 9.3 КБ | React-компонент пользовательского интерфейса |
 | 35 | [src/components/QuestionsViewer.tsx](#src-components-questionsviewer-tsx) | 537 | 26.7 КБ | React-компонент пользовательского интерфейса |
 | 36 | [src/components/RoadmapViewer.tsx](#src-components-roadmapviewer-tsx) | 667 | 34.0 КБ | React-компонент пользовательского интерфейса |
@@ -59,7 +59,7 @@
 | 48 | [src/lib/supabase.ts](#src-lib-supabase-ts) | 320 | 10.4 КБ | Утилиты интеграции (Supabase, Telegram, VK, URL) |
 | 49 | [src/lib/telegram.ts](#src-lib-telegram-ts) | 457 | 13.8 КБ | Утилиты интеграции (Supabase, Telegram, VK, URL) |
 | 50 | [src/lib/useScrollLock.ts](#src-lib-usescrolllock-ts) | 49 | 1.6 КБ | Утилиты интеграции (Supabase, Telegram, VK, URL) |
-| 51 | [src/lib/vacancyUrl.ts](#src-lib-vacancyurl-ts) | 699 | 28.5 КБ | Утилиты интеграции (Supabase, Telegram, VK, URL) |
+| 51 | [src/lib/vacancyUrl.ts](#src-lib-vacancyurl-ts) | 745 | 30.5 КБ | Утилиты интеграции (Supabase, Telegram, VK, URL) |
 | 52 | [src/lib/vk.ts](#src-lib-vk-ts) | 295 | 9.1 КБ | Утилиты интеграции (Supabase, Telegram, VK, URL) |
 | 53 | [src/lib/vkBridge.ts](#src-lib-vkbridge-ts) | 318 | 9.3 КБ | Утилиты интеграции (Supabase, Telegram, VK, URL) |
 | 54 | [src/main.tsx](#src-main-tsx) | 11 | 0.2 КБ | Конфигурационный или инфраструктурный файл |
@@ -71,7 +71,7 @@
 | 60 | [vercel.json](#vercel-json) | 9 | 0.1 КБ | Конфигурационный или инфраструктурный файл |
 | 61 | [vite.config.ts](#vite-config-ts) | 33 | 0.8 КБ | Конфигурация сборщика Vite и чанков |
 
-**Итого исходного кода:** 61 файлов, 26 581 строк, 1.20 МБ.
+**Итого исходного кода:** 61 файлов, 26 760 строк, 1.21 МБ.
 
 ---
 
@@ -432,7 +432,7 @@ npm run bot:all
 
 - **Путь:** `bot/bot.mjs`
 - **Назначение:** Сервер ботов Telegram и ВКонтакте + парсер
-- **Объем:** 4696 строк (191.0 КБ)
+- **Объем:** 4772 строк (193.6 КБ)
 
 ```javascript
 /**
@@ -2798,6 +2798,71 @@ export function resolveApplyUrl(rawUrl, companyName = '', sourceChannel = '', di
   return fallbackDirect;
 }
 
+export const COMPANY_OFFICIAL_CHANNELS = {
+  tbank: '@tbank_team',
+  kontur: '@KonturTech',
+  directum: '@Life_in_Directum',
+  t1: '@t1career',
+  yandex: '@yandex_intern',
+  ozon: '@ozon_tech_career',
+  sber: '@sber_careers',
+  avito: '@avito_tech',
+  vk: '@vk_team',
+};
+
+export function resolveChannelHandle(channel, companyName = '') {
+  const compKey = getCompanyKey(companyName);
+  const officialChannel = COMPANY_OFFICIAL_CHANNELS[compKey];
+
+  if (officialChannel) {
+    if (!channel) return officialChannel;
+
+    const clean = String(channel).trim().replace(/^@/, '');
+    const lower = clean.toLowerCase();
+
+    if (compKey === 'tbank' && (lower === 'tbank_start' || lower === 'tinkoff_jobs' || lower === 'tbank_career')) {
+      return '@tbank_team';
+    }
+    if (compKey === 'kontur' && (lower === 'kontur_career' || lower === 'konturtech')) {
+      return '@KonturTech';
+    }
+    if (compKey === 'directum' && (lower === 'directum_career' || lower === 'directum_careers' || lower === 'life_in_directum')) {
+      return '@Life_in_Directum';
+    }
+    if (compKey === 't1' && (lower === 't1_holding' || lower === 't1career')) {
+      return '@t1career';
+    }
+    if (compKey === 'yandex' && (lower === 'yaintern' || lower === 'yandex_jobs' || lower === 'yandex_intern')) {
+      return '@yandex_intern';
+    }
+    if (compKey === 'ozon' && (lower === 'ozontech' || lower === 'ozon_career' || lower === 'ozon_tech_career' || lower === 'ozoncamp')) {
+      return '@ozon_tech_career';
+    }
+    if (compKey === 'sber' && (lower === 'sbercareers' || lower === 'sber_tech' || lower === 'sbergraduate' || lower === 'sber_careers')) {
+      return '@sber_careers';
+    }
+    if (compKey === 'avito' && (lower === 'avito_career' || lower === 'avitocareer' || lower === 'avito_jobs' || lower === 'avito_tech')) {
+      return '@avito_tech';
+    }
+    if (compKey === 'vk' && (lower === 'vkteam' || lower === 'vk_internship' || lower === 'vk_team')) {
+      return '@vk_team';
+    }
+
+    return officialChannel;
+  }
+
+  if (!channel) return '@IT_start_izh_bot';
+
+  const clean = String(channel).trim().replace(/^@/, '');
+  const lower = clean.toLowerCase();
+
+  if (lower.includes('.') || lower.includes('/')) {
+    return '@IT_start_izh_bot';
+  }
+
+  return `@${clean}`;
+}
+
 export function isStrictVacancyPost(title = '', text = '') {
   const titleLower = title.toLowerCase();
   const combined = `${title} ${text}`.toLowerCase();
@@ -3103,7 +3168,8 @@ export const PORTAL_FALLBACK_VACANCIES = [
       salary: 'от 65 000 до 85 000 ₽',
       format: 'Удаленно',
       location: 'Екатеринбург / Удаленно',
-      channel: 'kontur.ru/career',
+      channel: '@KonturTech',
+      sourceChannel: '@KonturTech',
       directionId: 'frontend',
       subTrackId: 'react',
       url: 'https://kontur.ru/career/vacancies/intern-frontend',
@@ -3119,7 +3185,8 @@ export const PORTAL_FALLBACK_VACANCIES = [
       salary: 'от 80 000 до 105 000 ₽',
       format: 'Удаленно',
       location: 'Москва / Удаленно',
-      channel: 'education.tbank.ru',
+      channel: '@tbank_team',
+      sourceChannel: '@tbank_team',
       directionId: 'devops',
       subTrackId: 'k8s_iac',
       url: 'https://education.tbank.ru/start/',
@@ -3135,7 +3202,8 @@ export const PORTAL_FALLBACK_VACANCIES = [
       salary: 'от 70 000 до 90 000 ₽',
       format: 'Удаленно',
       location: 'Москва / Удаленно',
-      channel: 't1.ru/school',
+      channel: '@t1career',
+      sourceChannel: '@t1career',
       directionId: 'backend',
       subTrackId: 'java',
       url: 'https://career.t1.ru/vacancies/',
@@ -3151,7 +3219,8 @@ export const PORTAL_FALLBACK_VACANCIES = [
       salary: 'от 55 000 до 75 000 ₽',
       format: 'Гибрид',
       location: 'Ижевск / Удаленно',
-      channel: 'career.directum.ru',
+      channel: '@Life_in_Directum',
+      sourceChannel: '@Life_in_Directum',
       directionId: 'frontend',
       subTrackId: 'react',
       url: 'https://career.directum.ru/vacancy/',
@@ -3167,7 +3236,8 @@ export const PORTAL_FALLBACK_VACANCIES = [
       salary: 'от 80 000 до 105 000 ₽',
       format: 'Гибрид',
       location: 'Москва / Екатеринбург / Гибрид',
-      channel: 'yandex.ru/yabackend',
+      channel: '@yandex_intern',
+      sourceChannel: '@yandex_intern',
       directionId: 'backend',
       subTrackId: 'python',
       url: 'https://yandex.ru/yaintern/backend/',
@@ -3183,7 +3253,8 @@ export const PORTAL_FALLBACK_VACANCIES = [
       salary: 'от 85 000 до 110 000 ₽',
       format: 'Удаленно',
       location: 'Москва / Удаленно',
-      channel: 'job.ozon.ru',
+      channel: '@ozon_tech_career',
+      sourceChannel: '@ozon_tech_career',
       directionId: 'backend',
       subTrackId: 'golang',
       url: 'https://job.ozon.ru/it/camp/golang/',
@@ -3199,7 +3270,8 @@ export const PORTAL_FALLBACK_VACANCIES = [
       salary: 'от 80 000 до 105 000 ₽',
       format: 'Офис',
       location: 'Москва (Кутузовский)',
-      channel: 'sbergraduate.ru',
+      channel: '@sber_careers',
+      sourceChannel: '@sber_careers',
       directionId: 'data_science',
       subTrackId: 'ml',
       url: 'https://sbergraduate.ru/sberseasons-moscow/ml/',
@@ -3215,7 +3287,8 @@ export const PORTAL_FALLBACK_VACANCIES = [
       salary: 'от 75 000 до 95 000 ₽',
       format: 'Гибрид',
       location: 'Москва / Санкт-Петербург',
-      channel: 'career.avito.com',
+      channel: '@avito_tech',
+      sourceChannel: '@avito_tech',
       directionId: 'mobile',
       subTrackId: 'android',
       url: 'https://career.avito.com/vacancies/razrabotka/20803/',
@@ -3231,7 +3304,8 @@ export const PORTAL_FALLBACK_VACANCIES = [
       salary: 'от 65 000 до 85 000 ₽',
       format: 'Удаленно',
       location: 'Санкт-Петербург / Москва',
-      channel: 'internship.vk.company',
+      channel: '@vk_team',
+      sourceChannel: '@vk_team',
       directionId: 'frontend',
       subTrackId: 'react',
       url: 'https://internship.vk.company/internship/',
@@ -3247,7 +3321,8 @@ export const PORTAL_FALLBACK_VACANCIES = [
       salary: 'от 60 000 до 80 000 ₽',
       format: 'Удаленно',
       location: 'Екатеринбург / Удаленно',
-      channel: 'kontur.ru/career',
+      channel: '@KonturTech',
+      sourceChannel: '@KonturTech',
       directionId: 'qa',
       subTrackId: 'auto_qa',
       url: 'https://kontur.ru/career/vacancies/intern-qa',
@@ -3592,6 +3667,7 @@ export async function getActiveInternships(forceRefresh = false) {
           const rawUrl = item.source_url || item.url || GITHUB_PAGES_URL;
           const directionId = item.direction || item.direction_id || 'backend';
           const directUrl = resolveApplyUrl(rawUrl, item.company, item.source_name, directionId);
+          const verifiedChannel = resolveChannelHandle(item.source_name, item.company);
           return {
             id: String(item.id),
             companyId: comp.id || item.company_id || 'other',
@@ -3600,8 +3676,8 @@ export async function getActiveInternships(forceRefresh = false) {
             salary: formatSalary(item.salary),
             format: item.format || 'Удаленно',
             location: item.city || item.location || 'Москва / Удаленно',
-            channel: item.source_name || '@IT_start_izh_bot',
-            sourceChannel: item.source_name || '@IT_start_izh_bot',
+            channel: verifiedChannel,
+            sourceChannel: verifiedChannel,
             directionId,
             subTrackId: item.sub_track || item.sub_track_id || 'python',
             url: directUrl,
@@ -4475,7 +4551,7 @@ export async function sendVacancies(chatId, filter = 'all') {
   } else {
     list.slice(0, 5).forEach((item, idx) => {
       const applyUrl = item.applyUrl || item.url || RENDER_URL;
-      const channel = item.sourceChannel || item.channel || '@t1career';
+      const channel = resolveChannelHandle(item.sourceChannel || item.channel, item.company);
       const stack = Array.isArray(item.tags) && item.tags.length > 0 ? item.tags.slice(0, 4).join(' • ') : '';
       const salaryFormatted = formatSalary(item.salary);
       const loc = formatLocation(item);
@@ -5236,7 +5312,7 @@ TELEGRAM_BOT_TOKEN="ТОКЕН_TG" VK_BOT_TOKEN="ТОКЕН_VK" npm run bot:all
 
 - **Путь:** `bot/vk_bot.mjs`
 - **Назначение:** Сервер ботов Telegram и ВКонтакте + парсер
-- **Объем:** 2222 строк (85.7 КБ)
+- **Объем:** 2224 строк (85.8 КБ)
 
 ```javascript
 /**
@@ -5277,9 +5353,10 @@ import {
   DIRECTION_TITLES,
   resolveDirectionByQuery,
   formatSalary,
+  resolveChannelHandle,
 } from './bot.mjs';
 
-export { ALL_INTERNSHIPS, SEED_INTERNSHIPS, PORTAL_FALLBACK_VACANCIES, DIRECTION_ALIASES, DIRECTION_TITLES, resolveDirectionByQuery, formatSalary };
+export { ALL_INTERNSHIPS, SEED_INTERNSHIPS, PORTAL_FALLBACK_VACANCIES, DIRECTION_ALIASES, DIRECTION_TITLES, resolveDirectionByQuery, formatSalary, resolveChannelHandle };
 
 // Auto-load .env configuration if present
 function autoLoadEnv() {
@@ -5599,12 +5676,13 @@ export function formatVkVacancyMessage(item) {
   const desc = item.description ? `\n📝 ${item.description.slice(0, 160)}...` : '';
   const url = item.applyUrl || item.url || GITHUB_PAGES_URL;
 
+  const channel = resolveChannelHandle(item.sourceChannel || item.channel, item.company);
   return (
     `💼 ${item.company} — ${item.title}\n` +
     `━━━━━━━━━━━━━━━━━━━━\n` +
     `💰 Зарплата: ${formatSalary(item.salary)}\n` +
     `📍 Формат: ${formatLocation(item)}\n` +
-    `📢 Источник: ${item.sourceChannel || item.channel || 'IT-Старт'}\n` +
+    `📢 Источник: ${channel}\n` +
     (tagsStr ? `🏷 Стек: ${tagsStr}\n` : '') +
     desc +
     `\n\n🔗 Подробнее и отклик: ${url}`
@@ -5629,7 +5707,7 @@ export function formatVkVacanciesList(items = [], title = 'Актуальные 
 
   slice.forEach((item, idx) => {
     const verifiedApplyUrl = item.applyUrl || item.url || RENDER_URL;
-    const channel = item.sourceChannel || item.channel || '@t1career';
+    const channel = resolveChannelHandle(item.sourceChannel || item.channel, item.company);
     const loc = formatLocation(item);
     text += `[${idx + 1}] 🏢 ${item.company}\n`;
     text += `💼 ${item.title}\n`;
@@ -6184,7 +6262,7 @@ export async function notifyVkSubscribers(vacancies = [], token = VK_BOT_TOKEN) 
         : 'Junior / Стажировка';
       const isWeb = vac.sourceType === 'portal' || vac.sourceType === 'website';
       const sourceLabel = isWeb ? 'Карьерный сайт' : 'Telegram-канал';
-      const sourceChannel = vac.sourceChannel || vac.channel || (isWeb ? 'Сайт работодателя' : 'Telegram-канал');
+      const sourceChannel = resolveChannelHandle(vac.sourceChannel || vac.channel, vac.company);
       const applyUrl = vac.applyUrl || vac.url || RENDER_URL;
       const msg =
         `🔥 Новая стажировка!\n` +
@@ -8078,7 +8156,7 @@ run();
 
 - **Путь:** `scripts/cleanup_supabase_internships.mjs`
 - **Назначение:** Скрипты сборки, очистки базы и верификации ссылок
-- **Объем:** 232 строк (9.1 КБ)
+- **Объем:** 235 строк (9.3 КБ)
 
 ```javascript
 import { createClient } from '@supabase/supabase-js';
@@ -8087,6 +8165,7 @@ import {
   PORTAL_FALLBACK_VACANCIES,
   formatSalary,
   resolveApplyUrl,
+  resolveChannelHandle,
   isStrictVacancyPost,
 } from '../bot/bot.mjs';
 
@@ -8162,6 +8241,8 @@ async function main() {
     const format = row.format || 'Удаленно';
     const city = row.city || row.location || 'Москва / Удаленно';
 
+    const verifiedChannel = resolveChannelHandle(row.source_name, row.company);
+
     validRowsToUpdate.push({
       id: row.id,
       title,
@@ -8171,8 +8252,8 @@ async function main() {
       format,
       city,
       salary: formattedSalary,
-      source_type: row.source_type || 'portal',
-      source_name: row.source_name || '@IT_start_izh_bot',
+      source_type: row.source_type || (verifiedChannel.startsWith('@') ? 'telegram' : 'portal'),
+      source_name: verifiedChannel,
       source_url: resolvedUrl,
       description: row.description || '',
       tags: Array.isArray(row.tags) ? row.tags : [row.company, 'Стажировка'],
@@ -8220,7 +8301,7 @@ async function main() {
       city: item.location || 'Москва / Удаленно',
       salary: formatSalary(item.salary),
       source_type: item.sourceType || 'portal',
-      source_name: item.sourceChannel || '@IT_start_izh_bot',
+      source_name: resolveChannelHandle(item.sourceChannel, item.company),
       source_url: resolveApplyUrl(item.applyUrl, item.company, item.sourceChannel, item.directionId),
       description: item.description,
       tags: item.tags,
@@ -8239,7 +8320,7 @@ async function main() {
       city: item.location || 'Москва / Удаленно',
       salary: formatSalary(item.salary),
       source_type: item.sourceType || 'portal',
-      source_name: item.channel || '@IT_start_izh_bot',
+      source_name: resolveChannelHandle(item.channel || item.sourceChannel, item.company),
       source_url: resolveApplyUrl(item.url, item.company, item.channel, item.directionId),
       description: item.description,
       tags: item.tags,
@@ -12051,7 +12132,7 @@ describe('16. Comprehensive Responsive & Adaptive Layout Suite', () => {
 
 - **Путь:** `src/__tests__/vacancy_quality.test.ts`
 - **Назначение:** Автоматизированные тесты Vitest
-- **Объем:** 199 строк (13.4 КБ)
+- **Объем:** 249 строк (16.0 КБ)
 
 ```typescript
 import { describe, it, expect } from 'vitest';
@@ -12059,6 +12140,7 @@ import {
   formatSalary,
   isStrictVacancyPost,
   resolveApplyUrl,
+  resolveChannelHandle,
   detectVacancyTrack,
 } from '../lib/vacancyUrl';
 import { SEED_INTERNSHIPS } from '../data/internships';
@@ -12249,6 +12331,55 @@ describe('Vacancy Quality & Link Integrity Verification', () => {
     it('detects Data Science tracks accurately', () => {
       expect(detectVacancyTrack('Стажёр ML / Data Science').directionId).toBe('data_science');
       expect(detectVacancyTrack('Junior Аналитик данных').directionId).toBe('data_science');
+    });
+  });
+
+  describe('5. resolveChannelHandle & target employer parity', () => {
+    it('always maps target employers to their verified official channels regardless of raw input', () => {
+      // 1. Sberbank
+      expect(resolveChannelHandle('hh.ru/3529', 'Сбер')).toBe('@sber_careers');
+      expect(resolveChannelHandle(undefined, 'Сбер (SberSeasons)')).toBe('@sber_careers');
+      expect(resolveChannelHandle('sbergraduate.ru', 'Сбер AI')).toBe('@sber_careers');
+
+      // 2. Avito
+      expect(resolveChannelHandle('career.avito.com', 'Авито')).toBe('@avito_tech');
+      expect(resolveChannelHandle(undefined, 'Avito Tech')).toBe('@avito_tech');
+      expect(resolveChannelHandle('@avito_career', 'Авито')).toBe('@avito_tech');
+
+      // 3. Ozon
+      expect(resolveChannelHandle('hh.ru/2180', 'Ozon Tech')).toBe('@ozon_tech_career');
+      expect(resolveChannelHandle('job.ozon.ru', 'Ozon')).toBe('@ozon_tech_career');
+      expect(resolveChannelHandle(undefined, 'Ozon Tech')).toBe('@ozon_tech_career');
+
+      // 4. VK
+      expect(resolveChannelHandle('internship.vk.company', 'VK')).toBe('@vk_team');
+      expect(resolveChannelHandle(undefined, 'VK (ВКонтакте)')).toBe('@vk_team');
+
+      // 5. Т-Банк
+      expect(resolveChannelHandle('education.tbank.ru', 'Т-Банк')).toBe('@tbank_team');
+      expect(resolveChannelHandle('@tbank_start', 'Т-Банк (Тинькофф)')).toBe('@tbank_team');
+
+      // 6. СКБ Контур
+      expect(resolveChannelHandle('kontur.ru/career', 'СКБ Контур')).toBe('@KonturTech');
+      expect(resolveChannelHandle('kontur_career', 'Контур')).toBe('@KonturTech');
+
+      // 7. Directum
+      expect(resolveChannelHandle('career.directum.ru', 'Directum')).toBe('@Life_in_Directum');
+      expect(resolveChannelHandle(undefined, 'Directum')).toBe('@Life_in_Directum');
+
+      // 8. Холдинг Т1
+      expect(resolveChannelHandle('t1.ru/school', 'Холдинг Т1')).toBe('@t1career');
+      expect(resolveChannelHandle(undefined, 'Холдинг Т1')).toBe('@t1career');
+
+      // 9. Яндекс
+      expect(resolveChannelHandle('yandex.ru/yabackend', 'Яндекс')).toBe('@yandex_intern');
+      expect(resolveChannelHandle(undefined, 'Яндекс')).toBe('@yandex_intern');
+    });
+
+    it('handles external aggregator channels without mangling web domains', () => {
+      expect(resolveChannelHandle('@normrabota', 'IT Channels')).toBe('@normrabota');
+      expect(resolveChannelHandle('hh.ru/other', 'Неизвестная компания')).toBe('@IT_start_izh_bot');
+      expect(resolveChannelHandle(undefined, '')).toBe('@IT_start_izh_bot');
     });
   });
 });
@@ -13793,7 +13924,7 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
 
 - **Путь:** `src/components/InternshipCard.tsx`
 - **Назначение:** React-компонент пользовательского интерфейса
-- **Объем:** 227 строк (10.7 КБ)
+- **Объем:** 227 строк (10.8 КБ)
 
 ```typescript
 import React from 'react';
@@ -13957,7 +14088,7 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
             const verifiedChannel = resolveChannelHandle(internship.sourceChannel, internship.company);
             const cleanChannel = verifiedChannel.replace(/^@/, '');
             const isTg = verifiedChannel.startsWith('@');
-            const isWeb = verifiedChannel.includes('.');
+            const isWeb = !isTg && (verifiedChannel.includes('.') || verifiedChannel.startsWith('http'));
 
             return (
               <>
@@ -14030,7 +14161,7 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
 
 - **Путь:** `src/components/InternshipModal.tsx`
 - **Назначение:** React-компонент пользовательского интерфейса
-- **Объем:** 582 строк (30.0 КБ)
+- **Объем:** 584 строк (30.3 КБ)
 
 ```typescript
 import React from 'react';
@@ -14247,7 +14378,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
               const verifiedChannel = resolveChannelHandle(internship.sourceChannel, internship.company);
               const cleanChannel = verifiedChannel.replace(/^@/, '');
               const isTg = verifiedChannel.startsWith('@');
-              const isWeb = verifiedChannel.includes('.');
+              const isWeb = !isTg && (verifiedChannel.includes('.') || verifiedChannel.startsWith('http'));
 
               if (isTg) {
                 return (
@@ -14256,6 +14387,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-xs px-2.5 py-1 rounded-full liquid-glass-pill text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white flex items-center gap-1 transition-colors"
+                    title={`Открыть проверенный Telegram-канал ${verifiedChannel}`}
                   >
                     <Bot className="w-3 h-3 text-neutral-500" />
                     <span>Источник: {verifiedChannel}</span>
@@ -14272,6 +14404,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-xs px-2.5 py-1 rounded-full liquid-glass-pill text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white flex items-center gap-1 transition-colors"
+                    title={`Открыть карьерный сайт ${verifiedChannel}`}
                   >
                     <Globe className="w-3 h-3 text-neutral-500" />
                     <span>Источник: {verifiedChannel}</span>
@@ -14282,7 +14415,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
 
               return (
                 <span className="text-xs px-2.5 py-1 rounded-full liquid-glass-pill text-neutral-600 dark:text-neutral-400">
-                  Источник: {internship.sourceChannel}
+                  Источник: {verifiedChannel}
                 </span>
               );
             })()}
@@ -14553,7 +14686,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
               const verifiedChannel = resolveChannelHandle(internship.sourceChannel, internship.company);
               const cleanChannel = verifiedChannel.replace(/^@/, '');
               const isTg = verifiedChannel.startsWith('@');
-              const isWeb = verifiedChannel.includes('.');
+              const isWeb = !isTg && (verifiedChannel.includes('.') || verifiedChannel.startsWith('http'));
 
               if (isTg) {
                 return (
@@ -25362,7 +25495,7 @@ export function useScrollLock(lock: boolean) {
 
 - **Путь:** `src/lib/vacancyUrl.ts`
 - **Назначение:** Утилиты интеграции (Supabase, Telegram, VK, URL)
-- **Объем:** 699 строк (28.5 КБ)
+- **Объем:** 745 строк (30.5 КБ)
 
 ```typescript
 import type { DirectionId, SubTrackId } from '../types';
@@ -25691,36 +25824,82 @@ export function resolveApplyUrl(
 }
 
 /**
+ * Official verified Telegram channels for target employers
+ */
+export const COMPANY_OFFICIAL_CHANNELS: Record<string, string> = {
+  tbank: '@tbank_team',
+  kontur: '@KonturTech',
+  directum: '@Life_in_Directum',
+  t1: '@t1career',
+  yandex: '@yandex_intern',
+  ozon: '@ozon_tech_career',
+  sber: '@sber_careers',
+  avito: '@avito_tech',
+  vk: '@vk_team',
+};
+
+/**
  * Resolves Telegram channel handles to valid existing public channels.
- * Fixes broken handles like @kontur_career -> @KonturTech.
+ * Guarantees that every target company vacancy always points to its verified company channel,
+ * and eliminates web domains/job board names being prepended with '@' (like @hh.ru or @career.avito.com).
  */
 export function resolveChannelHandle(channel: string | undefined, companyName = ''): string {
-  if (!channel) {
-    const compKey = getCompanyKey(companyName);
-    switch (compKey) {
-      case 'kontur':
-        return '@KonturTech';
-      case 'directum':
-        return '@Life_in_Directum';
-      case 't1':
-        return '@t1career';
-      case 'yandex':
-        return '@yandex_intern';
-      case 'tbank':
-      default:
-        return '@tbank_team';
+  const compKey = getCompanyKey(companyName);
+  const officialChannel = COMPANY_OFFICIAL_CHANNELS[compKey];
+
+  // If company is one of the 9 target employers, always map to its canonical verified channel
+  if (officialChannel) {
+    if (!channel) return officialChannel;
+
+    const clean = channel.trim().replace(/^@/, '');
+    const lower = clean.toLowerCase();
+
+    // Check if channel is an official subchannel or alias for this company
+    if (compKey === 'tbank' && (lower === 'tbank_start' || lower === 'tinkoff_jobs' || lower === 'tbank_career')) {
+      return '@tbank_team';
     }
+    if (compKey === 'kontur' && (lower === 'kontur_career' || lower === 'konturtech')) {
+      return '@KonturTech';
+    }
+    if (compKey === 'directum' && (lower === 'directum_career' || lower === 'directum_careers' || lower === 'life_in_directum')) {
+      return '@Life_in_Directum';
+    }
+    if (compKey === 't1' && (lower === 't1_holding' || lower === 't1career')) {
+      return '@t1career';
+    }
+    if (compKey === 'yandex' && (lower === 'yaintern' || lower === 'yandex_jobs' || lower === 'yandex_intern')) {
+      return '@yandex_intern';
+    }
+    if (compKey === 'ozon' && (lower === 'ozontech' || lower === 'ozon_career' || lower === 'ozon_tech_career' || lower === 'ozoncamp')) {
+      return '@ozon_tech_career';
+    }
+    if (compKey === 'sber' && (lower === 'sbercareers' || lower === 'sber_tech' || lower === 'sbergraduate' || lower === 'sber_careers')) {
+      return '@sber_careers';
+    }
+    if (compKey === 'avito' && (lower === 'avito_career' || lower === 'avitocareer' || lower === 'avito_jobs' || lower === 'avito_tech')) {
+      return '@avito_tech';
+    }
+    if (compKey === 'vk' && (lower === 'vkteam' || lower === 'vk_internship' || lower === 'vk_team')) {
+      return '@vk_team';
+    }
+
+    // If channel is a website domain (hh.ru, career.avito.com, t1.ru, etc.) or another random channel,
+    // enforce the company's verified official channel:
+    return officialChannel;
   }
+
+  // For other/external companies or aggregators
+  if (!channel) return '@IT_start_izh_bot';
 
   const clean = channel.trim().replace(/^@/, '');
   const lower = clean.toLowerCase();
 
-  if (lower === 'kontur_career') return '@KonturTech';
-  if (lower === 'directum_career' || lower === 'directum_careers') return '@Life_in_Directum';
-  if (lower === 't1_holding') return '@t1career';
-  if (lower === 'tbank_career' || lower === 'tinkoff_jobs') return '@tbank_team';
+  // If it looks like a web domain, don't prepend @
+  if (lower.includes('.') || lower.includes('/')) {
+    return '@IT_start_izh_bot';
+  }
 
-  return channel.startsWith('@') ? channel : `@${channel}`;
+  return `@${clean}`;
 }
 
 /**

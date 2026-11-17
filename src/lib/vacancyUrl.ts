@@ -324,36 +324,82 @@ export function resolveApplyUrl(
 }
 
 /**
+ * Official verified Telegram channels for target employers
+ */
+export const COMPANY_OFFICIAL_CHANNELS: Record<string, string> = {
+  tbank: '@tbank_team',
+  kontur: '@KonturTech',
+  directum: '@Life_in_Directum',
+  t1: '@t1career',
+  yandex: '@yandex_intern',
+  ozon: '@ozon_tech_career',
+  sber: '@sber_careers',
+  avito: '@avito_tech',
+  vk: '@vk_team',
+};
+
+/**
  * Resolves Telegram channel handles to valid existing public channels.
- * Fixes broken handles like @kontur_career -> @KonturTech.
+ * Guarantees that every target company vacancy always points to its verified company channel,
+ * and eliminates web domains/job board names being prepended with '@' (like @hh.ru or @career.avito.com).
  */
 export function resolveChannelHandle(channel: string | undefined, companyName = ''): string {
-  if (!channel) {
-    const compKey = getCompanyKey(companyName);
-    switch (compKey) {
-      case 'kontur':
-        return '@KonturTech';
-      case 'directum':
-        return '@Life_in_Directum';
-      case 't1':
-        return '@t1career';
-      case 'yandex':
-        return '@yandex_intern';
-      case 'tbank':
-      default:
-        return '@tbank_team';
+  const compKey = getCompanyKey(companyName);
+  const officialChannel = COMPANY_OFFICIAL_CHANNELS[compKey];
+
+  // If company is one of the 9 target employers, always map to its canonical verified channel
+  if (officialChannel) {
+    if (!channel) return officialChannel;
+
+    const clean = channel.trim().replace(/^@/, '');
+    const lower = clean.toLowerCase();
+
+    // Check if channel is an official subchannel or alias for this company
+    if (compKey === 'tbank' && (lower === 'tbank_start' || lower === 'tinkoff_jobs' || lower === 'tbank_career')) {
+      return '@tbank_team';
     }
+    if (compKey === 'kontur' && (lower === 'kontur_career' || lower === 'konturtech')) {
+      return '@KonturTech';
+    }
+    if (compKey === 'directum' && (lower === 'directum_career' || lower === 'directum_careers' || lower === 'life_in_directum')) {
+      return '@Life_in_Directum';
+    }
+    if (compKey === 't1' && (lower === 't1_holding' || lower === 't1career')) {
+      return '@t1career';
+    }
+    if (compKey === 'yandex' && (lower === 'yaintern' || lower === 'yandex_jobs' || lower === 'yandex_intern')) {
+      return '@yandex_intern';
+    }
+    if (compKey === 'ozon' && (lower === 'ozontech' || lower === 'ozon_career' || lower === 'ozon_tech_career' || lower === 'ozoncamp')) {
+      return '@ozon_tech_career';
+    }
+    if (compKey === 'sber' && (lower === 'sbercareers' || lower === 'sber_tech' || lower === 'sbergraduate' || lower === 'sber_careers')) {
+      return '@sber_careers';
+    }
+    if (compKey === 'avito' && (lower === 'avito_career' || lower === 'avitocareer' || lower === 'avito_jobs' || lower === 'avito_tech')) {
+      return '@avito_tech';
+    }
+    if (compKey === 'vk' && (lower === 'vkteam' || lower === 'vk_internship' || lower === 'vk_team')) {
+      return '@vk_team';
+    }
+
+    // If channel is a website domain (hh.ru, career.avito.com, t1.ru, etc.) or another random channel,
+    // enforce the company's verified official channel:
+    return officialChannel;
   }
+
+  // For other/external companies or aggregators
+  if (!channel) return '@IT_start_izh_bot';
 
   const clean = channel.trim().replace(/^@/, '');
   const lower = clean.toLowerCase();
 
-  if (lower === 'kontur_career') return '@KonturTech';
-  if (lower === 'directum_career' || lower === 'directum_careers') return '@Life_in_Directum';
-  if (lower === 't1_holding') return '@t1career';
-  if (lower === 'tbank_career' || lower === 'tinkoff_jobs') return '@tbank_team';
+  // If it looks like a web domain, don't prepend @
+  if (lower.includes('.') || lower.includes('/')) {
+    return '@IT_start_izh_bot';
+  }
 
-  return channel.startsWith('@') ? channel : `@${channel}`;
+  return `@${clean}`;
 }
 
 /**

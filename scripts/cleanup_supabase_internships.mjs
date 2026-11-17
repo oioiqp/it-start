@@ -4,6 +4,7 @@ import {
   PORTAL_FALLBACK_VACANCIES,
   formatSalary,
   resolveApplyUrl,
+  resolveChannelHandle,
   isStrictVacancyPost,
 } from '../bot/bot.mjs';
 
@@ -79,6 +80,8 @@ async function main() {
     const format = row.format || 'Удаленно';
     const city = row.city || row.location || 'Москва / Удаленно';
 
+    const verifiedChannel = resolveChannelHandle(row.source_name, row.company);
+
     validRowsToUpdate.push({
       id: row.id,
       title,
@@ -88,8 +91,8 @@ async function main() {
       format,
       city,
       salary: formattedSalary,
-      source_type: row.source_type || 'portal',
-      source_name: row.source_name || '@IT_start_izh_bot',
+      source_type: row.source_type || (verifiedChannel.startsWith('@') ? 'telegram' : 'portal'),
+      source_name: verifiedChannel,
       source_url: resolvedUrl,
       description: row.description || '',
       tags: Array.isArray(row.tags) ? row.tags : [row.company, 'Стажировка'],
@@ -137,7 +140,7 @@ async function main() {
       city: item.location || 'Москва / Удаленно',
       salary: formatSalary(item.salary),
       source_type: item.sourceType || 'portal',
-      source_name: item.sourceChannel || '@IT_start_izh_bot',
+      source_name: resolveChannelHandle(item.sourceChannel, item.company),
       source_url: resolveApplyUrl(item.applyUrl, item.company, item.sourceChannel, item.directionId),
       description: item.description,
       tags: item.tags,
@@ -156,7 +159,7 @@ async function main() {
       city: item.location || 'Москва / Удаленно',
       salary: formatSalary(item.salary),
       source_type: item.sourceType || 'portal',
-      source_name: item.channel || '@IT_start_izh_bot',
+      source_name: resolveChannelHandle(item.channel || item.sourceChannel, item.company),
       source_url: resolveApplyUrl(item.url, item.company, item.channel, item.directionId),
       description: item.description,
       tags: item.tags,
