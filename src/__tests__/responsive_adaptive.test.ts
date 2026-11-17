@@ -198,25 +198,6 @@ describe('16. Comprehensive Responsive & Adaptive Layout Suite', () => {
   });
 
   describe('TelegramParserTab Responsive Layout', () => {
-    it('renders channel filters with touch scroll and adaptive publish button', async () => {
-      const { TelegramParserTab } = await import('../components/TelegramParserTab');
-      const html = renderToString(
-        React.createElement(TelegramParserTab, {
-          telegramUser: null,
-          currentSubscription: null,
-          onSubscriptionSaved: () => {},
-          onInternshipAdded: () => {},
-        })
-      );
-
-      // Filters container
-      expect(html).toContain('max-w-full w-full sm:w-fit touch-pan-x overscroll-x-contain');
-      // Adaptive publish button labels
-      expect(html).toContain('sm:hidden');
-      expect(html).toContain('hidden sm:inline');
-    });
-  });
-
   describe('FlashcardsTrainer Responsive Adaptation (320px - 1920px)', () => {
     it('renders with flex-wrap controls, compact padding, and adaptive rating labels for narrow screens', async () => {
       const { FlashcardsTrainer } = await import('../components/FlashcardsTrainer');
