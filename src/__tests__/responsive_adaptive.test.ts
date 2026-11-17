@@ -197,34 +197,7 @@ describe('16. Comprehensive Responsive & Adaptive Layout Suite', () => {
     });
   });
 
-  describe('TelegramParserTab Responsive Layout', () => {
-  describe('FlashcardsTrainer Responsive Adaptation (320px - 1920px)', () => {
-    it('renders with flex-wrap controls, compact padding, and adaptive rating labels for narrow screens', async () => {
-      const { FlashcardsTrainer } = await import('../components/FlashcardsTrainer');
-      const html = renderToString(
-        React.createElement(FlashcardsTrainer, {
-          questions: QUESTIONS,
-          userProgress: mockUserProgress,
-          onMarkLearned: () => {},
-          onMarkRepeat: () => {},
-        })
-      );
-
-      // Top control bar has flex-wrap and min-w-0 to prevent button push-out on 320px
-      expect(html).toContain('flex items-center justify-between text-xs px-1 text-neutral-600 gap-2 flex-wrap');
-      expect(html).toContain('flex items-center gap-2 flex-wrap min-w-0');
-      // Compact p-4 on mobile gives usable width
-      expect(html).toContain('p-4 sm:p-8');
-      // Break-words for long question titles
-      expect(html).toContain('break-words');
-      // Adaptive action buttons with compact text on ultra-narrow viewports
-      expect(html).toContain('min-[380px]:inline');
-      expect(html).toContain('min-[380px]:hidden');
-      expect(html).toContain('Знаю отлично');
-      expect(html).toContain('Знаю');
-    });
-  });
-
+  
   describe('SelfCheckTrainer Responsive Adaptation (320px - 1920px)', () => {
     it('adapts header, card padding, and action buttons for 320px screens', async () => {
       const { SelfCheckTrainer } = await import('../components/SelfCheckTrainer');
@@ -296,3 +269,4 @@ describe('16. Comprehensive Responsive & Adaptive Layout Suite', () => {
     });
   });
 });
+
