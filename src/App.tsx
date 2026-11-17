@@ -369,13 +369,6 @@ export function App() {
     }));
   };
 
-  const handleInternshipAdded = (newInternship: Internship) => {
-    setInternships((prev) => {
-      const next = [newInternship, ...prev];
-      saveCachedInternships(next);
-      return next;
-    });
-  };
 
   // Helper for matching companies with synonyms
   const matchesCompanyFilter = (companyName: string, targetCompany: string): boolean => {
