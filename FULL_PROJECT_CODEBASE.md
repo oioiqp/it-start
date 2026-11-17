@@ -1,6 +1,6 @@
 # 📘 IT-Старт — Полная документация и исходный код проекта
 
-> Документ сформирован автоматически: 17.11.2026, 11:44:17
+> Документ сформирован автоматически: 17.11.2026, 15:57:41
 > Проект: **IT-Старт (IT Start)** — Единая экосистема агрегации IT-стажировок, дорожных карт и подготовки к техническим собеседованиям.
 
 ---
@@ -14,9 +14,9 @@
 | 3 | [.gitignore](#-gitignore) | 29 | 0.3 КБ | Конфигурационный или инфраструктурный файл |
 | 4 | [.oxlintrc.json](#-oxlintrc-json) | 10 | 0.3 КБ | Конфигурационный или инфраструктурный файл |
 | 5 | [ARCHITECTURE.md](#architecture-md) | 173 | 20.0 КБ | Конфигурационный или инфраструктурный файл |
-| 6 | [bot/bot.mjs](#bot-bot-mjs) | 4772 | 193.6 КБ | Сервер ботов Telegram и ВКонтакте + парсер |
+| 6 | [bot/bot.mjs](#bot-bot-mjs) | 4776 | 193.9 КБ | Сервер ботов Telegram и ВКонтакте + парсер |
 | 7 | [bot/README.md](#bot-readme-md) | 88 | 7.0 КБ | Сервер ботов Telegram и ВКонтакте + парсер |
-| 8 | [bot/vk_bot.mjs](#bot-vk_bot-mjs) | 2224 | 85.8 КБ | Сервер ботов Telegram и ВКонтакте + парсер |
+| 8 | [bot/vk_bot.mjs](#bot-vk_bot-mjs) | 2228 | 86.0 КБ | Сервер ботов Telegram и ВКонтакте + парсер |
 | 9 | [index.html](#index-html) | 53 | 2.7 КБ | Конфигурационный или инфраструктурный файл |
 | 10 | [package.json](#package-json) | 44 | 1.2 КБ | Зависимости и npm-скрипты проекта |
 | 11 | [public/.nojekyll](#public--nojekyll) | 2 | 0.0 КБ | Конфигурационный или инфраструктурный файл |
@@ -27,7 +27,7 @@
 | 16 | [scripts/check_tbank_links.mjs](#scripts-check_tbank_links-mjs) | 15 | 0.7 КБ | Скрипты сборки, очистки базы и верификации ссылок |
 | 17 | [scripts/check_tbank_tracks.mjs](#scripts-check_tbank_tracks-mjs) | 15 | 0.5 КБ | Скрипты сборки, очистки базы и верификации ссылок |
 | 18 | [scripts/clean_supabase.mjs](#scripts-clean_supabase-mjs) | 204 | 8.4 КБ | Скрипты сборки, очистки базы и верификации ссылок |
-| 19 | [scripts/cleanup_supabase_internships.mjs](#scripts-cleanup_supabase_internships-mjs) | 235 | 9.3 КБ | Скрипты сборки, очистки базы и верификации ссылок |
+| 19 | [scripts/cleanup_supabase_internships.mjs](#scripts-cleanup_supabase_internships-mjs) | 242 | 9.7 КБ | Скрипты сборки, очистки базы и верификации ссылок |
 | 20 | [scripts/generate_icons.cjs](#scripts-generate_icons-cjs) | 211 | 6.6 КБ | Скрипты сборки, очистки базы и верификации ссылок |
 | 21 | [scripts/links_verification_report.json](#scripts-links_verification_report-json) | 445 | 13.4 КБ | Скрипты сборки, очистки базы и верификации ссылок |
 | 22 | [scripts/postbuild.cjs](#scripts-postbuild-cjs) | 12 | 0.4 КБ | Скрипты сборки, очистки базы и верификации ссылок |
@@ -40,26 +40,26 @@
 | 29 | [src/App.css](#src-app-css) | 185 | 2.8 КБ | Конфигурационный или инфраструктурный файл |
 | 30 | [src/App.tsx](#src-app-tsx) | 1080 | 53.4 КБ | Главный компонент приложения (роутинг вкладок, состояние) |
 | 31 | [src/components/FlashcardsTrainer.tsx](#src-components-flashcardstrainer-tsx) | 238 | 9.6 КБ | React-компонент пользовательского интерфейса |
-| 32 | [src/components/InternshipCard.tsx](#src-components-internshipcard-tsx) | 227 | 10.8 КБ | React-компонент пользовательского интерфейса |
-| 33 | [src/components/InternshipModal.tsx](#src-components-internshipmodal-tsx) | 584 | 30.3 КБ | React-компонент пользовательского интерфейса |
+| 32 | [src/components/InternshipCard.tsx](#src-components-internshipcard-tsx) | 216 | 9.3 КБ | React-компонент пользовательского интерфейса |
+| 33 | [src/components/InternshipModal.tsx](#src-components-internshipmodal-tsx) | 557 | 27.9 КБ | React-компонент пользовательского интерфейса |
 | 34 | [src/components/Navbar.tsx](#src-components-navbar-tsx) | 200 | 9.3 КБ | React-компонент пользовательского интерфейса |
 | 35 | [src/components/QuestionsViewer.tsx](#src-components-questionsviewer-tsx) | 537 | 26.7 КБ | React-компонент пользовательского интерфейса |
 | 36 | [src/components/RoadmapViewer.tsx](#src-components-roadmapviewer-tsx) | 667 | 34.0 КБ | React-компонент пользовательского интерфейса |
 | 37 | [src/components/SelfCheckTrainer.tsx](#src-components-selfchecktrainer-tsx) | 416 | 18.6 КБ | React-компонент пользовательского интерфейса |
-| 38 | [src/components/SubscribeModal.tsx](#src-components-subscribemodal-tsx) | 893 | 43.6 КБ | React-компонент пользовательского интерфейса |
+| 38 | [src/components/SubscribeModal.tsx](#src-components-subscribemodal-tsx) | 900 | 43.8 КБ | React-компонент пользовательского интерфейса |
 | 39 | [src/components/TelegramParserTab.tsx](#src-components-telegramparsertab-tsx) | 2044 | 106.8 КБ | React-компонент пользовательского интерфейса |
 | 40 | [src/data/channels.ts](#src-data-channels-ts) | 760 | 27.6 КБ | Статическая база знаний (вакансии, роадмапы, вопросы) |
 | 41 | [src/data/directions.ts](#src-data-directions-ts) | 183 | 8.9 КБ | Статическая база знаний (вакансии, роадмапы, вопросы) |
-| 42 | [src/data/internships.ts](#src-data-internships-ts) | 1248 | 71.6 КБ | Статическая база знаний (вакансии, роадмапы, вопросы) |
+| 42 | [src/data/internships.ts](#src-data-internships-ts) | 1248 | 71.5 КБ | Статическая база знаний (вакансии, роадмапы, вопросы) |
 | 43 | [src/data/questions.ts](#src-data-questions-ts) | 1568 | 135.2 КБ | Статическая база знаний (вакансии, роадмапы, вопросы) |
 | 44 | [src/data/roadmaps.ts](#src-data-roadmaps-ts) | 688 | 38.7 КБ | Статическая база знаний (вакансии, роадмапы, вопросы) |
 | 45 | [src/data/team.ts](#src-data-team-ts) | 50 | 3.1 КБ | Статическая база знаний (вакансии, роадмапы, вопросы) |
-| 46 | [src/index.css](#src-index-css) | 395 | 12.5 КБ | Глобальные стили, темы и эффект Liquid Glass |
+| 46 | [src/index.css](#src-index-css) | 437 | 13.6 КБ | Глобальные стили, темы и эффект Liquid Glass |
 | 47 | [src/lib/storage.ts](#src-lib-storage-ts) | 95 | 3.1 КБ | Утилиты интеграции (Supabase, Telegram, VK, URL) |
-| 48 | [src/lib/supabase.ts](#src-lib-supabase-ts) | 320 | 10.4 КБ | Утилиты интеграции (Supabase, Telegram, VK, URL) |
+| 48 | [src/lib/supabase.ts](#src-lib-supabase-ts) | 332 | 10.8 КБ | Утилиты интеграции (Supabase, Telegram, VK, URL) |
 | 49 | [src/lib/telegram.ts](#src-lib-telegram-ts) | 457 | 13.8 КБ | Утилиты интеграции (Supabase, Telegram, VK, URL) |
 | 50 | [src/lib/useScrollLock.ts](#src-lib-usescrolllock-ts) | 49 | 1.6 КБ | Утилиты интеграции (Supabase, Telegram, VK, URL) |
-| 51 | [src/lib/vacancyUrl.ts](#src-lib-vacancyurl-ts) | 745 | 30.5 КБ | Утилиты интеграции (Supabase, Telegram, VK, URL) |
+| 51 | [src/lib/vacancyUrl.ts](#src-lib-vacancyurl-ts) | 818 | 33.2 КБ | Утилиты интеграции (Supabase, Telegram, VK, URL) |
 | 52 | [src/lib/vk.ts](#src-lib-vk-ts) | 295 | 9.1 КБ | Утилиты интеграции (Supabase, Telegram, VK, URL) |
 | 53 | [src/lib/vkBridge.ts](#src-lib-vkbridge-ts) | 318 | 9.3 КБ | Утилиты интеграции (Supabase, Telegram, VK, URL) |
 | 54 | [src/main.tsx](#src-main-tsx) | 11 | 0.2 КБ | Конфигурационный или инфраструктурный файл |
@@ -71,7 +71,7 @@
 | 60 | [vercel.json](#vercel-json) | 9 | 0.1 КБ | Конфигурационный или инфраструктурный файл |
 | 61 | [vite.config.ts](#vite-config-ts) | 33 | 0.8 КБ | Конфигурация сборщика Vite и чанков |
 
-**Итого исходного кода:** 61 файлов, 26 760 строк, 1.21 МБ.
+**Итого исходного кода:** 61 файлов, 26 871 строк, 1.21 МБ.
 
 ---
 
@@ -432,7 +432,7 @@ npm run bot:all
 
 - **Путь:** `bot/bot.mjs`
 - **Назначение:** Сервер ботов Telegram и ВКонтакте + парсер
-- **Объем:** 4772 строк (193.6 КБ)
+- **Объем:** 4776 строк (193.9 КБ)
 
 ```javascript
 /**
@@ -4555,6 +4555,10 @@ export async function sendVacancies(chatId, filter = 'all') {
       const stack = Array.isArray(item.tags) && item.tags.length > 0 ? item.tags.slice(0, 4).join(' • ') : '';
       const salaryFormatted = formatSalary(item.salary);
       const loc = formatLocation(item);
+      const isTgPost = applyUrl.includes('t.me/');
+      const isPortal = !isTgPost && !applyUrl.includes('hh.ru');
+      const actionText = isTgPost ? 'Пост в Telegram →' : isPortal ? 'Подать заявку на сайте →' : 'Откликнуться на hh.ru →';
+      const sourceLabel = isTgPost ? `📢 Пост в ${channel}` : isPortal ? `🌐 Сайт ${item.company}` : `📄 HeadHunter`;
 
       text += `<b>${idx + 1}. 🏢 ${item.company}</b>\n`;
       text += `💼 <b>${item.title}</b>\n`;
@@ -4562,7 +4566,7 @@ export async function sendVacancies(chatId, filter = 'all') {
       if (stack) {
         text += `🏷 <code>${stack}</code>\n`;
       }
-      text += `📢 ${channel}  ➔  <a href="${applyUrl}"><b>Откликнуться →</b></a>\n`;
+      text += `${sourceLabel} ➔ <a href="${applyUrl}"><b>${actionText}</b></a>\n`;
       text += `─────────────────────\n`;
     });
     if (list.length > 5) {
@@ -5312,7 +5316,7 @@ TELEGRAM_BOT_TOKEN="ТОКЕН_TG" VK_BOT_TOKEN="ТОКЕН_VK" npm run bot:all
 
 - **Путь:** `bot/vk_bot.mjs`
 - **Назначение:** Сервер ботов Telegram и ВКонтакте + парсер
-- **Объем:** 2224 строк (85.8 КБ)
+- **Объем:** 2228 строк (86.0 КБ)
 
 ```javascript
 /**
@@ -5709,13 +5713,17 @@ export function formatVkVacanciesList(items = [], title = 'Актуальные 
     const verifiedApplyUrl = item.applyUrl || item.url || RENDER_URL;
     const channel = resolveChannelHandle(item.sourceChannel || item.channel, item.company);
     const loc = formatLocation(item);
+    const isTgPost = verifiedApplyUrl.includes('t.me/');
+    const isPortal = !isTgPost && !verifiedApplyUrl.includes('hh.ru');
+    const sourceLabel = isTgPost ? `📢 Пост в ${channel}` : isPortal ? `🌐 Сайт ${item.company}` : `📄 HeadHunter`;
+
     text += `[${idx + 1}] 🏢 ${item.company}\n`;
     text += `💼 ${item.title}\n`;
     text += `💰 ${formatSalary(item.salary)} | 📍 ${loc}\n`;
     if (Array.isArray(item.tags) && item.tags.length > 0) {
       text += `🏷 Стек: ${item.tags.slice(0, 4).join(' • ')}\n`;
     }
-    text += `📢 ${channel}  ➔  ${verifiedApplyUrl}\n`;
+    text += `${sourceLabel} ➔ ${verifiedApplyUrl}\n`;
     text += '─────────────────────\n';
   });
 
@@ -8156,7 +8164,7 @@ run();
 
 - **Путь:** `scripts/cleanup_supabase_internships.mjs`
 - **Назначение:** Скрипты сборки, очистки базы и верификации ссылок
-- **Объем:** 235 строк (9.3 КБ)
+- **Объем:** 242 строк (9.7 КБ)
 
 ```javascript
 import { createClient } from '@supabase/supabase-js';
@@ -8242,6 +8250,9 @@ async function main() {
     const city = row.city || row.location || 'Москва / Удаленно';
 
     const verifiedChannel = resolveChannelHandle(row.source_name, row.company);
+    const isTgPost = resolvedUrl.startsWith('https://t.me/') || resolvedUrl.startsWith('http://t.me/');
+    const sourceType = isTgPost ? 'telegram' : 'portal';
+    const sourceName = isTgPost ? verifiedChannel : row.company;
 
     validRowsToUpdate.push({
       id: row.id,
@@ -8252,8 +8263,8 @@ async function main() {
       format,
       city,
       salary: formattedSalary,
-      source_type: row.source_type || (verifiedChannel.startsWith('@') ? 'telegram' : 'portal'),
-      source_name: verifiedChannel,
+      source_type: sourceType,
+      source_name: sourceName,
       source_url: resolvedUrl,
       description: row.description || '',
       tags: Array.isArray(row.tags) ? row.tags : [row.company, 'Стажировка'],
@@ -8291,6 +8302,8 @@ async function main() {
   const canonicalRows = [];
 
   for (const item of SEED_INTERNSHIPS) {
+    const directUrl = resolveApplyUrl(item.applyUrl, item.company, item.sourceChannel, item.directionId);
+    const isTg = directUrl.startsWith('https://t.me/') || directUrl.startsWith('http://t.me/');
     canonicalRows.push({
       id: item.id,
       title: item.title,
@@ -8300,9 +8313,9 @@ async function main() {
       format: item.format || 'Удаленно',
       city: item.location || 'Москва / Удаленно',
       salary: formatSalary(item.salary),
-      source_type: item.sourceType || 'portal',
-      source_name: resolveChannelHandle(item.sourceChannel, item.company),
-      source_url: resolveApplyUrl(item.applyUrl, item.company, item.sourceChannel, item.directionId),
+      source_type: isTg ? 'telegram' : 'portal',
+      source_name: isTg ? resolveChannelHandle(item.sourceChannel, item.company) : item.company,
+      source_url: directUrl,
       description: item.description,
       tags: item.tags,
       published_at: item.publishedAt || new Date().toISOString(),
@@ -8310,6 +8323,8 @@ async function main() {
   }
 
   for (const item of PORTAL_FALLBACK_VACANCIES) {
+    const directUrl = resolveApplyUrl(item.url, item.company, item.channel, item.directionId);
+    const isTg = directUrl.startsWith('https://t.me/') || directUrl.startsWith('http://t.me/');
     canonicalRows.push({
       id: item.id,
       title: item.title,
@@ -8319,9 +8334,9 @@ async function main() {
       format: item.format || 'Удаленно',
       city: item.location || 'Москва / Удаленно',
       salary: formatSalary(item.salary),
-      source_type: item.sourceType || 'portal',
-      source_name: resolveChannelHandle(item.channel || item.sourceChannel, item.company),
-      source_url: resolveApplyUrl(item.url, item.company, item.channel, item.directionId),
+      source_type: isTg ? 'telegram' : 'portal',
+      source_name: isTg ? resolveChannelHandle(item.channel || item.sourceChannel, item.company) : item.company,
+      source_url: directUrl,
       description: item.description,
       tags: item.tags,
       published_at: new Date().toISOString(),
@@ -13924,7 +13939,7 @@ export const FlashcardsTrainer: React.FC<FlashcardsTrainerProps> = ({
 
 - **Путь:** `src/components/InternshipCard.tsx`
 - **Назначение:** React-компонент пользовательского интерфейса
-- **Объем:** 227 строк (10.8 КБ)
+- **Объем:** 216 строк (9.3 КБ)
 
 ```typescript
 import React from 'react';
@@ -13940,7 +13955,11 @@ import {
 } from 'lucide-react';
 import type { Internship, Question, RoadmapTopic, UserProgress } from '../types';
 import { triggerHaptic } from '../lib/telegram';
-import { resolveApplyUrl, resolveChannelHandle, getCompanyMonogram, formatSalary } from '../lib/vacancyUrl';
+import {
+  getCompanyMonogram,
+  formatSalary,
+  getVacancySourceDetails,
+} from '../lib/vacancyUrl';
 
 interface InternshipCardProps {
   internship: Internship;
@@ -14084,46 +14103,31 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
         {/* Source and Actions */}
         <div className="flex items-center justify-between gap-2">
           {(() => {
-            const verifiedApplyUrl = resolveApplyUrl(internship.applyUrl, internship.company, internship.sourceChannel, internship.directionId);
-            const verifiedChannel = resolveChannelHandle(internship.sourceChannel, internship.company);
-            const cleanChannel = verifiedChannel.replace(/^@/, '');
-            const isTg = verifiedChannel.startsWith('@');
-            const isWeb = !isTg && (verifiedChannel.includes('.') || verifiedChannel.startsWith('http'));
+            const src = getVacancySourceDetails(
+              internship.applyUrl,
+              internship.company,
+              internship.sourceChannel,
+              internship.directionId
+            );
 
             return (
               <>
-                {isTg ? (
-                  <a
-                    href={`https://t.me/${cleanChannel}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1 text-[11px] font-semibold truncate min-w-0 text-neutral-600 hover:text-black dark:text-neutral-400 dark:hover:text-white transition-colors"
-                    title={`Открыть проверенный Telegram-канал ${verifiedChannel}`}
-                  >
+                <a
+                  href={src.badgeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 text-[11px] font-semibold truncate min-w-0 text-neutral-600 hover:text-black dark:text-neutral-400 dark:hover:text-white transition-colors"
+                  title={src.badgeTooltip}
+                >
+                  {src.type === 'telegram_post' ? (
                     <Bot className="w-3.5 h-3.5 shrink-0 text-neutral-500 dark:text-neutral-400" />
-                    <span className="truncate underline decoration-neutral-300 dark:decoration-neutral-700">
-                      {verifiedChannel}
-                    </span>
-                  </a>
-                ) : isWeb ? (
-                  <a
-                    href={verifiedChannel.startsWith('http') ? verifiedChannel : `https://${verifiedChannel}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1 text-[11px] font-semibold truncate min-w-0 text-neutral-600 hover:text-black dark:text-neutral-400 dark:hover:text-white transition-colors"
-                    title={`Открыть карьерный сайт ${verifiedChannel}`}
-                  >
+                  ) : (
                     <Globe className="w-3.5 h-3.5 shrink-0 text-neutral-500 dark:text-neutral-400" />
-                    <span className="truncate underline decoration-neutral-300 dark:decoration-neutral-700">
-                      {verifiedChannel}
-                    </span>
-                  </a>
-                ) : (
-                  <div className="flex items-center gap-1 text-[11px] text-neutral-600 dark:text-neutral-400 font-medium truncate min-w-0">
-                    <Bot className="w-3.5 h-3.5 shrink-0 opacity-70" />
-                    <span className="truncate">{verifiedChannel}</span>
-                  </div>
-                )}
+                  )}
+                  <span className="truncate underline decoration-neutral-300 dark:decoration-neutral-700">
+                    {src.badgeLabel}
+                  </span>
+                </a>
 
                 <div className="flex items-center gap-2 shrink-0">
                   <button
@@ -14135,13 +14139,13 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
                   </button>
 
                   <a
-                    href={verifiedApplyUrl}
+                    href={src.applyUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-1.5 px-4 sm:px-5 py-2 min-h-[38px] rounded-full text-xs font-semibold transition-transform duration-150 active:scale-95 bg-neutral-900 hover:bg-black text-white dark:bg-white dark:hover:bg-neutral-100 dark:text-neutral-900 shadow-xs cursor-pointer"
-                    title={`Подать заявку на официальном сайте ${internship.company}`}
+                    title={src.actionLabel}
                   >
-                    <span>Отклик</span>
+                    <span>{src.type === 'telegram_post' ? 'В Telegram' : 'Отклик'}</span>
                     <ExternalLink className="w-3 h-3" />
                   </a>
                 </div>
@@ -14161,7 +14165,7 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
 
 - **Путь:** `src/components/InternshipModal.tsx`
 - **Назначение:** React-компонент пользовательского интерфейса
-- **Объем:** 584 строк (30.3 КБ)
+- **Объем:** 557 строк (27.9 КБ)
 
 ```typescript
 import React from 'react';
@@ -14185,7 +14189,11 @@ import {
 import confetti from 'canvas-confetti';
 import type { Internship, Question, RoadmapTopic, UserProgress } from '../types';
 import { triggerHaptic } from '../lib/telegram';
-import { resolveApplyUrl, resolveChannelHandle, getCompanyMonogram, formatSalary } from '../lib/vacancyUrl';
+import {
+  getCompanyMonogram,
+  formatSalary,
+  getVacancySourceDetails,
+} from '../lib/vacancyUrl';
 import { useScrollLock } from '../lib/useScrollLock';
 
 interface InternshipModalProps {
@@ -14323,14 +14331,21 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
-      className="fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-[max(0.75rem,env(safe-area-inset-bottom))] liquid-modal-overlay overflow-y-auto overscroll-contain touch-pan-y modal-overlay-animation"
+      className="fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-[max(0.75rem,env(safe-area-inset-bottom))] overflow-y-auto overscroll-contain touch-pan-y modal-overlay-animation"
       style={{
         paddingTop: 'max(0.75rem, max(env(safe-area-inset-top, 0px), var(--vk-safe-area-top, 0px)))',
         paddingBottom: 'max(0.75rem, max(env(safe-area-inset-bottom, 0px), var(--vk-safe-area-bottom, 0px)))',
       }}
     >
+      {/* Apple Liquid Glass Frosted Backdrop Layer */}
       <div
-        className="relative w-full max-w-3xl rounded-2xl sm:rounded-3xl p-4 sm:p-8 my-auto sm:my-8 max-h-[92vh] sm:max-h-[90vh] flex flex-col modal-enter-animation liquid-glass-modal text-neutral-900 dark:text-neutral-100 overflow-hidden shadow-2xl"
+        className="fixed inset-0 liquid-modal-overlay pointer-events-auto"
+        onClick={onClose}
+        aria-hidden="true"
+      />
+
+      <div
+        className="relative z-10 w-full max-w-3xl rounded-2xl sm:rounded-3xl p-4 sm:p-8 my-auto sm:my-8 max-h-[92vh] sm:max-h-[90vh] flex flex-col modal-enter-animation liquid-glass-modal text-neutral-900 dark:text-neutral-100 overflow-hidden shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
@@ -14375,48 +14390,29 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
               {formatSalary(internship.salary)}
             </span>
             {(() => {
-              const verifiedChannel = resolveChannelHandle(internship.sourceChannel, internship.company);
-              const cleanChannel = verifiedChannel.replace(/^@/, '');
-              const isTg = verifiedChannel.startsWith('@');
-              const isWeb = !isTg && (verifiedChannel.includes('.') || verifiedChannel.startsWith('http'));
-
-              if (isTg) {
-                return (
-                  <a
-                    href={`https://t.me/${cleanChannel}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs px-2.5 py-1 rounded-full liquid-glass-pill text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white flex items-center gap-1 transition-colors"
-                    title={`Открыть проверенный Telegram-канал ${verifiedChannel}`}
-                  >
-                    <Bot className="w-3 h-3 text-neutral-500" />
-                    <span>Источник: {verifiedChannel}</span>
-                    <ExternalLink className="w-2.5 h-2.5 opacity-60" />
-                  </a>
-                );
-              }
-
-              if (isWeb) {
-                const targetUrl = verifiedChannel.startsWith('http') ? verifiedChannel : `https://${verifiedChannel}`;
-                return (
-                  <a
-                    href={targetUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs px-2.5 py-1 rounded-full liquid-glass-pill text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white flex items-center gap-1 transition-colors"
-                    title={`Открыть карьерный сайт ${verifiedChannel}`}
-                  >
-                    <Globe className="w-3 h-3 text-neutral-500" />
-                    <span>Источник: {verifiedChannel}</span>
-                    <ExternalLink className="w-2.5 h-2.5 opacity-60" />
-                  </a>
-                );
-              }
+              const src = getVacancySourceDetails(
+                internship.applyUrl,
+                internship.company,
+                internship.sourceChannel,
+                internship.directionId
+              );
 
               return (
-                <span className="text-xs px-2.5 py-1 rounded-full liquid-glass-pill text-neutral-600 dark:text-neutral-400">
-                  Источник: {verifiedChannel}
-                </span>
+                <a
+                  href={src.badgeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs px-2.5 py-1 rounded-full liquid-glass-pill text-neutral-700 dark:text-neutral-300 hover:text-black dark:hover:text-white flex items-center gap-1.5 transition-colors font-medium"
+                  title={src.badgeTooltip}
+                >
+                  {src.type === 'telegram_post' ? (
+                    <Bot className="w-3 h-3 text-neutral-500 dark:text-neutral-400" />
+                  ) : (
+                    <Globe className="w-3 h-3 text-neutral-500 dark:text-neutral-400" />
+                  )}
+                  <span>Источник: {src.badgeLabel}</span>
+                  <ExternalLink className="w-2.5 h-2.5 opacity-60" />
+                </a>
               );
             })()}
           </div>
@@ -14674,72 +14670,53 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
 
         {/* Modal Footer */}
         <div className="shrink-0 pt-3 sm:pt-4 pb-[max(0.25rem,env(safe-area-inset-bottom))] border-t flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-3 border-black/5 dark:border-white/5">
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            <button
-              onClick={onClose}
-              className="flex-1 sm:flex-initial min-h-[44px] px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-transform duration-150 active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-800 cursor-pointer text-center"
-            >
-              Закрыть
-            </button>
-
-            {(() => {
-              const verifiedChannel = resolveChannelHandle(internship.sourceChannel, internship.company);
-              const cleanChannel = verifiedChannel.replace(/^@/, '');
-              const isTg = verifiedChannel.startsWith('@');
-              const isWeb = !isTg && (verifiedChannel.includes('.') || verifiedChannel.startsWith('http'));
-
-              if (isTg) {
-                return (
-                  <a
-                    href={`https://t.me/${cleanChannel}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-1 sm:flex-initial min-h-[44px] flex items-center justify-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-full text-xs font-semibold transition-transform duration-150 active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-800 dark:text-neutral-200 truncate"
-                    title={`Открыть проверенный Telegram-канал ${verifiedChannel}`}
-                  >
-                    <Bot className="w-3.5 h-3.5 shrink-0 text-neutral-600 dark:text-neutral-400" />
-                    <span className="truncate">Канал {verifiedChannel}</span>
-                    <ExternalLink className="w-3 h-3 shrink-0" />
-                  </a>
-                );
-              }
-
-              if (isWeb) {
-                const targetUrl = verifiedChannel.startsWith('http') ? verifiedChannel : `https://${verifiedChannel}`;
-                return (
-                  <a
-                    href={targetUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-1 sm:flex-initial min-h-[44px] flex items-center justify-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-full text-xs font-semibold transition-transform duration-150 active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-800 dark:text-neutral-200 truncate"
-                    title={`Открыть карьерный сайт ${verifiedChannel}`}
-                  >
-                    <Globe className="w-3.5 h-3.5 shrink-0 text-neutral-600 dark:text-neutral-400" />
-                    <span className="truncate">Сайт {verifiedChannel}</span>
-                    <ExternalLink className="w-3 h-3 shrink-0" />
-                  </a>
-                );
-              }
-
-              return null;
-            })()}
-          </div>
-
           {(() => {
-            const verifiedApplyUrl = resolveApplyUrl(internship.applyUrl, internship.company, internship.sourceChannel, internship.directionId);
-            const isTgPost = verifiedApplyUrl.includes('t.me/');
+            const src = getVacancySourceDetails(
+              internship.applyUrl,
+              internship.company,
+              internship.sourceChannel,
+              internship.directionId
+            );
+
             return (
-              <a
-                href={verifiedApplyUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full sm:w-auto min-h-[44px] flex items-center justify-center gap-2 px-5 sm:px-6 py-2.5 rounded-full font-semibold text-xs sm:text-sm active:scale-95 transition-transform duration-150 bg-neutral-900 hover:bg-black text-white dark:bg-white dark:hover:bg-neutral-100 dark:text-neutral-900 shadow-xs cursor-pointer text-center"
-                title={`Подать заявку: ${verifiedApplyUrl}`}
-              >
-                <span className="sm:hidden truncate">{isTgPost ? 'Пост с вакансией' : `Откликнуться на ${internship.company}`}</span>
-                <span className="hidden sm:inline">{isTgPost ? 'Перейти к вакансии в Telegram' : `Подать заявку на сайте ${internship.company}`}</span>
-                <ExternalLink className="w-3.5 h-3.5 shrink-0" />
-              </a>
+              <>
+                <div className="flex items-center gap-2 w-full sm:w-auto">
+                  <button
+                    onClick={onClose}
+                    className="flex-1 sm:flex-initial min-h-[44px] px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-transform duration-150 active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-800 dark:text-neutral-200 cursor-pointer text-center"
+                  >
+                    Закрыть
+                  </button>
+
+                  {/* Secondary Channel Link if official verified employer channel exists */}
+                  {src.officialChannelHandle && (
+                    <a
+                      href={src.officialChannelUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 sm:flex-initial min-h-[44px] flex items-center justify-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-full text-xs font-semibold transition-transform duration-150 active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-800 dark:text-neutral-200 truncate"
+                      title={`Официальный Telegram-канал ${internship.company}: ${src.officialChannelHandle}`}
+                    >
+                      <Bot className="w-3.5 h-3.5 shrink-0 text-neutral-600 dark:text-neutral-400" />
+                      <span className="truncate">Канал {src.officialChannelHandle}</span>
+                      <ExternalLink className="w-3 h-3 shrink-0" />
+                    </a>
+                  )}
+                </div>
+
+                {/* Primary Action Button */}
+                <a
+                  href={src.applyUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full sm:w-auto min-h-[44px] flex items-center justify-center gap-2 px-5 sm:px-6 py-2.5 rounded-full font-semibold text-xs sm:text-sm active:scale-95 transition-transform duration-150 bg-neutral-900 hover:bg-black text-white dark:bg-white dark:hover:bg-neutral-100 dark:text-neutral-900 shadow-xs cursor-pointer text-center"
+                  title={src.actionLabel}
+                >
+                  <span className="sm:hidden truncate">{src.actionMobileLabel}</span>
+                  <span className="hidden sm:inline">{src.actionLabel}</span>
+                  <ExternalLink className="w-3.5 h-3.5 shrink-0" />
+                </a>
+              </>
             );
           })()}
         </div>
@@ -16615,7 +16592,7 @@ export const SelfCheckTrainer: React.FC<SelfCheckTrainerProps> = ({
 
 - **Путь:** `src/components/SubscribeModal.tsx`
 - **Назначение:** React-компонент пользовательского интерфейса
-- **Объем:** 893 строк (43.6 КБ)
+- **Объем:** 900 строк (43.8 КБ)
 
 ```typescript
 import React, { useState, useEffect } from 'react';
@@ -17025,14 +17002,21 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
-      className="fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-[max(0.75rem,env(safe-area-inset-bottom))] liquid-modal-overlay overflow-y-auto overscroll-contain touch-pan-y modal-overlay-animation"
+      className="fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-[max(0.75rem,env(safe-area-inset-bottom))] overflow-y-auto overscroll-contain touch-pan-y modal-overlay-animation"
       style={{
         paddingTop: 'max(0.75rem, max(env(safe-area-inset-top, 0px), var(--vk-safe-area-top, 0px)))',
         paddingBottom: 'max(0.75rem, max(env(safe-area-inset-bottom, 0px), var(--vk-safe-area-bottom, 0px)))',
       }}
     >
+      {/* Apple Liquid Glass Frosted Backdrop Layer */}
       <div
-        className="relative w-full max-w-xl rounded-2xl sm:rounded-3xl shadow-2xl p-4 sm:p-6 my-auto sm:my-8 modal-enter-animation liquid-glass-modal text-neutral-900 dark:text-neutral-100 flex flex-col h-[610px] sm:h-[620px] min-h-[580px] max-h-[92vh] sm:max-h-[88vh] overflow-hidden"
+        className="fixed inset-0 liquid-modal-overlay pointer-events-auto"
+        onClick={onClose}
+        aria-hidden="true"
+      />
+
+      <div
+        className="relative z-10 w-full max-w-xl rounded-2xl sm:rounded-3xl shadow-2xl p-4 sm:p-6 my-auto sm:my-8 modal-enter-animation liquid-glass-modal text-neutral-900 dark:text-neutral-100 flex flex-col h-[610px] sm:h-[620px] min-h-[580px] max-h-[92vh] sm:max-h-[88vh] overflow-hidden"
         style={{ height: 'min(620px, 90vh)' }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -20535,7 +20519,7 @@ export const DIRECTIONS: Direction[] = [
 
 - **Путь:** `src/data/internships.ts`
 - **Назначение:** Статическая база знаний (вакансии, роадмапы, вопросы)
-- **Объем:** 1248 строк (71.6 КБ)
+- **Объем:** 1248 строк (71.5 КБ)
 
 ```typescript
 import type { Internship } from '../types';
@@ -20596,7 +20580,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
       'Оптимизация SQL-запросов и мониторинг метрик сервиса',
     ],
     sourceChannel: '@yandex_intern',
-    sourceType: 'telegram',
+    sourceType: 'portal',
     applyUrl: 'https://yandex.ru/yaintern/backend/',
     publishedAt: '2026-03-27T14:30:00.000Z',
     isHot: true,
@@ -20625,7 +20609,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
       'Покрытие кода юнит-тестами и бенчмарками',
     ],
     sourceChannel: '@ozon_tech_career',
-    sourceType: 'telegram',
+    sourceType: 'portal',
     applyUrl: 'https://job.ozon.ru/it/camp/golang/',
     publishedAt: '2026-03-26T11:15:00.000Z',
     isHot: true,
@@ -20654,7 +20638,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
       'Участие в формулировании и проверке продуктовых гипотез',
     ],
     sourceChannel: '@sber_careers',
-    sourceType: 'telegram',
+    sourceType: 'portal',
     applyUrl: 'https://sbergraduate.ru/sberseasons-moscow/ml/',
     publishedAt: '2026-03-25T16:00:00.000Z',
     isHot: false,
@@ -20683,7 +20667,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
       'Исправление багов и повышение стабильности приложения',
     ],
     sourceChannel: '@avito_tech',
-    sourceType: 'telegram',
+    sourceType: 'portal',
     applyUrl: 'https://career.avito.com/vacancies/razrabotka/20803/',
     publishedAt: '2026-03-25T10:00:00.000Z',
     isHot: true,
@@ -20712,7 +20696,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
       'Интеграция прогона тестов в CI/CD пайплайн',
     ],
     sourceChannel: '@vk_team',
-    sourceType: 'telegram',
+    sourceType: 'portal',
     applyUrl: 'https://internship.vk.company/internship/',
     publishedAt: '2026-03-24T12:00:00.000Z',
     isHot: false,
@@ -20741,7 +20725,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
       'Мониторинг доступности систем в Prometheus и Grafana',
     ],
     sourceChannel: '@sber_careers',
-    sourceType: 'telegram',
+    sourceType: 'portal',
     applyUrl: 'https://sbergraduate.ru/sberseasons-moscow/devops/',
     publishedAt: '2026-03-23T15:20:00.000Z',
     isHot: false,
@@ -20770,7 +20754,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
       'Покрытие сервисов модульными тестами JUnit 5 / Mockito',
     ],
     sourceChannel: '@sber_careers',
-    sourceType: 'telegram',
+    sourceType: 'portal',
     applyUrl: 'https://sbergraduate.ru/sberseasons-moscow/java/',
     publishedAt: '2026-03-22T08:45:00.000Z',
     isHot: true,
@@ -20799,7 +20783,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
       'Взаимодействие с UX-дизайнерами и аналитиками',
     ],
     sourceChannel: '@KonturTech',
-    sourceType: 'telegram',
+    sourceType: 'portal',
     applyUrl: 'https://kontur.ru/career/vacancies/intern-frontend',
     publishedAt: '2026-03-21T11:00:00.000Z',
     isHot: false,
@@ -20828,7 +20812,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
       'Создание дашбордов для продуктовых команд',
     ],
     sourceChannel: '@tbank_team',
-    sourceType: 'telegram',
+    sourceType: 'portal',
     applyUrl: 'https://education.tbank.ru/start/analyst/',
     publishedAt: '2026-03-20T17:10:00.000Z',
     isHot: false,
@@ -20857,7 +20841,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
       'Написание UI-тестов',
     ],
     sourceChannel: '@yandex_intern',
-    sourceType: 'telegram',
+    sourceType: 'portal',
     applyUrl: 'https://yandex.ru/yaintern/mobile/',
     publishedAt: '2026-03-19T13:40:00.000Z',
     isHot: true,
@@ -20886,7 +20870,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
       'Тестирование верстки на экранах различных диагоналей',
     ],
     sourceChannel: '@ozon_tech_career',
-    sourceType: 'telegram',
+    sourceType: 'portal',
     applyUrl: 'https://job.ozon.ru/it/camp/mobile/',
     publishedAt: '2026-03-18T10:15:00.000Z',
     isHot: false,
@@ -20915,7 +20899,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
       'Оформление дефектов в трекере и контроль их исправления',
     ],
     sourceChannel: '@sber_careers',
-    sourceType: 'telegram',
+    sourceType: 'portal',
     applyUrl: 'https://sbergraduate.ru/sberseasons-moscow/qa/',
     publishedAt: '2026-03-17T15:00:00.000Z',
     isHot: false,
@@ -20944,7 +20928,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
       'Написание юнит и e2e тестов на Jest',
     ],
     sourceChannel: '@vk_team',
-    sourceType: 'telegram',
+    sourceType: 'portal',
     applyUrl: 'https://internship.vk.company/internship/',
     publishedAt: '2026-03-16T11:30:00.000Z',
     isHot: true,
@@ -20973,7 +20957,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
       'Участие в расследовании сетевых инцидентов',
     ],
     sourceChannel: '@avito_tech',
-    sourceType: 'telegram',
+    sourceType: 'portal',
     applyUrl: 'https://career.avito.com/vacancies/razrabotka/20803/',
     publishedAt: '2026-03-15T09:00:00.000Z',
     isHot: false,
@@ -21002,7 +20986,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
       'Поддержка и развитие общей библиотеки UI-компонентов',
     ],
     sourceChannel: '@tbank_team',
-    sourceType: 'telegram',
+    sourceType: 'portal',
     applyUrl: 'https://education.tbank.ru/start/frontend/',
     publishedAt: '2026-03-14T12:00:00.000Z',
     isHot: false,
@@ -21031,7 +21015,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
       'Разработка автоматических метрик качества ответов',
     ],
     sourceChannel: '@yandex_intern',
-    sourceType: 'telegram',
+    sourceType: 'portal',
     applyUrl: 'https://yandex.ru/yaintern/ml/',
     publishedAt: '2026-03-13T16:45:00.000Z',
     isHot: true,
@@ -21060,7 +21044,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
       'Написание автоматических тестов',
     ],
     sourceChannel: '@KonturTech',
-    sourceType: 'telegram',
+    sourceType: 'portal',
     applyUrl: 'https://kontur.ru/career/vacancies/intern-backend',
     publishedAt: '2026-03-12T10:00:00.000Z',
     isHot: false,
@@ -21089,7 +21073,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
       'Написание модульных тестов и участие в код-ревью',
     ],
     sourceChannel: '@t1career',
-    sourceType: 'telegram',
+    sourceType: 'portal',
     applyUrl: 'https://career.t1.ru/vacancies/',
     publishedAt: '2026-03-29T10:00:00.000Z',
     isHot: true,
@@ -21117,7 +21101,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
       'Реагирование на инциденты и аудит логов',
     ],
     sourceChannel: '@t1career',
-    sourceType: 'telegram',
+    sourceType: 'portal',
     applyUrl: 'https://career.t1.ru/vacancies/',
     publishedAt: '2026-03-29T12:00:00.000Z',
     isHot: false,
@@ -21145,7 +21129,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
       'Составление отчетов о результатах прогона',
     ],
     sourceChannel: '@t1career',
-    sourceType: 'telegram',
+    sourceType: 'portal',
     applyUrl: 'https://career.t1.ru/vacancies/',
     publishedAt: '2026-03-29T14:30:00.000Z',
     isHot: true,
@@ -21174,7 +21158,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
       'Оптимизация производительности рендеринга больших таблиц данных',
     ],
     sourceChannel: '@Life_in_Directum',
-    sourceType: 'telegram',
+    sourceType: 'portal',
     applyUrl: 'https://career.directum.ru/vacancy/',
     publishedAt: '2026-03-29T11:00:00.000Z',
     isHot: true,
@@ -21202,7 +21186,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
       'Написание модульных тестов и оптимизация запросов к БД',
     ],
     sourceChannel: '@Life_in_Directum',
-    sourceType: 'telegram',
+    sourceType: 'portal',
     applyUrl: 'https://career.directum.ru/vacancy/',
     publishedAt: '2026-03-29T09:30:00.000Z',
     isHot: true,
@@ -21230,7 +21214,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
       'Фиксация найденных багов в Jira/YouTrack',
     ],
     sourceChannel: '@Life_in_Directum',
-    sourceType: 'telegram',
+    sourceType: 'portal',
     applyUrl: 'https://career.directum.ru/vacancy/',
     publishedAt: '2026-03-28T16:00:00.000Z',
     isHot: false,
@@ -21258,7 +21242,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
       'Взаимодействие с наставником, дизайнерами и бэкенд-командой',
     ],
     sourceChannel: '@KonturTech',
-    sourceType: 'telegram',
+    sourceType: 'portal',
     applyUrl: 'https://kontur.ru/career/vacancies/intern-frontend',
     publishedAt: '2026-03-29T13:15:00.000Z',
     isHot: true,
@@ -21286,7 +21270,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
       'Участие в обсуждениях архитектуры микросервисов',
     ],
     sourceChannel: '@KonturTech',
-    sourceType: 'telegram',
+    sourceType: 'portal',
     applyUrl: 'https://kontur.ru/career/vacancies/intern-backend',
     publishedAt: '2026-03-29T15:00:00.000Z',
     isHot: true,
@@ -21314,7 +21298,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
       'Написание модульных и интеграционных тестов',
     ],
     sourceChannel: '@tbank_team',
-    sourceType: 'telegram',
+    sourceType: 'portal',
     applyUrl: 'https://education.tbank.ru/start/',
     publishedAt: '2026-03-29T08:00:00.000Z',
     isHot: true,
@@ -21342,7 +21326,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
       'Анализ инцидентов и повышение надежности систем',
     ],
     sourceChannel: '@tbank_team',
-    sourceType: 'telegram',
+    sourceType: 'portal',
     applyUrl: 'https://education.tbank.ru/start/',
     publishedAt: '2026-03-29T11:45:00.000Z',
     isHot: true,
@@ -21371,7 +21355,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
       'Покрытие компонентов юнит- и скриншот-тестами',
     ],
     sourceChannel: '@ozon_tech_career',
-    sourceType: 'telegram',
+    sourceType: 'portal',
     applyUrl: 'https://job.ozon.ru/it/camp/frontend/',
     publishedAt: '2026-03-30T09:00:00.000Z',
     isHot: true,
@@ -21400,7 +21384,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
       'Интеграция проверок в пайплайны GitLab CI',
     ],
     sourceChannel: '@ozon_tech_career',
-    sourceType: 'telegram',
+    sourceType: 'portal',
     applyUrl: 'https://job.ozon.ru/it/camp/qa/',
     publishedAt: '2026-03-30T10:30:00.000Z',
     isHot: true,
@@ -21429,7 +21413,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
       'Участие в кросс-командном код-ревью',
     ],
     sourceChannel: '@avito_tech',
-    sourceType: 'telegram',
+    sourceType: 'portal',
     applyUrl: 'https://career.avito.com/vacancies/razrabotka/20803/',
     publishedAt: '2026-03-30T11:00:00.000Z',
     isHot: true,
@@ -21458,7 +21442,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
       'Покрытие сервисов интеграционными тестами',
     ],
     sourceChannel: '@avito_tech',
-    sourceType: 'telegram',
+    sourceType: 'portal',
     applyUrl: 'https://career.avito.com/vacancies/razrabotka/20812/',
     publishedAt: '2026-03-30T12:15:00.000Z',
     isHot: true,
@@ -21487,7 +21471,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
       'Оптимизация UX для миллионов ежедневных пользователей',
     ],
     sourceChannel: '@vk_team',
-    sourceType: 'telegram',
+    sourceType: 'portal',
     applyUrl: 'https://internship.vk.company/internship/',
     publishedAt: '2026-03-30T13:00:00.000Z',
     isHot: true,
@@ -21516,7 +21500,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
       'Анализ качества метрик ранжирования контента',
     ],
     sourceChannel: '@vk_team',
-    sourceType: 'telegram',
+    sourceType: 'portal',
     applyUrl: 'https://internship.vk.company/internship/',
     publishedAt: '2026-03-30T14:20:00.000Z',
     isHot: true,
@@ -21545,7 +21529,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
       'Участие в проектировании архитектуры распределенных систем',
     ],
     sourceChannel: '@tbank_team',
-    sourceType: 'telegram',
+    sourceType: 'portal',
     applyUrl: 'https://education.tbank.ru/start/',
     publishedAt: '2026-03-30T15:00:00.000Z',
     isHot: true,
@@ -21574,7 +21558,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
       'Сопровождение релизов финтех-продуктов',
     ],
     sourceChannel: '@tbank_team',
-    sourceType: 'telegram',
+    sourceType: 'portal',
     applyUrl: 'https://education.tbank.ru/start/',
     publishedAt: '2026-03-30T16:10:00.000Z',
     isHot: false,
@@ -21603,7 +21587,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
       'Участие в проектировании требований к новым фичам',
     ],
     sourceChannel: '@KonturTech',
-    sourceType: 'telegram',
+    sourceType: 'portal',
     applyUrl: 'https://kontur.ru/career/vacancies/intern-qa',
     publishedAt: '2026-03-30T17:00:00.000Z',
     isHot: true,
@@ -21632,7 +21616,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
       'Участие в архитектурных ревью и модульном тестировании',
     ],
     sourceChannel: '@Life_in_Directum',
-    sourceType: 'telegram',
+    sourceType: 'portal',
     applyUrl: 'https://career.directum.ru/vacancy/',
     publishedAt: '2026-03-30T17:45:00.000Z',
     isHot: true,
@@ -24129,7 +24113,7 @@ export const TEAM_MEMBERS: TeamMember[] = [
 
 - **Путь:** `src/index.css`
 - **Назначение:** Глобальные стили, темы и эффект Liquid Glass
-- **Объем:** 395 строк (12.5 КБ)
+- **Объем:** 437 строк (13.6 КБ)
 
 ```css
 @import "tailwindcss";
@@ -24231,46 +24215,89 @@ export const TEAM_MEMBERS: TeamMember[] = [
   }
 }
 
-/* Modal Dimming Overlay (desktop: subtle blur, mobile: lightweight solid overlay) */
+/* Apple Liquid Glass Modal Overlay with authentic frosted blur */
 .liquid-modal-overlay {
-  background-color: rgba(2, 6, 23, 0.45);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background-color: rgba(15, 23, 42, 0.40);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
   overscroll-behavior: contain;
   touch-action: pan-y;
   -webkit-overflow-scrolling: touch;
+  transition: backdrop-filter 0.25s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.25s ease;
 }
 
-/* Modal Dialog Window Surface */
+.dark .liquid-modal-overlay {
+  background-color: rgba(2, 6, 23, 0.65);
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
+}
+
+/* Modal Dialog Window Surface (Apple Liquid Glass Material) */
 .liquid-glass-modal {
   position: relative;
-  backdrop-filter: blur(36px) saturate(130%);
-  -webkit-backdrop-filter: blur(36px) saturate(130%);
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.88) 0%, rgba(246, 248, 252, 0.82) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.50);
+  backdrop-filter: blur(48px) saturate(190%);
+  -webkit-backdrop-filter: blur(48px) saturate(190%);
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.96) 0%, rgba(248, 250, 252, 0.93) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.90);
   box-shadow: 
-    0 25px 50px -12px rgba(15, 23, 42, 0.18),
-    0 4px 12px -2px rgba(15, 23, 42, 0.04);
+    0 30px 60px -15px rgba(15, 23, 42, 0.24),
+    0 4px 16px -2px rgba(15, 23, 42, 0.05),
+    inset 0 1px 2px 0 rgba(255, 255, 255, 1);
   transform: translateZ(0);
   touch-action: pan-y;
   overscroll-behavior: contain;
 }
 
 .dark .liquid-glass-modal {
-  background: linear-gradient(145deg, rgba(24, 28, 38, 0.90) 0%, rgba(18, 22, 30, 0.86) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: linear-gradient(165deg, rgba(24, 28, 38, 0.96) 0%, rgba(16, 20, 28, 0.93) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   box-shadow: 
-    0 25px 50px -12px rgba(0, 0, 0, 0.60),
-    0 4px 12px -2px rgba(0, 0, 0, 0.30);
+    0 30px 70px -15px rgba(0, 0, 0, 0.75),
+    0 4px 16px -2px rgba(0, 0, 0, 0.40),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.15);
 }
 
-/* Eliminate nested backdrop-filter overdraw inside all modal windows */
-.liquid-glass-modal .liquid-glass,
-.liquid-glass-modal .liquid-glass-subtle,
-.liquid-glass-modal .liquid-glass-pill,
+/* Eliminate nested backdrop-filter overdraw and improve contrast inside modal windows */
+.liquid-glass-modal .liquid-glass-subtle {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.dark .liquid-glass-modal .liquid-glass-subtle {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.liquid-glass-modal .liquid-glass-pill {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: rgba(255, 255, 255, 0.80);
+}
+
+.dark .liquid-glass-modal .liquid-glass-pill {
+  background: rgba(255, 255, 255, 0.09);
+}
+
 .liquid-glass-modal .liquid-glass-tile {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.dark .liquid-glass-modal .liquid-glass-tile {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.liquid-glass-modal .liquid-glass {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: rgba(255, 255, 255, 0.65);
+}
+
+.dark .liquid-glass-modal .liquid-glass {
+  background: rgba(255, 255, 255, 0.06);
 }
 
 /* Minimalist Liquid Matte Frosted Glass Main Surface */
@@ -24400,28 +24427,36 @@ export const TEAM_MEMBERS: TeamMember[] = [
     background-attachment: scroll !important;
   }
 
-  /* Remove heavy backdrop-blur on modal overlays completely to avoid nested GPU blur shaders */
+  /* Apple Liquid Glass blur on modal overlays */
   .liquid-modal-overlay {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    background-color: rgba(15, 23, 42, 0.65) !important;
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    background-color: rgba(15, 23, 42, 0.48);
   }
 
-  /* Gentle frosted Apple Liquid Glass aesthetics on mobile (translucent frosted matte) */
+  .dark .liquid-modal-overlay {
+    background-color: rgba(2, 6, 23, 0.72);
+  }
+
+  /* Authentic frosted Apple Liquid Glass aesthetics on mobile */
   .liquid-glass-modal {
-    backdrop-filter: blur(28px) saturate(140%);
-    -webkit-backdrop-filter: blur(28px) saturate(140%);
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.88) 0%, rgba(246, 248, 252, 0.78) 100%);
-    border: 1px solid rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(36px) saturate(180%);
+    -webkit-backdrop-filter: blur(36px) saturate(180%);
+    background: linear-gradient(165deg, rgba(255, 255, 255, 0.96) 0%, rgba(246, 248, 252, 0.93) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.90);
     box-shadow: 
-      0 20px 40px -10px rgba(15, 23, 42, 0.16),
+      0 25px 50px -12px rgba(15, 23, 42, 0.22),
       0 2px 8px -1px rgba(15, 23, 42, 0.04),
-      inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.95);
+      inset 0 1px 1.5px 0 rgba(255, 255, 255, 1);
   }
 
   .dark .liquid-glass-modal {
-    background: linear-gradient(145deg, rgba(24, 28, 38, 0.92) 0%, rgba(18, 22, 30, 0.88) 100%);
+    background: linear-gradient(165deg, rgba(24, 28, 38, 0.96) 0%, rgba(16, 20, 28, 0.93) 100%);
     border-color: rgba(255, 255, 255, 0.16);
+    box-shadow: 
+      0 25px 50px -12px rgba(0, 0, 0, 0.70),
+      0 2px 8px -1px rgba(0, 0, 0, 0.35),
+      inset 0 1px 1px 0 rgba(255, 255, 255, 0.15);
   }
 
   .liquid-glass {
@@ -24497,15 +24532,6 @@ export const TEAM_MEMBERS: TeamMember[] = [
     -webkit-backdrop-filter: none !important;
   }
 
-  /* When modal is open on mobile: turn off blur passes on background elements hidden under the dark overlay */
-  html.modal-open main .liquid-glass,
-  html.modal-open main .liquid-glass-subtle,
-  html.modal-open main .liquid-glass-pill,
-  html.modal-open main .liquid-glass-tile,
-  html.modal-open .liquid-glass-nav {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-  }
 }
 
 /* Custom Minimalist Apple-Style Scrollbars */
@@ -24639,7 +24665,7 @@ export function saveCachedInternships(items: Internship[]): void {
 
 - **Путь:** `src/lib/supabase.ts`
 - **Назначение:** Утилиты интеграции (Supabase, Telegram, VK, URL)
-- **Объем:** 320 строк (10.4 КБ)
+- **Объем:** 332 строк (10.8 КБ)
 
 ```typescript
 import { createClient } from '@supabase/supabase-js';
@@ -24732,6 +24758,18 @@ export async function fetchInternshipsFromSupabase(): Promise<Internship[] | nul
         const directionId = item.direction || item.direction_id || 'backend';
         const subTrackId = item.sub_track || item.sub_track_id || 'python';
 
+        const directApplyUrl = resolveApplyUrl(
+          item.source_url || item.apply_url,
+          item.company,
+          item.source_name || item.source_channel,
+          directionId
+        );
+        const isTgPost = directApplyUrl.includes('t.me/');
+        const derivedSourceType: 'telegram' | 'portal' = isTgPost ? 'telegram' : 'portal';
+        const sourceChannel = isTgPost
+          ? resolveChannelHandle(item.source_name || item.source_channel, item.company)
+          : (item.source_name || item.company || 'portal');
+
         return {
           id: String(item.id),
           title: item.title,
@@ -24746,9 +24784,9 @@ export async function fetchInternshipsFromSupabase(): Promise<Internship[] | nul
           description: item.description || '',
           requirements: parseArray(item.requirements, defaultRequirements),
           responsibilities: parseArray(item.responsibilities, defaultResponsibilities),
-          sourceChannel: resolveChannelHandle(item.source_name || item.source_channel, item.company),
-          sourceType: (item.source_type || 'telegram') as 'telegram' | 'portal',
-          applyUrl: resolveApplyUrl(item.source_url || item.apply_url, item.company, item.source_name || item.source_channel, directionId),
+          sourceChannel,
+          sourceType: derivedSourceType,
+          applyUrl: directApplyUrl,
           publishedAt: item.published_at || new Date().toISOString(),
           isHot: Boolean(item.is_hot),
         };
@@ -25495,7 +25533,7 @@ export function useScrollLock(lock: boolean) {
 
 - **Путь:** `src/lib/vacancyUrl.ts`
 - **Назначение:** Утилиты интеграции (Supabase, Telegram, VK, URL)
-- **Объем:** 745 строк (30.5 КБ)
+- **Объем:** 818 строк (33.2 КБ)
 
 ```typescript
 import type { DirectionId, SubTrackId } from '../types';
@@ -26240,6 +26278,79 @@ export function detectVacancyTrack(
   }
 
   return { directionId: 'backend', subTrackId: 'python' };
+}
+
+/**
+ * Structured details about vacancy source (Telegram post vs Official Portal vs HeadHunter).
+ * Guarantees that users are never misinformed about channel sources or generic homepages.
+ */
+export interface VacancySourceDetails {
+  type: 'telegram_post' | 'portal' | 'hh';
+  badgeLabel: string;
+  badgeUrl: string;
+  badgeTooltip: string;
+  actionLabel: string;
+  actionMobileLabel: string;
+  applyUrl: string;
+  officialChannelHandle: string;
+  officialChannelUrl: string;
+}
+
+export function getVacancySourceDetails(
+  rawApplyUrl: string | undefined,
+  companyName = '',
+  sourceChannel = '',
+  directionId?: string
+): VacancySourceDetails {
+  const compKey = getCompanyKey(companyName);
+  const resolvedUrl = resolveApplyUrl(rawApplyUrl, companyName, sourceChannel, directionId);
+  const officialChannelHandle = COMPANY_OFFICIAL_CHANNELS[compKey] || resolveChannelHandle(sourceChannel, companyName);
+  const officialChannelUrl = `https://t.me/${officialChannelHandle.replace(/^@/, '')}`;
+
+  // 1. Direct Telegram post (e.g. https://t.me/channel/123)
+  const tgPostMatch = resolvedUrl.match(/https?:\/\/t\.me\/([a-zA-Z0-9_]+)\/(\d+)/i);
+  if (tgPostMatch) {
+    const postChannel = `@${tgPostMatch[1]}`;
+    return {
+      type: 'telegram_post',
+      badgeLabel: `Пост в ${postChannel}`,
+      badgeUrl: resolvedUrl,
+      badgeTooltip: `Открыть публикацию с вакансией в Telegram: ${resolvedUrl}`,
+      actionLabel: 'Перейти к вакансии в Telegram',
+      actionMobileLabel: 'Пост в Telegram',
+      applyUrl: resolvedUrl,
+      officialChannelHandle: postChannel,
+      officialChannelUrl: `https://t.me/${postChannel.replace(/^@/, '')}`,
+    };
+  }
+
+  // 2. HeadHunter direct vacancy
+  if (resolvedUrl.includes('hh.ru/vacancy/')) {
+    return {
+      type: 'hh',
+      badgeLabel: 'HeadHunter (hh.ru)',
+      badgeUrl: resolvedUrl,
+      badgeTooltip: `Открыть вакансию на HeadHunter: ${resolvedUrl}`,
+      actionLabel: 'Откликнуться на hh.ru',
+      actionMobileLabel: 'На hh.ru',
+      applyUrl: resolvedUrl,
+      officialChannelHandle,
+      officialChannelUrl,
+    };
+  }
+
+  // 3. Official employer career portal
+  return {
+    type: 'portal',
+    badgeLabel: `Сайт ${companyName || 'работодателя'}`,
+    badgeUrl: resolvedUrl,
+    badgeTooltip: `Открыть страницу вакансии на официальном сайте ${companyName}: ${resolvedUrl}`,
+    actionLabel: `Подать заявку на сайте ${companyName || ''}`.trim(),
+    actionMobileLabel: `Откликнуться на ${companyName || 'сайте'}`.trim(),
+    applyUrl: resolvedUrl,
+    officialChannelHandle,
+    officialChannelUrl,
+  };
 }
 
 ```

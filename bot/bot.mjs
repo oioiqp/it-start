@@ -4118,6 +4118,10 @@ export async function sendVacancies(chatId, filter = 'all') {
       const stack = Array.isArray(item.tags) && item.tags.length > 0 ? item.tags.slice(0, 4).join(' • ') : '';
       const salaryFormatted = formatSalary(item.salary);
       const loc = formatLocation(item);
+      const isTgPost = applyUrl.includes('t.me/');
+      const isPortal = !isTgPost && !applyUrl.includes('hh.ru');
+      const actionText = isTgPost ? 'Пост в Telegram →' : isPortal ? 'Подать заявку на сайте →' : 'Откликнуться на hh.ru →';
+      const sourceLabel = isTgPost ? `📢 Пост в ${channel}` : isPortal ? `🌐 Сайт ${item.company}` : `📄 HeadHunter`;
 
       text += `<b>${idx + 1}. 🏢 ${item.company}</b>\n`;
       text += `💼 <b>${item.title}</b>\n`;
@@ -4125,7 +4129,7 @@ export async function sendVacancies(chatId, filter = 'all') {
       if (stack) {
         text += `🏷 <code>${stack}</code>\n`;
       }
-      text += `📢 ${channel}  ➔  <a href="${applyUrl}"><b>Откликнуться →</b></a>\n`;
+      text += `${sourceLabel} ➔ <a href="${applyUrl}"><b>${actionText}</b></a>\n`;
       text += `─────────────────────\n`;
     });
     if (list.length > 5) {

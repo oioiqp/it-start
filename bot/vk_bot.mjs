@@ -392,13 +392,17 @@ export function formatVkVacanciesList(items = [], title = 'Актуальные 
     const verifiedApplyUrl = item.applyUrl || item.url || RENDER_URL;
     const channel = resolveChannelHandle(item.sourceChannel || item.channel, item.company);
     const loc = formatLocation(item);
+    const isTgPost = verifiedApplyUrl.includes('t.me/');
+    const isPortal = !isTgPost && !verifiedApplyUrl.includes('hh.ru');
+    const sourceLabel = isTgPost ? `📢 Пост в ${channel}` : isPortal ? `🌐 Сайт ${item.company}` : `📄 HeadHunter`;
+
     text += `[${idx + 1}] 🏢 ${item.company}\n`;
     text += `💼 ${item.title}\n`;
     text += `💰 ${formatSalary(item.salary)} | 📍 ${loc}\n`;
     if (Array.isArray(item.tags) && item.tags.length > 0) {
       text += `🏷 Стек: ${item.tags.slice(0, 4).join(' • ')}\n`;
     }
-    text += `📢 ${channel}  ➔  ${verifiedApplyUrl}\n`;
+    text += `${sourceLabel} ➔ ${verifiedApplyUrl}\n`;
     text += '─────────────────────\n';
   });
 

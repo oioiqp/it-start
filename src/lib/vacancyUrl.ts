@@ -742,3 +742,76 @@ export function detectVacancyTrack(
   return { directionId: 'backend', subTrackId: 'python' };
 }
 
+/**
+ * Structured details about vacancy source (Telegram post vs Official Portal vs HeadHunter).
+ * Guarantees that users are never misinformed about channel sources or generic homepages.
+ */
+export interface VacancySourceDetails {
+  type: 'telegram_post' | 'portal' | 'hh';
+  badgeLabel: string;
+  badgeUrl: string;
+  badgeTooltip: string;
+  actionLabel: string;
+  actionMobileLabel: string;
+  applyUrl: string;
+  officialChannelHandle: string;
+  officialChannelUrl: string;
+}
+
+export function getVacancySourceDetails(
+  rawApplyUrl: string | undefined,
+  companyName = '',
+  sourceChannel = '',
+  directionId?: string
+): VacancySourceDetails {
+  const compKey = getCompanyKey(companyName);
+  const resolvedUrl = resolveApplyUrl(rawApplyUrl, companyName, sourceChannel, directionId);
+  const officialChannelHandle = COMPANY_OFFICIAL_CHANNELS[compKey] || resolveChannelHandle(sourceChannel, companyName);
+  const officialChannelUrl = `https://t.me/${officialChannelHandle.replace(/^@/, '')}`;
+
+  // 1. Direct Telegram post (e.g. https://t.me/channel/123)
+  const tgPostMatch = resolvedUrl.match(/https?:\/\/t\.me\/([a-zA-Z0-9_]+)\/(\d+)/i);
+  if (tgPostMatch) {
+    const postChannel = `@${tgPostMatch[1]}`;
+    return {
+      type: 'telegram_post',
+      badgeLabel: `Пост в ${postChannel}`,
+      badgeUrl: resolvedUrl,
+      badgeTooltip: `Открыть публикацию с вакансией в Telegram: ${resolvedUrl}`,
+      actionLabel: 'Перейти к вакансии в Telegram',
+      actionMobileLabel: 'Пост в Telegram',
+      applyUrl: resolvedUrl,
+      officialChannelHandle: postChannel,
+      officialChannelUrl: `https://t.me/${postChannel.replace(/^@/, '')}`,
+    };
+  }
+
+  // 2. HeadHunter direct vacancy
+  if (resolvedUrl.includes('hh.ru/vacancy/')) {
+    return {
+      type: 'hh',
+      badgeLabel: 'HeadHunter (hh.ru)',
+      badgeUrl: resolvedUrl,
+      badgeTooltip: `Открыть вакансию на HeadHunter: ${resolvedUrl}`,
+      actionLabel: 'Откликнуться на hh.ru',
+      actionMobileLabel: 'На hh.ru',
+      applyUrl: resolvedUrl,
+      officialChannelHandle,
+      officialChannelUrl,
+    };
+  }
+
+  // 3. Official employer career portal
+  return {
+    type: 'portal',
+    badgeLabel: `Сайт ${companyName || 'работодателя'}`,
+    badgeUrl: resolvedUrl,
+    badgeTooltip: `Открыть страницу вакансии на официальном сайте ${companyName}: ${resolvedUrl}`,
+    actionLabel: `Подать заявку на сайте ${companyName || ''}`.trim(),
+    actionMobileLabel: `Откликнуться на ${companyName || 'сайте'}`.trim(),
+    applyUrl: resolvedUrl,
+    officialChannelHandle,
+    officialChannelUrl,
+  };
+}
+

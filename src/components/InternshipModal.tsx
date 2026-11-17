@@ -19,7 +19,11 @@ import {
 import confetti from 'canvas-confetti';
 import type { Internship, Question, RoadmapTopic, UserProgress } from '../types';
 import { triggerHaptic } from '../lib/telegram';
-import { resolveApplyUrl, resolveChannelHandle, getCompanyMonogram, formatSalary } from '../lib/vacancyUrl';
+import {
+  getCompanyMonogram,
+  formatSalary,
+  getVacancySourceDetails,
+} from '../lib/vacancyUrl';
 import { useScrollLock } from '../lib/useScrollLock';
 
 interface InternshipModalProps {
@@ -157,14 +161,21 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
-      className="fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-[max(0.75rem,env(safe-area-inset-bottom))] liquid-modal-overlay overflow-y-auto overscroll-contain touch-pan-y modal-overlay-animation"
+      className="fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-[max(0.75rem,env(safe-area-inset-bottom))] overflow-y-auto overscroll-contain touch-pan-y modal-overlay-animation"
       style={{
         paddingTop: 'max(0.75rem, max(env(safe-area-inset-top, 0px), var(--vk-safe-area-top, 0px)))',
         paddingBottom: 'max(0.75rem, max(env(safe-area-inset-bottom, 0px), var(--vk-safe-area-bottom, 0px)))',
       }}
     >
+      {/* Apple Liquid Glass Frosted Backdrop Layer */}
       <div
-        className="relative w-full max-w-3xl rounded-2xl sm:rounded-3xl p-4 sm:p-8 my-auto sm:my-8 max-h-[92vh] sm:max-h-[90vh] flex flex-col modal-enter-animation liquid-glass-modal text-neutral-900 dark:text-neutral-100 overflow-hidden shadow-2xl"
+        className="fixed inset-0 liquid-modal-overlay pointer-events-auto"
+        onClick={onClose}
+        aria-hidden="true"
+      />
+
+      <div
+        className="relative z-10 w-full max-w-3xl rounded-2xl sm:rounded-3xl p-4 sm:p-8 my-auto sm:my-8 max-h-[92vh] sm:max-h-[90vh] flex flex-col modal-enter-animation liquid-glass-modal text-neutral-900 dark:text-neutral-100 overflow-hidden shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
@@ -209,48 +220,29 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
               {formatSalary(internship.salary)}
             </span>
             {(() => {
-              const verifiedChannel = resolveChannelHandle(internship.sourceChannel, internship.company);
-              const cleanChannel = verifiedChannel.replace(/^@/, '');
-              const isTg = verifiedChannel.startsWith('@');
-              const isWeb = !isTg && (verifiedChannel.includes('.') || verifiedChannel.startsWith('http'));
-
-              if (isTg) {
-                return (
-                  <a
-                    href={`https://t.me/${cleanChannel}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs px-2.5 py-1 rounded-full liquid-glass-pill text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white flex items-center gap-1 transition-colors"
-                    title={`Открыть проверенный Telegram-канал ${verifiedChannel}`}
-                  >
-                    <Bot className="w-3 h-3 text-neutral-500" />
-                    <span>Источник: {verifiedChannel}</span>
-                    <ExternalLink className="w-2.5 h-2.5 opacity-60" />
-                  </a>
-                );
-              }
-
-              if (isWeb) {
-                const targetUrl = verifiedChannel.startsWith('http') ? verifiedChannel : `https://${verifiedChannel}`;
-                return (
-                  <a
-                    href={targetUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs px-2.5 py-1 rounded-full liquid-glass-pill text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white flex items-center gap-1 transition-colors"
-                    title={`Открыть карьерный сайт ${verifiedChannel}`}
-                  >
-                    <Globe className="w-3 h-3 text-neutral-500" />
-                    <span>Источник: {verifiedChannel}</span>
-                    <ExternalLink className="w-2.5 h-2.5 opacity-60" />
-                  </a>
-                );
-              }
+              const src = getVacancySourceDetails(
+                internship.applyUrl,
+                internship.company,
+                internship.sourceChannel,
+                internship.directionId
+              );
 
               return (
-                <span className="text-xs px-2.5 py-1 rounded-full liquid-glass-pill text-neutral-600 dark:text-neutral-400">
-                  Источник: {verifiedChannel}
-                </span>
+                <a
+                  href={src.badgeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs px-2.5 py-1 rounded-full liquid-glass-pill text-neutral-700 dark:text-neutral-300 hover:text-black dark:hover:text-white flex items-center gap-1.5 transition-colors font-medium"
+                  title={src.badgeTooltip}
+                >
+                  {src.type === 'telegram_post' ? (
+                    <Bot className="w-3 h-3 text-neutral-500 dark:text-neutral-400" />
+                  ) : (
+                    <Globe className="w-3 h-3 text-neutral-500 dark:text-neutral-400" />
+                  )}
+                  <span>Источник: {src.badgeLabel}</span>
+                  <ExternalLink className="w-2.5 h-2.5 opacity-60" />
+                </a>
               );
             })()}
           </div>
@@ -508,72 +500,53 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
 
         {/* Modal Footer */}
         <div className="shrink-0 pt-3 sm:pt-4 pb-[max(0.25rem,env(safe-area-inset-bottom))] border-t flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-3 border-black/5 dark:border-white/5">
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            <button
-              onClick={onClose}
-              className="flex-1 sm:flex-initial min-h-[44px] px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-transform duration-150 active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-800 cursor-pointer text-center"
-            >
-              Закрыть
-            </button>
-
-            {(() => {
-              const verifiedChannel = resolveChannelHandle(internship.sourceChannel, internship.company);
-              const cleanChannel = verifiedChannel.replace(/^@/, '');
-              const isTg = verifiedChannel.startsWith('@');
-              const isWeb = !isTg && (verifiedChannel.includes('.') || verifiedChannel.startsWith('http'));
-
-              if (isTg) {
-                return (
-                  <a
-                    href={`https://t.me/${cleanChannel}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-1 sm:flex-initial min-h-[44px] flex items-center justify-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-full text-xs font-semibold transition-transform duration-150 active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-800 dark:text-neutral-200 truncate"
-                    title={`Открыть проверенный Telegram-канал ${verifiedChannel}`}
-                  >
-                    <Bot className="w-3.5 h-3.5 shrink-0 text-neutral-600 dark:text-neutral-400" />
-                    <span className="truncate">Канал {verifiedChannel}</span>
-                    <ExternalLink className="w-3 h-3 shrink-0" />
-                  </a>
-                );
-              }
-
-              if (isWeb) {
-                const targetUrl = verifiedChannel.startsWith('http') ? verifiedChannel : `https://${verifiedChannel}`;
-                return (
-                  <a
-                    href={targetUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-1 sm:flex-initial min-h-[44px] flex items-center justify-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-full text-xs font-semibold transition-transform duration-150 active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-800 dark:text-neutral-200 truncate"
-                    title={`Открыть карьерный сайт ${verifiedChannel}`}
-                  >
-                    <Globe className="w-3.5 h-3.5 shrink-0 text-neutral-600 dark:text-neutral-400" />
-                    <span className="truncate">Сайт {verifiedChannel}</span>
-                    <ExternalLink className="w-3 h-3 shrink-0" />
-                  </a>
-                );
-              }
-
-              return null;
-            })()}
-          </div>
-
           {(() => {
-            const verifiedApplyUrl = resolveApplyUrl(internship.applyUrl, internship.company, internship.sourceChannel, internship.directionId);
-            const isTgPost = verifiedApplyUrl.includes('t.me/');
+            const src = getVacancySourceDetails(
+              internship.applyUrl,
+              internship.company,
+              internship.sourceChannel,
+              internship.directionId
+            );
+
             return (
-              <a
-                href={verifiedApplyUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full sm:w-auto min-h-[44px] flex items-center justify-center gap-2 px-5 sm:px-6 py-2.5 rounded-full font-semibold text-xs sm:text-sm active:scale-95 transition-transform duration-150 bg-neutral-900 hover:bg-black text-white dark:bg-white dark:hover:bg-neutral-100 dark:text-neutral-900 shadow-xs cursor-pointer text-center"
-                title={`Подать заявку: ${verifiedApplyUrl}`}
-              >
-                <span className="sm:hidden truncate">{isTgPost ? 'Пост с вакансией' : `Откликнуться на ${internship.company}`}</span>
-                <span className="hidden sm:inline">{isTgPost ? 'Перейти к вакансии в Telegram' : `Подать заявку на сайте ${internship.company}`}</span>
-                <ExternalLink className="w-3.5 h-3.5 shrink-0" />
-              </a>
+              <>
+                <div className="flex items-center gap-2 w-full sm:w-auto">
+                  <button
+                    onClick={onClose}
+                    className="flex-1 sm:flex-initial min-h-[44px] px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-transform duration-150 active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-800 dark:text-neutral-200 cursor-pointer text-center"
+                  >
+                    Закрыть
+                  </button>
+
+                  {/* Secondary Channel Link if official verified employer channel exists */}
+                  {src.officialChannelHandle && (
+                    <a
+                      href={src.officialChannelUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 sm:flex-initial min-h-[44px] flex items-center justify-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-full text-xs font-semibold transition-transform duration-150 active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-800 dark:text-neutral-200 truncate"
+                      title={`Официальный Telegram-канал ${internship.company}: ${src.officialChannelHandle}`}
+                    >
+                      <Bot className="w-3.5 h-3.5 shrink-0 text-neutral-600 dark:text-neutral-400" />
+                      <span className="truncate">Канал {src.officialChannelHandle}</span>
+                      <ExternalLink className="w-3 h-3 shrink-0" />
+                    </a>
+                  )}
+                </div>
+
+                {/* Primary Action Button */}
+                <a
+                  href={src.applyUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full sm:w-auto min-h-[44px] flex items-center justify-center gap-2 px-5 sm:px-6 py-2.5 rounded-full font-semibold text-xs sm:text-sm active:scale-95 transition-transform duration-150 bg-neutral-900 hover:bg-black text-white dark:bg-white dark:hover:bg-neutral-100 dark:text-neutral-900 shadow-xs cursor-pointer text-center"
+                  title={src.actionLabel}
+                >
+                  <span className="sm:hidden truncate">{src.actionMobileLabel}</span>
+                  <span className="hidden sm:inline">{src.actionLabel}</span>
+                  <ExternalLink className="w-3.5 h-3.5 shrink-0" />
+                </a>
+              </>
             );
           })()}
         </div>

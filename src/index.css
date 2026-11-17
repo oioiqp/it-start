@@ -97,46 +97,89 @@
   }
 }
 
-/* Modal Dimming Overlay (desktop: subtle blur, mobile: lightweight solid overlay) */
+/* Apple Liquid Glass Modal Overlay with authentic frosted blur */
 .liquid-modal-overlay {
-  background-color: rgba(2, 6, 23, 0.45);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background-color: rgba(15, 23, 42, 0.40);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
   overscroll-behavior: contain;
   touch-action: pan-y;
   -webkit-overflow-scrolling: touch;
+  transition: backdrop-filter 0.25s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.25s ease;
 }
 
-/* Modal Dialog Window Surface */
+.dark .liquid-modal-overlay {
+  background-color: rgba(2, 6, 23, 0.65);
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
+}
+
+/* Modal Dialog Window Surface (Apple Liquid Glass Material) */
 .liquid-glass-modal {
   position: relative;
-  backdrop-filter: blur(36px) saturate(130%);
-  -webkit-backdrop-filter: blur(36px) saturate(130%);
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.88) 0%, rgba(246, 248, 252, 0.82) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.50);
+  backdrop-filter: blur(48px) saturate(190%);
+  -webkit-backdrop-filter: blur(48px) saturate(190%);
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.96) 0%, rgba(248, 250, 252, 0.93) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.90);
   box-shadow: 
-    0 25px 50px -12px rgba(15, 23, 42, 0.18),
-    0 4px 12px -2px rgba(15, 23, 42, 0.04);
+    0 30px 60px -15px rgba(15, 23, 42, 0.24),
+    0 4px 16px -2px rgba(15, 23, 42, 0.05),
+    inset 0 1px 2px 0 rgba(255, 255, 255, 1);
   transform: translateZ(0);
   touch-action: pan-y;
   overscroll-behavior: contain;
 }
 
 .dark .liquid-glass-modal {
-  background: linear-gradient(145deg, rgba(24, 28, 38, 0.90) 0%, rgba(18, 22, 30, 0.86) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: linear-gradient(165deg, rgba(24, 28, 38, 0.96) 0%, rgba(16, 20, 28, 0.93) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   box-shadow: 
-    0 25px 50px -12px rgba(0, 0, 0, 0.60),
-    0 4px 12px -2px rgba(0, 0, 0, 0.30);
+    0 30px 70px -15px rgba(0, 0, 0, 0.75),
+    0 4px 16px -2px rgba(0, 0, 0, 0.40),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.15);
 }
 
-/* Eliminate nested backdrop-filter overdraw inside all modal windows */
-.liquid-glass-modal .liquid-glass,
-.liquid-glass-modal .liquid-glass-subtle,
-.liquid-glass-modal .liquid-glass-pill,
+/* Eliminate nested backdrop-filter overdraw and improve contrast inside modal windows */
+.liquid-glass-modal .liquid-glass-subtle {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.dark .liquid-glass-modal .liquid-glass-subtle {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.liquid-glass-modal .liquid-glass-pill {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: rgba(255, 255, 255, 0.80);
+}
+
+.dark .liquid-glass-modal .liquid-glass-pill {
+  background: rgba(255, 255, 255, 0.09);
+}
+
 .liquid-glass-modal .liquid-glass-tile {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.dark .liquid-glass-modal .liquid-glass-tile {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.liquid-glass-modal .liquid-glass {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: rgba(255, 255, 255, 0.65);
+}
+
+.dark .liquid-glass-modal .liquid-glass {
+  background: rgba(255, 255, 255, 0.06);
 }
 
 /* Minimalist Liquid Matte Frosted Glass Main Surface */
@@ -266,28 +309,36 @@
     background-attachment: scroll !important;
   }
 
-  /* Remove heavy backdrop-blur on modal overlays completely to avoid nested GPU blur shaders */
+  /* Apple Liquid Glass blur on modal overlays */
   .liquid-modal-overlay {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    background-color: rgba(15, 23, 42, 0.65) !important;
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    background-color: rgba(15, 23, 42, 0.48);
   }
 
-  /* Gentle frosted Apple Liquid Glass aesthetics on mobile (translucent frosted matte) */
+  .dark .liquid-modal-overlay {
+    background-color: rgba(2, 6, 23, 0.72);
+  }
+
+  /* Authentic frosted Apple Liquid Glass aesthetics on mobile */
   .liquid-glass-modal {
-    backdrop-filter: blur(28px) saturate(140%);
-    -webkit-backdrop-filter: blur(28px) saturate(140%);
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.88) 0%, rgba(246, 248, 252, 0.78) 100%);
-    border: 1px solid rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(36px) saturate(180%);
+    -webkit-backdrop-filter: blur(36px) saturate(180%);
+    background: linear-gradient(165deg, rgba(255, 255, 255, 0.96) 0%, rgba(246, 248, 252, 0.93) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.90);
     box-shadow: 
-      0 20px 40px -10px rgba(15, 23, 42, 0.16),
+      0 25px 50px -12px rgba(15, 23, 42, 0.22),
       0 2px 8px -1px rgba(15, 23, 42, 0.04),
-      inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.95);
+      inset 0 1px 1.5px 0 rgba(255, 255, 255, 1);
   }
 
   .dark .liquid-glass-modal {
-    background: linear-gradient(145deg, rgba(24, 28, 38, 0.92) 0%, rgba(18, 22, 30, 0.88) 100%);
+    background: linear-gradient(165deg, rgba(24, 28, 38, 0.96) 0%, rgba(16, 20, 28, 0.93) 100%);
     border-color: rgba(255, 255, 255, 0.16);
+    box-shadow: 
+      0 25px 50px -12px rgba(0, 0, 0, 0.70),
+      0 2px 8px -1px rgba(0, 0, 0, 0.35),
+      inset 0 1px 1px 0 rgba(255, 255, 255, 0.15);
   }
 
   .liquid-glass {
@@ -363,15 +414,6 @@
     -webkit-backdrop-filter: none !important;
   }
 
-  /* When modal is open on mobile: turn off blur passes on background elements hidden under the dark overlay */
-  html.modal-open main .liquid-glass,
-  html.modal-open main .liquid-glass-subtle,
-  html.modal-open main .liquid-glass-pill,
-  html.modal-open main .liquid-glass-tile,
-  html.modal-open .liquid-glass-nav {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-  }
 }
 
 /* Custom Minimalist Apple-Style Scrollbars */

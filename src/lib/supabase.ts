@@ -88,6 +88,18 @@ export async function fetchInternshipsFromSupabase(): Promise<Internship[] | nul
         const directionId = item.direction || item.direction_id || 'backend';
         const subTrackId = item.sub_track || item.sub_track_id || 'python';
 
+        const directApplyUrl = resolveApplyUrl(
+          item.source_url || item.apply_url,
+          item.company,
+          item.source_name || item.source_channel,
+          directionId
+        );
+        const isTgPost = directApplyUrl.includes('t.me/');
+        const derivedSourceType: 'telegram' | 'portal' = isTgPost ? 'telegram' : 'portal';
+        const sourceChannel = isTgPost
+          ? resolveChannelHandle(item.source_name || item.source_channel, item.company)
+          : (item.source_name || item.company || 'portal');
+
         return {
           id: String(item.id),
           title: item.title,
@@ -102,9 +114,9 @@ export async function fetchInternshipsFromSupabase(): Promise<Internship[] | nul
           description: item.description || '',
           requirements: parseArray(item.requirements, defaultRequirements),
           responsibilities: parseArray(item.responsibilities, defaultResponsibilities),
-          sourceChannel: resolveChannelHandle(item.source_name || item.source_channel, item.company),
-          sourceType: (item.source_type || 'telegram') as 'telegram' | 'portal',
-          applyUrl: resolveApplyUrl(item.source_url || item.apply_url, item.company, item.source_name || item.source_channel, directionId),
+          sourceChannel,
+          sourceType: derivedSourceType,
+          applyUrl: directApplyUrl,
           publishedAt: item.published_at || new Date().toISOString(),
           isHot: Boolean(item.is_hot),
         };

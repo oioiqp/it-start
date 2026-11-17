@@ -81,6 +81,9 @@ async function main() {
     const city = row.city || row.location || 'Москва / Удаленно';
 
     const verifiedChannel = resolveChannelHandle(row.source_name, row.company);
+    const isTgPost = resolvedUrl.startsWith('https://t.me/') || resolvedUrl.startsWith('http://t.me/');
+    const sourceType = isTgPost ? 'telegram' : 'portal';
+    const sourceName = isTgPost ? verifiedChannel : row.company;
 
     validRowsToUpdate.push({
       id: row.id,
@@ -91,8 +94,8 @@ async function main() {
       format,
       city,
       salary: formattedSalary,
-      source_type: row.source_type || (verifiedChannel.startsWith('@') ? 'telegram' : 'portal'),
-      source_name: verifiedChannel,
+      source_type: sourceType,
+      source_name: sourceName,
       source_url: resolvedUrl,
       description: row.description || '',
       tags: Array.isArray(row.tags) ? row.tags : [row.company, 'Стажировка'],
@@ -130,6 +133,8 @@ async function main() {
   const canonicalRows = [];
 
   for (const item of SEED_INTERNSHIPS) {
+    const directUrl = resolveApplyUrl(item.applyUrl, item.company, item.sourceChannel, item.directionId);
+    const isTg = directUrl.startsWith('https://t.me/') || directUrl.startsWith('http://t.me/');
     canonicalRows.push({
       id: item.id,
       title: item.title,
@@ -139,9 +144,9 @@ async function main() {
       format: item.format || 'Удаленно',
       city: item.location || 'Москва / Удаленно',
       salary: formatSalary(item.salary),
-      source_type: item.sourceType || 'portal',
-      source_name: resolveChannelHandle(item.sourceChannel, item.company),
-      source_url: resolveApplyUrl(item.applyUrl, item.company, item.sourceChannel, item.directionId),
+      source_type: isTg ? 'telegram' : 'portal',
+      source_name: isTg ? resolveChannelHandle(item.sourceChannel, item.company) : item.company,
+      source_url: directUrl,
       description: item.description,
       tags: item.tags,
       published_at: item.publishedAt || new Date().toISOString(),
@@ -149,6 +154,8 @@ async function main() {
   }
 
   for (const item of PORTAL_FALLBACK_VACANCIES) {
+    const directUrl = resolveApplyUrl(item.url, item.company, item.channel, item.directionId);
+    const isTg = directUrl.startsWith('https://t.me/') || directUrl.startsWith('http://t.me/');
     canonicalRows.push({
       id: item.id,
       title: item.title,
@@ -158,9 +165,9 @@ async function main() {
       format: item.format || 'Удаленно',
       city: item.location || 'Москва / Удаленно',
       salary: formatSalary(item.salary),
-      source_type: item.sourceType || 'portal',
-      source_name: resolveChannelHandle(item.channel || item.sourceChannel, item.company),
-      source_url: resolveApplyUrl(item.url, item.company, item.channel, item.directionId),
+      source_type: isTg ? 'telegram' : 'portal',
+      source_name: isTg ? resolveChannelHandle(item.channel || item.sourceChannel, item.company) : item.company,
+      source_url: directUrl,
       description: item.description,
       tags: item.tags,
       published_at: new Date().toISOString(),
