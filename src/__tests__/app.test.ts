@@ -581,7 +581,7 @@ describe('11. Target Companies & Telegram Channels Tracking', () => {
     expect(hasQA).toBe(true);
   });
 
-  it('exports valid MONITORED_CHANNELS_LIST and INITIAL_PARSED_POSTS from TelegramParserTab', async () => {
+  it('exports valid MONITORED_CHANNELS_LIST and INITIAL_PARSED_POSTS', async () => {
     const { MONITORED_CHANNELS_LIST, INITIAL_PARSED_POSTS } = await import(
       '../data/channels'
     );
