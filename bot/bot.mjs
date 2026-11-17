@@ -4627,6 +4627,14 @@ export async function sendHelp(chatId) {
   return { ok: true, type: 'help', chatId };
 }
 
+
+export function getSubscriptionKeyboard(isSubscribed) {
+  return [
+    [{ text: '📋 Все вакансии', callback_data: 'vacancies:all' }],
+    [{ text: isSubscribed ? '🔕 Отписаться' : '🔔 Подписка', callback_data: isSubscribed ? 'unsubscribe' : 'subscribe' }],
+  ];
+}
+
 /**
  * Handle inline button callback queries
  */
@@ -4668,6 +4676,16 @@ export async function handleCallbackQuery(query) {
       username: query.from?.username || '',
       first_name: query.from?.first_name || 'Разработчик',
     });
+    
+    // Update keyboard
+    if (query.message) {
+        await callTelegram('editMessageReplyMarkup', {
+            chat_id: chatId,
+            message_id: query.message.message_id,
+            reply_markup: { inline_keyboard: getSubscriptionKeyboard(true) }
+        });
+    }
+
     return callTelegram('sendMessage', {
       chat_id: chatId,
       text: `🔔 <b>Подписка успешно оформлена!</b> Вы будете получать уведомления о новых стажировках.`,
@@ -4675,6 +4693,16 @@ export async function handleCallbackQuery(query) {
     });
   } else if (data === 'unsubscribe') {
     await unregisterTgSubscriber(chatId);
+    
+    // Update keyboard
+    if (query.message) {
+        await callTelegram('editMessageReplyMarkup', {
+            chat_id: chatId,
+            message_id: query.message.message_id,
+            reply_markup: { inline_keyboard: getSubscriptionKeyboard(false) }
+        });
+    }
+
     return callTelegram('sendMessage', {
       chat_id: chatId,
       text: `🔕 <b>Вы отписались от уведомлений IT-Старт.</b>\nЧтобы возобновить, отправьте /subscribe.`,

@@ -27,7 +27,6 @@ import { InternshipCard } from './components/InternshipCard';
 import { InternshipModal } from './components/InternshipModal';
 import { RoadmapViewer } from './components/RoadmapViewer';
 import { QuestionsViewer } from './components/QuestionsViewer';
-import { TelegramParserTab } from './components/TelegramParserTab';
 import { SubscribeModal } from './components/SubscribeModal';
 import {
   fetchInternshipsFromSupabase,
@@ -61,7 +60,7 @@ import { RENDER_URL } from './services/subscriptionService';
 
 export function App() {
   // Navigation
-  const [activeTab, setActiveTab] = useState<'internships' | 'roadmaps' | 'questions' | 'telegram'>('internships');
+  const [activeTab, setActiveTab] = useState<'internships' | 'roadmaps' | 'questions'>('internships');
 
   // Telegram User & Subscription
   const [telegramUser, setTelegramUser] = useState<TelegramUser | null>(() => initTelegramWebApp());
@@ -100,6 +99,7 @@ export function App() {
   const [selectedFormat, setSelectedFormat] = useState<WorkFormat | 'all'>('all');
   const [selectedSource, setSelectedSource] = useState<'all' | 'telegram' | 'portal'>('all');
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState<boolean>(false);
+  const [sortConfig, setSortConfig] = useState<{ field: 'publishedAt' | 'salary', direction: 'asc' | 'desc' }>({ field: 'publishedAt', direction: 'desc' });
 
   const TARGET_COMPANIES = [
     'Т-Банк',
@@ -249,6 +249,18 @@ export function App() {
     syncInternships();
   }, []);
 
+  // Handle URL params for navigation
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const vacancyId = params.get('vacancyId');
+    if (vacancyId) {
+        const internship = internships.find(i => i.id === vacancyId);
+        if (internship) {
+            setSelectedInternshipForPlan(internship);
+        }
+    }
+  }, [internships]);
+
   // Save progress helper
   const updateProgress = (updater: (prev: UserProgress) => UserProgress) => {
     setUserProgress((prev) => {
@@ -383,50 +395,69 @@ export function App() {
     return false;
   };
 
-  // Filtered internships for feed
-  const filteredInternships = internships.filter((item) => {
-    if (selectedCompany !== 'all' && !matchesCompanyFilter(item.company, selectedCompany)) {
-      return false;
-    }
-    if (selectedDirection !== 'all' && item.directionId !== selectedDirection) return false;
-    if (selectedSubTrack !== 'all' && item.subTrackId !== selectedSubTrack) return false;
-    if (selectedFormat !== 'all' && item.format !== selectedFormat) return false;
-    if (selectedSource === 'telegram' && item.sourceType !== 'telegram') return false;
-    if (selectedSource === 'portal' && item.sourceType !== 'portal') return false;
+  // Filtered and Sorted Internships
+  const filteredAndSortedInternships = useMemo(() => {
+    let result = internships.filter((item) => {
+      if (selectedCompany !== 'all' && !matchesCompanyFilter(item.company, selectedCompany)) {
+        return false;
+      }
+      if (selectedDirection !== 'all' && item.directionId !== selectedDirection) return false;
+      if (selectedSubTrack !== 'all' && item.subTrackId !== selectedSubTrack) return false;
+      if (selectedFormat !== 'all' && item.format !== selectedFormat) return false;
+      if (selectedSource === 'telegram' && item.sourceType !== 'telegram') return false;
+      if (selectedSource === 'portal' && item.sourceType !== 'portal') return false;
 
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase().trim();
-      const isDirectum = q.includes('директ') || q.includes('direct');
-      const isT1 = q.includes('т1') || q.includes('t1');
-      const isTBank = q.includes('тбанк') || q.includes('т-банк') || q.includes('tbank') || q.includes('тиньк');
-      const isKontur = q.includes('контур') || q.includes('kontur');
-      const isOzon = q.includes('озон') || q.includes('ozon');
-      const isSber = q.includes('сбер') || q.includes('sber');
-      const isAvito = q.includes('авито') || q.includes('avito');
-      const isYandex = q.includes('яндекс') || q.includes('yandex');
-      const isVk = q.includes('вк') || q.includes('vk') || q.includes('вконтакт');
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase().trim();
+        const isDirectum = q.includes('директ') || q.includes('direct');
+        const isT1 = q.includes('т1') || q.includes('t1');
+        const isTBank = q.includes('тбанк') || q.includes('т-банк') || q.includes('tbank') || q.includes('тиньк');
+        const isKontur = q.includes('контур') || q.includes('kontur');
+        const isOzon = q.includes('озон') || q.includes('ozon');
+        const isSber = q.includes('сбер') || q.includes('sber');
+        const isAvito = q.includes('авито') || q.includes('avito');
+        const isYandex = q.includes('яндекс') || q.includes('yandex');
+        const isVk = q.includes('вк') || q.includes('vk') || q.includes('вконтакт');
 
-      const compLower = item.company.toLowerCase();
-      const matchCompany =
-        compLower.includes(q) ||
-        (isDirectum && compLower.includes('directum')) ||
-        (isT1 && (compLower.includes('т1') || compLower.includes('t1'))) ||
-        (isTBank && (compLower.includes('т-банк') || compLower.includes('тинькофф') || compLower.includes('tbank'))) ||
-        (isKontur && (compLower.includes('контур') || compLower.includes('kontur'))) ||
-        (isOzon && compLower.includes('ozon')) ||
-        (isSber && compLower.includes('сбер')) ||
-        (isAvito && compLower.includes('avito')) ||
-        (isYandex && compLower.includes('яндекс')) ||
-        (isVk && compLower.includes('vk'));
+        const compLower = item.company.toLowerCase();
+        const matchCompany =
+          compLower.includes(q) ||
+          (isDirectum && compLower.includes('directum')) ||
+          (isT1 && (compLower.includes('т1') || compLower.includes('t1'))) ||
+          (isTBank && (compLower.includes('т-банк') || compLower.includes('тинькофф') || compLower.includes('tbank'))) ||
+          (isKontur && (compLower.includes('контур') || compLower.includes('kontur'))) ||
+          (isOzon && compLower.includes('ozon')) ||
+          (isSber && compLower.includes('сбер')) ||
+          (isAvito && compLower.includes('avito')) ||
+          (isYandex && compLower.includes('яндекс')) ||
+          (isVk && compLower.includes('vk'));
 
-      const matchTitle = item.title.toLowerCase().includes(q);
-      const matchTags = item.tags.some((t) => t.toLowerCase().includes(q));
-      const matchDesc = item.description.toLowerCase().includes(q);
-      return matchTitle || matchCompany || matchTags || matchDesc;
-    }
+        const matchTitle = item.title.toLowerCase().includes(q);
+        const matchTags = item.tags.some((t) => t.toLowerCase().includes(q));
+        const matchDesc = item.description.toLowerCase().includes(q);
+        return matchTitle || matchCompany || matchTags || matchDesc;
+      }
+      return true;
+    });
 
-    return true;
-  });
+    result.sort((a, b) => {
+      if (sortConfig.field === 'salary') {
+        const getSalaryValue = (s: string) => {
+             const match = s.match(/(\d+\s?\d+)/);
+             return match ? parseInt(match[0].replace(/\s/g, ''), 10) : 0;
+        }
+        const aVal = getSalaryValue(a.salary);
+        const bVal = getSalaryValue(b.salary);
+        return sortConfig.direction === 'asc' ? aVal - bVal : bVal - aVal;
+      } else {
+        const aDate = new Date(a.publishedAt || '2000-01-01').getTime();
+        const bDate = new Date(b.publishedAt || '2000-01-01').getTime();
+        return sortConfig.direction === 'asc' ? aDate - bDate : bDate - aDate;
+      }
+    });
+
+    return result;
+  }, [internships, selectedCompany, selectedDirection, selectedSubTrack, selectedFormat, selectedSource, searchQuery, sortConfig]);
 
   return (
     <div className="min-h-screen flex flex-col relative light bg-[#dbe0ea] text-neutral-900 liquid-ambient selection:bg-neutral-950 selection:text-white">
@@ -629,6 +660,19 @@ export function App() {
                       {(selectedCompany !== 'all' ? 1 : 0) + (selectedFormat !== 'all' ? 1 : 0) + (selectedSource !== 'all' ? 1 : 0)}
                     </span>
                   )}
+                </button>
+
+                {/* Sort Button */}
+                <button
+                  onClick={() => {
+                      setSortConfig(prev => ({
+                          field: prev.field === 'publishedAt' ? 'salary' : 'publishedAt',
+                          direction: prev.direction === 'desc' ? 'asc' : 'desc'
+                      }));
+                  }}
+                  className="px-3.5 py-2.5 sm:py-3 rounded-full text-xs font-semibold liquid-glass-pill hover:bg-white/50 text-neutral-700 dark:text-neutral-300 shrink-0"
+                >
+                  {sortConfig.field === 'publishedAt' ? 'По дате' : 'По зарплате'} {sortConfig.direction === 'asc' ? '↑' : '↓'}
                 </button>
 
                 {/* Reset Filters button if any active */}
@@ -882,7 +926,7 @@ export function App() {
                     onClick={() => setIsMobileFiltersOpen(false)}
                     className="w-full py-2 rounded-full text-xs font-semibold bg-neutral-900 text-white dark:bg-white dark:text-black shadow-xs transition-transform active:scale-95"
                   >
-                    Показать стажировки ({filteredInternships.length})
+                    Показать стажировки ({filteredAndSortedInternships.length})
                   </button>
                 </div>
               </div>
@@ -892,7 +936,7 @@ export function App() {
             <div className="space-y-4">
               <div className="flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-400 px-1">
                 <span>
-                  Найдено стажировок: <strong className="text-neutral-900 dark:text-white">{filteredInternships.length}</strong>
+                  Найдено стажировок: <strong className="text-neutral-900 dark:text-white">{filteredAndSortedInternships.length}</strong>
                 </span>
                 {isLoadingInternships && (
                   <span className="flex items-center gap-1.5 text-neutral-700 dark:text-neutral-300">
@@ -902,7 +946,7 @@ export function App() {
                 )}
               </div>
 
-              {filteredInternships.length === 0 ? (
+              {filteredAndSortedInternships.length === 0 ? (
                 <div className="p-8 sm:p-12 text-center rounded-2xl sm:rounded-3xl space-y-3 liquid-glass text-neutral-700 dark:text-neutral-300">
                   <Briefcase className="w-12 h-12 text-neutral-400 dark:text-neutral-500 mx-auto" />
                   <h3 className="text-base font-bold text-neutral-900 dark:text-white font-sans leading-snug">
@@ -929,7 +973,7 @@ export function App() {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
-                  {filteredInternships.map((internship) => (
+                  {filteredAndSortedInternships.map((internship) => (
                     <InternshipCard
                       key={internship.id}
                       internship={internship}
@@ -966,15 +1010,6 @@ export function App() {
           />
         )}
 
-        {/* TAB 4: TELEGRAM & PARSER */}
-        {activeTab === 'telegram' && (
-          <TelegramParserTab
-            telegramUser={telegramUser}
-            currentSubscription={currentSubscription}
-            onSubscriptionSaved={(sub) => setCurrentSubscription(sub)}
-            onInternshipAdded={handleInternshipAdded}
-          />
-        )}
       </main>
 
       {/* Preparation Plan Modal */}

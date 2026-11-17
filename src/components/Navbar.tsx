@@ -11,8 +11,8 @@ import type { VkUser } from '../lib/vkBridge';
 import { triggerHaptic } from '../lib/telegram';
 
 interface NavbarProps {
-  activeTab: 'internships' | 'roadmaps' | 'questions' | 'telegram';
-  setActiveTab: (tab: 'internships' | 'roadmaps' | 'questions' | 'telegram') => void;
+  activeTab: 'internships' | 'roadmaps' | 'questions';
+  setActiveTab: (tab: 'internships' | 'roadmaps' | 'questions') => void;
   telegramUser?: TelegramUser | null;
   vkUser?: VkUser | null;
   isVk?: boolean;
@@ -32,7 +32,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   isVk,
   onOpenSubscribeModal,
 }) => {
-  const handleTabClick = (tab: 'internships' | 'roadmaps' | 'questions' | 'telegram') => {
+  const handleTabClick = (tab: 'internships' | 'roadmaps' | 'questions') => {
     triggerHaptic('selection');
     setActiveTab(tab);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -42,7 +42,6 @@ export const Navbar: React.FC<NavbarProps> = ({
     { id: 'internships' as const, label: 'Стажировки', icon: Briefcase },
     { id: 'roadmaps' as const, label: 'Роадмапы', icon: Map },
     { id: 'questions' as const, label: 'Тренажёр', icon: HelpCircle },
-    { id: 'telegram' as const, label: 'Парсер', icon: Send },
   ];
 
   return (
