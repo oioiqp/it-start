@@ -663,17 +663,20 @@ export function App() {
                 </button>
 
                 {/* Sort Button */}
-                <button
-                  onClick={() => {
-                      setSortConfig(prev => ({
-                          field: prev.field === 'publishedAt' ? 'salary' : 'publishedAt',
-                          direction: prev.direction === 'desc' ? 'asc' : 'desc'
-                      }));
-                  }}
-                  className="px-3.5 py-2.5 sm:py-3 rounded-full text-xs font-semibold liquid-glass-pill hover:bg-white/50 text-neutral-700 dark:text-neutral-300 shrink-0"
-                >
-                  {sortConfig.field === 'publishedAt' ? 'По дате' : 'По зарплате'} {sortConfig.direction === 'asc' ? '↑' : '↓'}
-                </button>
+                <div className="flex gap-1 liquid-glass-pill rounded-full p-1 items-center shrink-0">
+                    <button
+                        onClick={() => setSortConfig(prev => ({ ...prev, field: prev.field === 'publishedAt' ? 'salary' : 'publishedAt' }))}
+                        className={`px-3 py-1.5 rounded-full text-xs font-semibold ${sortConfig.field === 'publishedAt' ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950' : 'text-neutral-700 dark:text-neutral-300'}`}
+                    >
+                        {sortConfig.field === 'publishedAt' ? 'По дате' : 'По з/п'}
+                    </button>
+                    <button
+                        onClick={() => setSortConfig(prev => ({ ...prev, direction: prev.direction === 'desc' ? 'asc' : 'desc' }))}
+                        className="px-2 py-1.5 rounded-full text-xs font-semibold text-neutral-700 dark:text-neutral-300"
+                    >
+                        {sortConfig.direction === 'asc' ? '↑' : '↓'}
+                    </button>
+                </div>
 
                 {/* Reset Filters button if any active */}
                 {(searchQuery || selectedCompany !== 'all' || selectedDirection !== 'all' || selectedSubTrack !== 'all' || selectedFormat !== 'all' || selectedSource !== 'all') && (

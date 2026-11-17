@@ -3407,7 +3407,7 @@ export async function scanChannelsAndSyncSupabase(notifySubscribers = true) {
                   [
                     {
                       text: '🚀 Открыть в WebApp',
-                      web_app: { url: WEBAPP_URL },
+                      web_app: { url: `${WEBAPP_URL}${WEBAPP_URL.includes('?') ? '&' : '?'}vacancyId=${item.id}` },
                     },
                   ],
                   [
