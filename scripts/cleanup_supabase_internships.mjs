@@ -1,12 +1,13 @@
 import { createClient } from '@supabase/supabase-js';
 import { SEED_INTERNSHIPS } from '../src/data/internships.ts';
 import {
-  PORTAL_FALLBACK_VACANCIES,
   formatSalary,
   resolveApplyUrl,
   resolveChannelHandle,
   isStrictVacancyPost,
-} from '../bot/bot.mjs';
+  isVacancyActive,
+} from '../src/lib/vacancyUrl.ts';
+import { PORTAL_FALLBACK_VACANCIES } from '../bot/bot.mjs';
 
 const SUPABASE_URL = 'https://pmgsymacvhzsixbpndsn.supabase.co';
 const SUPABASE_ANON_KEY =
@@ -39,33 +40,72 @@ async function main() {
 
     // 2. Validate strict IT vacancy requirements
     const isStrictIT = isStrictVacancyPost(row.title || '', row.description || '');
-    if (!isStrictIT && row.id !== 'int-38') {
+    if (!isStrictIT) {
       console.log(`❌ Нецелевая / спам / не-IT вакансия к удалению: [${row.id}] ${row.company} — ${row.title}`);
       toDelete.push(row.id);
       continue;
     }
 
-    // 3. Normalize salary & URLs
+    // 3. Remove inactive Directum vacancies (recruitment closed, target page has no internships)
+    if (
+      (row.company || '').toLowerCase().includes('directum') ||
+      (row.company || '').toLowerCase().includes('директ') ||
+      row.id.includes('directum')
+    ) {
+      console.log(`❌ Directum вакансия к удалению (набор завершён): [${row.id}] ${row.title}`);
+      toDelete.push(row.id);
+      continue;
+    }
+
+    // 4. Remove all expired/closed HeadHunter aggregator vacancies
+    if (row.id.startsWith('hh-') || (row.source_url || '').includes('hh.ru')) {
+      console.log(`❌ Устаревшая / закрытая hh.ru вакансия к удалению: [${row.id}] ${row.company} — ${row.title}`);
+      toDelete.push(row.id);
+      continue;
+    }
+
+    // 5. Remove closed/stale Avito vacancies
+    if (
+      row.id.includes('site-avito-20706') ||
+      row.id.includes('site-avito-20946') ||
+      (row.source_url || '').includes('20803') ||
+      (row.source_url || '').includes('20812') ||
+      (row.source_url || '').includes('20816')
+    ) {
+      console.log(`❌ Устаревшая Avito ссылка к удалению: [${row.id}] ${row.source_url}`);
+      toDelete.push(row.id);
+      continue;
+    }
+
+    // 6. Check general active & freshness rules
+    const active = isVacancyActive({
+      id: row.id,
+      title: row.title,
+      company: row.company,
+      applyUrl: row.source_url || row.url,
+      description: row.description,
+      publishedAt: row.published_at,
+      isActive: row.is_active,
+      status: row.status,
+    });
+    if (!active) {
+      console.log(`❌ Неактуальная / архивная вакансия к удалению: [${row.id}] ${row.company} — ${row.title}`);
+      toDelete.push(row.id);
+      continue;
+    }
+
+    // 7. Normalize salary & URLs
     const formattedSalary = formatSalary(row.salary);
     let title = row.title;
     let resolvedUrl = resolveApplyUrl(
       row.source_url || row.url,
       row.company,
       row.source_name,
-      row.direction
+      row.direction,
+      row.sub_track
     );
 
-    // Specific corrections for historical rows
     if (
-      row.id === 'int-38' ||
-      row.id === 'bot-directum-1' ||
-      row.id === 'bot-directum-2' ||
-      row.id === 'bot-directum-3' ||
-      row.source_url?.includes('career.directum.ru/vacancy')
-    ) {
-      title = row.title || 'Стажёр Backend C# / .NET Developer (Directum RX)';
-      resolvedUrl = 'https://career.directum.ru/vacancy/';
-    } else if (
       row.id === 'bot-t1-3' ||
       row.id === 'bot-t1-1' ||
       row.source_url?.includes('career.t1.ru/vacancies')
@@ -73,8 +113,6 @@ async function main() {
       resolvedUrl = 'https://career.t1.ru/vacancies/';
     } else if (row.id === 'bot-vk-1' || row.source_url?.includes('internship.vk.company')) {
       resolvedUrl = 'https://internship.vk.company/internship/';
-    } else if (row.id === 'hh-3529-138722040') {
-      resolvedUrl = 'https://hh.ru/vacancy/138722040';
     }
 
     const format = row.format || 'Удаленно';
@@ -129,11 +167,14 @@ async function main() {
   }
 
   // 4. Upsert canonical SEED_INTERNSHIPS & PORTAL_FALLBACK_VACANCIES
-  console.log(`\nСинхронизация эталонных SEED (${SEED_INTERNSHIPS.length}) и PORTAL_FALLBACK (${PORTAL_FALLBACK_VACANCIES.length}) вакансий...`);
+  const activeSeeds = SEED_INTERNSHIPS.filter((i) => isVacancyActive(i));
+  const activePortals = PORTAL_FALLBACK_VACANCIES.filter((i) => isVacancyActive(i));
+
+  console.log(`\nСинхронизация эталонных активных SEED (${activeSeeds.length}) и PORTAL_FALLBACK (${activePortals.length}) вакансий...`);
   const canonicalRows = [];
 
-  for (const item of SEED_INTERNSHIPS) {
-    const directUrl = resolveApplyUrl(item.applyUrl, item.company, item.sourceChannel, item.directionId);
+  for (const item of activeSeeds) {
+    const directUrl = resolveApplyUrl(item.applyUrl, item.company, item.sourceChannel, item.directionId, item.subTrackId);
     const isTg = directUrl.startsWith('https://t.me/') || directUrl.startsWith('http://t.me/');
     canonicalRows.push({
       id: item.id,
@@ -153,8 +194,8 @@ async function main() {
     });
   }
 
-  for (const item of PORTAL_FALLBACK_VACANCIES) {
-    const directUrl = resolveApplyUrl(item.url, item.company, item.channel, item.directionId);
+  for (const item of activePortals) {
+    const directUrl = resolveApplyUrl(item.url, item.company, item.channel, item.directionId, item.subTrackId);
     const isTg = directUrl.startsWith('https://t.me/') || directUrl.startsWith('http://t.me/');
     canonicalRows.push({
       id: item.id,
@@ -219,6 +260,10 @@ async function main() {
     if (!isStrictVacancyPost(r.title, r.description || '')) {
       nonIT++;
       console.log(`[Non-IT remaining] ${r.id}: ${r.title}`);
+    }
+    if (!isVacancyActive(r)) {
+      badUrls++;
+      console.log(`[Inactive remaining] ${r.id}: ${r.title} (${r.source_url})`);
     }
   }
 

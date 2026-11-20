@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Internship, TelegramSubscription, UserProgress } from '../types';
-import { resolveApplyUrl, resolveChannelHandle, formatSalary, isStrictVacancyPost } from './vacancyUrl';
+import { resolveApplyUrl, resolveChannelHandle, formatSalary, isStrictVacancyPost, isVacancyActive } from './vacancyUrl';
 
 export const SUPABASE_URL = 'https://pmgsymacvhzsixbpndsn.supabase.co';
 export const SUPABASE_ANON_KEY =
@@ -58,7 +58,8 @@ export async function fetchInternshipsFromSupabase(): Promise<Internship[] | nul
 
     if (data && data.length > 0) {
       const validRows = data.filter((item: any) =>
-        isStrictVacancyPost(item.title || '', item.description || '')
+        isStrictVacancyPost(item.title || '', item.description || '') &&
+        isVacancyActive(item)
       );
       const items = validRows.map((item: any) => {
         const parseArray = (val: any, fallback: string[]): string[] => {
@@ -92,7 +93,8 @@ export async function fetchInternshipsFromSupabase(): Promise<Internship[] | nul
           item.source_url || item.apply_url,
           item.company,
           item.source_name || item.source_channel,
-          directionId
+          directionId,
+          subTrackId
         );
         const isTgPost = directApplyUrl.includes('t.me/');
         const derivedSourceType: 'telegram' | 'portal' = isTgPost ? 'telegram' : 'portal';
@@ -119,6 +121,8 @@ export async function fetchInternshipsFromSupabase(): Promise<Internship[] | nul
           applyUrl: directApplyUrl,
           publishedAt: item.published_at || new Date().toISOString(),
           isHot: Boolean(item.is_hot),
+          isActive: item.is_active !== false && item.status !== 'closed' && item.status !== 'archived',
+          status: item.status || 'active',
         };
       });
 
@@ -151,7 +155,9 @@ export async function seedInternshipsToSupabase(seedData: Internship[]): Promise
   if (isSupabaseOffline) return true;
 
   try {
-    const rows = seedData.map((item) => ({
+    const rows = seedData
+      .filter((item) => isVacancyActive(item))
+      .map((item) => ({
       id: item.id,
       title: item.title,
       company: item.company,

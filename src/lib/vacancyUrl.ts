@@ -5,13 +5,13 @@ import type { DirectionId, SubTrackId } from '../types';
  */
 export const COMPANY_OFFICIAL_PORTALS: Record<string, string> = {
   tbank: 'https://education.tbank.ru/start/',
-  kontur: 'https://kontur.ru/career/vacancies/intern-frontend',
-  directum: 'https://career.directum.ru/vacancy/',
+  kontur: 'https://kontur.ru/career/students',
+  directum: 'https://career.directum.ru/',
   t1: 'https://career.t1.ru/vacancies/',
-  yandex: 'https://yandex.ru/yaintern/backend/',
-  ozon: 'https://job.ozon.ru/it/camp/golang/',
-  sber: 'https://sbergraduate.ru/sberseasons-moscow/ml/',
-  avito: 'https://career.avito.com/vacancies/razrabotka/20803/',
+  yandex: 'https://yandex.ru/yaintern/',
+  ozon: 'https://job.ozon.ru/it/camp/',
+  sber: 'https://sbergraduate.ru/sberseasons-moscow/',
+  avito: 'https://start.avito.ru/internships',
   vk: 'https://internship.vk.company/internship/',
 };
 
@@ -68,17 +68,25 @@ export function getCompanyMonogram(companyName = ''): string {
 export function getDirectVacancyPortalUrl(
   companyKey: string,
   directionId?: string,
-  fallback = 'https://career.directum.ru/vacancy/'
+  fallback = 'https://career.directum.ru/',
+  subTrackId?: string
 ): string {
   switch (companyKey) {
     case 'avito':
-      if (directionId === 'mobile') return 'https://career.avito.com/vacancies/razrabotka/20803/';
-      if (directionId === 'frontend') return 'https://career.avito.com/vacancies/razrabotka/20803/';
-      if (directionId === 'backend') return 'https://career.avito.com/vacancies/razrabotka/20812/';
-      if (directionId === 'data_science') return 'https://career.avito.com/vacancies/analitika-dannykh/20816/';
-      if (directionId === 'devops') return 'https://career.avito.com/vacancies/razrabotka/20803/';
-      if (directionId === 'qa') return 'https://career.avito.com/vacancies/razrabotka/20803/';
-      return 'https://career.avito.com/vacancies/razrabotka/20803/';
+      if (directionId === 'data_science') {
+        if (subTrackId === 'analytics') return 'https://start.avito.ru/analysts-internship';
+        return 'https://start.avito.ru/datascience-internship';
+      }
+      if (
+        directionId === 'mobile' ||
+        directionId === 'frontend' ||
+        directionId === 'backend' ||
+        directionId === 'devops' ||
+        directionId === 'qa'
+      ) {
+        return 'https://start.avito.ru/tech';
+      }
+      return 'https://start.avito.ru/internships';
     case 'tbank':
       if (directionId === 'frontend') return 'https://education.tbank.ru/start/frontend/';
       if (directionId === 'data_science') return 'https://education.tbank.ru/start/analyst/';
@@ -86,11 +94,10 @@ export function getDirectVacancyPortalUrl(
     case 'kontur':
       if (directionId === 'backend') return 'https://kontur.ru/career/vacancies/intern-backend';
       if (directionId === 'qa') return 'https://kontur.ru/career/vacancies/intern-qa';
-      return 'https://kontur.ru/career/vacancies/intern-frontend';
+      if (directionId === 'frontend') return 'https://kontur.ru/career/vacancies/intern-frontend';
+      return 'https://kontur.ru/career/students';
     case 'directum':
-      if (directionId === 'backend') return 'https://career.directum.ru/vacancy/';
-      if (directionId === 'qa') return 'https://career.directum.ru/vacancy/';
-      return 'https://career.directum.ru/vacancy/';
+      return 'https://career.directum.ru/';
     case 't1':
       if (directionId === 'devops') return 'https://career.t1.ru/vacancies/';
       if (directionId === 'qa') return 'https://career.t1.ru/vacancies/';
@@ -100,17 +107,20 @@ export function getDirectVacancyPortalUrl(
       if (directionId === 'mobile') return 'https://yandex.ru/yaintern/mobile/';
       if (directionId === 'data_science') return 'https://yandex.ru/yaintern/ml/';
       if (directionId === 'devops') return 'https://yandex.ru/yaintern/devops/';
-      return 'https://yandex.ru/yaintern/backend/';
+      if (directionId === 'backend') return 'https://yandex.ru/yaintern/backend/';
+      return 'https://yandex.ru/yaintern/';
     case 'ozon':
       if (directionId === 'frontend') return 'https://job.ozon.ru/it/camp/frontend/';
       if (directionId === 'qa') return 'https://job.ozon.ru/it/camp/qa/';
       if (directionId === 'mobile') return 'https://job.ozon.ru/it/camp/mobile/';
-      return 'https://job.ozon.ru/it/camp/golang/';
+      if (directionId === 'backend') return 'https://job.ozon.ru/it/camp/golang/';
+      return 'https://job.ozon.ru/it/camp/';
     case 'sber':
       if (directionId === 'backend') return 'https://sbergraduate.ru/sberseasons-moscow/java/';
       if (directionId === 'devops') return 'https://sbergraduate.ru/sberseasons-moscow/devops/';
       if (directionId === 'qa') return 'https://sbergraduate.ru/sberseasons-moscow/qa/';
-      return 'https://sbergraduate.ru/sberseasons-moscow/ml/';
+      if (directionId === 'data_science') return 'https://sbergraduate.ru/sberseasons-moscow/ml/';
+      return 'https://sbergraduate.ru/sberseasons-moscow/';
     case 'vk':
       return 'https://internship.vk.company/internship/';
     default:
@@ -127,10 +137,11 @@ export function resolveApplyUrl(
   rawUrl: string | undefined,
   companyName = '',
   sourceChannel = '',
-  directionId?: string
+  directionId?: string,
+  subTrackId?: string
 ): string {
   const companyKey = getCompanyKey(companyName);
-  const directPortal = getDirectVacancyPortalUrl(companyKey, directionId);
+  const directPortal = getDirectVacancyPortalUrl(companyKey, directionId, undefined, subTrackId);
 
   // If sourceChannel points to a specific post in Telegram, store it for fallback
   const hasSpecificPostSource =
@@ -165,6 +176,10 @@ export function resolveApplyUrl(
     return `https://career.habr.com${trimmed.split('?')[0]}`;
   }
   if (/^\/vacancies\/[a-zA-Z0-9_-]+\/\d+\/?/i.test(trimmed)) {
+    // Relative Avito URL: if company is Avito or known senior/regular IDs, resolve to direct Avito portal
+    if (companyKey === 'avito' || trimmed.includes('20803') || trimmed.includes('20812') || trimmed.includes('20816')) {
+      return fallbackDirect;
+    }
     return `https://career.avito.com${trimmed.split('?')[0]}`;
   }
 
@@ -206,7 +221,7 @@ export function resolveApplyUrl(
     lower.includes('/search/') ||
     lower.includes('/vacancies/?') ||
     lower.includes('/vacancies?') ||
-    // Avito generic
+    // Avito generic & non-internship pages
     lower === 'https://career.avito.com/' ||
     lower === 'https://career.avito.com' ||
     lower === 'https://avito.ru/' ||
@@ -216,10 +231,24 @@ export function resolveApplyUrl(
     lower === 'https://career.avito.com/vacancies' ||
     lower === 'https://career.avito.com/vacancies/' ||
     lower.includes('career.avito.com/internship') ||
-    // Directum generic
+    lower.includes('career.avito.com/students') ||
+    lower.includes('career.avito.com/start') ||
+    // Stale / senior / regular roles that must NEVER be shown as internships:
+    lower.includes('/vacancies/razrabotka/20803') ||
+    lower.includes('/vacancies/razrabotka/20812') ||
+    lower.includes('/vacancies/analitika-dannykh/20816') ||
+    lower.includes('/vacancies/razrabotka/20805') ||
+    lower.includes('/vacancies/razrabotka/20808') ||
+    // Directum generic & empty vacancy list pages
     lower === 'https://career.directum.ru/' ||
     lower === 'https://career.directum.ru' ||
+    lower === 'https://career.directum.ru/vacancy' ||
+    lower === 'https://career.directum.ru/vacancy/' ||
+    lower.includes('career.directum.ru/vacancy') ||
     lower.includes('lead_product_owner') ||
+    lower.includes('business_bevelopment') ||
+    lower.includes('rukovoditel_proektov') ||
+    lower.includes('inzhener_po_informacionnoj_bezopasnosti') ||
     // Kontur generic
     lower === 'https://kontur.ru/career/' ||
     lower === 'https://kontur.ru/career' ||
@@ -243,7 +272,7 @@ export function resolveApplyUrl(
     lower === 'https://sbergraduate.ru' ||
     lower === 'https://sbergraduate.ru/sberseasons-moscow/' ||
     lower === 'https://sbergraduate.ru/sberseasons-moscow' ||
-    // Obsolete & 404 employer links that must be rerouted to live verified portals
+    // Obsolete employer links that must be rerouted to live verified portals
     lower.includes('education.tbank.ru/start/sre') ||
     lower.includes('fintech.tbank.ru') ||
     lower.includes('/vacancy/web-developer') ||
@@ -252,8 +281,6 @@ export function resolveApplyUrl(
     lower.includes('/vacancies/java-developer') ||
     lower.includes('/vacancies/devops-engineer') ||
     lower.includes('/vacancies/qa-automation') ||
-    lower.includes('/vacancies/razrabotka/20805') ||
-    lower.includes('/vacancies/razrabotka/20808') ||
     lower.includes('/internship/web') ||
     lower.includes('/internship/backend') ||
     lower.includes('/internship/qa') ||
@@ -297,16 +324,14 @@ export function resolveApplyUrl(
   // 7. Direct company vacancy detail page with actual vacancy slug or ID
   if (
     trimmed.includes('/yaintern/') ||
-    trimmed.includes('career.directum.ru/vacancy') ||
+    trimmed.includes('start.avito.ru/') ||
     trimmed.includes('career.t1.ru/vacancies') ||
     trimmed.includes('internship.vk.company/internship') ||
     trimmed.includes('internship.vk.company/vacancy') ||
     trimmed.includes('education.tbank.ru/start/') ||
-    trimmed.includes('/vacancies/razrabotka/') ||
-    trimmed.includes('/vacancies/data-science/') ||
-    trimmed.includes('/vacancies/analitika-dannykh/') ||
     trimmed.includes('/camp/') ||
     trimmed.includes('/intern-') ||
+    trimmed.includes('/students') ||
     trimmed.includes('/sberseasons-moscow/ml/') ||
     trimmed.includes('/sberseasons-moscow/java/') ||
     trimmed.includes('/sberseasons-moscow/devops/') ||
@@ -317,6 +342,9 @@ export function resolveApplyUrl(
 
   // 8. General absolute vacancy ID pattern (e.g. https://domain.com/vacancies/<category>/<number>/)
   if (/^https?:\/\/[^/]+\/vacancies\/[a-zA-Z0-9_-]+\/\d+\/?/i.test(trimmed)) {
+    if (trimmed.includes('20803') || trimmed.includes('20812') || trimmed.includes('20816') || trimmed.includes('avito')) {
+      return fallbackDirect;
+    }
     return trimmed;
   }
 
@@ -762,10 +790,11 @@ export function getVacancySourceDetails(
   rawApplyUrl: string | undefined,
   companyName = '',
   sourceChannel = '',
-  directionId?: string
+  directionId?: string,
+  subTrackId?: string
 ): VacancySourceDetails {
   const compKey = getCompanyKey(companyName);
-  const resolvedUrl = resolveApplyUrl(rawApplyUrl, companyName, sourceChannel, directionId);
+  const resolvedUrl = resolveApplyUrl(rawApplyUrl, companyName, sourceChannel, directionId, subTrackId);
   const officialChannelHandle = COMPANY_OFFICIAL_CHANNELS[compKey] || resolveChannelHandle(sourceChannel, companyName);
   const officialChannelUrl = `https://t.me/${officialChannelHandle.replace(/^@/, '')}`;
 
@@ -814,4 +843,134 @@ export function getVacancySourceDetails(
     officialChannelUrl,
   };
 }
+
+export interface VacancyFreshnessInput {
+  id?: string;
+  title?: string;
+  company?: string;
+  applyUrl?: string;
+  source_url?: string;
+  url?: string;
+  description?: string;
+  publishedAt?: string;
+  published_at?: string;
+  isActive?: boolean;
+  is_active?: boolean;
+  status?: string;
+  expiresAt?: string;
+  expires_at?: string;
+}
+
+/**
+ * Validates vacancy relevance, freshness (TTL), and active recruitment status.
+ * Rejects expired, closed, archived, or dead-end vacancy positions where recruitment
+ * has ended or where target career pages have no open internships.
+ */
+export function isVacancyActive(item: VacancyFreshnessInput | null | undefined): boolean {
+  if (!item) return false;
+
+  // 1. Explicit inactive flag or archived/closed status
+  if (item.isActive === false || item.is_active === false) return false;
+  const statusLower = (item.status || '').toLowerCase();
+  if (
+    statusLower === 'closed' ||
+    statusLower === 'archived' ||
+    statusLower === 'expired' ||
+    statusLower === 'inactive'
+  ) {
+    return false;
+  }
+
+  // 2. Explicit expiration date
+  const exp = item.expiresAt || item.expires_at;
+  if (exp) {
+    const expTime = new Date(exp).getTime();
+    if (!isNaN(expTime) && expTime < Date.now()) return false;
+  }
+
+  // 3. Reject known closed/archived IDs and dead patterns in text
+  const url = (item.applyUrl || item.source_url || item.url || '').toLowerCase();
+  const title = (item.title || '').toLowerCase();
+  const desc = (item.description || '').toLowerCase();
+  const combinedText = `${title} ${desc}`;
+
+  // Check text flags for closed/archived
+  if (
+    combinedText.includes('вакансия закрыта') ||
+    combinedText.includes('в архиве') ||
+    combinedText.includes('в архив') ||
+    combinedText.includes('архивн') ||
+    combinedText.includes('набор закрыт') ||
+    combinedText.includes('набор завершен') ||
+    combinedText.includes('набор завершён') ||
+    combinedText.includes('прием заявок окончен') ||
+    combinedText.includes('приём заявок окончен')
+  ) {
+    return false;
+  }
+
+  // 4. Stale senior / closed Avito links
+  if (
+    url.includes('/vacancies/razrabotka/20803') ||
+    url.includes('/vacancies/razrabotka/20812') ||
+    url.includes('/vacancies/analitika-dannykh/20816') ||
+    url.includes('/vacancies/razrabotka/20805') ||
+    url.includes('/vacancies/razrabotka/20808')
+  ) {
+    return false;
+  }
+
+  // 5. Directum empty/general vacancy list with no open frontend/internships
+  // Directum currently only lists regular staff developer jobs on career.directum.ru/vacancy/
+  const compLower = (item.company || '').toLowerCase();
+  if (compLower.includes('directum') || compLower.includes('директум')) {
+    if (
+      title.includes('frontend') ||
+      title.includes('веб-разработчик') ||
+      title.includes('web-разработчик') ||
+      url.includes('career.directum.ru/vacancy') ||
+      url.includes('lead_product_owner')
+    ) {
+      if (item.isActive !== true) {
+        return false;
+      }
+    }
+  }
+
+  // 6. TTL Check & known closed aggregator vacancies (e.g. HeadHunter)
+  // Job aggregator vacancies (hh.ru) close very fast (typically within 30-45 days).
+  const isAggregator = (item.id || '').startsWith('hh-') || url.includes('hh.ru');
+  if (isAggregator) {
+    const KNOWN_CLOSED_HH_IDS = [
+      '139656665', '139621206', '138386223', '139486039', '138439076',
+      '138762873', '139548242', '136870562', '139408637', '139265845',
+      '139081220', '138848517', '136870560', '139350426', '138896406',
+      '138600055', '138000233', '138843300', '139311364', '138103037',
+      '137690459', '138120436', '138892012', '137608896', '138187404',
+      '138543206', '138490688', '138745106', '138741112', '138722040'
+    ];
+    if (
+      KNOWN_CLOSED_HH_IDS.some(
+        (closedId) => url.includes(closedId) || (item.id || '').includes(closedId)
+      )
+    ) {
+      return false;
+    }
+
+    const pub = item.publishedAt || item.published_at;
+    if (pub) {
+      const pubTime = new Date(pub).getTime();
+      if (!isNaN(pubTime)) {
+        const ageMs = Date.now() - pubTime;
+        const maxAgeMs = 45 * 24 * 60 * 60 * 1000;
+        if (ageMs > maxAgeMs) {
+          return false;
+        }
+      }
+    }
+  }
+
+  return true;
+}
+
 

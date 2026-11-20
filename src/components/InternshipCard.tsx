@@ -163,7 +163,8 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
               internship.applyUrl,
               internship.company,
               internship.sourceChannel,
-              internship.directionId
+              internship.directionId,
+              internship.subTrackId
             );
 
             return (

@@ -2,11 +2,15 @@ import { describe, it, expect } from 'vitest';
 import {
   formatSalary,
   isStrictVacancyPost,
+  isVacancyActive,
   resolveApplyUrl,
   resolveChannelHandle,
   detectVacancyTrack,
+  COMPANY_OFFICIAL_PORTALS,
+  getDirectVacancyPortalUrl,
 } from '../lib/vacancyUrl';
 import { SEED_INTERNSHIPS } from '../data/internships';
+import { MONITORED_WEBSITES_LIST } from '../data/channels';
 
 describe('Vacancy Quality & Link Integrity Verification', () => {
   describe('1. formatSalary', () => {
@@ -119,18 +123,18 @@ describe('Vacancy Quality & Link Integrity Verification', () => {
       expect(resolveApplyUrl('/vacancies/1000168452', 'Яндекс', undefined, 'backend'))
         .toBe('https://career.habr.com/vacancies/1000168452');
       expect(resolveApplyUrl('/vacancies/razrabotka/20812/', 'Авито', undefined, 'backend'))
-        .toBe('https://career.avito.com/vacancies/razrabotka/20812/');
+        .toBe('https://start.avito.ru/tech');
     });
 
     it('resolves generic homepages to directional direct portals', () => {
       const avitoDirect = resolveApplyUrl('https://career.avito.com/', 'Авито', undefined, 'mobile');
-      expect(avitoDirect).toBe('https://career.avito.com/vacancies/razrabotka/20803/');
+      expect(avitoDirect).toBe('https://start.avito.ru/tech');
 
       const avitoDevops = resolveApplyUrl('https://career.avito.com', 'Авито', undefined, 'devops');
-      expect(avitoDevops).toBe('https://career.avito.com/vacancies/razrabotka/20803/');
+      expect(avitoDevops).toBe('https://start.avito.ru/tech');
 
       const avitoSearch = resolveApplyUrl('https://career.avito.com/vacancies/?search=стажер', 'Авито', undefined, 'frontend');
-      expect(avitoSearch).toBe('https://career.avito.com/vacancies/razrabotka/20803/');
+      expect(avitoSearch).toBe('https://start.avito.ru/tech');
 
       const tbankDirect = resolveApplyUrl('https://tbank.ru', 'Т-Банк', undefined, 'frontend');
       expect(tbankDirect).toBe('https://education.tbank.ru/start/frontend/');
@@ -142,10 +146,87 @@ describe('Vacancy Quality & Link Integrity Verification', () => {
       expect(sberDirect).toBe('https://sbergraduate.ru/sberseasons-moscow/ml/');
 
       const directumDirect = resolveApplyUrl('https://career.directum.ru', 'Directum', undefined, 'frontend');
-      expect(directumDirect).toBe('https://career.directum.ru/vacancy/');
+      expect(directumDirect).toBe('https://career.directum.ru/');
 
       const directumLead = resolveApplyUrl('https://career.directum.ru/lead_product_ownerRX', 'Directum', undefined, 'backend');
-      expect(directumLead).toBe('https://career.directum.ru/vacancy/');
+      expect(directumLead).toBe('https://career.directum.ru/');
+
+      const directumVacancySlash = resolveApplyUrl('https://career.directum.ru/vacancy/', 'Directum', undefined, 'backend');
+      expect(directumVacancySlash).toBe('https://career.directum.ru/');
+
+      const directumVacancyNoSlash = resolveApplyUrl('https://career.directum.ru/vacancy', 'Directum', undefined, 'qa');
+      expect(directumVacancyNoSlash).toBe('https://career.directum.ru/');
+    });
+
+    it('resolves official internship portals for target companies according to specifications', () => {
+      // 1. Company official portals configuration
+      expect(COMPANY_OFFICIAL_PORTALS.tbank).toBe('https://education.tbank.ru/start/');
+      expect(COMPANY_OFFICIAL_PORTALS.kontur).toBe('https://kontur.ru/career/students');
+      expect(COMPANY_OFFICIAL_PORTALS.directum).toBe('https://career.directum.ru/');
+      expect(COMPANY_OFFICIAL_PORTALS.t1).toBe('https://career.t1.ru/vacancies/');
+      expect(COMPANY_OFFICIAL_PORTALS.yandex).toBe('https://yandex.ru/yaintern/');
+      expect(COMPANY_OFFICIAL_PORTALS.ozon).toBe('https://job.ozon.ru/it/camp/');
+      expect(COMPANY_OFFICIAL_PORTALS.sber).toBe('https://sbergraduate.ru/sberseasons-moscow/');
+      expect(COMPANY_OFFICIAL_PORTALS.avito).toBe('https://start.avito.ru/internships');
+      expect(COMPANY_OFFICIAL_PORTALS.vk).toBe('https://internship.vk.company/internship/');
+
+      // 2. Avito specialized internship endpoints
+      expect(getDirectVacancyPortalUrl('avito', 'mobile')).toBe('https://start.avito.ru/tech');
+      expect(getDirectVacancyPortalUrl('avito', 'frontend')).toBe('https://start.avito.ru/tech');
+      expect(getDirectVacancyPortalUrl('avito', 'backend')).toBe('https://start.avito.ru/tech');
+      expect(getDirectVacancyPortalUrl('avito', 'devops')).toBe('https://start.avito.ru/tech');
+      expect(getDirectVacancyPortalUrl('avito', 'qa')).toBe('https://start.avito.ru/tech');
+      expect(getDirectVacancyPortalUrl('avito', 'data_science')).toBe('https://start.avito.ru/datascience-internship');
+      expect(getDirectVacancyPortalUrl('avito', 'data_science', undefined, 'analytics')).toBe('https://start.avito.ru/analysts-internship');
+      expect(getDirectVacancyPortalUrl('avito')).toBe('https://start.avito.ru/internships');
+
+      // 3. Stale / senior Avito links are strictly intercepted
+      expect(resolveApplyUrl('https://career.avito.com/vacancies/razrabotka/20803/', 'Авито', undefined, 'mobile'))
+        .toBe('https://start.avito.ru/tech');
+      expect(resolveApplyUrl('https://career.avito.com/vacancies/razrabotka/20812/', 'Авито', undefined, 'backend'))
+        .toBe('https://start.avito.ru/tech');
+      expect(resolveApplyUrl('https://career.avito.com/vacancies/analitika-dannykh/20816/', 'Авито', undefined, 'data_science', 'analytics'))
+        .toBe('https://start.avito.ru/analysts-internship');
+      expect(resolveApplyUrl('https://career.avito.com/vacancies/razrabotka/20803/', 'Авито'))
+        .toBe('https://start.avito.ru/internships');
+
+      // 4. Kontur student portal fallback
+      expect(getDirectVacancyPortalUrl('kontur')).toBe('https://kontur.ru/career/students');
+      expect(resolveApplyUrl('https://kontur.ru/career/', 'Контур')).toBe('https://kontur.ru/career/students');
+
+      // 5. Directum portal fallback
+      expect(getDirectVacancyPortalUrl('directum')).toBe('https://career.directum.ru/');
+      expect(resolveApplyUrl('https://career.directum.ru/vacancy/', 'Directum')).toBe('https://career.directum.ru/');
+
+      // 6. Yandex internship portal
+      expect(getDirectVacancyPortalUrl('yandex')).toBe('https://yandex.ru/yaintern/');
+      expect(resolveApplyUrl('https://yandex.ru/jobs/', 'Яндекс')).toBe('https://yandex.ru/yaintern/');
+
+      // 7. Ozon Camp portal
+      expect(getDirectVacancyPortalUrl('ozon')).toBe('https://job.ozon.ru/it/camp/');
+      expect(resolveApplyUrl('https://job.ozon.ru/it/', 'Ozon')).toBe('https://job.ozon.ru/it/camp/');
+
+      // 8. T1 career portal
+      expect(getDirectVacancyPortalUrl('t1')).toBe('https://career.t1.ru/vacancies/');
+      expect(resolveApplyUrl('https://career.t1.ru/', 'Холдинг Т1')).toBe('https://career.t1.ru/vacancies/');
+
+      // 9. Sber Seasons portal
+      expect(getDirectVacancyPortalUrl('sber')).toBe('https://sbergraduate.ru/sberseasons-moscow/');
+
+      // 10. VK internship portal
+      expect(getDirectVacancyPortalUrl('vk')).toBe('https://internship.vk.company/internship/');
+      expect(resolveApplyUrl('https://internship.vk.company/', 'VK')).toBe('https://internship.vk.company/internship/');
+
+      // 11. Monitored websites list canonical URLs for all target employers
+      const siteMap = Object.fromEntries(MONITORED_WEBSITES_LIST.map((w) => [w.id, w.url]));
+      expect(siteMap['site-kontur']).toBe('https://kontur.ru/career/students');
+      expect(siteMap['site-tbank']).toBe('https://education.tbank.ru/start/');
+      expect(siteMap['site-t1']).toBe('https://career.t1.ru/vacancies/');
+      expect(siteMap['site-directum']).toBe('https://career.directum.ru/');
+      expect(siteMap['site-yandex']).toBe('https://yandex.ru/yaintern/');
+      expect(siteMap['site-ozon']).toBe('https://job.ozon.ru/it/camp/');
+      expect(siteMap['site-sber']).toBe('https://sbergraduate.ru/sberseasons-moscow/');
+      expect(siteMap['site-avito']).toBe('https://start.avito.ru/internships');
     });
 
     it('preserves valid Telegram post URLs with post IDs', () => {
@@ -243,6 +324,142 @@ describe('Vacancy Quality & Link Integrity Verification', () => {
       expect(resolveChannelHandle('@normrabota', 'IT Channels')).toBe('@normrabota');
       expect(resolveChannelHandle('hh.ru/other', 'Неизвестная компания')).toBe('@IT_start_izh_bot');
       expect(resolveChannelHandle(undefined, '')).toBe('@IT_start_izh_bot');
+    });
+  });
+
+  describe('6. isVacancyActive & freshness / relevance engine', () => {
+    it('approves legitimate active 2026 internships with direct portals', () => {
+      expect(
+        isVacancyActive({
+          title: 'Стажёр Frontend-разработчик (React)',
+          company: 'Т-Банк (Тинькофф)',
+          applyUrl: 'https://education.tbank.ru/start/frontend/',
+          publishedAt: '2026-11-20T00:00:00.000Z',
+          isActive: true,
+        })
+      ).toBe(true);
+
+      expect(
+        isVacancyActive({
+          title: 'Стажёр Backend-разработчик (Python)',
+          company: 'Яндекс',
+          applyUrl: 'https://yandex.ru/yaintern/backend/',
+          publishedAt: '2026-11-20T00:00:00.000Z',
+          isActive: true,
+        })
+      ).toBe(true);
+
+      expect(
+        isVacancyActive({
+          title: 'Стажёр Frontend-разработчик (Авито Старт)',
+          company: 'Avito Tech',
+          applyUrl: 'https://start.avito.ru/tech',
+          publishedAt: '2026-11-20T00:00:00.000Z',
+          isActive: true,
+        })
+      ).toBe(true);
+    });
+
+    it('rejects vacancies explicitly marked inactive, closed or archived', () => {
+      expect(isVacancyActive({ title: 'Frontend intern', isActive: false })).toBe(false);
+      expect(isVacancyActive({ title: 'Frontend intern', is_active: false })).toBe(false);
+      expect(isVacancyActive({ title: 'Frontend intern', status: 'closed' })).toBe(false);
+      expect(isVacancyActive({ title: 'Frontend intern', status: 'archived' })).toBe(false);
+      expect(isVacancyActive({ title: 'Frontend intern', status: 'expired' })).toBe(false);
+    });
+
+    it('rejects expired vacancies by expiresAt date', () => {
+      expect(
+        isVacancyActive({
+          title: 'Python Intern',
+          expiresAt: '2020-01-01T00:00:00.000Z',
+        })
+      ).toBe(false);
+    });
+
+    it('rejects stale senior or archived Avito links (20803, 20812, 20816)', () => {
+      expect(
+        isVacancyActive({
+          title: 'Стажёр Frontend',
+          company: 'Авито',
+          applyUrl: 'https://career.avito.com/vacancies/razrabotka/20803/',
+        })
+      ).toBe(false);
+
+      expect(
+        isVacancyActive({
+          title: 'Стажёр Аналитик',
+          company: 'Авито',
+          applyUrl: 'https://career.avito.com/vacancies/analitika-dannykh/20816/',
+        })
+      ).toBe(false);
+    });
+
+    it('rejects inactive Directum frontend positions where target page has no internships', () => {
+      expect(
+        isVacancyActive({
+          title: 'Стажёр Web-разработчик (TypeScript / React)',
+          company: 'Directum',
+          applyUrl: 'https://career.directum.ru/',
+          isActive: false,
+        })
+      ).toBe(false);
+
+      expect(
+        isVacancyActive({
+          title: 'Стажёр Web-разработчик (TypeScript / React)',
+          company: 'Directum',
+          applyUrl: 'https://career.directum.ru/vacancy/',
+        })
+      ).toBe(false);
+    });
+
+    it('rejects closed and archived HeadHunter positions', () => {
+      expect(
+        isVacancyActive({
+          id: 'hh-3529-139656665',
+          company: 'Сбер',
+          title: 'Стажер QA',
+          applyUrl: 'https://hh.ru/vacancy/139656665',
+        })
+      ).toBe(false);
+
+      expect(
+        isVacancyActive({
+          id: 'hh-2180-138386223',
+          company: 'Ozon Tech',
+          title: 'Стажёр-разработчик Golang',
+          applyUrl: 'https://hh.ru/vacancy/138386223',
+        })
+      ).toBe(false);
+    });
+
+    it('rejects closed aggregator postings exceeding 45-day TTL', () => {
+      expect(
+        isVacancyActive({
+          id: 'hh-999-12345678',
+          company: 'Some Company',
+          title: 'Junior Go Developer',
+          applyUrl: 'https://hh.ru/vacancy/12345678',
+          publishedAt: '2026-01-01T00:00:00.000Z',
+        })
+      ).toBe(false);
+    });
+
+    it('rejects posts containing archive / closed notification phrases', () => {
+      expect(
+        isVacancyActive({
+          title: 'Стажёр Frontend (набор закрыт)',
+          description: 'Прием заявок окончен',
+        })
+      ).toBe(false);
+
+      expect(
+        isVacancyActive({
+          title: 'Стажёр QA',
+          description: 'Вакансия перенесена в архив',
+        })
+      ).toBe(false);
     });
   });
 });

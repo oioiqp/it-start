@@ -84,6 +84,10 @@ export interface Internship {
   applyUrl: string;
   publishedAt: string;
   isHot?: boolean;
+  isActive?: boolean;
+  status?: 'active' | 'closed' | 'archived' | 'expired';
+  expiresAt?: string;
+  batchYear?: number | string;
 }
 
 export interface Question {

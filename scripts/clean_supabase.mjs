@@ -84,8 +84,9 @@ async function run() {
       }
     }
 
-    // 3. Delete non-IT aggregator posts like SMM / CRM / Sales
+    // 3. Delete non-IT aggregator posts like SMM / CRM / Sales or closed vacancies
     const titleLower = (row.title || '').toLowerCase();
+    const urlLower = (row.source_url || '').toLowerCase();
     if (
       titleLower.includes('crm-маркетолог') ||
       titleLower.includes('менеджер по продажам') ||
@@ -95,7 +96,13 @@ async function run() {
       titleLower.includes('какая ide') ||
       titleLower.includes('сегодня важный день') ||
       titleLower.includes('нужно только рассказать') ||
-      titleLower.includes('авиация начинается')
+      titleLower.includes('авиация начинается') ||
+      row.id.startsWith('hh-') ||
+      urlLower.includes('hh.ru') ||
+      (row.company || '').toLowerCase().includes('directum') ||
+      row.id.includes('directum') ||
+      row.id.includes('site-avito-20706') ||
+      row.id.includes('site-avito-20946')
     ) {
       toDelete.push(row.id);
       continue;
@@ -107,18 +114,6 @@ async function run() {
     let newSourceName = row.source_name;
 
     const companyLower = (row.company || '').toLowerCase();
-
-    // Check Directum
-    if (companyLower.includes('directum') || companyLower.includes('директ')) {
-      if (!newSourceUrl || newSourceUrl === 'https://career.directum.ru/' || newSourceUrl === 'https://career.directum.ru' || newSourceUrl.includes('clck.ru') || newSourceUrl.includes('vc.ru') || newSourceUrl.includes('?search=')) {
-        newSourceUrl = 'https://career.directum.ru/lead_product_ownerRX';
-        needsUpdate = true;
-      }
-      if (newSourceName === '@directum_careers' || newSourceName === '@directum_career') {
-        newSourceName = '@Life_in_Directum';
-        needsUpdate = true;
-      }
-    }
 
     // Check Kontur
     if (companyLower.includes('контур') || companyLower.includes('kontur')) {
@@ -154,8 +149,8 @@ async function run() {
 
     // Check Avito
     if (companyLower.includes('авито') || companyLower.includes('avito')) {
-      if (!newSourceUrl || newSourceUrl === 'https://career.avito.com/' || newSourceUrl === 'https://career.avito.com' || newSourceUrl.includes('?search=') || newSourceUrl === 'https://career.avito.com/vacancies/') {
-        newSourceUrl = 'https://career.avito.com/vacancies/razrabotka/20803/';
+      if (!newSourceUrl || newSourceUrl === 'https://career.avito.com/' || newSourceUrl === 'https://career.avito.com' || newSourceUrl.includes('?search=') || newSourceUrl === 'https://career.avito.com/vacancies/' || newSourceUrl.includes('20803')) {
+        newSourceUrl = 'https://start.avito.ru/tech';
         needsUpdate = true;
       }
     }
@@ -163,7 +158,7 @@ async function run() {
     // Check T-Bank
     if (companyLower.includes('т-банк') || companyLower.includes('тинькофф') || companyLower.includes('tbank')) {
       if (!newSourceUrl || newSourceUrl.includes('2w.ru') || newSourceUrl === 'https://tbank.ru' || newSourceUrl === 'https://tbank.ru/' || newSourceUrl.includes('?search=')) {
-        newSourceUrl = 'https://fintech.tbank.ru/start/frontend/';
+        newSourceUrl = 'https://education.tbank.ru/start/frontend/';
         needsUpdate = true;
       }
     }

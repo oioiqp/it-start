@@ -361,8 +361,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@avito_tech",
     "directionId": "mobile",
     "subTrackId": "android",
-    "url": "https://career.avito.com/vacancies/razrabotka/20803/",
-    "applyUrl": "https://career.avito.com/vacancies/razrabotka/20803/",
+    "url": "https://start.avito.ru/tech",
+    "applyUrl": "https://start.avito.ru/tech",
     "sourceChannel": "@avito_tech",
     "description": "Разработка фичей для мобильного приложения Авито с десятками миллионов пользователей. Чистая архитектура, дизайн-система и лучшие инженерные практики.",
     "tags": [
@@ -591,8 +591,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@avito_tech",
     "directionId": "devops",
     "subTrackId": "k8s_iac",
-    "url": "https://career.avito.com/vacancies/razrabotka/20803/",
-    "applyUrl": "https://career.avito.com/vacancies/razrabotka/20803/",
+    "url": "https://start.avito.ru/tech",
+    "applyUrl": "https://start.avito.ru/tech",
     "sourceChannel": "@avito_tech",
     "description": "Команда Core Platform в Авито. Мы развиваем внутреннюю платформу разработки на базе K8s, обслуживающую сотни микросервисов.",
     "tags": [
@@ -752,8 +752,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@Life_in_Directum",
     "directionId": "frontend",
     "subTrackId": "react",
-    "url": "https://career.directum.ru/vacancy/",
-    "applyUrl": "https://career.directum.ru/vacancy/",
+    "url": "https://career.directum.ru/",
+    "applyUrl": "https://career.directum.ru/",
     "sourceChannel": "@Life_in_Directum",
     "description": "Разработка веб-клиента флагманской платформы управления цифровыми процессами и документами Directum RX в Ижевске.",
     "tags": [
@@ -763,7 +763,9 @@ export const ALL_INTERNSHIPS = [
       "Web Client",
       "Ижевск",
       "Директум"
-    ]
+    ],
+    "isActive": false,
+    "status": "closed"
   },
   {
     "id": "int-23",
@@ -776,8 +778,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@Life_in_Directum",
     "directionId": "backend",
     "subTrackId": "java",
-    "url": "https://career.directum.ru/vacancy/",
-    "applyUrl": "https://career.directum.ru/vacancy/",
+    "url": "https://career.directum.ru/",
+    "applyUrl": "https://career.directum.ru/",
     "sourceChannel": "@Life_in_Directum",
     "description": "Разработка масштабируемого бэкенда интеллектуальной системы управления документами Directum RX. Микросервисы, асинхронная обработка и AI-модули.",
     "tags": [
@@ -788,7 +790,9 @@ export const ALL_INTERNSHIPS = [
       "Web API",
       "Ижевск",
       "Директум"
-    ]
+    ],
+    "isActive": false,
+    "status": "closed"
   },
   {
     "id": "int-24",
@@ -801,8 +805,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@Life_in_Directum",
     "directionId": "qa",
     "subTrackId": "manual_qa",
-    "url": "https://career.directum.ru/vacancy/",
-    "applyUrl": "https://career.directum.ru/vacancy/",
+    "url": "https://career.directum.ru/",
+    "applyUrl": "https://career.directum.ru/",
     "sourceChannel": "@Life_in_Directum",
     "description": "Тестирование веб- и десктоп-клиентов Directum RX, поиск дефектов в бизнес-процессах электронного документооборота.",
     "tags": [
@@ -812,7 +816,9 @@ export const ALL_INTERNSHIPS = [
       "Postman",
       "Ижевск",
       "Директум"
-    ]
+    ],
+    "isActive": false,
+    "status": "closed"
   },
   {
     "id": "int-25",
@@ -964,8 +970,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@avito_tech",
     "directionId": "frontend",
     "subTrackId": "react",
-    "url": "https://career.avito.com/vacancies/razrabotka/20803/",
-    "applyUrl": "https://career.avito.com/vacancies/razrabotka/20803/",
+    "url": "https://start.avito.ru/tech",
+    "applyUrl": "https://start.avito.ru/tech",
     "sourceChannel": "@avito_tech",
     "description": "Программа стажировки Авито Старт: разработка ключевых разделов Avito.ru с миллионной аудиторией. Дизайн-система, микрофронтенды и высокие стандарты качества.",
     "tags": [
@@ -987,8 +993,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@avito_tech",
     "directionId": "backend",
     "subTrackId": "python",
-    "url": "https://career.avito.com/vacancies/razrabotka/20812/",
-    "applyUrl": "https://career.avito.com/vacancies/razrabotka/20812/",
+    "url": "https://start.avito.ru/tech",
+    "applyUrl": "https://start.avito.ru/tech",
     "sourceChannel": "@avito_tech",
     "description": "Разработка распределенных микросервисов поиска и рекомендаций Авито. Решение алгоритмических задач и обработка терабайтов данных под руководством Senior ментора.",
     "tags": [
@@ -1126,8 +1132,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@Life_in_Directum",
     "directionId": "backend",
     "subTrackId": "python",
-    "url": "https://career.directum.ru/vacancy/",
-    "applyUrl": "https://career.directum.ru/vacancy/",
+    "url": "https://career.directum.ru/",
+    "applyUrl": "https://career.directum.ru/",
     "sourceChannel": "@Life_in_Directum",
     "description": "Официальная программа стажировок Directum: разработка ядра интеллектуальной платформы управления цифровыми процессами и документами Directum RX в Ижевске под менторством экспертов.",
     "tags": [
@@ -1138,7 +1144,9 @@ export const ALL_INTERNSHIPS = [
       "Ижевск",
       "Директум",
       "Стажировка"
-    ]
+    ],
+    "isActive": false,
+    "status": "closed"
   },
   {
     "id": "int-39",
@@ -1221,8 +1229,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@avito_tech",
     "directionId": "data_science",
     "subTrackId": "analytics",
-    "url": "https://career.avito.com/vacancies/analitika-dannykh/20816/",
-    "applyUrl": "https://career.avito.com/vacancies/analitika-dannykh/20816/",
+    "url": "https://start.avito.ru/analysts-internship",
+    "applyUrl": "https://start.avito.ru/analysts-internship",
     "sourceChannel": "@avito_tech",
     "description": "Оплачиваемая программа стажировки Авито Старт для аналитиков данных: анализ пользовательского поведения, проведение A/B тестов, расчет продуктовых метрик и дашборды.",
     "tags": [
@@ -1324,7 +1332,7 @@ export const CAREER_WEBSITES_DATA = [
     companyId: 'directum',
     company: 'Directum',
     name: 'Карьерный портал Directum (Ижевск)',
-    url: 'https://career.directum.ru/vacancy',
+    url: 'https://career.directum.ru/',
     category: 'Прямой карьерный сайт вендора Directum RX',
     type: 'direct_site',
     city: 'Ижевск',
@@ -1334,8 +1342,8 @@ export const CAREER_WEBSITES_DATA = [
     companyId: 'kontur',
     company: 'СКБ Контур',
     name: 'Контур.Старт & Вакансии СКБ Контур',
-    url: 'https://kontur.ru/career/vacancies',
-    category: 'Официальный портал карьеры Контура',
+    url: 'https://kontur.ru/career/students',
+    category: 'Официальный студенческий портал карьеры Контура',
     type: 'direct_site',
     city: 'Екатеринбург / Удаленно',
   },
@@ -1354,7 +1362,7 @@ export const CAREER_WEBSITES_DATA = [
     companyId: 't1',
     company: 'Холдинг Т1',
     name: 'Открытая школа Т1 & Карьера',
-    url: 'https://career.t1.ru/',
+    url: 'https://career.t1.ru/vacancies/',
     category: 'Официальный образовательный интенсив Т1',
     type: 'direct_site',
     city: 'Москва / Удаленно',
@@ -1434,7 +1442,7 @@ export const CAREER_WEBSITES_DATA = [
     companyId: 'yandex',
     company: 'Яндекс',
     name: 'Яндекс Интерны & Young Con',
-    url: 'https://yandex.ru/jobs/',
+    url: 'https://yandex.ru/yaintern/',
     category: 'Официальный портал стажировок Яндекса',
     type: 'direct_site',
     city: 'Москва / Гибрид',
@@ -1444,7 +1452,7 @@ export const CAREER_WEBSITES_DATA = [
     companyId: 'ozon',
     company: 'Ozon Tech',
     name: 'Ozon Camp & Карьера в IT',
-    url: 'https://job.ozon.ru/it/',
+    url: 'https://job.ozon.ru/it/camp/',
     category: 'Официальный карьерный портал Ozon Tech',
     type: 'direct_site',
     city: 'Москва / Удаленно',
@@ -1454,7 +1462,7 @@ export const CAREER_WEBSITES_DATA = [
     companyId: 'sber',
     company: 'Сбер',
     name: 'Сбер Карьера & SberSeasons',
-    url: 'https://sbergraduate.ru/',
+    url: 'https://sbergraduate.ru/sberseasons-moscow/',
     category: 'Официальная программа стажировок Сбера',
     type: 'direct_site',
     city: 'Москва / Офис',
@@ -1464,7 +1472,7 @@ export const CAREER_WEBSITES_DATA = [
     companyId: 'avito',
     company: 'Авито',
     name: 'Карьера в Avito Tech',
-    url: 'https://career.avito.com/vacancies/?search=стажер',
+    url: 'https://start.avito.ru/internships',
     category: 'Официальная программа стажировок Авито',
     type: 'direct_site',
     city: 'Москва / Санкт-Петербург',
@@ -1965,13 +1973,13 @@ export function detectVacancyTrack(title = '', text = '') {
 
 export const COMPANY_OFFICIAL_PORTALS = {
   tbank: 'https://education.tbank.ru/start/',
-  kontur: 'https://kontur.ru/career/vacancies/intern-frontend',
-  directum: 'https://career.directum.ru/vacancy/',
+  kontur: 'https://kontur.ru/career/students',
+  directum: 'https://career.directum.ru/',
   t1: 'https://career.t1.ru/vacancies/',
-  yandex: 'https://yandex.ru/yaintern/backend/',
-  ozon: 'https://job.ozon.ru/it/camp/golang/',
-  sber: 'https://sbergraduate.ru/sberseasons-moscow/ml/',
-  avito: 'https://career.avito.com/vacancies/razrabotka/20803/',
+  yandex: 'https://yandex.ru/yaintern/',
+  ozon: 'https://job.ozon.ru/it/camp/',
+  sber: 'https://sbergraduate.ru/sberseasons-moscow/',
+  avito: 'https://start.avito.ru/internships',
   vk: 'https://internship.vk.company/internship/',
 };
 
@@ -1991,16 +1999,23 @@ export function getCompanyKey(companyName = '') {
   return 'other';
 }
 
-export function getDirectVacancyPortalUrl(companyKey, directionId = undefined, fallback = 'https://career.directum.ru/vacancy/') {
+export function getDirectVacancyPortalUrl(companyKey, directionId = undefined, fallback = 'https://career.directum.ru/', subTrackId = undefined) {
   switch (companyKey) {
     case 'avito':
-      if (directionId === 'mobile') return 'https://career.avito.com/vacancies/razrabotka/20803/';
-      if (directionId === 'frontend') return 'https://career.avito.com/vacancies/razrabotka/20803/';
-      if (directionId === 'backend') return 'https://career.avito.com/vacancies/razrabotka/20812/';
-      if (directionId === 'data_science') return 'https://career.avito.com/vacancies/analitika-dannykh/20816/';
-      if (directionId === 'devops') return 'https://career.avito.com/vacancies/razrabotka/20803/';
-      if (directionId === 'qa') return 'https://career.avito.com/vacancies/razrabotka/20803/';
-      return 'https://career.avito.com/vacancies/razrabotka/20803/';
+      if (directionId === 'data_science') {
+        if (subTrackId === 'analytics') return 'https://start.avito.ru/analysts-internship';
+        return 'https://start.avito.ru/datascience-internship';
+      }
+      if (
+        directionId === 'mobile' ||
+        directionId === 'frontend' ||
+        directionId === 'backend' ||
+        directionId === 'devops' ||
+        directionId === 'qa'
+      ) {
+        return 'https://start.avito.ru/tech';
+      }
+      return 'https://start.avito.ru/internships';
     case 'tbank':
       if (directionId === 'frontend') return 'https://education.tbank.ru/start/frontend/';
       if (directionId === 'data_science') return 'https://education.tbank.ru/start/analyst/';
@@ -2008,11 +2023,10 @@ export function getDirectVacancyPortalUrl(companyKey, directionId = undefined, f
     case 'kontur':
       if (directionId === 'backend') return 'https://kontur.ru/career/vacancies/intern-backend';
       if (directionId === 'qa') return 'https://kontur.ru/career/vacancies/intern-qa';
-      return 'https://kontur.ru/career/vacancies/intern-frontend';
+      if (directionId === 'frontend') return 'https://kontur.ru/career/vacancies/intern-frontend';
+      return 'https://kontur.ru/career/students';
     case 'directum':
-      if (directionId === 'backend') return 'https://career.directum.ru/vacancy/';
-      if (directionId === 'qa') return 'https://career.directum.ru/vacancy/';
-      return 'https://career.directum.ru/vacancy/';
+      return 'https://career.directum.ru/';
     case 't1':
       if (directionId === 'devops') return 'https://career.t1.ru/vacancies/';
       if (directionId === 'qa') return 'https://career.t1.ru/vacancies/';
@@ -2022,22 +2036,21 @@ export function getDirectVacancyPortalUrl(companyKey, directionId = undefined, f
       if (directionId === 'mobile') return 'https://yandex.ru/yaintern/mobile/';
       if (directionId === 'data_science') return 'https://yandex.ru/yaintern/ml/';
       if (directionId === 'devops') return 'https://yandex.ru/yaintern/devops/';
-      return 'https://yandex.ru/yaintern/backend/';
+      if (directionId === 'backend') return 'https://yandex.ru/yaintern/backend/';
+      return 'https://yandex.ru/yaintern/';
     case 'ozon':
       if (directionId === 'frontend') return 'https://job.ozon.ru/it/camp/frontend/';
       if (directionId === 'qa') return 'https://job.ozon.ru/it/camp/qa/';
       if (directionId === 'mobile') return 'https://job.ozon.ru/it/camp/mobile/';
-      return 'https://job.ozon.ru/it/camp/golang/';
+      if (directionId === 'backend') return 'https://job.ozon.ru/it/camp/golang/';
+      return 'https://job.ozon.ru/it/camp/';
     case 'sber':
       if (directionId === 'backend') return 'https://sbergraduate.ru/sberseasons-moscow/java/';
       if (directionId === 'devops') return 'https://sbergraduate.ru/sberseasons-moscow/devops/';
       if (directionId === 'qa') return 'https://sbergraduate.ru/sberseasons-moscow/qa/';
-      return 'https://sbergraduate.ru/sberseasons-moscow/ml/';
+      if (directionId === 'data_science') return 'https://sbergraduate.ru/sberseasons-moscow/ml/';
+      return 'https://sbergraduate.ru/sberseasons-moscow/';
     case 'vk':
-      if (directionId === 'backend') return 'https://internship.vk.company/internship/';
-      if (directionId === 'qa') return 'https://internship.vk.company/internship/';
-      if (directionId === 'data_science') return 'https://internship.vk.company/internship/';
-      if (directionId === 'mobile') return 'https://internship.vk.company/internship/';
       return 'https://internship.vk.company/internship/';
     default:
       return fallback;
@@ -2174,9 +2187,9 @@ export function formatSalary(salaryInput) {
   return 'По договорённости';
 }
 
-export function resolveApplyUrl(rawUrl, companyName = '', sourceChannel = '', directionId = undefined) {
+export function resolveApplyUrl(rawUrl, companyName = '', sourceChannel = '', directionId = undefined, subTrackId = undefined) {
   const companyKey = getCompanyKey(companyName);
-  const directPortal = getDirectVacancyPortalUrl(companyKey, directionId);
+  const directPortal = getDirectVacancyPortalUrl(companyKey, directionId, undefined, subTrackId);
 
   const hasSpecificPostSource =
     sourceChannel && /^https?:\/\/t\.me\/[a-zA-Z0-9_]+\/\d+/i.test(sourceChannel.trim());
@@ -2210,6 +2223,9 @@ export function resolveApplyUrl(rawUrl, companyName = '', sourceChannel = '', di
     return `https://career.habr.com${trimmed.split('?')[0]}`;
   }
   if (/^\/vacancies\/[a-zA-Z0-9_-]+\/\d+\/?/i.test(trimmed)) {
+    if (companyKey === 'avito' || trimmed.includes('20803') || trimmed.includes('20812') || trimmed.includes('20816')) {
+      return fallbackDirect;
+    }
     return `https://career.avito.com${trimmed.split('?')[0]}`;
   }
 
@@ -2251,6 +2267,7 @@ export function resolveApplyUrl(rawUrl, companyName = '', sourceChannel = '', di
     lower.includes('/search/') ||
     lower.includes('/vacancies/?') ||
     lower.includes('/vacancies?') ||
+    // Avito generic & non-internship pages
     lower === 'https://career.avito.com/' ||
     lower === 'https://career.avito.com' ||
     lower === 'https://avito.ru/' ||
@@ -2260,28 +2277,48 @@ export function resolveApplyUrl(rawUrl, companyName = '', sourceChannel = '', di
     lower === 'https://career.avito.com/vacancies' ||
     lower === 'https://career.avito.com/vacancies/' ||
     lower.includes('career.avito.com/internship') ||
+    lower.includes('career.avito.com/students') ||
+    lower.includes('career.avito.com/start') ||
+    // Stale / senior / regular roles that must NEVER be shown as internships:
+    lower.includes('/vacancies/razrabotka/20803') ||
+    lower.includes('/vacancies/razrabotka/20812') ||
+    lower.includes('/vacancies/analitika-dannykh/20816') ||
+    lower.includes('/vacancies/razrabotka/20805') ||
+    lower.includes('/vacancies/razrabotka/20808') ||
+    // Directum generic & empty vacancy list pages
     lower === 'https://career.directum.ru/' ||
     lower === 'https://career.directum.ru' ||
+    lower === 'https://career.directum.ru/vacancy' ||
+    lower === 'https://career.directum.ru/vacancy/' ||
+    lower.includes('career.directum.ru/vacancy') ||
     lower.includes('lead_product_owner') ||
+    lower.includes('business_bevelopment') ||
+    lower.includes('rukovoditel_proektov') ||
+    lower.includes('inzhener_po_informacionnoj_bezopasnosti') ||
+    // Kontur generic
     lower === 'https://kontur.ru/career/' ||
     lower === 'https://kontur.ru/career' ||
     lower === 'https://kontur.ru/career/vacancies' ||
     lower === 'https://kontur.ru/career/vacancies/' ||
+    // T1 generic
     lower === 'https://career.t1.ru/' ||
     lower === 'https://career.t1.ru' ||
     lower.includes('t1.ru/school') ||
+    // Yandex generic
     lower === 'https://yandex.ru/jobs/' ||
     lower === 'https://yandex.ru/jobs' ||
     lower.includes('yabackend') ||
+    // Ozon generic
     lower === 'https://job.ozon.ru/it/' ||
     lower === 'https://job.ozon.ru/it' ||
     lower === 'https://job.ozon.ru/' ||
     lower === 'https://job.ozon.ru' ||
+    // Sber generic
     lower === 'https://sbergraduate.ru/' ||
     lower === 'https://sbergraduate.ru' ||
     lower === 'https://sbergraduate.ru/sberseasons-moscow/' ||
     lower === 'https://sbergraduate.ru/sberseasons-moscow' ||
-    // Obsolete & 404 employer links that must be rerouted to live verified portals
+    // Obsolete employer links that must be rerouted to live verified portals
     lower.includes('education.tbank.ru/start/sre') ||
     lower.includes('fintech.tbank.ru') ||
     lower.includes('/vacancy/web-developer') ||
@@ -2290,8 +2327,6 @@ export function resolveApplyUrl(rawUrl, companyName = '', sourceChannel = '', di
     lower.includes('/vacancies/java-developer') ||
     lower.includes('/vacancies/devops-engineer') ||
     lower.includes('/vacancies/qa-automation') ||
-    lower.includes('/vacancies/razrabotka/20805') ||
-    lower.includes('/vacancies/razrabotka/20808') ||
     lower.includes('/internship/web') ||
     lower.includes('/internship/backend') ||
     lower.includes('/internship/qa') ||
@@ -2306,7 +2341,7 @@ export function resolveApplyUrl(rawUrl, companyName = '', sourceChannel = '', di
     lower === 'https://fintech.tbank.ru' ||
     lower === 'https://fintech.tbank.ru/' ||
     lower === 'https://fintech.tbank.ru/start' ||
-    lower === 'https://education.tbank.ru/start/' ||
+    lower === 'https://fintech.tbank.ru/start/' ||
     lower === 'https://www.tbank.ru/career/it/' ||
     lower === 'https://www.tbank.ru/career/it' ||
     lower === 'https://tbank.ru/career/it/' ||
@@ -2335,16 +2370,14 @@ export function resolveApplyUrl(rawUrl, companyName = '', sourceChannel = '', di
   // 7. Direct company vacancy detail page with actual vacancy slug or ID
   if (
     trimmed.includes('/yaintern/') ||
-    trimmed.includes('career.directum.ru/vacancy') ||
+    trimmed.includes('start.avito.ru/') ||
     trimmed.includes('career.t1.ru/vacancies') ||
     trimmed.includes('internship.vk.company/internship') ||
     trimmed.includes('internship.vk.company/vacancy') ||
     trimmed.includes('education.tbank.ru/start/') ||
-    trimmed.includes('/vacancies/razrabotka/') ||
-    trimmed.includes('/vacancies/data-science/') ||
-    trimmed.includes('/vacancies/analitika-dannykh/') ||
     trimmed.includes('/camp/') ||
     trimmed.includes('/intern-') ||
+    trimmed.includes('/students') ||
     trimmed.includes('/sberseasons-moscow/ml/') ||
     trimmed.includes('/sberseasons-moscow/java/') ||
     trimmed.includes('/sberseasons-moscow/devops/') ||
@@ -2355,6 +2388,9 @@ export function resolveApplyUrl(rawUrl, companyName = '', sourceChannel = '', di
 
   // 8. General absolute vacancy ID pattern (e.g. https://domain.com/vacancies/<category>/<number>/)
   if (/^https?:\/\/[^/]+\/vacancies\/[a-zA-Z0-9_-]+\/\d+\/?/i.test(trimmed)) {
+    if (trimmed.includes('20803') || trimmed.includes('20812') || trimmed.includes('20816') || trimmed.includes('avito')) {
+      return fallbackDirect;
+    }
     return trimmed;
   }
 
@@ -2542,6 +2578,103 @@ export function isStrictVacancyPost(title = '', text = '') {
   return true;
 }
 
+export function isVacancyActive(item) {
+  if (!item) return false;
+  if (item.isActive === false || item.is_active === false) return false;
+  const statusLower = (item.status || '').toLowerCase();
+  if (
+    statusLower === 'closed' ||
+    statusLower === 'archived' ||
+    statusLower === 'expired' ||
+    statusLower === 'inactive'
+  ) {
+    return false;
+  }
+
+  const exp = item.expiresAt || item.expires_at;
+  if (exp) {
+    const expTime = new Date(exp).getTime();
+    if (!isNaN(expTime) && expTime < Date.now()) return false;
+  }
+
+  const url = (item.applyUrl || item.source_url || item.url || '').toLowerCase();
+  const title = (item.title || '').toLowerCase();
+  const desc = (item.description || '').toLowerCase();
+  const combinedText = `${title} ${desc}`;
+
+  if (
+    combinedText.includes('вакансия закрыта') ||
+    combinedText.includes('в архиве') ||
+    combinedText.includes('в архив') ||
+    combinedText.includes('архивн') ||
+    combinedText.includes('набор закрыт') ||
+    combinedText.includes('набор завершен') ||
+    combinedText.includes('набор завершён') ||
+    combinedText.includes('прием заявок окончен') ||
+    combinedText.includes('приём заявок окончен')
+  ) {
+    return false;
+  }
+
+  if (
+    url.includes('/vacancies/razrabotka/20803') ||
+    url.includes('/vacancies/razrabotka/20812') ||
+    url.includes('/vacancies/analitika-dannykh/20816') ||
+    url.includes('/vacancies/razrabotka/20805') ||
+    url.includes('/vacancies/razrabotka/20808')
+  ) {
+    return false;
+  }
+
+  const compLower = (item.company || '').toLowerCase();
+  if (compLower.includes('directum') || compLower.includes('директум')) {
+    if (
+      title.includes('frontend') ||
+      title.includes('веб-разработчик') ||
+      title.includes('web-разработчик') ||
+      url.includes('career.directum.ru/vacancy') ||
+      url.includes('lead_product_owner')
+    ) {
+      if (item.isActive !== true) {
+        return false;
+      }
+    }
+  }
+
+  const isAggregator = (item.id || '').startsWith('hh-') || url.includes('hh.ru');
+  if (isAggregator) {
+    const KNOWN_CLOSED_HH_IDS = [
+      '139656665', '139621206', '138386223', '139486039', '138439076',
+      '138762873', '139548242', '136870562', '139408637', '139265845',
+      '139081220', '138848517', '136870560', '139350426', '138896406',
+      '138600055', '138000233', '138843300', '139311364', '138103037',
+      '137690459', '138120436', '138892012', '137608896', '138187404',
+      '138543206', '138490688', '138745106', '138741112', '138722040'
+    ];
+    if (
+      KNOWN_CLOSED_HH_IDS.some(
+        (closedId) => url.includes(closedId) || (item.id || '').includes(closedId)
+      )
+    ) {
+      return false;
+    }
+
+    const pub = item.publishedAt || item.published_at;
+    if (pub) {
+      const pubTime = new Date(pub).getTime();
+      if (!isNaN(pubTime)) {
+        const ageMs = Date.now() - pubTime;
+        const maxAgeMs = 45 * 24 * 60 * 60 * 1000;
+        if (ageMs > maxAgeMs) {
+          return false;
+        }
+      }
+    }
+  }
+
+  return true;
+}
+
 /**
  * Parse public Telegram channel web preview (https://t.me/s/<channel>)
  * Extracts posts, filters IT vacancies, maps to Internship format
@@ -2654,7 +2787,7 @@ export async function parseChannelPosts(channelHandle, companyInfo) {
       }
       salary = formatSalary(salary);
 
-      const resolvedUrl = resolveApplyUrl(applyUrl, companyInfo.name, postUrl, directionId);
+      const resolvedUrl = resolveApplyUrl(applyUrl, companyInfo.name, postUrl, directionId, subTrackId);
 
       const postId = postSlug.replace('/', '-');
       posts.push({
@@ -2775,23 +2908,6 @@ export const PORTAL_FALLBACK_VACANCIES = [
       sourceType: 'portal',
     },
     {
-      id: 'site-directum-rx-web',
-      companyId: 'directum',
-      company: 'Directum',
-      title: 'Стажёр Web-разработчик TypeScript / React (Directum RX)',
-      salary: 'от 55 000 до 75 000 ₽',
-      format: 'Гибрид',
-      location: 'Ижевск / Удаленно',
-      channel: '@Life_in_Directum',
-      sourceChannel: '@Life_in_Directum',
-      directionId: 'frontend',
-      subTrackId: 'react',
-      url: 'https://career.directum.ru/vacancy/',
-      description: 'Разработка веб-клиента платформы Directum RX в Ижевске на современном TypeScript и React под менторством старших инженеров.',
-      tags: ['Directum RX', 'Ижевск', 'React', 'TypeScript'],
-      sourceType: 'portal',
-    },
-    {
       id: 'site-yandex-backend',
       companyId: 'yandex',
       company: 'Яндекс',
@@ -2854,7 +2970,7 @@ export const PORTAL_FALLBACK_VACANCIES = [
       sourceChannel: '@avito_tech',
       directionId: 'mobile',
       subTrackId: 'android',
-      url: 'https://career.avito.com/vacancies/razrabotka/20803/',
+      url: 'https://start.avito.ru/tech',
       description: 'Стажировка в командах мобильной разработки Авито: создание фичей супераппа на Kotlin, Jetpack Compose и Coroutines.',
       tags: ['Авито', 'Android', 'Kotlin', 'Compose'],
       sourceType: 'portal',
@@ -2933,7 +3049,7 @@ export async function parseCareerWebsites() {
           const { directionId, subTrackId } = detectVacancyTrack(rawTitle);
 
           const rawUrl = href.startsWith('http') ? href : `https://career.directum.ru${href}`;
-          const directDirectumUrl = resolveApplyUrl(rawUrl, 'Directum', undefined, directionId);
+          const directDirectumUrl = resolveApplyUrl(rawUrl, 'Directum', undefined, directionId, subTrackId);
           parsed.push({
             id: `site-directum-${href.replace(/[^a-zA-Z0-9_-]/g, '')}`,
             companyId: 'directum',
@@ -2986,7 +3102,7 @@ export async function parseCareerWebsites() {
 
         const rawUrl = href.startsWith('http') ? href : `https://career.avito.com${href}`;
         const { directionId, subTrackId } = detectVacancyTrack(rawTitle);
-        const directAvitoUrl = resolveApplyUrl(rawUrl, 'Авито', undefined, directionId);
+        const directAvitoUrl = resolveApplyUrl(rawUrl, 'Авито', undefined, directionId, subTrackId);
         const numId = href.replace(/[^0-9]/g, '') || Math.random().toString(36).slice(2, 7);
 
         parsed.push({
@@ -3051,7 +3167,7 @@ export async function parseCareerWebsites() {
             if (!isStrictVacancyPost(rawTitle, '')) continue;
 
             const { directionId, subTrackId } = detectVacancyTrack(rawTitle);
-            const cleanUrl = resolveApplyUrl(m[1].split('?')[0], emp.company, undefined, directionId);
+            const cleanUrl = resolveApplyUrl(m[1].split('?')[0], emp.company, undefined, directionId, subTrackId);
             const numId = cleanUrl.match(/\/(\d+)/)?.[1] || Math.random().toString(36).slice(2, 7);
             count++;
 
@@ -3122,7 +3238,7 @@ export async function parseCareerWebsites() {
               count++;
               const numId = href.replace(/[^0-9]/g, '');
               const { directionId, subTrackId } = detectVacancyTrack(rawTitle);
-              const directHabrUrl = resolveApplyUrl(`https://career.habr.com${href}`, comp.company, undefined, directionId);
+              const directHabrUrl = resolveApplyUrl(`https://career.habr.com${href}`, comp.company, undefined, directionId, subTrackId);
 
               parsed.push({
                 id: `habr-${comp.alias}-${numId}`,
@@ -3224,12 +3340,16 @@ export async function getActiveInternships(forceRefresh = false) {
       };
 
       const mapped = data
-        .filter((item) => isStrictVacancyPost(item.title || '', item.description || ''))
+        .filter(
+          (item) =>
+            isStrictVacancyPost(item.title || '', item.description || '') && isVacancyActive(item)
+        )
         .map((item) => {
           const comp = findCompanyByQuery(item.company) || {};
           const rawUrl = item.source_url || item.url || GITHUB_PAGES_URL;
           const directionId = item.direction || item.direction_id || 'backend';
-          const directUrl = resolveApplyUrl(rawUrl, item.company, item.source_name, directionId);
+          const subTrackId = item.sub_track || item.sub_track_id || 'python';
+          const directUrl = resolveApplyUrl(rawUrl, item.company, item.source_name, directionId, subTrackId);
           const verifiedChannel = resolveChannelHandle(item.source_name, item.company);
           return {
             id: String(item.id),
@@ -3242,7 +3362,7 @@ export async function getActiveInternships(forceRefresh = false) {
             channel: verifiedChannel,
             sourceChannel: verifiedChannel,
             directionId,
-            subTrackId: item.sub_track || item.sub_track_id || 'python',
+            subTrackId,
             url: directUrl,
             applyUrl: directUrl,
             sourceType: item.source_type || (String(item.source_name || '').startsWith('@') ? 'telegram' : 'portal'),
@@ -3252,7 +3372,7 @@ export async function getActiveInternships(forceRefresh = false) {
         });
 
       const idSet = new Set(mapped.map((m) => m.id));
-      const remaining = ALL_INTERNSHIPS.filter((i) => !idSet.has(i.id));
+      const remaining = ALL_INTERNSHIPS.filter((i) => !idSet.has(i.id) && isVacancyActive(i));
       const combined = [...mapped, ...remaining];
       cachedActiveInternships = combined;
       lastInternshipsCacheTime = Date.now();
@@ -3292,7 +3412,7 @@ export async function scanChannelsAndSyncSupabase(notifySubscribers = true) {
   const allToSync = [];
 
   for (const item of [...newlyParsed, ...ALL_INTERNSHIPS]) {
-    if (!isStrictVacancyPost(item.title || '', item.description || '')) {
+    if (!isStrictVacancyPost(item.title || '', item.description || '') || !isVacancyActive(item)) {
       continue;
     }
     const titleKey = `${item.company}_${item.title}`.toLowerCase();
@@ -3302,7 +3422,7 @@ export async function scanChannelsAndSyncSupabase(notifySubscribers = true) {
       allToSync.push({
         ...item,
         salary: formatSalary(item.salary),
-        url: resolveApplyUrl(item.url || item.applyUrl, item.company, item.channel, item.directionId),
+        url: resolveApplyUrl(item.url || item.applyUrl, item.company, item.channel, item.directionId, item.subTrackId),
       });
     }
   }
@@ -4114,13 +4234,14 @@ export async function sendVacancies(chatId, filter = 'all') {
   } else {
     list.slice(0, 5).forEach((item, idx) => {
       const applyUrl = item.applyUrl || item.url || RENDER_URL;
+      const webAppVacancyUrl = `${WEBAPP_URL}${WEBAPP_URL.includes('?') ? '&' : '?'}vacancyId=${item.id}`;
       const channel = resolveChannelHandle(item.sourceChannel || item.channel, item.company);
       const stack = Array.isArray(item.tags) && item.tags.length > 0 ? item.tags.slice(0, 4).join(' • ') : '';
       const salaryFormatted = formatSalary(item.salary);
       const loc = formatLocation(item);
       const isTgPost = applyUrl.includes('t.me/');
       const isPortal = !isTgPost && !applyUrl.includes('hh.ru');
-      const actionText = isTgPost ? 'Пост в Telegram →' : isPortal ? 'Подать заявку на сайте →' : 'Откликнуться на hh.ru →';
+      const actionText = '🚀 Открыть в WebApp';
       const sourceLabel = isTgPost ? `📢 Пост в ${channel}` : isPortal ? `🌐 Сайт ${item.company}` : `📄 HeadHunter`;
 
       text += `<b>${idx + 1}. 🏢 ${item.company}</b>\n`;
@@ -4129,7 +4250,7 @@ export async function sendVacancies(chatId, filter = 'all') {
       if (stack) {
         text += `🏷 <code>${stack}</code>\n`;
       }
-      text += `${sourceLabel} ➔ <a href="${applyUrl}"><b>${actionText}</b></a>\n`;
+      text += `${sourceLabel} ➔ <a href="${webAppVacancyUrl}"><b>${actionText}</b></a>\n`;
       text += `─────────────────────\n`;
     });
     if (list.length > 5) {
@@ -4144,6 +4265,8 @@ export async function sendVacancies(chatId, filter = 'all') {
   }
 
   const webAppUrlWithParams = `${WEBAPP_URL}${WEBAPP_URL.includes('?') ? '&' : '?'}tg_chat_id=${chatId}&subscribed=1#tg_chat_id=${chatId}`;
+
+  const isSubscribed = tgSubscribers.has(String(chatId)) && tgSubscribers.get(String(chatId)).is_active;
 
   const keyboard = {
     inline_keyboard: [
@@ -4175,6 +4298,7 @@ export async function sendVacancies(chatId, filter = 'all') {
         { text: '🔷 VK', callback_data: 'vacancies:vk' },
       ],
       [
+        { text: isSubscribed ? '🔕 Отписаться' : '🔔 Подписка', callback_data: isSubscribed ? 'unsubscribe' : 'subscribe' },
         { text: '💼 Вакансии', callback_data: 'vacancies:all' },
         { text: '🏢 Компании', callback_data: 'companies' },
       ],
@@ -4679,10 +4803,56 @@ export async function handleCallbackQuery(query) {
     
     // Update keyboard
     if (query.message) {
+        const isSubscribed = true;
+        // Reconstruct keyboard for the vacancies list
+        const webAppUrlWithParams = `${WEBAPP_URL}${WEBAPP_URL.includes('?') ? '&' : '?'}tg_chat_id=${chatId}&subscribed=${isSubscribed ? '1' : '0'}#tg_chat_id=${chatId}`;
+        const keyboard = {
+            inline_keyboard: [
+              [
+                { text: '💻 Frontend', callback_data: 'direction:frontend' },
+                { text: '⚙️ Backend', callback_data: 'direction:backend' },
+              ],
+              [
+                { text: '📱 Mobile', callback_data: 'direction:mobile' },
+                { text: '🤖 Data Science', callback_data: 'direction:data_science' },
+              ],
+              [
+                { text: '🧪 QA', callback_data: 'direction:qa' },
+                { text: '☁️ DevOps', callback_data: 'direction:devops' },
+              ],
+              [
+                { text: '🏢 Т1', callback_data: 'vacancies:t1' },
+                { text: '💼 Контур', callback_data: 'vacancies:kontur' },
+                { text: '💳 Т-Банк', callback_data: 'vacancies:tbank' },
+              ],
+              [
+                { text: '⚡ Directum', callback_data: 'vacancies:directum' },
+                { text: '🔍 Яндекс', callback_data: 'vacancies:yandex' },
+                { text: '📦 Ozon', callback_data: 'vacancies:ozon' },
+              ],
+              [
+                { text: '🟢 Сбер', callback_data: 'vacancies:sber' },
+                { text: '🟣 Авито', callback_data: 'vacancies:avito' },
+                { text: '🔷 VK', callback_data: 'vacancies:vk' },
+              ],
+              [
+                { text: isSubscribed ? '🔕 Отписаться' : '🔔 Подписка', callback_data: isSubscribed ? 'unsubscribe' : 'subscribe' },
+                { text: '💼 Вакансии', callback_data: 'vacancies:all' },
+                { text: '🏢 Компании', callback_data: 'companies' },
+              ],
+              [
+                { text: '🚀 Открыть в WebApp', web_app: { url: webAppUrlWithParams } },
+              ],
+              [
+                { text: '🌐 Открыть сайт без VPN', url: RENDER_URL },
+              ],
+            ],
+          };
+
         await callTelegram('editMessageReplyMarkup', {
             chat_id: chatId,
             message_id: query.message.message_id,
-            reply_markup: { inline_keyboard: getSubscriptionKeyboard(true) }
+            reply_markup: keyboard
         });
     }
 
@@ -4696,10 +4866,56 @@ export async function handleCallbackQuery(query) {
     
     // Update keyboard
     if (query.message) {
+        const isSubscribed = false;
+        // Reconstruct keyboard for the vacancies list
+        const webAppUrlWithParams = `${WEBAPP_URL}${WEBAPP_URL.includes('?') ? '&' : '?'}tg_chat_id=${chatId}&subscribed=${isSubscribed ? '1' : '0'}#tg_chat_id=${chatId}`;
+        const keyboard = {
+            inline_keyboard: [
+              [
+                { text: '💻 Frontend', callback_data: 'direction:frontend' },
+                { text: '⚙️ Backend', callback_data: 'direction:backend' },
+              ],
+              [
+                { text: '📱 Mobile', callback_data: 'direction:mobile' },
+                { text: '🤖 Data Science', callback_data: 'direction:data_science' },
+              ],
+              [
+                { text: '🧪 QA', callback_data: 'direction:qa' },
+                { text: '☁️ DevOps', callback_data: 'direction:devops' },
+              ],
+              [
+                { text: '🏢 Т1', callback_data: 'vacancies:t1' },
+                { text: '💼 Контур', callback_data: 'vacancies:kontur' },
+                { text: '💳 Т-Банк', callback_data: 'vacancies:tbank' },
+              ],
+              [
+                { text: '⚡ Directum', callback_data: 'vacancies:directum' },
+                { text: '🔍 Яндекс', callback_data: 'vacancies:yandex' },
+                { text: '📦 Ozon', callback_data: 'vacancies:ozon' },
+              ],
+              [
+                { text: '🟢 Сбер', callback_data: 'vacancies:sber' },
+                { text: '🟣 Авито', callback_data: 'vacancies:avito' },
+                { text: '🔷 VK', callback_data: 'vacancies:vk' },
+              ],
+              [
+                { text: isSubscribed ? '🔕 Отписаться' : '🔔 Подписка', callback_data: isSubscribed ? 'unsubscribe' : 'subscribe' },
+                { text: '💼 Вакансии', callback_data: 'vacancies:all' },
+                { text: '🏢 Компании', callback_data: 'companies' },
+              ],
+              [
+                { text: '🚀 Открыть в WebApp', web_app: { url: webAppUrlWithParams } },
+              ],
+              [
+                { text: '🌐 Открыть сайт без VPN', url: RENDER_URL },
+              ],
+            ],
+          };
+
         await callTelegram('editMessageReplyMarkup', {
             chat_id: chatId,
             message_id: query.message.message_id,
-            reply_markup: { inline_keyboard: getSubscriptionKeyboard(false) }
+            reply_markup: keyboard
         });
     }
 

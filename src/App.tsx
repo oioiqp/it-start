@@ -37,6 +37,7 @@ import {
   TELEGRAM_BOT_URL,
   GITHUB_PAGES_URL,
 } from './lib/supabase';
+import { isVacancyActive } from './lib/vacancyUrl';
 import {
   getCachedInternships,
   getLocalProgress,
@@ -251,6 +252,7 @@ export function App() {
 
   // Handle URL params for navigation
   useEffect(() => {
+    if (isLoadingInternships) return;
     const params = new URLSearchParams(window.location.search);
     const vacancyId = params.get('vacancyId');
     if (vacancyId) {
@@ -259,7 +261,7 @@ export function App() {
             setSelectedInternshipForPlan(internship);
         }
     }
-  }, [internships]);
+  }, [internships, isLoadingInternships]);
 
   // Save progress helper
   const updateProgress = (updater: (prev: UserProgress) => UserProgress) => {
@@ -391,6 +393,9 @@ export function App() {
   // Filtered and Sorted Internships
   const filteredAndSortedInternships = useMemo(() => {
     let result = internships.filter((item) => {
+      // 0. Only show verified active vacancies
+      if (!isVacancyActive(item)) return false;
+
       if (selectedCompany !== 'all' && !matchesCompanyFilter(item.company, selectedCompany)) {
         return false;
       }
@@ -946,26 +951,46 @@ export function App() {
                 <div className="p-8 sm:p-12 text-center rounded-2xl sm:rounded-3xl space-y-3 liquid-glass text-neutral-700 dark:text-neutral-300">
                   <Briefcase className="w-12 h-12 text-neutral-400 dark:text-neutral-500 mx-auto" />
                   <h3 className="text-base font-bold text-neutral-900 dark:text-white font-sans leading-snug">
-                    Стажировки по заданным фильтрам не найдены
+                    {selectedCompany !== 'all' &&
+                    (selectedCompany.toLowerCase().includes('directum') || selectedCompany.toLowerCase().includes('директ'))
+                      ? 'Набор на стажировки в Directum на данный момент завершён'
+                      : 'Стажировки по заданным фильтрам не найдены'}
                   </h3>
                   <p className="text-xs text-neutral-500 dark:text-neutral-400 max-w-md mx-auto leading-relaxed">
-                    Попробуйте сбросить фильтры или добавьте новую вакансию в симуляторе парсера!
+                    {selectedCompany !== 'all' &&
+                    (selectedCompany.toLowerCase().includes('directum') || selectedCompany.toLowerCase().includes('директ'))
+                      ? 'Компания Directum проводит набор волнами (студенческие лаборатории). Новые анонсы и старт отборов публикуются в официальном канале @Life_in_Directum.'
+                      : 'Попробуйте сбросить фильтры или выберите другое направление!'}
                   </p>
-                  <button
-                    onClick={() => {
-                      setSearchQuery('');
-                      setSelectedCompany('all');
-                      setSelectedDirection('all');
-                      setSelectedSubTrack('all');
-                      setSelectedFormat('all');
-                      setSelectedSource('all');
-                    }}
-                    className="px-5 py-2 rounded-full text-xs font-semibold transition-all
-                      bg-neutral-900 text-white hover:bg-black
-                      dark:bg-white dark:text-neutral-950 dark:hover:bg-neutral-200 shadow-xs"
-                  >
-                    Сбросить все фильтры
-                  </button>
+                  <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
+                    {selectedCompany !== 'all' &&
+                      (selectedCompany.toLowerCase().includes('directum') || selectedCompany.toLowerCase().includes('директ')) && (
+                        <a
+                          href="https://t.me/Life_in_Directum"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-5 py-2 rounded-full text-xs font-semibold transition-all bg-[#0088cc] text-white hover:bg-[#0077b5] shadow-xs inline-flex items-center gap-1.5 cursor-pointer"
+                        >
+                          <Send className="w-3 h-3" />
+                          Канал @Life_in_Directum
+                        </a>
+                      )}
+                    <button
+                      onClick={() => {
+                        setSearchQuery('');
+                        setSelectedCompany('all');
+                        setSelectedDirection('all');
+                        setSelectedSubTrack('all');
+                        setSelectedFormat('all');
+                        setSelectedSource('all');
+                      }}
+                      className="px-5 py-2 rounded-full text-xs font-semibold transition-all
+                        bg-neutral-900 text-white hover:bg-black
+                        dark:bg-white dark:text-neutral-950 dark:hover:bg-neutral-200 shadow-xs cursor-pointer"
+                    >
+                      Сбросить все фильтры
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">

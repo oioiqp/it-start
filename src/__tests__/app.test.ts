@@ -742,9 +742,13 @@ describe('11. Target Companies & Telegram Channels Tracking', () => {
     expect(botModule.CAREER_WEBSITES_DATA.length).toBeGreaterThanOrEqual(10);
     const siteUrls = botModule.CAREER_WEBSITES_DATA.map((s: any) => s.url);
     expect(siteUrls.some((u: string) => u.includes('career.directum.ru'))).toBe(true);
-    expect(siteUrls.some((u: string) => u.includes('kontur.ru'))).toBe(true);
-    expect(siteUrls.some((u: string) => u.includes('education.tbank.ru') || u.includes('fintech.tbank.ru'))).toBe(true);
-    expect(siteUrls.some((u: string) => u.includes('t1.ru'))).toBe(true);
+    expect(siteUrls.some((u: string) => u.includes('kontur.ru/career/students'))).toBe(true);
+    expect(siteUrls.some((u: string) => u.includes('education.tbank.ru'))).toBe(true);
+    expect(siteUrls.some((u: string) => u.includes('career.t1.ru/vacancies'))).toBe(true);
+    expect(siteUrls.some((u: string) => u.includes('yandex.ru/yaintern'))).toBe(true);
+    expect(siteUrls.some((u: string) => u.includes('job.ozon.ru/it/camp'))).toBe(true);
+    expect(siteUrls.some((u: string) => u.includes('sbergraduate.ru/sberseasons-moscow'))).toBe(true);
+    expect(siteUrls.some((u: string) => u.includes('start.avito.ru/internships'))).toBe(true);
 
     expect(typeof botModule.parseTelegramChannels).toBe('function');
     expect(typeof botModule.parseCareerWebsites).toBe('function');
@@ -1500,7 +1504,10 @@ describe('13. Real Employer Positions & Liquid Glass Bento Dark/Light Theme Syst
     expect(avitoItems.some((i) => i.subTrackId === 'analytics')).toBe(true);
     avitoItems.forEach((i) => {
       expect(i.sourceChannel).toBe('@avito_tech');
-      expect(i.applyUrl).toContain('avito.com');
+      expect(i.applyUrl).toMatch(/avito\.(com|ru)/);
+      expect(i.applyUrl).not.toContain('20803');
+      expect(i.applyUrl).not.toContain('20812');
+      expect(i.applyUrl).not.toContain('20816');
     });
 
     // 9. VK: Web, Mobile, Data
@@ -1835,26 +1842,31 @@ describe('15. Telegram Mini App & VK Cross-Platform Integration & Modal Geometry
     // @ts-ignore
     const bot: any = await import('../../bot/bot.mjs');
 
-    // 1. Verify Avito generic root and search queries are strictly resolved to direct vacancies
-    expect(resolveApplyUrl('https://career.avito.com/', 'Авито')).toContain('/vacancies/razrabotka/');
-    expect(resolveApplyUrl('https://career.avito.com/vacancies/?search=стажер', 'Авито')).toContain('/vacancies/razrabotka/');
-    expect(resolveApplyUrl('https://career.avito.com/vacancies/', 'Авито')).toContain('/vacancies/razrabotka/');
-    expect(resolveApplyUrl('https://career.avito.com/internship', 'Авито')).toContain('/vacancies/razrabotka/');
+    // 1. Verify Avito generic root and search queries are strictly resolved to direct internship pages
+    expect(resolveApplyUrl('https://career.avito.com/', 'Авито')).toContain('start.avito.ru');
+    expect(resolveApplyUrl('https://career.avito.com/vacancies/?search=стажер', 'Авито')).toContain('start.avito.ru');
+    expect(resolveApplyUrl('https://career.avito.com/vacancies/', 'Авито')).toContain('start.avito.ru');
+    expect(resolveApplyUrl('https://career.avito.com/internship', 'Авито')).toContain('start.avito.ru');
 
-    // 2. Direct Avito vacancy URL is preserved as-is
-    const directAvito = 'https://career.avito.com/vacancies/razrabotka/20803/';
-    expect(resolveApplyUrl(directAvito, 'Авито')).toBe(directAvito);
+    // 2. Direct Avito tech internship URL is preserved as-is, while obsolete senior vacancy IDs are intercepted
+    const techAvito = 'https://start.avito.ru/tech';
+    expect(resolveApplyUrl(techAvito, 'Авито')).toBe(techAvito);
+    expect(resolveApplyUrl('https://career.avito.com/vacancies/razrabotka/20803/', 'Авито')).toBe('https://start.avito.ru/internships');
 
-    // 3. Fallback to specific Telegram post when available
+    // 3. Directum empty /vacancy/ paths resolve to official career portal
+    expect(resolveApplyUrl('https://career.directum.ru/vacancy/', 'Directum')).toBe('https://career.directum.ru/');
+    expect(resolveApplyUrl('https://career.directum.ru/vacancy', 'Directum')).toBe('https://career.directum.ru/');
+
+    // 4. Fallback to specific Telegram post when available
     const tgPost = 'https://t.me/avito_tech/745';
     expect(resolveApplyUrl('https://career.avito.com/?search=стажер', 'Авито', tgPost)).toBe(tgPost);
     expect(resolveApplyUrl('', 'Авито', tgPost)).toBe(tgPost);
 
-    // 4. Job boards (hh.ru, habr career) direct vacancy URLs
+    // 5. Job boards (hh.ru, habr career) direct vacancy URLs
     expect(resolveApplyUrl('https://hh.ru/vacancy/138000233', 'Сбер')).toBe('https://hh.ru/vacancy/138000233');
     expect(resolveApplyUrl('https://career.habr.com/vacancies/1000168291', 'Авито')).toBe('https://career.habr.com/vacancies/1000168291');
 
-    // 5. Verify ALL 43 SEED_INTERNSHIPS have direct, non-search URLs
+    // 6. Verify ALL 43 SEED_INTERNSHIPS have direct, non-search URLs
     expect(SEED_INTERNSHIPS.length).toBe(43);
     for (const item of SEED_INTERNSHIPS) {
       const isDirectPath =
@@ -1865,17 +1877,24 @@ describe('15. Telegram Mini App & VK Cross-Platform Integration & Modal Geometry
         item.applyUrl.includes('/pages/internship') ||
         item.applyUrl.includes('/start/') ||
         item.applyUrl.includes('/camp/') ||
-        item.applyUrl.includes('/lead_');
+        item.applyUrl.includes('/tech') ||
+        item.applyUrl.includes('start.avito.ru');
       expect(isDirectPath).toBe(true);
       expect(item.applyUrl.startsWith('https://')).toBe(true);
+      expect(item.applyUrl).not.toContain('20803');
+      expect(item.applyUrl).not.toContain('career.directum.ru/vacancy');
     }
 
-    // 6. Verify bot ALL_INTERNSHIPS has exact parity with direct URLs
+    // 7. Verify bot ALL_INTERNSHIPS has exact parity with direct URLs
     expect(bot.ALL_INTERNSHIPS.length).toBe(43);
     for (const botItem of bot.ALL_INTERNSHIPS) {
       expect(botItem.url).not.toContain('?search=');
       expect(botItem.applyUrl).not.toContain('?search=');
       expect(botItem.sourceChannel).toBeDefined();
+      expect(botItem.url).not.toContain('20803');
+      expect(botItem.applyUrl).not.toContain('20803');
+      expect(botItem.url).not.toContain('career.directum.ru/vacancy');
+      expect(botItem.applyUrl).not.toContain('career.directum.ru/vacancy');
     }
   });
 });

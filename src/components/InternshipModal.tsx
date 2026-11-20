@@ -224,7 +224,8 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                 internship.applyUrl,
                 internship.company,
                 internship.sourceChannel,
-                internship.directionId
+                internship.directionId,
+                internship.subTrackId
               );
 
               return (
@@ -505,7 +506,8 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
               internship.applyUrl,
               internship.company,
               internship.sourceChannel,
-              internship.directionId
+              internship.directionId,
+              internship.subTrackId
             );
 
             return (
