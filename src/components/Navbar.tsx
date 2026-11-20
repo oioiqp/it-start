@@ -5,14 +5,17 @@ import {
   HelpCircle,
   Send,
   Bot,
+  CheckCheck,
 } from 'lucide-react';
 import type { TelegramUser, UserProgress } from '../types';
 import type { VkUser } from '../lib/vkBridge';
 import { triggerHaptic } from '../lib/telegram';
 
+export type NavTabId = 'internships' | 'applications' | 'roadmaps' | 'questions';
+
 interface NavbarProps {
-  activeTab: 'internships' | 'roadmaps' | 'questions';
-  setActiveTab: (tab: 'internships' | 'roadmaps' | 'questions') => void;
+  activeTab: NavTabId;
+  setActiveTab: (tab: NavTabId) => void;
   telegramUser?: TelegramUser | null;
   vkUser?: VkUser | null;
   isVk?: boolean;
@@ -22,6 +25,7 @@ interface NavbarProps {
   onOpenSubscribeModal: () => void;
   theme?: 'dark' | 'light';
   onToggleTheme?: () => void;
+  applicationsCount?: number;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -31,8 +35,9 @@ export const Navbar: React.FC<NavbarProps> = ({
   vkUser,
   isVk,
   onOpenSubscribeModal,
+  applicationsCount = 0,
 }) => {
-  const handleTabClick = (tab: 'internships' | 'roadmaps' | 'questions') => {
+  const handleTabClick = (tab: NavTabId) => {
     triggerHaptic('selection');
     setActiveTab(tab);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -40,6 +45,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   const navTabs = [
     { id: 'internships' as const, label: 'Стажировки', icon: Briefcase },
+    { id: 'applications' as const, label: 'Отклики', icon: CheckCheck, badge: applicationsCount },
     { id: 'roadmaps' as const, label: 'Роадмапы', icon: Map },
     { id: 'questions' as const, label: 'Тренажёр', icon: HelpCircle },
   ];
@@ -96,6 +102,17 @@ export const Navbar: React.FC<NavbarProps> = ({
               >
                 <Icon className="w-3.5 h-3.5 shrink-0" />
                 <span className={isActive ? 'inline' : 'hidden sm:inline'}>{tab.label}</span>
+                {typeof tab.badge === 'number' && tab.badge > 0 && (
+                  <span
+                    className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+                      isActive
+                        ? 'bg-white/20 text-white dark:bg-black/20 dark:text-black'
+                        : 'bg-black/10 text-neutral-800 dark:bg-white/15 dark:text-neutral-200'
+                    }`}
+                  >
+                    {tab.badge}
+                  </span>
+                )}
               </button>
             );
           })}

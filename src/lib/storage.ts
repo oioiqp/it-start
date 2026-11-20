@@ -1,9 +1,11 @@
-import type { Internship, TelegramSubscription, UserProgress } from '../types';
+import type { Internship, JobApplication, TelegramSubscription, UserProgress } from '../types';
 
 const PROGRESS_STORAGE_KEY = 'it_start_user_progress';
 const SUBSCRIPTION_STORAGE_KEY = 'it_start_local_subscription';
 const INTERNSHIPS_STORAGE_KEY = 'it_start_cached_internships';
 const THEME_STORAGE_KEY = 'it_start_theme';
+const FAVORITES_STORAGE_KEY = 'it_start_favorites';
+const APPLICATIONS_STORAGE_KEY = 'it_start_applications';
 
 export function getLocalTheme(): 'dark' | 'light' {
   if (typeof window === 'undefined') return 'dark';
@@ -92,3 +94,75 @@ export function saveCachedInternships(items: Internship[]): void {
     console.warn('Failed to cache internships in localStorage:', e);
   }
 }
+
+export function getLocalFavorites(): string[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem(FAVORITES_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveLocalFavorites(favorites: string[]): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(favorites));
+  } catch (e) {
+    console.warn('Failed to save favorites to localStorage:', e);
+  }
+}
+
+export function toggleLocalFavorite(vacancyId: string): string[] {
+  const current = getLocalFavorites();
+  const exists = current.includes(vacancyId);
+  const next = exists ? current.filter((id) => id !== vacancyId) : [...current, vacancyId];
+  saveLocalFavorites(next);
+  return next;
+}
+
+export function getLocalApplications(): JobApplication[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem(APPLICATIONS_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveLocalApplications(apps: JobApplication[]): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(APPLICATIONS_STORAGE_KEY, JSON.stringify(apps));
+  } catch (e) {
+    console.warn('Failed to save applications to localStorage:', e);
+  }
+}
+
+export function addLocalApplication(app: JobApplication): JobApplication[] {
+  const current = getLocalApplications();
+  const existsIndex = current.findIndex((a) => a.vacancyId === app.vacancyId);
+  let next: JobApplication[];
+  if (existsIndex >= 0) {
+    next = [...current];
+    next[existsIndex] = { ...next[existsIndex], ...app };
+  } else {
+    next = [app, ...current];
+  }
+  saveLocalApplications(next);
+  return next;
+}
+
+export function removeLocalApplication(vacancyId: string): JobApplication[] {
+  const current = getLocalApplications();
+  const next = current.filter((a) => a.vacancyId !== vacancyId && a.id !== vacancyId);
+  saveLocalApplications(next);
+  return next;
+}
+

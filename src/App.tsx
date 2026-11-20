@@ -8,10 +8,12 @@ import {
   RefreshCw,
   X,
   SlidersHorizontal,
+  Star,
 } from 'lucide-react';
 import type {
   DirectionId,
   Internship,
+  JobApplication,
   SubTrackId,
   TelegramSubscription,
   TelegramUser,
@@ -22,12 +24,14 @@ import { DIRECTIONS } from './data/directions';
 import { ROADMAP_TOPICS } from './data/roadmaps';
 import { SEED_INTERNSHIPS } from './data/internships';
 import { QUESTIONS } from './data/questions';
-import { Navbar } from './components/Navbar';
-import { InternshipCard } from './components/InternshipCard';
+import { Navbar, type NavTabId } from './components/Navbar';
+import { InternshipCard, formatPublishedDate } from './components/InternshipCard';
 import { InternshipModal } from './components/InternshipModal';
 import { RoadmapViewer } from './components/RoadmapViewer';
 import { QuestionsViewer } from './components/QuestionsViewer';
 import { SubscribeModal } from './components/SubscribeModal';
+import { CompanyModal } from './components/CompanyModal';
+import { ApplicationsView } from './components/ApplicationsView';
 import {
   fetchInternshipsFromSupabase,
   seedInternshipsToSupabase,
@@ -46,6 +50,12 @@ import {
   saveCachedInternships,
   saveLocalProgress,
   saveLocalTheme,
+  getLocalFavorites,
+  toggleLocalFavorite,
+  getLocalApplications,
+  addLocalApplication,
+  removeLocalApplication,
+  saveLocalApplications,
 } from './lib/storage';
 import { initTelegramWebApp, triggerHaptic } from './lib/telegram';
 import {
@@ -61,7 +71,17 @@ import { RENDER_URL } from './services/subscriptionService';
 
 export function App() {
   // Navigation
-  const [activeTab, setActiveTab] = useState<'internships' | 'roadmaps' | 'questions'>('internships');
+  const [activeTab, setActiveTab] = useState<NavTabId>('internships');
+
+  // Favorites state
+  const [favorites, setFavorites] = useState<string[]>(() => getLocalFavorites());
+  const [onlyFavorites, setOnlyFavorites] = useState<boolean>(false);
+
+  // Applications state
+  const [applications, setApplications] = useState<JobApplication[]>(() => getLocalApplications());
+
+  // Company info modal state
+  const [selectedCompanyForInfo, setSelectedCompanyForInfo] = useState<string | null>(null);
 
   // Telegram User & Subscription
   const [telegramUser, setTelegramUser] = useState<TelegramUser | null>(() => initTelegramWebApp());
@@ -371,6 +391,46 @@ export function App() {
     }));
   };
 
+  // Favorites Handlers
+  const handleToggleFavorite = (id: string) => {
+    const next = toggleLocalFavorite(id);
+    setFavorites(next);
+  };
+
+  // Applications Handlers
+  const handleAddApplication = (internship: Internship, deadlineDays = 14) => {
+    const today = new Date();
+    const deadline = new Date(today.getTime() + deadlineDays * 24 * 60 * 60 * 1000);
+    const newApp: JobApplication = {
+      id: internship.id,
+      vacancyId: internship.id,
+      title: internship.title,
+      company: internship.company,
+      salary: internship.salary,
+      location: internship.location,
+      format: internship.format,
+      applyUrl: internship.applyUrl,
+      sourceType: internship.sourceType,
+      sourceChannel: internship.sourceChannel,
+      appliedAt: today.toISOString(),
+      deadlineDate: deadline.toISOString(),
+      deadlineAction: 'Предоставить выполненное тестовое задание и прикрепить ссылку',
+      status: 'applied',
+    };
+    const next = addLocalApplication(newApp);
+    setApplications(next);
+  };
+
+  const handleUpdateApplication = (app: JobApplication) => {
+    const next = applications.map((a) => (a.vacancyId === app.vacancyId ? app : a));
+    setApplications(next);
+    saveLocalApplications(next);
+  };
+
+  const handleRemoveApplication = (vacancyId: string) => {
+    const next = removeLocalApplication(vacancyId);
+    setApplications(next);
+  };
 
   // Helper for matching companies with synonyms
   const matchesCompanyFilter = (companyName: string, targetCompany: string): boolean => {
@@ -395,6 +455,9 @@ export function App() {
     let result = internships.filter((item) => {
       // 0. Only show verified active vacancies
       if (!isVacancyActive(item)) return false;
+
+      // 0.1 Favorites filter
+      if (onlyFavorites && !favorites.includes(item.id)) return false;
 
       if (selectedCompany !== 'all' && !matchesCompanyFilter(item.company, selectedCompany)) {
         return false;
@@ -455,7 +518,7 @@ export function App() {
     });
 
     return result;
-  }, [internships, selectedCompany, selectedDirection, selectedSubTrack, selectedFormat, selectedSource, searchQuery, sortConfig]);
+  }, [internships, selectedCompany, selectedDirection, selectedSubTrack, selectedFormat, selectedSource, searchQuery, sortConfig, onlyFavorites, favorites]);
 
   return (
     <div className="min-h-screen flex flex-col relative light bg-[#dbe0ea] text-neutral-900 liquid-ambient selection:bg-neutral-950 selection:text-white">
@@ -483,6 +546,7 @@ export function App() {
           userProgress={userProgress}
           totalTopicsCount={ROADMAP_TOPICS.length}
           totalQuestionsCount={QUESTIONS.length}
+          applicationsCount={applications.length}
           onOpenSubscribeModal={() => {
             triggerHaptic('medium');
             setIsSubscribeModalOpen(true);
@@ -637,6 +701,31 @@ export function App() {
                     </button>
                   )}
                 </div>
+
+                {/* Favorites filter button */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    triggerHaptic('selection');
+                    setOnlyFavorites(!onlyFavorites);
+                  }}
+                  className={`flex items-center gap-1.5 px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 shrink-0 cursor-pointer ${
+                    onlyFavorites
+                      ? 'bg-amber-400 text-neutral-950 font-bold shadow-xs'
+                      : 'liquid-glass-pill hover:bg-white/50 text-neutral-700 dark:text-neutral-300'
+                  }`}
+                  title="Показать только избранные вакансии"
+                >
+                  <Star className={`w-3.5 h-3.5 ${onlyFavorites ? 'fill-neutral-950 text-neutral-950' : 'text-amber-500 fill-amber-400'}`} />
+                  <span>Избранное</span>
+                  {favorites.length > 0 && (
+                    <span className={`w-4 h-4 rounded-full text-[10px] font-bold flex items-center justify-center ${
+                      onlyFavorites ? 'bg-neutral-950 text-amber-400' : 'bg-black/10 text-neutral-800 dark:bg-white/15 dark:text-white'
+                    }`}>
+                      {favorites.length}
+                    </span>
+                  )}
+                </button>
 
                 {/* Mobile Filters Toggle Button */}
                 <button
@@ -884,20 +973,25 @@ export function App() {
 
                 {/* Format & Source selectors */}
                 <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-black/5 dark:border-white/5 text-xs">
-                  {/* Format Filter */}
+                  {/* Format Filter with Visual Badges */}
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <span className="text-neutral-600 dark:text-neutral-400 font-semibold text-[11px]">Формат:</span>
-                    {(['all', 'Удаленно', 'Гибрид', 'Офис'] as const).map((fmt) => (
+                    {[
+                      { id: 'all' as const, label: 'Все' },
+                      { id: 'Удаленно' as const, label: '🏠 Дома' },
+                      { id: 'Офис' as const, label: '🏢 В офисе' },
+                      { id: 'Гибрид' as const, label: '🏠+🏢 Гибрид' },
+                    ].map((fmt) => (
                       <button
-                        key={fmt}
-                        onClick={() => setSelectedFormat(fmt)}
+                        key={fmt.id}
+                        onClick={() => setSelectedFormat(fmt.id)}
                         className={`px-2.5 py-1 rounded-full transition-all duration-150 active:scale-95 text-xs font-medium ${
-                          selectedFormat === fmt
+                          selectedFormat === fmt.id
                             ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-xs'
                             : 'liquid-glass-pill hover:bg-white/50 text-neutral-700 dark:text-neutral-300'
                         }`}
                       >
-                        {fmt === 'all' ? 'Все' : fmt}
+                        {fmt.label}
                       </button>
                     ))}
                   </div>
@@ -949,65 +1043,117 @@ export function App() {
 
               {filteredAndSortedInternships.length === 0 ? (
                 <div className="p-8 sm:p-12 text-center rounded-2xl sm:rounded-3xl space-y-3 liquid-glass text-neutral-700 dark:text-neutral-300">
-                  <Briefcase className="w-12 h-12 text-neutral-400 dark:text-neutral-500 mx-auto" />
-                  <h3 className="text-base font-bold text-neutral-900 dark:text-white font-sans leading-snug">
-                    {selectedCompany !== 'all' &&
-                    (selectedCompany.toLowerCase().includes('directum') || selectedCompany.toLowerCase().includes('директ'))
-                      ? 'Набор на стажировки в Directum на данный момент завершён'
-                      : 'Стажировки по заданным фильтрам не найдены'}
-                  </h3>
-                  <p className="text-xs text-neutral-500 dark:text-neutral-400 max-w-md mx-auto leading-relaxed">
-                    {selectedCompany !== 'all' &&
-                    (selectedCompany.toLowerCase().includes('directum') || selectedCompany.toLowerCase().includes('директ'))
-                      ? 'Компания Directum проводит набор волнами (студенческие лаборатории). Новые анонсы и старт отборов публикуются в официальном канале @Life_in_Directum.'
-                      : 'Попробуйте сбросить фильтры или выберите другое направление!'}
-                  </p>
-                  <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
-                    {selectedCompany !== 'all' &&
-                      (selectedCompany.toLowerCase().includes('directum') || selectedCompany.toLowerCase().includes('директ')) && (
-                        <a
-                          href="https://t.me/Life_in_Directum"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="px-5 py-2 rounded-full text-xs font-semibold transition-all bg-[#0088cc] text-white hover:bg-[#0077b5] shadow-xs inline-flex items-center gap-1.5 cursor-pointer"
+                  {onlyFavorites ? (
+                    <>
+                      <Star className="w-12 h-12 text-amber-500 fill-amber-400 mx-auto" />
+                      <h3 className="text-base font-bold text-neutral-900 dark:text-white font-sans leading-snug">
+                        {favorites.length === 0
+                          ? 'У вас пока нет избранных стажировок'
+                          : 'Нет избранных стажировок по заданным фильтрам'}
+                      </h3>
+                      <p className="text-xs text-neutral-500 dark:text-neutral-400 max-w-md mx-auto leading-relaxed">
+                        {favorites.length === 0
+                          ? 'Нажмите на жёлтую звёздочку на любой карточке вакансии, чтобы сохранить её в избранное.'
+                          : 'Попробуйте сбросить поисковую строку или фильтр по направлению.'}
+                      </p>
+                      <div className="pt-2">
+                        <button
+                          onClick={() => setOnlyFavorites(false)}
+                          className="px-5 py-2 rounded-full text-xs font-semibold transition-all bg-neutral-900 text-white hover:bg-black dark:bg-white dark:text-neutral-950 shadow-xs cursor-pointer inline-flex items-center gap-1.5"
                         >
-                          <Send className="w-3 h-3" />
-                          Канал @Life_in_Directum
-                        </a>
-                      )}
-                    <button
-                      onClick={() => {
-                        setSearchQuery('');
-                        setSelectedCompany('all');
-                        setSelectedDirection('all');
-                        setSelectedSubTrack('all');
-                        setSelectedFormat('all');
-                        setSelectedSource('all');
-                      }}
-                      className="px-5 py-2 rounded-full text-xs font-semibold transition-all
-                        bg-neutral-900 text-white hover:bg-black
-                        dark:bg-white dark:text-neutral-950 dark:hover:bg-neutral-200 shadow-xs cursor-pointer"
-                    >
-                      Сбросить все фильтры
-                    </button>
-                  </div>
+                          <span>Показать все вакансии</span>
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <Briefcase className="w-12 h-12 text-neutral-400 dark:text-neutral-500 mx-auto" />
+                      <h3 className="text-base font-bold text-neutral-900 dark:text-white font-sans leading-snug">
+                        {selectedCompany !== 'all' &&
+                        (selectedCompany.toLowerCase().includes('directum') || selectedCompany.toLowerCase().includes('директ'))
+                          ? 'Набор на стажировки в Directum на данный момент завершён'
+                          : 'Стажировки по заданным фильтрам не найдены'}
+                      </h3>
+                      <p className="text-xs text-neutral-500 dark:text-neutral-400 max-w-md mx-auto leading-relaxed">
+                        {selectedCompany !== 'all' &&
+                        (selectedCompany.toLowerCase().includes('directum') || selectedCompany.toLowerCase().includes('директ'))
+                          ? 'Компания Directum проводит набор волнами (студенческие лаборатории). Новые анонсы и старт отборов публикуются в официальном канале @Life_in_Directum.'
+                          : 'Попробуйте сбросить фильтры или выберите другое направление!'}
+                      </p>
+                      <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
+                        {selectedCompany !== 'all' &&
+                          (selectedCompany.toLowerCase().includes('directum') || selectedCompany.toLowerCase().includes('директ')) && (
+                            <a
+                              href="https://t.me/Life_in_Directum"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-5 py-2 rounded-full text-xs font-semibold transition-all bg-[#0088cc] text-white hover:bg-[#0077b5] shadow-xs inline-flex items-center gap-1.5 cursor-pointer"
+                            >
+                              <Send className="w-3 h-3" />
+                              Канал @Life_in_Directum
+                            </a>
+                          )}
+                        <button
+                          onClick={() => {
+                            setSearchQuery('');
+                            setSelectedCompany('all');
+                            setSelectedDirection('all');
+                            setSelectedSubTrack('all');
+                            setSelectedFormat('all');
+                            setSelectedSource('all');
+                          }}
+                          className="px-5 py-2 rounded-full text-xs font-semibold transition-all
+                            bg-neutral-900 text-white hover:bg-black
+                            dark:bg-white dark:text-neutral-950 dark:hover:bg-neutral-200 shadow-xs cursor-pointer"
+                        >
+                          Сбросить все фильтры
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
-                  {filteredAndSortedInternships.map((internship) => (
-                    <InternshipCard
-                      key={internship.id}
-                      internship={internship}
-                      userProgress={userProgress}
-                      roadmapTopics={ROADMAP_TOPICS}
-                      questions={QUESTIONS}
-                      onOpenPlan={(item) => setSelectedInternshipForPlan(item)}
-                    />
-                  ))}
+                  {filteredAndSortedInternships.map((internship) => {
+                    const appliedItem = applications.find((a) => a.vacancyId === internship.id);
+                    return (
+                      <InternshipCard
+                        key={internship.id}
+                        internship={internship}
+                        userProgress={userProgress}
+                        roadmapTopics={ROADMAP_TOPICS}
+                        questions={QUESTIONS}
+                        onOpenPlan={(item) => setSelectedInternshipForPlan(item)}
+                        isFavorite={favorites.includes(internship.id)}
+                        onToggleFavorite={handleToggleFavorite}
+                        onOpenCompanyInfo={(comp) => setSelectedCompanyForInfo(comp)}
+                        isApplied={Boolean(appliedItem)}
+                        appliedDeadline={
+                          appliedItem?.deadlineDate
+                            ? formatPublishedDate(appliedItem.deadlineDate)
+                            : undefined
+                        }
+                        onApplyVacancy={(item) => handleAddApplication(item)}
+                      />
+                    );
+                  })}
                 </div>
               )}
             </div>
           </div>
+        )}
+
+        {/* TAB: APPLICATIONS */}
+        {activeTab === 'applications' && (
+          <ApplicationsView
+            applications={applications}
+            allInternships={internships}
+            onUpdateApplication={handleUpdateApplication}
+            onRemoveApplication={handleRemoveApplication}
+            onOpenPlan={(item) => setSelectedInternshipForPlan(item)}
+            onOpenCompanyInfo={(comp) => setSelectedCompanyForInfo(comp)}
+            onNavigateToCatalog={() => setActiveTab('internships')}
+          />
         )}
 
         {/* TAB 2: ROADMAPS */}
@@ -1017,6 +1163,8 @@ export function App() {
             userProgress={userProgress}
             onToggleTopic={handleToggleTopic}
             onToggleSubtopic={handleToggleSubtopic}
+            questions={QUESTIONS}
+            onToggleQuestion={handleToggleQuestion}
           />
         )}
 
@@ -1043,6 +1191,17 @@ export function App() {
         onToggleTopic={handleToggleTopic}
         onToggleSubtopic={handleToggleSubtopic}
         onToggleQuestion={handleToggleQuestion}
+        isFavorite={selectedInternshipForPlan ? favorites.includes(selectedInternshipForPlan.id) : false}
+        onToggleFavorite={handleToggleFavorite}
+        onOpenCompanyInfo={(comp) => setSelectedCompanyForInfo(comp)}
+        isApplied={selectedInternshipForPlan ? applications.some((a) => a.vacancyId === selectedInternshipForPlan.id) : false}
+        onApplyVacancy={(item) => handleAddApplication(item)}
+      />
+
+      {/* Company Info Modal */}
+      <CompanyModal
+        companyName={selectedCompanyForInfo}
+        onClose={() => setSelectedCompanyForInfo(null)}
       />
 
       {/* Subscribe to Telegram & VK Modal */}

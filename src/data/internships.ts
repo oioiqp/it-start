@@ -187,7 +187,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
     salary: 'от 75 000 до 95 000 ₽',
     directionId: 'devops',
     subTrackId: 'cicd_docker',
-    tags: ['Linux', 'Docker', 'CI/CD', 'Kubernetes', 'SberSeasons'],
+    tags: ['Linux', 'Docker', 'CI/CD', 'Kubernetes', 'Bash'],
     description: 'Автоматизация сборки и развертывания облачных сервисов Сбера в программе SberSeasons. Практика на реальной высоконагруженной инфраструктуре с персональным ментором.',
     requirements: [
       'Уверенное владение командной строкой Linux (процессы, сеть, права)',
@@ -216,7 +216,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
     salary: 'от 70 000 до 90 000 ₽',
     directionId: 'backend',
     subTrackId: 'java',
-    tags: ['Java 21', 'Spring Boot', 'PostgreSQL', 'Kafka', 'SberSeasons'],
+    tags: ['Java 21', 'Spring Boot', 'PostgreSQL', 'Kafka', 'Hibernate'],
     description: 'Разработка микросервисов процессинга и цифровой платформы Сбера в рамках стажировки SberSeasons. Обучение под крылом Senior-инженеров.',
     requirements: [
       'Крепкое понимание Java Core (ООП, Collections, Stream API, Concurrency)',
@@ -535,7 +535,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
     salary: 'от 70 000 до 90 000 ₽',
     directionId: 'backend',
     subTrackId: 'java',
-    tags: ['Java 21', 'Spring Boot', 'Открытая школа Т1', 'PostgreSQL', 'Kafka'],
+    tags: ['Java 21', 'Spring Boot', 'PostgreSQL', 'Kafka', 'Maven'],
     description: 'Обучение и стажировка в Открытой школе Т1 с переходом в штат. Разработка надежных Enterprise-сервисов для крупнейших корпоративных заказчиков.',
     requirements: [
       'Базовые знания Java Core (ООП, коллекции, исключения)',
@@ -564,7 +564,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
     salary: 'от 75 000 до 95 000 ₽',
     directionId: 'devops',
     subTrackId: 'cicd_docker',
-    tags: ['Linux', 'Docker', 'CI/CD', 'Ansible', 'Т1 Облако'],
+    tags: ['Linux', 'Docker', 'CI/CD', 'Ansible', 'Bash'],
     description: 'Поддержка и автоматизация инфраструктуры масштабируемых облачных решений Т1 Облако.',
     requirements: [
       'Уверенное знание Linux (системное администрирование, сеть, безопасность)',
@@ -592,7 +592,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
     salary: 'от 60 000 до 80 000 ₽',
     directionId: 'qa',
     subTrackId: 'auto_qa',
-    tags: ['QA Automation', 'Python', 'Pytest', 'REST API', 'Т1'],
+    tags: ['QA Automation', 'Python', 'Pytest', 'REST API', 'CI/CD'],
     description: 'Автоматизация тестирования банковских и интеграционных платформ группы Т1.',
     requirements: [
       'Теория тестирования и техники тест-дизайна',
@@ -620,7 +620,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
     salary: 'от 55 000 до 75 000 ₽',
     directionId: 'frontend',
     subTrackId: 'react',
-    tags: ['React', 'TypeScript', 'Directum RX', 'Web Client', 'Ижевск', 'Директум'],
+    tags: ['React', 'TypeScript', 'Web Client', 'CSS3', 'Redux'],
     description: 'Разработка веб-клиента флагманской платформы управления цифровыми процессами и документами Directum RX в Ижевске.',
     requirements: [
       'Знание современного JavaScript/TypeScript и React',
@@ -651,7 +651,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
     salary: 'от 55 000 до 80 000 ₽',
     directionId: 'backend',
     subTrackId: 'java',
-    tags: ['C#', '.NET', 'Directum RX', 'PostgreSQL', 'Web API', 'Ижевск', 'Директум'],
+    tags: ['C#', '.NET', 'PostgreSQL', 'Web API', 'Entity Framework'],
     description: 'Разработка масштабируемого бэкенда интеллектуальной системы управления документами Directum RX. Микросервисы, асинхронная обработка и AI-модули.',
     requirements: [
       'Знание базовых принципов ООП, SOLID и языка C# или Java',
@@ -681,7 +681,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
     salary: 'от 50 000 до 65 000 ₽',
     directionId: 'qa',
     subTrackId: 'manual_qa',
-    tags: ['Manual QA', 'Тест-дизайн', 'Directum RX', 'Postman', 'Ижевск', 'Директум'],
+    tags: ['Manual QA', 'Тест-дизайн', 'Postman', 'SQL', 'Swagger'],
     description: 'Тестирование веб- и десктоп-клиентов Directum RX, поиск дефектов в бизнес-процессах электронного документооборота.',
     requirements: [
       'Понимание жизненного цикла ПО и видов тестирования',
@@ -703,7 +703,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
   },
   {
     id: 'int-25',
-    title: 'Стажёр Frontend-разработчик (Контур.Старт)',
+    title: 'Стажёр Frontend-разработчик',
     company: 'Контур',
     companyLogo: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=100&h=100&fit=crop&q=80',
     location: 'Екатеринбург / Пермь / Удаленно',
@@ -711,8 +711,8 @@ export const SEED_INTERNSHIPS: Internship[] = [
     salary: 'от 65 000 до 85 000 ₽',
     directionId: 'frontend',
     subTrackId: 'react',
-    tags: ['React', 'TypeScript', 'Контур.Старт', 'Jest', 'Redux'],
-    description: 'Оплачиваемая стажировка Контур.Старт 2026 с индивидуальным наставником. Разработка современных интерфейсов для экосистемы Контура.',
+    tags: ['React', 'TypeScript', 'Redux Toolkit', 'Jest', 'Tailwind'],
+    description: 'Разработка современных интерфейсов для экосистемы Контура с индивидуальным наставником.',
     requirements: [
       'Хорошее знание HTML5, CSS3, JavaScript ES6+ и TypeScript',
       'Опыт разработки на React (хуки, функциональные компоненты)',
@@ -731,7 +731,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
   },
   {
     id: 'int-26',
-    title: 'Стажёр Backend-разработчик (Контур.Старт / Python)',
+    title: 'Стажёр Backend-разработчик (Python)',
     company: 'Контур',
     companyLogo: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=100&h=100&fit=crop&q=80',
     location: 'Екатеринбург / Удаленно',
@@ -739,8 +739,8 @@ export const SEED_INTERNSHIPS: Internship[] = [
     salary: 'от 70 000 до 90 000 ₽',
     directionId: 'backend',
     subTrackId: 'python',
-    tags: ['Python', 'Контур.Старт', 'PostgreSQL', 'Docker', 'FastAPI'],
-    description: 'Программа стажировки Контур.Старт для начинающих бэкендеров. Решение реальных бизнес-задач под менторством Senior-разработчиков.',
+    tags: ['Python', 'PostgreSQL', 'Docker', 'FastAPI', 'Redis'],
+    description: 'Разработка микросервисов и API для сервисов электронного взаимодействия под менторством Senior-разработчиков.',
     requirements: [
       'Знание основ Python и стандартных библиотек',
       'Понимание принципов проектирования реляционных БД (PostgreSQL)',
@@ -767,7 +767,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
     salary: 'от 75 000 до 95 000 ₽',
     directionId: 'backend',
     subTrackId: 'python',
-    tags: ['Python 3.12', 'FastAPI', 'PostgreSQL', 'Kafka', 'Т-Банк Финтех'],
+    tags: ['Python 3.12', 'FastAPI', 'PostgreSQL', 'Kafka', 'Redis'],
     description: 'Разработка ключевых сервисов процессинга и кредитных конвейеров банка. Высокая нагрузка и строгие требования к надежности.',
     requirements: [
       'Отличное знание Python 3 и асинхронного программирования (asyncio)',
@@ -795,7 +795,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
     salary: 'от 80 000 до 105 000 ₽',
     directionId: 'devops',
     subTrackId: 'k8s_iac',
-    tags: ['Kubernetes', 'Linux', 'Terraform', 'Prometheus', 'Т-Банк SRE'],
+    tags: ['Kubernetes', 'Linux', 'Terraform', 'Prometheus', 'Grafana'],
     description: 'Обеспечение бесперебойной работы критических сервисов Т-Банка. Автоматизация развертывания и мониторинга сотен микросервисов.',
     requirements: [
       'Глубокое понимание устройства Linux и компьютерных сетей',
@@ -823,7 +823,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
     salary: 'от 70 000 до 90 000 ₽',
     directionId: 'frontend',
     subTrackId: 'react',
-    tags: ['React 19', 'TypeScript', 'Ozon Camp', 'Next.js', 'Tailwind'],
+    tags: ['React 19', 'TypeScript', 'Next.js', 'Tailwind', 'Zustand'],
     description: 'Оплачиваемая стажировка Ozon Camp 2026 в командах маркетплейса. Разработка высоконагруженных витрин, чекаута и кабинетов продавцов.',
     requirements: [
       'Уверенное знание современного JavaScript (ES2023+) и TypeScript',
@@ -844,7 +844,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
   },
   {
     id: 'int-30',
-    title: 'Стажёр QA Automation (Go / Python / Ozon Camp)',
+    title: 'Стажёр QA Automation (Go / Python)',
     company: 'Ozon Tech',
     companyLogo: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=100&h=100&fit=crop&q=80',
     location: 'Москва / Удаленно',
@@ -852,7 +852,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
     salary: 'от 70 000 до 90 000 ₽',
     directionId: 'qa',
     subTrackId: 'auto_qa',
-    tags: ['QA Auto', 'Go', 'Python', 'gRPC', 'Ozon Camp', 'Kafka'],
+    tags: ['QA Auto', 'Go', 'Python', 'gRPC', 'Kafka', 'Docker'],
     description: 'Автоматизация тестирования высоконагруженных микросервисов логистики Ozon. Работа с протоколами gRPC, очередями Kafka и базами PostgreSQL.',
     requirements: [
       'Теория тестирования (тест-дизайн, пирамида тестирования)',
@@ -881,7 +881,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
     salary: 'от 70 000 до 95 000 ₽',
     directionId: 'frontend',
     subTrackId: 'react',
-    tags: ['React', 'TypeScript', 'Авито Старт', 'SSR', 'Redux Toolkit'],
+    tags: ['React', 'TypeScript', 'SSR', 'Redux Toolkit', 'Next.js'],
     description: 'Программа стажировки Авито Старт: разработка ключевых разделов Avito.ru с миллионной аудиторией. Дизайн-система, микрофронтенды и высокие стандарты качества.',
     requirements: [
       'Отличное знание JavaScript, TypeScript и React',
@@ -910,7 +910,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
     salary: 'от 75 000 до 100 000 ₽',
     directionId: 'backend',
     subTrackId: 'python',
-    tags: ['Python 3.12', 'Golang', 'PostgreSQL', 'Kafka', 'Авито Старт'],
+    tags: ['Python 3.12', 'Golang', 'PostgreSQL', 'Kafka', 'Docker'],
     description: 'Разработка распределенных микросервисов поиска и рекомендаций Авито. Решение алгоритмических задач и обработка терабайтов данных под руководством Senior ментора.',
     requirements: [
       'Уверенное знание Python 3 или Go, стандартных библиотек',
@@ -939,7 +939,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
     salary: 'от 65 000 до 85 000 ₽',
     directionId: 'frontend',
     subTrackId: 'react',
-    tags: ['React', 'TypeScript', 'VKUI', 'VK Mini Apps', 'VK Team'],
+    tags: ['React', 'TypeScript', 'VKUI', 'VK Mini Apps', 'CSS Modules'],
     description: 'Оплачиваемая стажировка VK Team: создание веб-интерфейсов ВКонтакте, VK Видео и VK Мессенджера на стеке React, TypeScript и библиотеки VKUI.',
     requirements: [
       'Хорошее знание HTML5, CSS3, JavaScript ES6+ и TypeScript',
@@ -968,7 +968,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
     salary: 'от 75 000 до 95 000 ₽',
     directionId: 'data_science',
     subTrackId: 'ml',
-    tags: ['Python', 'PyTorch', 'RecSys', 'NLP', 'VK Team', 'BigData'],
+    tags: ['Python', 'PyTorch', 'RecSys', 'NLP', 'BigData', 'Spark'],
     description: 'Разработка рекомендательных систем ленты, клипов и музыки ВКонтакте. Обучение моделей ранжирования на огромных графах социальных связей.',
     requirements: [
       'Крепкие знания математической статистики, линейной алгебры и тервера',
@@ -997,7 +997,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
     salary: 'от 80 000 до 105 000 ₽',
     directionId: 'backend',
     subTrackId: 'golang',
-    tags: ['Go', 'gRPC', 'PostgreSQL', 'Kafka', 'Т-Банк Финтех'],
+    tags: ['Go', 'gRPC', 'PostgreSQL', 'Kafka', 'Docker'],
     description: 'Разработка высокопроизводительных микросервисов платежного контура Т-Банка. Экстремальные нагрузки, строгая отказоустойчивость и менторская программа.',
     requirements: [
       'Понимание базовых механизмов Go (горутины, планировщик, каналы, sync)',
@@ -1018,7 +1018,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
   },
   {
     id: 'int-36',
-    title: 'Стажёр QA Automation Engineer (Java / Python / Т-Банк)',
+    title: 'Стажёр QA Automation Engineer (Java / Python)',
     company: 'Т-Банк',
     companyLogo: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&h=100&fit=crop&q=80',
     location: 'Москва / Удаленно',
@@ -1026,7 +1026,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
     salary: 'от 65 000 до 85 000 ₽',
     directionId: 'qa',
     subTrackId: 'auto_qa',
-    tags: ['QA Automation', 'Java', 'Python', 'Rest-Assured', 'Т-Банк'],
+    tags: ['QA Automation', 'Java', 'Python', 'Rest-Assured', 'CI/CD'],
     description: 'Автоматизация тестирования банковских платформ, инвестиций и мобильного банка. Создание надежных автотестов и интеграция в CI/CD.',
     requirements: [
       'Знание теории тестирования (тест-дизайн, виды дефектов)',
@@ -1047,7 +1047,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
   },
   {
     id: 'int-37',
-    title: 'Стажёр QA-инженер (Контур.Старт 2026)',
+    title: 'Стажёр QA-инженер',
     company: 'Контур',
     companyLogo: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=100&h=100&fit=crop&q=80',
     location: 'Екатеринбург / Пермь / Удаленно',
@@ -1055,8 +1055,8 @@ export const SEED_INTERNSHIPS: Internship[] = [
     salary: 'от 60 000 до 80 000 ₽',
     directionId: 'qa',
     subTrackId: 'manual_qa',
-    tags: ['Контур.Старт', 'Manual QA', 'Тест-дизайн', 'API', 'Контур'],
-    description: 'Программа стажировки Контур.Старт 2026 для инженеров по тестированию. Тестирование веб-сервисов Диадок, Фокус и Бухгалтерия с персональным наставником.',
+    tags: ['Manual QA', 'Тест-дизайн', 'API', 'Postman', 'SQL'],
+    description: 'Тестирование веб-сервисов Диадок, Фокус и Бухгалтерия с персональным наставником.',
     requirements: [
       'Знание теории тестирования ПО и методологий тест-дизайна',
       'Умение составлять подробные тест-кейсы и понятные баг-репорты',
@@ -1084,7 +1084,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
     salary: 'от 60 000 до 85 000 ₽',
     directionId: 'backend',
     subTrackId: 'python',
-    tags: ['Directum RX', 'C#', '.NET Core', 'PostgreSQL', 'Ижевск', 'Директум', 'Стажировка'],
+    tags: ['C#', '.NET Core', 'PostgreSQL', 'REST API', 'LINQ'],
     description: 'Официальная программа стажировок Directum: разработка ядра интеллектуальной платформы управления цифровыми процессами и документами Directum RX в Ижевске под менторством экспертов.',
     requirements: [
       'Уверенное знание языка C# и базовых концепций .NET Core',
@@ -1115,7 +1115,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
     salary: 'от 75 000 до 95 000 ₽',
     directionId: 'backend',
     subTrackId: 'java',
-    tags: ['Java 21', 'Spring Boot 3', 'Kafka', 'PostgreSQL', 'Т-Банк Старт'],
+    tags: ['Java 21', 'Spring Boot 3', 'Kafka', 'PostgreSQL', 'Gradle'],
     description: 'Оплачиваемая финтех-стажировка Т-Банк Старт: разработка отказоустойчивых бэкенд-микросервисов на Java 21, Spring Boot 3 и Kafka для платежных и расчетных систем с ментором.',
     requirements: [
       'Хорошее знание Core Java (Java 17/21), коллекций, multithreading и Stream API',
@@ -1145,7 +1145,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
     salary: 'от 75 000 до 100 000 ₽',
     directionId: 'frontend',
     subTrackId: 'react',
-    tags: ['React', 'TypeScript', 'Next.js', 'Redux', 'Яндекс Интерны'],
+    tags: ['React', 'TypeScript', 'Next.js', 'Redux', 'Webpack'],
     description: 'Оплачиваемая стажировка в Яндексе (Young Con): разработка сложных интерфейсов сервисов Поиска, Маркета и Go на React, TypeScript, SSR и микрофронтендах.',
     requirements: [
       'Отличное знание JavaScript (ES6+) и TypeScript',
@@ -1174,7 +1174,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
     salary: 'от 80 000 до 105 000 ₽',
     directionId: 'backend',
     subTrackId: 'java',
-    tags: ['C#', '.NET 8', 'ASP.NET Core', 'Ozon Camp', 'PostgreSQL', 'Kafka'],
+    tags: ['C#', '.NET 8', 'ASP.NET Core', 'PostgreSQL', 'Kafka', 'Docker'],
     description: 'Программа Ozon Camp: разработка высоконагруженных распределенных сервисов финансовой платформы и фулфилмента на C# и .NET 8 с персональным наставником.',
     requirements: [
       'Уверенное знание C# и платформы .NET Core / .NET 8',
@@ -1203,7 +1203,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
     salary: 'от 75 000 до 95 000 ₽',
     directionId: 'data_science',
     subTrackId: 'analytics',
-    tags: ['SQL', 'Python', 'A/B тесты', 'Аналитика данных', 'Авито Старт'],
+    tags: ['SQL', 'Python', 'A/B тесты', 'Аналитика данных', 'Tableau'],
     description: 'Оплачиваемая программа стажировки Авито Старт для аналитиков данных: анализ пользовательского поведения, проведение A/B тестов, расчет продуктовых метрик и дашборды.',
     requirements: [
       'Уверенное владение сложными SQL-запросами (оконные функции, агрегации, CTE)',
@@ -1232,7 +1232,7 @@ export const SEED_INTERNSHIPS: Internship[] = [
     salary: 'от 70 000 до 90 000 ₽',
     directionId: 'mobile',
     subTrackId: 'android',
-    tags: ['Android', 'Kotlin', 'iOS', 'Swift', 'VK Team', 'Стажировка'],
+    tags: ['Android', 'Kotlin', 'iOS', 'Swift', 'REST API'],
     description: 'Официальная программа стажировок VK Team: разработка ключевых фичей мобильных приложений ВКонтакте, VK Музыка и VK Видео на Kotlin и Swift под менторством экспертов.',
     requirements: [
       'Базовые знания Kotlin или Swift и принципов мобильной разработки',

@@ -11,10 +11,12 @@ import {
   ArrowDown,
   CheckSquare,
   Square,
+  ChevronDown,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import type { DirectionId, RoadmapTopic, SubTrackId, UserProgress } from '../types';
+import type { DirectionId, Question, RoadmapTopic, SubTrackId, UserProgress } from '../types';
 import { DIRECTIONS } from '../data/directions';
+import { QUESTIONS as DEFAULT_QUESTIONS } from '../data/questions';
 import { triggerHaptic } from '../lib/telegram';
 
 interface RoadmapViewerProps {
@@ -22,6 +24,53 @@ interface RoadmapViewerProps {
   userProgress: UserProgress;
   onToggleTopic: (topicId: string) => void;
   onToggleSubtopic?: (topicId: string, subtopicIndex: number) => void;
+  questions?: Question[];
+  onToggleQuestion?: (questionId: string) => void;
+}
+
+// Helper to find interview questions for a roadmap topic
+function getQuestionsForTopic(topic: RoadmapTopic, allQuestions: Question[]): Question[] {
+  const dirQuestions = allQuestions.filter((q) => {
+    if (q.directionId !== topic.directionId) return false;
+    if (topic.category === 'core') {
+      return q.subTrackId === 'core';
+    }
+    return q.subTrackId === topic.subTrackId;
+  });
+
+  const topicTerms = [
+    ...topic.title.toLowerCase().split(/[\s,./()]+/).filter((w) => w.length > 3),
+    ...topic.subtopics.flatMap((s) => s.toLowerCase().split(/[\s,./()]+/).filter((w) => w.length > 3)),
+  ];
+
+  const scored = dirQuestions.map((q) => {
+    const qText = `${q.title} ${q.question} ${q.category}`.toLowerCase();
+    let score = 0;
+    for (const term of topicTerms) {
+      if (qText.includes(term)) score += 1;
+    }
+    return { q, score };
+  });
+
+  const matching = scored
+    .filter((item) => item.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .map((item) => item.q);
+
+  if (matching.length >= 2) {
+    return matching.slice(0, 3);
+  }
+
+  // Fallback: fill with general questions from this direction/subtrack
+  const combined = [...matching];
+  for (const q of dirQuestions) {
+    if (!combined.some((item) => item.id === q.id)) {
+      combined.push(q);
+    }
+    if (combined.length >= 2) break;
+  }
+
+  return combined.slice(0, 3);
 }
 
 export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
@@ -29,9 +78,16 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
   userProgress,
   onToggleTopic,
   onToggleSubtopic,
+  questions = DEFAULT_QUESTIONS,
+  onToggleQuestion,
 }) => {
   const [selectedDirectionId, setSelectedDirectionId] = useState<DirectionId>('frontend');
   const [selectedSubTrackId, setSelectedSubTrackId] = useState<SubTrackId>('react');
+
+  // Track expanded questions per topic
+  const [expandedTopicQuestions, setExpandedTopicQuestions] = useState<Record<string, boolean>>({});
+  // Track open question details (code snippet & answer)
+  const [openQuestionDetailId, setOpenQuestionDetailId] = useState<string | null>(null);
 
   const currentDirection = DIRECTIONS.find((d) => d.id === selectedDirectionId) || DIRECTIONS[0];
 
@@ -116,16 +172,150 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
     if (onToggleSubtopic) {
       onToggleSubtopic(topic.id, sIdx);
     } else {
-      // Fallback: toggle topic
       onToggleTopic(topic.id);
     }
 
-    // Check if this subtopic click might complete the topic
     const { checked, total } = getTopicProgress(topic);
     const currentlyChecked = getSubtopicChecked(topic, sIdx);
     if (!currentlyChecked && checked + 1 === total) {
       confetti({ particleCount: 45, spread: 60 });
     }
+  };
+
+  const handleToggleQuestionClick = (questionId: string) => {
+    triggerHaptic('selection');
+    if (onToggleQuestion) {
+      onToggleQuestion(questionId);
+      if (!userProgress.completedQuestions.includes(questionId)) {
+        confetti({ particleCount: 30, spread: 45 });
+      }
+    }
+  };
+
+  const toggleTopicQuestions = (topicId: string) => {
+    triggerHaptic('selection');
+    setExpandedTopicQuestions((prev) => ({ ...prev, [topicId]: !prev[topicId] }));
+  };
+
+  // Reusable renderer for topic node questions
+  const renderTopicQuestions = (topic: RoadmapTopic) => {
+    const topicQuestions = getQuestionsForTopic(topic, questions);
+    if (topicQuestions.length === 0) return null;
+
+    const isExpanded = Boolean(expandedTopicQuestions[topic.id]);
+    const learnedCount = topicQuestions.filter((q) =>
+      userProgress.completedQuestions.includes(q.id)
+    ).length;
+
+    return (
+      <div className="mt-3.5 pt-3.5 border-t border-black/5 dark:border-white/5 space-y-2">
+        <div className="flex items-center justify-between">
+          <button
+            type="button"
+            onClick={() => toggleTopicQuestions(topic.id)}
+            className="flex items-center gap-1.5 text-xs font-bold text-neutral-800 dark:text-neutral-200 hover:text-black dark:hover:text-white transition-colors cursor-pointer"
+          >
+            <HelpCircle className="w-3.5 h-3.5 text-amber-500" />
+            <span>Вопросы собеседований к теме ({topicQuestions.length})</span>
+            <ChevronDown
+              className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                isExpanded ? 'rotate-180' : ''
+              }`}
+            />
+          </button>
+
+          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full liquid-glass-pill text-neutral-600 dark:text-neutral-400">
+            {learnedCount} из {topicQuestions.length} изучено
+          </span>
+        </div>
+
+        {isExpanded && (
+          <div className="space-y-2 pt-1 animate-fade-in">
+            {topicQuestions.map((q) => {
+              const isLearned = userProgress.completedQuestions.includes(q.id);
+              const isDetailsOpen = openQuestionDetailId === q.id;
+
+              return (
+                <div
+                  key={q.id}
+                  className={`p-3 rounded-xl border text-xs transition-all ${
+                    isLearned
+                      ? 'bg-emerald-500/10 border-emerald-500/20 dark:bg-emerald-500/15 dark:border-emerald-500/30'
+                      : 'bg-white/60 border-black/5 dark:bg-white/[0.03] dark:border-white/[0.06]'
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setOpenQuestionDetailId(isDetailsOpen ? null : q.id)}
+                      className="text-left font-semibold text-neutral-900 dark:text-white hover:underline flex-1 cursor-pointer"
+                    >
+                      {q.title}
+                    </button>
+
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-black/5 dark:bg-white/10 text-neutral-600 dark:text-neutral-300">
+                        {q.difficulty}
+                      </span>
+
+                      {onToggleQuestion && (
+                        <button
+                          type="button"
+                          onClick={() => handleToggleQuestionClick(q.id)}
+                          className="p-1 rounded text-neutral-400 hover:text-emerald-500 cursor-pointer"
+                          title={isLearned ? 'Изучено (нажмите, чтобы снять)' : 'Отметить как изученное'}
+                        >
+                          {isLearned ? (
+                            <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                          ) : (
+                            <Circle className="w-4 h-4 text-neutral-400" />
+                          )}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {isDetailsOpen && (
+                    <div className="mt-2.5 pt-2.5 border-t border-black/5 dark:border-white/5 space-y-2">
+                      <p className="font-medium text-neutral-800 dark:text-neutral-200">
+                        <strong>Вопрос: </strong>
+                        {q.question}
+                      </p>
+
+                      {q.codeSnippet && (
+                        <pre className="p-2.5 rounded-lg bg-neutral-900 text-neutral-100 font-mono text-[11px] overflow-x-auto">
+                          <code>{q.codeSnippet}</code>
+                        </pre>
+                      )}
+
+                      <div className="p-2.5 rounded-lg bg-neutral-100 dark:bg-white/[0.05] text-neutral-700 dark:text-neutral-300 space-y-1">
+                        <span className="font-bold text-neutral-900 dark:text-white block">
+                          Эталонный ответ:
+                        </span>
+                        <p className="leading-relaxed">{q.answer}</p>
+                      </div>
+
+                      {q.keyTakeaways && q.keyTakeaways.length > 0 && (
+                        <div className="text-[11px] text-neutral-600 dark:text-neutral-400 space-y-0.5">
+                          <span className="font-semibold block text-neutral-700 dark:text-neutral-300">
+                            Главное запомнить:
+                          </span>
+                          <ul className="list-disc list-inside space-y-0.5">
+                            {q.keyTakeaways.map((point, pIdx) => (
+                              <li key={pIdx}>{point}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -212,7 +402,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
         </div>
       </div>
 
-      {/* CONNECTED ROADMAP TREE (roadmap.sh style) */}
+      {/* CONNECTED ROADMAP TREE */}
       <div className="relative py-4 space-y-0">
         {/* BLOCK 1: CORE FOUNDATION (Nodes 1..N) */}
         <div className="relative">
@@ -222,12 +412,13 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
               {currentDirection.coreTitle}
             </div>
             <div className="h-px flex-1 bg-neutral-200 dark:bg-white/10"></div>
-            <span className="text-xs text-neutral-500 dark:text-neutral-400 hidden sm:inline">Базовый фундамент (Обязательно для всех)</span>
+            <span className="text-xs text-neutral-500 dark:text-neutral-400 hidden sm:inline">
+              Базовый фундамент (Обязательно для всех)
+            </span>
           </div>
 
           {/* Core Nodes Spine */}
           <div className="relative pl-8 sm:pl-12 space-y-6">
-            {/* Continuous vertical connecting line */}
             <div className="absolute left-4 sm:left-6 top-6 bottom-0 w-0.5 -translate-x-1/2 bg-neutral-200 dark:bg-white/10"></div>
 
             {coreTopics.map((topic, idx) => {
@@ -235,7 +426,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
 
               return (
                 <div key={topic.id} className="relative group">
-                  {/* Tree Node Dot / Anchor exactly on the spine */}
+                  {/* Tree Node Dot */}
                   <div
                     className={`absolute -left-4 sm:-left-6 top-6 w-8 h-8 -translate-x-1/2 rounded-full border-2 flex items-center justify-center text-[11px] font-bold z-20 transition-all ${
                       isDone
@@ -259,7 +450,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                         : 'liquid-glass liquid-glass-interactive'
                     }`}
                   >
-                    {/* Header: Title, Order & Doc Link */}
+                    {/* Header */}
                     <div className="flex items-start justify-between gap-2.5 sm:gap-3 mb-2">
                       <div className="flex items-center gap-2 flex-wrap min-w-0 flex-1">
                         <span className="text-xs font-semibold text-neutral-500 dark:text-neutral-400">
@@ -286,9 +477,11 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                       </div>
                     </div>
 
-                    <p className="text-xs text-neutral-600 dark:text-neutral-300 mb-3.5 leading-relaxed">{topic.description}</p>
+                    <p className="text-xs text-neutral-600 dark:text-neutral-300 mb-3.5 leading-relaxed">
+                      {topic.description}
+                    </p>
 
-                    {/* Section Progress Bar */}
+                    {/* Progress Bar */}
                     <div className="rounded-2xl p-2.5 mb-3.5 transition-colors liquid-glass-subtle">
                       <div className="flex items-center justify-between text-[11px] mb-1">
                         <span className="text-neutral-600 dark:text-neutral-400 font-medium">
@@ -314,7 +507,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                       </div>
                     </div>
 
-                    {/* Interactive Subtopics Checklist */}
+                    {/* Subtopics Checklist */}
                     <div className="space-y-2 mb-3.5">
                       <span className="text-[11px] font-medium uppercase tracking-wider block text-neutral-500 dark:text-neutral-400">
                         Ключевые темы (отметьте галочками):
@@ -332,10 +525,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                                   : 'bg-neutral-100/70 border-neutral-200/70 text-neutral-700 hover:bg-neutral-200/60 dark:bg-white/[0.03] dark:border-white/[0.06] dark:text-neutral-300 dark:hover:bg-white/[0.07]'
                               }`}
                             >
-                              <button
-                                type="button"
-                                className="mt-0.5 shrink-0"
-                              >
+                              <button type="button" className="mt-0.5 shrink-0">
                                 {isSubChecked ? (
                                   <CheckSquare className="w-4 h-4 text-emerald-500" />
                                 ) : (
@@ -352,22 +542,24 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                     </div>
 
                     {/* Interview Callout */}
-                    <div className="p-3 rounded-2xl text-[11px] mb-3.5 space-y-1 transition-colors
-                      bg-amber-500/10 border border-amber-500/20 text-amber-900
-                      dark:bg-amber-500/15 dark:border-amber-500/25 dark:text-amber-300"
-                    >
+                    <div className="p-3 rounded-2xl text-[11px] mb-3.5 space-y-1 transition-colors bg-amber-500/10 border border-amber-500/20 text-amber-900 dark:bg-amber-500/15 dark:border-amber-500/25 dark:text-amber-300">
                       <span className="font-semibold flex items-center gap-1.5 text-amber-800 dark:text-amber-300">
                         <HelpCircle className="w-3.5 h-3.5" />
                         На что смотрят на собеседовании:
                       </span>
-                      <p className="text-neutral-700 dark:text-neutral-300 leading-relaxed">{topic.interviewTip}</p>
+                      <p className="text-neutral-700 dark:text-neutral-300 leading-relaxed">
+                        {topic.interviewTip}
+                      </p>
                     </div>
+
+                    {/* Interview Questions block for this topic */}
+                    {renderTopicQuestions(topic)}
 
                     {/* Section Mark Button */}
                     <button
                       type="button"
                       onClick={() => handleToggleTopicClick(topic)}
-                      className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-full text-xs font-semibold transition-all active:scale-95 ${
+                      className={`w-full mt-3 flex items-center justify-center gap-2 px-4 py-2 rounded-full text-xs font-semibold transition-all active:scale-95 ${
                         isDone
                           ? 'bg-neutral-900 text-white shadow-xs dark:bg-white dark:text-neutral-950'
                           : 'liquid-glass-pill hover:bg-white/50 text-neutral-800 dark:text-neutral-200'
@@ -394,26 +586,18 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
 
         {/* FORK NODE: SPECIALIZATION BRANCH CONNECTOR */}
         <div className="relative py-8 my-2">
-          {/* Continuous vertical connecting line through the fork */}
           <div className="absolute left-4 sm:left-6 top-0 bottom-0 w-0.5 -translate-x-1/2 bg-neutral-200 dark:bg-white/10"></div>
 
           <div className="relative pl-8 sm:pl-12">
-            {/* Fork icon badge exactly on spine */}
-            <div className="absolute -left-4 sm:-left-6 top-6 w-9 h-9 -translate-x-1/2 rounded-full border-2 flex items-center justify-center z-20 shadow-xs transition-all
-              bg-neutral-900 border-neutral-900 text-white dark:bg-white dark:border-white dark:text-neutral-950"
-            >
+            <div className="absolute -left-4 sm:-left-6 top-6 w-9 h-9 -translate-x-1/2 rounded-full border-2 flex items-center justify-center z-20 shadow-xs transition-all bg-neutral-900 border-neutral-900 text-white dark:bg-white dark:border-white dark:text-neutral-950">
               <GitFork className="w-4 h-4 rotate-180" />
             </div>
 
-            {/* Horizontal Branch Connector Arm */}
             <div className="absolute -left-4 sm:-left-6 top-10 w-4 sm:w-6 h-0.5 -translate-y-1/2 z-10 bg-neutral-300 dark:bg-white/15"></div>
 
-            {/* Fork Card */}
             <div className="p-5 sm:p-6 rounded-2xl sm:rounded-3xl transition-colors space-y-4 liquid-glass">
               <div className="flex items-center gap-2.5 flex-wrap">
-                <span className="px-3.5 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 shadow-xs
-                  bg-neutral-900 text-white dark:bg-white dark:text-neutral-950"
-                >
+                <span className="px-3.5 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 shadow-xs bg-neutral-900 text-white dark:bg-white dark:text-neutral-950">
                   <GitFork className="w-3.5 h-3.5" />
                   Развилка специализации
                 </span>
@@ -449,13 +633,11 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                             : 'liquid-glass-subtle text-neutral-800 hover:bg-white/50 shadow-xs'
                         }`}
                       >
-                        <div>
-                          <div className="text-xs font-bold flex items-center gap-1.5 font-sans">
-                            <span>{st.name}</span>
+                        <div className="min-w-0 pr-2">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs font-bold truncate">{st.name}</span>
                             {isCurrent && (
-                              <span className="px-2 py-0.5 rounded-full text-[9px] font-semibold
-                                bg-white/20 text-white dark:bg-black/10 dark:text-neutral-900"
-                              >
+                              <span className="text-[10px] px-1.5 py-0.2 rounded-full font-bold bg-white/20 text-white dark:bg-black/20 dark:text-black">
                                 Выбрано
                               </span>
                             )}
@@ -473,7 +655,9 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
 
               <div className="flex items-center gap-2 text-xs pt-1 text-neutral-600 dark:text-neutral-400">
                 <ArrowDown className="w-3.5 h-3.5 animate-bounce" />
-                <span>Ниже отображаются профильные темы для «{currentDirection.subTracks.find((s) => s.id === validSubTrack)?.name}» (Узлы #{coreTopics.length + 1}..#{coreTopics.length + subTrackTopics.length})</span>
+                <span>
+                  Ниже отображаются профильные темы для «{currentDirection.subTracks.find((s) => s.id === validSubTrack)?.name}» (Узлы #{coreTopics.length + 1}..#{coreTopics.length + subTrackTopics.length})
+                </span>
               </div>
             </div>
           </div>
@@ -481,18 +665,17 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
 
         {/* BLOCK 2: SUB-TRACK SPECIALIZATION (Nodes N+1..M) */}
         <div className="relative">
-          {/* Header of Sub-Track Section */}
           <div className="flex items-center gap-3 mb-6">
             <div className="px-3.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wider liquid-glass-pill text-neutral-800 dark:text-neutral-200">
               Ветка: {currentDirection.subTracks.find((s) => s.id === validSubTrack)?.name}
             </div>
             <div className="h-px flex-1 bg-neutral-200 dark:bg-white/10"></div>
-            <span className="text-xs text-neutral-500 dark:text-neutral-400 hidden sm:inline">Профильные требования к стажёрам</span>
+            <span className="text-xs text-neutral-500 dark:text-neutral-400 hidden sm:inline">
+              Профильные требования к стажёрам
+            </span>
           </div>
 
-          {/* Sub-track Nodes Spine */}
           <div className="relative pl-8 sm:pl-12 space-y-6">
-            {/* Continuous vertical connecting line */}
             <div className="absolute left-4 sm:left-6 top-0 bottom-6 w-0.5 -translate-x-1/2 bg-neutral-200 dark:bg-white/10"></div>
 
             {subTrackTopics.map((topic, idx) => {
@@ -501,7 +684,6 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
 
               return (
                 <div key={topic.id} className="relative group">
-                  {/* Tree Node Dot / Anchor on the spine */}
                   <div
                     className={`absolute -left-4 sm:-left-6 top-6 w-8 h-8 -translate-x-1/2 rounded-full border-2 flex items-center justify-center text-[11px] font-bold z-20 transition-all ${
                       isDone
@@ -514,10 +696,8 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                     {nodeNumber}
                   </div>
 
-                  {/* Horizontal Branch Connector Arm */}
                   <div className="absolute -left-4 sm:-left-6 top-10 w-4 sm:w-6 h-0.5 -translate-y-1/2 z-10 bg-neutral-300 dark:bg-white/15"></div>
 
-                  {/* Node Card */}
                   <div
                     className={`p-4 sm:p-6 rounded-2xl sm:rounded-3xl transition-all duration-300 ${
                       isDone
@@ -525,7 +705,6 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                         : 'liquid-glass liquid-glass-interactive'
                     }`}
                   >
-                    {/* Header: Title, Order & Doc Link */}
                     <div className="flex items-start justify-between gap-2.5 sm:gap-3 mb-2">
                       <div className="flex items-center gap-2 flex-wrap min-w-0 flex-1">
                         <span className="text-xs font-semibold text-neutral-500 dark:text-neutral-400">
@@ -555,9 +734,10 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                       </div>
                     </div>
 
-                    <p className="text-xs text-neutral-600 dark:text-neutral-300 mb-3.5 leading-relaxed">{topic.description}</p>
+                    <p className="text-xs text-neutral-600 dark:text-neutral-300 mb-3.5 leading-relaxed">
+                      {topic.description}
+                    </p>
 
-                    {/* Section Progress Bar */}
                     <div className="rounded-2xl p-2.5 mb-3.5 transition-colors liquid-glass-subtle">
                       <div className="flex items-center justify-between text-[11px] mb-1">
                         <span className="text-neutral-600 dark:text-neutral-400 font-medium">
@@ -583,10 +763,9 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                       </div>
                     </div>
 
-                    {/* Interactive Subtopics Checklist */}
                     <div className="space-y-2 mb-3.5">
                       <span className="text-[11px] font-medium uppercase tracking-wider block text-neutral-500 dark:text-neutral-400">
-                        Ключевые темы специализации (отметьте галочками):
+                        Ключевые темы (отметьте галочками):
                       </span>
                       <div className="grid grid-cols-1 gap-1.5">
                         {topic.subtopics.map((sub, sIdx) => {
@@ -601,10 +780,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                                   : 'bg-neutral-100/70 border-neutral-200/70 text-neutral-700 hover:bg-neutral-200/60 dark:bg-white/[0.03] dark:border-white/[0.06] dark:text-neutral-300 dark:hover:bg-white/[0.07]'
                               }`}
                             >
-                              <button
-                                type="button"
-                                className="mt-0.5 shrink-0"
-                              >
+                              <button type="button" className="mt-0.5 shrink-0">
                                 {isSubChecked ? (
                                   <CheckSquare className="w-4 h-4 text-emerald-500" />
                                 ) : (
@@ -620,23 +796,23 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                       </div>
                     </div>
 
-                    {/* Interview Callout */}
-                    <div className="p-3 rounded-2xl text-[11px] mb-3.5 space-y-1 transition-colors
-                      bg-amber-500/10 border border-amber-500/20 text-amber-900
-                      dark:bg-amber-500/15 dark:border-amber-500/25 dark:text-amber-300"
-                    >
+                    <div className="p-3 rounded-2xl text-[11px] mb-3.5 space-y-1 transition-colors bg-amber-500/10 border border-amber-500/20 text-amber-900 dark:bg-amber-500/15 dark:border-amber-500/25 dark:text-amber-300">
                       <span className="font-semibold flex items-center gap-1.5 text-amber-800 dark:text-amber-300">
                         <HelpCircle className="w-3.5 h-3.5" />
                         На что смотрят на собеседовании:
                       </span>
-                      <p className="text-neutral-700 dark:text-neutral-300 leading-relaxed">{topic.interviewTip}</p>
+                      <p className="text-neutral-700 dark:text-neutral-300 leading-relaxed">
+                        {topic.interviewTip}
+                      </p>
                     </div>
 
-                    {/* Section Mark Button */}
+                    {/* Interview Questions block for this topic */}
+                    {renderTopicQuestions(topic)}
+
                     <button
                       type="button"
                       onClick={() => handleToggleTopicClick(topic)}
-                      className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-full text-xs font-semibold transition-all active:scale-95 ${
+                      className={`w-full mt-3 flex items-center justify-center gap-2 px-4 py-2 rounded-full text-xs font-semibold transition-all active:scale-95 ${
                         isDone
                           ? 'bg-neutral-900 text-white shadow-xs dark:bg-white dark:text-neutral-950'
                           : 'liquid-glass-pill hover:bg-white/50 text-neutral-800 dark:text-neutral-200'

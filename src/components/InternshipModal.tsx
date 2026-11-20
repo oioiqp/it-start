@@ -7,7 +7,6 @@ import {
   ChevronDown,
   ChevronUp,
   MapPin,
-  Clock,
   Trophy,
   CheckSquare,
   Square,
@@ -15,6 +14,11 @@ import {
   HelpCircle,
   Bot,
   Globe,
+  Home,
+  Building2,
+  CircleAlert,
+  Star,
+  ListOrdered,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import type { Internship, Question, RoadmapTopic, UserProgress } from '../types';
@@ -24,6 +28,7 @@ import {
   formatSalary,
   getVacancySourceDetails,
 } from '../lib/vacancyUrl';
+import { getCompanyInfo } from '../data/companies';
 import { useScrollLock } from '../lib/useScrollLock';
 
 interface InternshipModalProps {
@@ -35,6 +40,11 @@ interface InternshipModalProps {
   onToggleTopic: (topicId: string) => void;
   onToggleSubtopic?: (topicId: string, subtopicIndex: number) => void;
   onToggleQuestion: (questionId: string) => void;
+  isFavorite?: boolean;
+  onToggleFavorite?: (id: string) => void;
+  onOpenCompanyInfo?: (companyName: string) => void;
+  isApplied?: boolean;
+  onApplyVacancy?: (internship: Internship) => void;
 }
 
 export const InternshipModal: React.FC<InternshipModalProps> = ({
@@ -46,6 +56,11 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
   onToggleTopic,
   onToggleSubtopic,
   onToggleQuestion,
+  isFavorite = false,
+  onToggleFavorite,
+  onOpenCompanyInfo,
+  isApplied = false,
+  onApplyVacancy,
 }) => {
   const [expandedQuestionId, setExpandedQuestionId] = React.useState<string | null>(null);
 
@@ -200,14 +215,56 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                 <span className="font-bold text-sm text-neutral-950 dark:text-white font-sans tracking-tight">
                   {internship.company}
                 </span>
+
+                {/* Company Info Button: circle with exclamation mark as specified */}
+                {onOpenCompanyInfo && (
+                  <button
+                    type="button"
+                    onClick={() => onOpenCompanyInfo(internship.company)}
+                    className="p-1 rounded-full text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-black/5 transition-colors cursor-pointer"
+                    title={`Информация о компании ${internship.company}: штат, позиция на рынке`}
+                    aria-label={`О компании ${internship.company}`}
+                  >
+                    <CircleAlert className="w-3.5 h-3.5" />
+                  </button>
+                )}
+
+                {/* Favorite Yellow Star Button */}
+                {onToggleFavorite && (
+                  <button
+                    type="button"
+                    onClick={() => onToggleFavorite(internship.id)}
+                    className={`p-1 rounded-full transition-transform active:scale-90 cursor-pointer ${
+                      isFavorite ? 'text-amber-500 bg-amber-400/15' : 'text-neutral-400 hover:text-amber-400'
+                    }`}
+                    title={isFavorite ? 'В избранном' : 'Добавить в избранное'}
+                  >
+                    <Star className={`w-3.5 h-3.5 ${isFavorite ? 'fill-amber-400 text-amber-500' : ''}`} />
+                  </button>
+                )}
+
                 <span className="text-xs text-neutral-500 dark:text-neutral-400 flex items-center gap-1 font-medium">
                   <MapPin className="w-3.5 h-3.5 opacity-70" />
                   {internship.location}
                 </span>
-                <span className="text-xs text-neutral-500 dark:text-neutral-400 flex items-center gap-1 font-medium">
-                  <Clock className="w-3.5 h-3.5 opacity-70" />
-                  {internship.format}
-                </span>
+
+                {/* Format icon badge */}
+                {internship.format === 'Удаленно' ? (
+                  <span className="text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-1 font-medium">
+                    <Home className="w-3.5 h-3.5" />
+                    Дома
+                  </span>
+                ) : internship.format === 'Офис' ? (
+                  <span className="text-xs text-blue-600 dark:text-blue-400 flex items-center gap-1 font-medium">
+                    <Building2 className="w-3.5 h-3.5" />
+                    В офисе
+                  </span>
+                ) : (
+                  <span className="text-xs text-violet-600 dark:text-violet-400 flex items-center gap-1 font-medium">
+                    <Home className="w-3 h-3" />+<Building2 className="w-3 h-3" />
+                    Гибрид
+                  </span>
+                )}
               </div>
               <h2 className="text-lg sm:text-2xl font-bold tracking-tight text-neutral-900 dark:text-white font-sans break-words leading-snug">
                 План подготовки: {internship.title}
@@ -219,6 +276,12 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
             <span className="text-xs font-semibold px-2.5 py-1 rounded-full liquid-glass-pill text-neutral-800 dark:text-neutral-200">
               {formatSalary(internship.salary)}
             </span>
+            {isApplied && (
+              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-500/20 flex items-center gap-1">
+                <CheckCircle2 className="w-3 h-3" />
+                В моих откликах
+              </span>
+            )}
             {(() => {
               const src = getVacancySourceDetails(
                 internship.applyUrl,
@@ -283,6 +346,43 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
               💡 Отмечайте изученные разделы и вопросы прямо в этом окне — ваш прогресс сохраняется синхронно в базе данных!
             </p>
           </div>
+
+          {/* Section: Steps to Pass Selection into Company */}
+          {(() => {
+            const compInfo = getCompanyInfo(internship.company);
+            const steps = compInfo.selectionSteps && compInfo.selectionSteps.length > 0
+              ? compInfo.selectionSteps
+              : [
+                  'Подача онлайн-заявки и резюме',
+                  'Онлайн-тестирование по профильному стеку',
+                  'Тестовое задание с установленным дедлайном',
+                  'Техническое онлайн-собеседование',
+                  'Получение оффера и старт стажировки',
+                ];
+            return (
+              <div className="p-4 sm:p-5 rounded-2xl liquid-glass-subtle space-y-2.5">
+                <div className="flex items-center gap-2">
+                  <ListOrdered className="w-4 h-4 text-amber-500" />
+                  <h3 className="text-sm font-semibold uppercase tracking-wider font-sans text-neutral-900 dark:text-white">
+                    Что нужно сделать для прохождения отбора в {compInfo.shortName || internship.company}:
+                  </h3>
+                </div>
+                <div className="space-y-1.5 pt-1">
+                  {steps.map((st, sIdx) => (
+                    <div
+                      key={sIdx}
+                      className="flex items-center gap-2.5 p-2 rounded-xl liquid-glass-pill text-xs text-neutral-800 dark:text-neutral-200"
+                    >
+                      <span className="w-5 h-5 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 flex items-center justify-center text-[10px] font-bold shrink-0">
+                        {sIdx + 1}
+                      </span>
+                      <span>{st}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
 
           {/* Section 1: Required Roadmap Steps */}
           <div>
@@ -541,6 +641,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                   href={src.applyUrl}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => onApplyVacancy?.(internship)}
                   className="w-full sm:w-auto min-h-[44px] flex items-center justify-center gap-2 px-5 sm:px-6 py-2.5 rounded-full font-semibold text-xs sm:text-sm active:scale-95 transition-transform duration-150 bg-neutral-900 hover:bg-black text-white dark:bg-white dark:hover:bg-neutral-100 dark:text-neutral-900 shadow-xs cursor-pointer text-center"
                   title={src.actionLabel}
                 >

@@ -88,6 +88,25 @@ export interface Internship {
   status?: 'active' | 'closed' | 'archived' | 'expired';
   expiresAt?: string;
   batchYear?: number | string;
+  selectionSteps?: string[];
+}
+
+export interface JobApplication {
+  id: string;
+  vacancyId: string;
+  title: string;
+  company: string;
+  salary: string;
+  location: string;
+  format: WorkFormat;
+  applyUrl: string;
+  sourceType?: 'telegram' | 'portal';
+  sourceChannel?: string;
+  appliedAt: string; // ISO string
+  deadlineDate: string; // ISO string or human string
+  deadlineAction: string; // e.g. "Предоставить тестовое задание"
+  status: 'applied' | 'test_task' | 'interview' | 'offer' | 'rejected';
+  notes?: string;
 }
 
 export interface Question {
