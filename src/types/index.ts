@@ -89,6 +89,9 @@ export interface Internship {
   expiresAt?: string;
   batchYear?: number | string;
   selectionSteps?: string[];
+  recruitmentType?: 'constant' | 'scheduled' | 'seasonal';
+  applicationDeadline?: string;
+  deadlineNote?: string;
 }
 
 export interface JobApplication {

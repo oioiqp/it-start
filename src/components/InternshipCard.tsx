@@ -36,6 +36,7 @@ interface InternshipCardProps {
   isApplied?: boolean;
   appliedDeadline?: string;
   onApplyVacancy?: (internship: Internship) => void;
+  onRemoveApplication?: (id: string) => void;
 }
 
 // Helper to clean repetitive noise and trailing stack/program descriptions from title
@@ -140,6 +141,7 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
   isApplied = false,
   appliedDeadline,
   onApplyVacancy,
+  onRemoveApplication,
 }) => {
   const [showSteps, setShowSteps] = React.useState(false);
   const companyInfo = getCompanyInfo(internship.company);
@@ -192,7 +194,13 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
 
   const handleApplyClick = () => {
     triggerHaptic('medium');
-    onApplyVacancy?.(internship);
+    // Opens official vacancy portal in new tab without creating unintended fake applications
+  };
+
+  const handleRemoveApply = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    triggerHaptic('selection');
+    onRemoveApplication?.(internship.id);
   };
 
   // Format badge rendering with visual icons (Дома, В офисе, Гибрид)
@@ -314,6 +322,33 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
           </div>
         </div>
 
+        {/* Recruitment Status & Deadline Badge */}
+        {internship.recruitmentType === 'scheduled' && (
+          <div className="mb-2.5 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold bg-amber-500/10 text-amber-900 dark:text-amber-200 border border-amber-500/25">
+            <Clock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
+            <span className="font-bold">Набор: {internship.applicationDeadline || 'до 31 января'}</span>
+            {internship.deadlineNote && (
+              <>
+                <span className="opacity-40">•</span>
+                <span className="text-[11px] font-medium opacity-90">{internship.deadlineNote}</span>
+              </>
+            )}
+          </div>
+        )}
+
+        {internship.recruitmentType === 'constant' && (
+          <div className="mb-2.5 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold bg-emerald-500/10 text-emerald-900 dark:text-emerald-200 border border-emerald-500/25">
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+            <span className="font-bold">Постоянный набор</span>
+            {internship.deadlineNote && (
+              <>
+                <span className="opacity-40">•</span>
+                <span className="text-[11px] font-medium opacity-90">{internship.deadlineNote}</span>
+              </>
+            )}
+          </div>
+        )}
+
         {/* Position Title (clean and concise) */}
         <h3 className="text-sm sm:text-base font-bold transition-colors tracking-tight line-clamp-2 mb-2 leading-snug text-neutral-950 group-hover:text-black dark:text-white dark:group-hover:text-neutral-100 font-sans">
           {cleanedTitle}
@@ -321,11 +356,23 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
 
         {/* Applied vacancy notice if user applied */}
         {isApplied && (
-          <div className="mb-3 px-3 py-1.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-700 dark:text-blue-300 flex items-center gap-2 text-xs font-semibold">
-            <CheckCircle2 className="w-3.5 h-3.5 shrink-0 text-blue-500" />
-            <span className="truncate">
-              Отклик подан {appliedDeadline ? `• Дедлайн: ${appliedDeadline}` : ''}
-            </span>
+          <div className="mb-3 px-3 py-1.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-700 dark:text-blue-300 flex items-center justify-between text-xs font-semibold">
+            <div className="flex items-center gap-2 truncate min-w-0">
+              <CheckCircle2 className="w-3.5 h-3.5 shrink-0 text-blue-500" />
+              <span className="truncate">
+                Отклик подан {appliedDeadline ? `• ${appliedDeadline}` : ''}
+              </span>
+            </div>
+            {onRemoveApplication && (
+              <button
+                type="button"
+                onClick={handleRemoveApply}
+                className="text-[11px] text-neutral-400 hover:text-red-500 underline ml-2 shrink-0 cursor-pointer"
+                title="Удалить из трекера откликов"
+              >
+                Отменить
+              </button>
+            )}
           </div>
         )}
 
@@ -422,7 +469,30 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
                   </span>
                 </a>
 
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                  {/* Intentional Tracker Toggle */}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      triggerHaptic('selection');
+                      if (isApplied) {
+                        onRemoveApplication?.(internship.id);
+                      } else {
+                        onApplyVacancy?.(internship);
+                      }
+                    }}
+                    className={`flex items-center gap-1.5 px-3 py-2 min-h-[38px] rounded-full text-xs font-semibold transition-transform duration-150 active:scale-95 cursor-pointer ${
+                      isApplied
+                        ? 'bg-blue-500/15 text-blue-700 dark:text-blue-300 border border-blue-500/30'
+                        : 'liquid-glass-pill hover:bg-white/50 text-neutral-700 dark:text-neutral-300'
+                    }`}
+                    title={isApplied ? 'Отклик уже в трекере (нажмите, чтобы убрать)' : 'Отметить отклик в трекере откликов'}
+                  >
+                    <CheckCircle2 className={`w-3.5 h-3.5 ${isApplied ? 'text-blue-500' : 'text-neutral-400'}`} />
+                    <span className="hidden sm:inline">{isApplied ? 'В откликах' : 'Откликнулся'}</span>
+                  </button>
+
                   <button
                     type="button"
                     onClick={handleOpenPlan}

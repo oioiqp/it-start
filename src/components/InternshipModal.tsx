@@ -19,6 +19,7 @@ import {
   CircleAlert,
   Star,
   ListOrdered,
+  Clock,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import type { Internship, Question, RoadmapTopic, UserProgress } from '../types';
@@ -45,6 +46,7 @@ interface InternshipModalProps {
   onOpenCompanyInfo?: (companyName: string) => void;
   isApplied?: boolean;
   onApplyVacancy?: (internship: Internship) => void;
+  onRemoveApplication?: (id: string) => void;
 }
 
 export const InternshipModal: React.FC<InternshipModalProps> = ({
@@ -61,6 +63,7 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
   onOpenCompanyInfo,
   isApplied = false,
   onApplyVacancy,
+  onRemoveApplication,
 }) => {
   const [expandedQuestionId, setExpandedQuestionId] = React.useState<string | null>(null);
 
@@ -276,6 +279,18 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
             <span className="text-xs font-semibold px-2.5 py-1 rounded-full liquid-glass-pill text-neutral-800 dark:text-neutral-200">
               {formatSalary(internship.salary)}
             </span>
+            {internship.recruitmentType === 'scheduled' && (
+              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-800 dark:text-amber-200 border border-amber-500/20 flex items-center gap-1">
+                <Clock className="w-3 h-3 text-amber-600 dark:text-amber-400" />
+                Набор: {internship.applicationDeadline || 'до 31 января'}
+              </span>
+            )}
+            {internship.recruitmentType === 'constant' && (
+              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-800 dark:text-emerald-200 border border-emerald-500/20 flex items-center gap-1">
+                <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                Постоянный набор
+              </span>
+            )}
             {isApplied && (
               <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-500/20 flex items-center gap-1">
                 <CheckCircle2 className="w-3 h-3" />
@@ -636,19 +651,42 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                   )}
                 </div>
 
-                {/* Primary Action Button */}
-                <a
-                  href={src.applyUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => onApplyVacancy?.(internship)}
-                  className="w-full sm:w-auto min-h-[44px] flex items-center justify-center gap-2 px-5 sm:px-6 py-2.5 rounded-full font-semibold text-xs sm:text-sm active:scale-95 transition-transform duration-150 bg-neutral-900 hover:bg-black text-white dark:bg-white dark:hover:bg-neutral-100 dark:text-neutral-900 shadow-xs cursor-pointer text-center"
-                  title={src.actionLabel}
-                >
-                  <span className="sm:hidden truncate">{src.actionMobileLabel}</span>
-                  <span className="hidden sm:inline">{src.actionLabel}</span>
-                  <ExternalLink className="w-3.5 h-3.5 shrink-0" />
-                </a>
+                {/* Actions: Tracker Toggle & Portal Link */}
+                <div className="flex items-center gap-2 w-full sm:w-auto">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      triggerHaptic('selection');
+                      if (isApplied) {
+                        onRemoveApplication?.(internship.id);
+                      } else {
+                        onApplyVacancy?.(internship);
+                      }
+                    }}
+                    className={`min-h-[44px] flex items-center justify-center gap-2 px-4 py-2.5 rounded-full font-semibold text-xs sm:text-sm active:scale-95 transition-all cursor-pointer ${
+                      isApplied
+                        ? 'bg-blue-500/15 text-blue-700 dark:text-blue-300 border border-blue-500/30'
+                        : 'liquid-glass-pill hover:bg-white/50 text-neutral-800 dark:text-neutral-200'
+                    }`}
+                    title={isApplied ? 'Отклик уже в трекере (нажмите, чтобы убрать)' : 'Отметить отклик в трекере откликов'}
+                  >
+                    <CheckCircle2 className={`w-4 h-4 ${isApplied ? 'text-blue-500' : 'text-neutral-400'}`} />
+                    <span>{isApplied ? 'Отклик учтён' : 'Отметить отклик'}</span>
+                  </button>
+
+                  <a
+                    href={src.applyUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => triggerHaptic('medium')}
+                    className="flex-1 sm:flex-initial min-h-[44px] flex items-center justify-center gap-2 px-5 sm:px-6 py-2.5 rounded-full font-semibold text-xs sm:text-sm active:scale-95 transition-transform duration-150 bg-neutral-900 hover:bg-black text-white dark:bg-white dark:hover:bg-neutral-100 dark:text-neutral-900 shadow-xs cursor-pointer text-center"
+                    title={src.actionLabel}
+                  >
+                    <span className="sm:hidden truncate">{src.actionMobileLabel}</span>
+                    <span className="hidden sm:inline">{src.actionLabel}</span>
+                    <ExternalLink className="w-3.5 h-3.5 shrink-0" />
+                  </a>
+                </div>
               </>
             );
           })()}

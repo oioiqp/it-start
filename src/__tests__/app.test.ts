@@ -1880,6 +1880,7 @@ describe('15. Telegram Mini App & VK Cross-Platform Integration & Modal Geometry
         item.applyUrl.includes('/tech') ||
         item.applyUrl.includes('start.avito.ru') ||
         item.applyUrl.includes('student_directum') ||
+        item.applyUrl.includes('/students') ||
         item.applyUrl.includes('open-school');
       expect(isDirectPath).toBe(true);
       expect(item.applyUrl.startsWith('https://')).toBe(true);

@@ -140,7 +140,7 @@ describe('Vacancy Quality & Link Integrity Verification', () => {
       expect(tbankDirect).toBe('https://education.tbank.ru/start/frontend/');
 
       const konturDirect = resolveApplyUrl('https://kontur.ru', 'Контур', undefined, 'frontend');
-      expect(konturDirect).toBe('https://kontur.ru/career/vacancies/intern-frontend');
+      expect(konturDirect).toBe('https://kontur.ru/career/students');
 
       const sberDirect = resolveApplyUrl('https://sbergraduate.ru', 'Сбер', undefined, 'data_science');
       expect(sberDirect).toBe('https://sbergraduate.ru/sberseasons-moscow/ml/');

@@ -96,9 +96,6 @@ export function getDirectVacancyPortalUrl(
       }
       return 'https://education.tbank.ru/start/';
     case 'kontur':
-      if (directionId === 'backend') return 'https://kontur.ru/career/vacancies/intern-backend';
-      if (directionId === 'qa') return 'https://kontur.ru/career/vacancies/intern-qa';
-      if (directionId === 'frontend') return 'https://kontur.ru/career/vacancies/intern-frontend';
       return 'https://kontur.ru/career/students';
     case 'directum':
       return 'https://vk.com/student_directum';
@@ -273,6 +270,7 @@ export function resolveApplyUrl(
     lower === 'https://sbergraduate.ru/sberseasons-moscow/' ||
     lower === 'https://sbergraduate.ru/sberseasons-moscow' ||
     // Obsolete employer links that must be rerouted to live verified portals
+    lower.includes('kontur.ru/career/vacancies/intern-') ||
     lower.includes('education.tbank.ru/start/sre') ||
     lower.includes('fintech.tbank.ru') ||
     lower.includes('/vacancy/web-developer') ||
@@ -922,21 +920,28 @@ export function isVacancyActive(item: VacancyFreshnessInput | null | undefined):
     return false;
   }
 
-  // 5. Directum empty/general vacancy list with no open frontend/internships
-  // Directum currently only lists regular staff developer jobs on career.directum.ru/vacancy/
+  // 5. Reject programs that are currently between seasons, closed, or have 0 openings
   const compLower = (item.company || '').toLowerCase();
-  if (compLower.includes('directum') || compLower.includes('директум')) {
-    if (
-      title.includes('frontend') ||
-      title.includes('веб-разработчик') ||
-      title.includes('web-разработчик') ||
-      url.includes('career.directum.ru/vacancy') ||
-      url.includes('lead_product_owner')
-    ) {
-      if (item.isActive !== true) {
-        return false;
-      }
-    }
+
+  // Avito Tech closed on Aug 30 (screenshot: "Приём заявок до 30 августа")
+  if ((compLower.includes('avito') || compLower.includes('авито')) && item.isActive !== true) {
+    return false;
+  }
+  // Ozon Camp currently between seasons (screenshot: "Скоро тут что-то будет...")
+  if ((compLower.includes('ozon') || compLower.includes('озон')) && item.isActive !== true) {
+    return false;
+  }
+  // VK Internship currently has 0 vacancies (screenshot: "0 из 0 вакансий")
+  if ((compLower.includes('vk') || compLower.includes('вконтакт')) && item.isActive !== true) {
+    return false;
+  }
+  // Directum currently has no open student internships
+  if ((compLower.includes('directum') || compLower.includes('директум')) && item.isActive !== true) {
+    return false;
+  }
+  // Sber off-season
+  if ((compLower.includes('сбер') || compLower.includes('sber')) && item.isActive !== true) {
+    return false;
   }
 
   // 6. TTL Check & known closed aggregator vacancies (e.g. HeadHunter)

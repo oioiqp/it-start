@@ -453,8 +453,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@KonturTech",
     "directionId": "frontend",
     "subTrackId": "angular",
-    "url": "https://kontur.ru/career/vacancies/intern-frontend",
-    "applyUrl": "https://kontur.ru/career/vacancies/intern-frontend",
+    "url": "https://kontur.ru/career/students",
+    "applyUrl": "https://kontur.ru/career/students",
     "sourceChannel": "@KonturTech",
     "description": "Разработка веб-сервисов электронного документооборота и бухгалтерии Контура, которыми пользуются миллионы предпринимателей.",
     "tags": [
@@ -660,8 +660,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@KonturTech",
     "directionId": "backend",
     "subTrackId": "golang",
-    "url": "https://kontur.ru/career/vacancies/intern-backend",
-    "applyUrl": "https://kontur.ru/career/vacancies/intern-backend",
+    "url": "https://kontur.ru/career/students",
+    "applyUrl": "https://kontur.ru/career/students",
     "sourceChannel": "@KonturTech",
     "description": "Разработка масштабируемых сервисов Контур.Фокус и Контур.Диадок. Чистая архитектура, code review от признанных экспертов.",
     "tags": [
@@ -831,8 +831,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@KonturTech",
     "directionId": "frontend",
     "subTrackId": "react",
-    "url": "https://kontur.ru/career/vacancies/intern-frontend",
-    "applyUrl": "https://kontur.ru/career/vacancies/intern-frontend",
+    "url": "https://kontur.ru/career/students",
+    "applyUrl": "https://kontur.ru/career/students",
     "sourceChannel": "@KonturTech",
     "description": "Оплачиваемая стажировка Контур.Старт 2026 с индивидуальным наставником. Разработка современных интерфейсов для экосистемы Контура.",
     "tags": [
@@ -854,8 +854,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@KonturTech",
     "directionId": "backend",
     "subTrackId": "python",
-    "url": "https://kontur.ru/career/vacancies/intern-backend",
-    "applyUrl": "https://kontur.ru/career/vacancies/intern-backend",
+    "url": "https://kontur.ru/career/students",
+    "applyUrl": "https://kontur.ru/career/students",
     "sourceChannel": "@KonturTech",
     "description": "Программа стажировки Контур.Старт для начинающих бэкендеров. Решение реальных бизнес-задач под менторством Senior-разработчиков.",
     "tags": [
@@ -1109,8 +1109,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@KonturTech",
     "directionId": "qa",
     "subTrackId": "manual_qa",
-    "url": "https://kontur.ru/career/vacancies/intern-qa",
-    "applyUrl": "https://kontur.ru/career/vacancies/intern-qa",
+    "url": "https://kontur.ru/career/students",
+    "applyUrl": "https://kontur.ru/career/students",
     "sourceChannel": "@KonturTech",
     "description": "Программа стажировки Контур.Старт 2026 для инженеров по тестированию. Тестирование веб-сервисов Диадок, Фокус и Бухгалтерия с персональным наставником.",
     "tags": [
@@ -2025,9 +2025,6 @@ export function getDirectVacancyPortalUrl(companyKey, directionId = undefined, f
       }
       return 'https://education.tbank.ru/start/';
     case 'kontur':
-      if (directionId === 'backend') return 'https://kontur.ru/career/vacancies/intern-backend';
-      if (directionId === 'qa') return 'https://kontur.ru/career/vacancies/intern-qa';
-      if (directionId === 'frontend') return 'https://kontur.ru/career/vacancies/intern-frontend';
       return 'https://kontur.ru/career/students';
     case 'directum':
       return 'https://vk.com/student_directum';
@@ -2321,6 +2318,7 @@ export function resolveApplyUrl(rawUrl, companyName = '', sourceChannel = '', di
     lower === 'https://sbergraduate.ru/sberseasons-moscow/' ||
     lower === 'https://sbergraduate.ru/sberseasons-moscow' ||
     // Obsolete employer links that must be rerouted to live verified portals
+    lower.includes('kontur.ru/career/vacancies/intern-') ||
     lower.includes('education.tbank.ru/start/sre') ||
     lower.includes('fintech.tbank.ru') ||
     lower.includes('/vacancy/web-developer') ||
@@ -2870,7 +2868,7 @@ export const PORTAL_FALLBACK_VACANCIES = [
       sourceChannel: '@KonturTech',
       directionId: 'frontend',
       subTrackId: 'react',
-      url: 'https://kontur.ru/career/vacancies/intern-frontend',
+      url: 'https://kontur.ru/career/students',
       description: 'Официальная программа Контур.Старт: разработка веб-интерфейсов на React/TypeScript с персональным наставником.',
       tags: ['Контур.Старт', 'React', 'TypeScript', 'Контур'],
       sourceType: 'portal',
@@ -3006,7 +3004,7 @@ export const PORTAL_FALLBACK_VACANCIES = [
       sourceChannel: '@KonturTech',
       directionId: 'qa',
       subTrackId: 'auto_qa',
-      url: 'https://kontur.ru/career/vacancies/intern-qa',
+      url: 'https://kontur.ru/career/students',
       description: 'Программа Контур.Старт: ручное и автоматизированное тестирование сервисов экосистемы Контура с персональным наставником.',
       tags: ['Контур.Старт', 'QA', 'Python', 'Контур'],
       sourceType: 'portal',

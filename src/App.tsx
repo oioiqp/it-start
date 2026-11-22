@@ -398,9 +398,30 @@ export function App() {
   };
 
   // Applications Handlers
-  const handleAddApplication = (internship: Internship, deadlineDays = 14) => {
+  const handleAddApplication = (internship: Internship) => {
     const today = new Date();
-    const deadline = new Date(today.getTime() + deadlineDays * 24 * 60 * 60 * 1000);
+    const compLower = internship.company.toLowerCase();
+
+    let deadlineDateStr = '';
+    let deadlineAction = 'Подать резюме и портфолио на карьерном портале компании';
+
+    if (compLower.includes('т-банк') || compLower.includes('тинькофф')) {
+      deadlineDateStr = '2027-01-31T23:59:59.000Z';
+      deadlineAction = 'Заполнить форму до 31 января включительно и сдать вступительный экзамен с 25 по 31 января';
+    } else if (internship.recruitmentType === 'constant' || compLower.includes('яндекс')) {
+      deadlineDateStr = '';
+      deadlineAction = 'Заполнить анкету на портале и решить вступительный контест (7 дней с момента старта)';
+    } else if (compLower.includes('т1')) {
+      deadlineDateStr = '';
+      deadlineAction = 'Подать заявку в Открытую школу Т1 и пройти онлайн-тестирование';
+    } else if (compLower.includes('контур')) {
+      deadlineDateStr = '';
+      deadlineAction = 'Заполнить анкету студента в программу Контур.Старт на сайте kontur.ru/career/students';
+    } else if (internship.expiresAt) {
+      deadlineDateStr = internship.expiresAt;
+      deadlineAction = 'Подать заявку до окончания приёма';
+    }
+
     const newApp: JobApplication = {
       id: internship.id,
       vacancyId: internship.id,
@@ -413,8 +434,8 @@ export function App() {
       sourceType: internship.sourceType,
       sourceChannel: internship.sourceChannel,
       appliedAt: today.toISOString(),
-      deadlineDate: deadline.toISOString(),
-      deadlineAction: 'Предоставить выполненное тестовое задание и прикрепить ссылку',
+      deadlineDate: deadlineDateStr,
+      deadlineAction: deadlineAction,
       status: 'applied',
     };
     const next = addLocalApplication(newApp);
@@ -1129,11 +1150,16 @@ export function App() {
                         onOpenCompanyInfo={(comp) => setSelectedCompanyForInfo(comp)}
                         isApplied={Boolean(appliedItem)}
                         appliedDeadline={
-                          appliedItem?.deadlineDate
-                            ? formatPublishedDate(appliedItem.deadlineDate)
+                          appliedItem
+                            ? appliedItem.deadlineDate
+                              ? `Дедлайн: ${formatPublishedDate(appliedItem.deadlineDate)}`
+                              : internship.applicationDeadline
+                              ? `Набор: ${internship.applicationDeadline}`
+                              : 'Постоянный набор'
                             : undefined
                         }
                         onApplyVacancy={(item) => handleAddApplication(item)}
+                        onRemoveApplication={(id) => handleRemoveApplication(id)}
                       />
                     );
                   })}
@@ -1196,6 +1222,7 @@ export function App() {
         onOpenCompanyInfo={(comp) => setSelectedCompanyForInfo(comp)}
         isApplied={selectedInternshipForPlan ? applications.some((a) => a.vacancyId === selectedInternshipForPlan.id) : false}
         onApplyVacancy={(item) => handleAddApplication(item)}
+        onRemoveApplication={(id) => handleRemoveApplication(id)}
       />
 
       {/* Company Info Modal */}
