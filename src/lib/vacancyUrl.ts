@@ -6,13 +6,13 @@ import type { DirectionId, SubTrackId } from '../types';
 export const COMPANY_OFFICIAL_PORTALS: Record<string, string> = {
   tbank: 'https://education.tbank.ru/start/',
   kontur: 'https://kontur.ru/career/students',
-  directum: 'https://career.directum.ru/',
-  t1: 'https://career.t1.ru/vacancies/',
+  directum: 'https://vk.com/student_directum',
+  t1: 'https://career.t1.ru/debut/open-school/',
   yandex: 'https://yandex.ru/yaintern/',
   ozon: 'https://job.ozon.ru/it/camp/',
   sber: 'https://sbergraduate.ru/sberseasons-moscow/',
-  avito: 'https://start.avito.ru/internships',
-  vk: 'https://internship.vk.company/internship/',
+  avito: 'https://start.avito.ru/tech',
+  vk: 'https://internship.vk.company/vacancy',
 };
 
 /**
@@ -68,7 +68,7 @@ export function getCompanyMonogram(companyName = ''): string {
 export function getDirectVacancyPortalUrl(
   companyKey: string,
   directionId?: string,
-  fallback = 'https://career.directum.ru/',
+  fallback = 'https://vk.com/student_directum',
   subTrackId?: string
 ): string {
   switch (companyKey) {
@@ -77,19 +77,23 @@ export function getDirectVacancyPortalUrl(
         if (subTrackId === 'analytics') return 'https://start.avito.ru/analysts-internship';
         return 'https://start.avito.ru/datascience-internship';
       }
-      if (
-        directionId === 'mobile' ||
-        directionId === 'frontend' ||
-        directionId === 'backend' ||
-        directionId === 'devops' ||
-        directionId === 'qa'
-      ) {
-        return 'https://start.avito.ru/tech';
-      }
-      return 'https://start.avito.ru/internships';
+      return 'https://start.avito.ru/tech';
     case 'tbank':
+      if (subTrackId === 'python') return 'https://education.tbank.ru/start/python/';
+      if (subTrackId === 'java') return 'https://education.tbank.ru/start/java/';
+      if (subTrackId === 'golang' || subTrackId === 'go') return 'https://education.tbank.ru/start/go/';
+      if (subTrackId === 'ios') return 'https://education.tbank.ru/start/ios/';
+      if (subTrackId === 'android') return 'https://education.tbank.ru/start/android/';
       if (directionId === 'frontend') return 'https://education.tbank.ru/start/frontend/';
       if (directionId === 'data_science') return 'https://education.tbank.ru/start/analyst/';
+      if (directionId === 'qa') return 'https://education.tbank.ru/start/java/';
+      if (directionId === 'devops') return 'https://education.tbank.ru/start/python/';
+      if (directionId === 'mobile') return 'https://education.tbank.ru/start/android/';
+      if (directionId === 'backend') {
+        if (subTrackId === 'java') return 'https://education.tbank.ru/start/java/';
+        if (subTrackId === 'golang') return 'https://education.tbank.ru/start/go/';
+        return 'https://education.tbank.ru/start/python/';
+      }
       return 'https://education.tbank.ru/start/';
     case 'kontur':
       if (directionId === 'backend') return 'https://kontur.ru/career/vacancies/intern-backend';
@@ -97,11 +101,9 @@ export function getDirectVacancyPortalUrl(
       if (directionId === 'frontend') return 'https://kontur.ru/career/vacancies/intern-frontend';
       return 'https://kontur.ru/career/students';
     case 'directum':
-      return 'https://career.directum.ru/';
+      return 'https://vk.com/student_directum';
     case 't1':
-      if (directionId === 'devops') return 'https://career.t1.ru/vacancies/';
-      if (directionId === 'qa') return 'https://career.t1.ru/vacancies/';
-      return 'https://career.t1.ru/vacancies/';
+      return 'https://career.t1.ru/debut/open-school/';
     case 'yandex':
       if (directionId === 'frontend') return 'https://yandex.ru/yaintern/frontend/';
       if (directionId === 'mobile') return 'https://yandex.ru/yaintern/mobile/';
@@ -122,7 +124,7 @@ export function getDirectVacancyPortalUrl(
       if (directionId === 'data_science') return 'https://sbergraduate.ru/sberseasons-moscow/ml/';
       return 'https://sbergraduate.ru/sberseasons-moscow/';
     case 'vk':
-      return 'https://internship.vk.company/internship/';
+      return 'https://internship.vk.company/vacancy';
     default:
       return fallback;
   }
@@ -222,29 +224,25 @@ export function resolveApplyUrl(
     lower.includes('/vacancies/?') ||
     lower.includes('/vacancies?') ||
     // Avito generic & non-internship pages
-    lower === 'https://career.avito.com/' ||
-    lower === 'https://career.avito.com' ||
+    lower.includes('career.avito.com') ||
     lower === 'https://avito.ru/' ||
     lower === 'https://avito.ru' ||
     lower === 'https://www.avito.ru/' ||
     lower === 'https://www.avito.ru' ||
-    lower === 'https://career.avito.com/vacancies' ||
-    lower === 'https://career.avito.com/vacancies/' ||
-    lower.includes('career.avito.com/internship') ||
-    lower.includes('career.avito.com/students') ||
-    lower.includes('career.avito.com/start') ||
+    lower === 'https://start.avito.ru/internships' ||
+    lower === 'https://start.avito.ru/internships/' ||
+    lower === 'https://start.avito.ru' ||
+    lower === 'https://start.avito.ru/' ||
     // Stale / senior / regular roles that must NEVER be shown as internships:
     lower.includes('/vacancies/razrabotka/20803') ||
     lower.includes('/vacancies/razrabotka/20812') ||
     lower.includes('/vacancies/analitika-dannykh/20816') ||
     lower.includes('/vacancies/razrabotka/20805') ||
     lower.includes('/vacancies/razrabotka/20808') ||
-    // Directum generic & empty vacancy list pages
-    lower === 'https://career.directum.ru/' ||
-    lower === 'https://career.directum.ru' ||
-    lower === 'https://career.directum.ru/vacancy' ||
-    lower === 'https://career.directum.ru/vacancy/' ||
-    lower.includes('career.directum.ru/vacancy') ||
+    lower.includes('senior') ||
+    (lower.includes('sre') && !lower.includes('intern') && !lower.includes('стаж')) ||
+    // Directum: all career.directum.ru pages are redirected to verified student community
+    lower.includes('career.directum.ru') ||
     lower.includes('lead_product_owner') ||
     lower.includes('business_bevelopment') ||
     lower.includes('rukovoditel_proektov') ||
@@ -257,6 +255,8 @@ export function resolveApplyUrl(
     // T1 generic
     lower === 'https://career.t1.ru/' ||
     lower === 'https://career.t1.ru' ||
+    lower === 'https://career.t1.ru/vacancies' ||
+    lower === 'https://career.t1.ru/vacancies/' ||
     lower.includes('t1.ru/school') ||
     // Yandex generic
     lower === 'https://yandex.ru/jobs/' ||
@@ -303,6 +303,8 @@ export function resolveApplyUrl(
     // VK generic
     lower === 'https://internship.vk.company/' ||
     lower === 'https://internship.vk.company' ||
+    lower === 'https://internship.vk.company/internship/' ||
+    lower === 'https://internship.vk.company/internship' ||
     // HH generic
     lower === 'https://hh.ru' ||
     lower === 'https://hh.ru/' ||

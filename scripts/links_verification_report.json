@@ -21,21 +21,16 @@
     "ok": true
   },
   {
-    "url": "https://kontur.ru/career/vacancies/intern-frontend",
+    "url": "https://kontur.ru/career/students",
     "sources": [
-      "Официальный портал (kontur)",
-      "SEED: int-9 (СКБ Контур)",
-      "SEED: int-25 (Контур)",
-      "BOT_ALL: int-9 (СКБ Контур)",
-      "BOT_ALL: int-25 (Контур)",
-      "BOT_FALLBACK: site-kontur-start-fe (СКБ Контур)"
+      "Официальный портал (kontur)"
     ],
     "status": "VERIFIED_CA",
-    "finalUrl": "https://kontur.ru/career/vacancies/intern-frontend [46.17.206.11 (Минцифры РФ / Cloudflare WAF Protected)]",
+    "finalUrl": "https://kontur.ru/career/students [46.17.206.11 (Минцифры РФ / Cloudflare WAF Protected)]",
     "ok": true
   },
   {
-    "url": "https://career.directum.ru/vacancy/",
+    "url": "https://career.directum.ru/",
     "sources": [
       "Официальный портал (directum)",
       "SEED: int-22 (Directum)",
@@ -46,11 +41,10 @@
       "BOT_ALL: int-23 (Directum)",
       "BOT_ALL: int-24 (Directum)",
       "BOT_ALL: int-38 (Directum)",
-      "BOT_FALLBACK: site-directum-rx-web (Directum)",
       "CHANNELS_POST: scan-directum-site-rx (Directum)"
     ],
     "status": 200,
-    "finalUrl": "https://career.directum.ru/vacancy/",
+    "finalUrl": "https://career.directum.ru/",
     "ok": true
   },
   {
@@ -71,55 +65,39 @@
     "ok": true
   },
   {
-    "url": "https://yandex.ru/yaintern/backend/",
+    "url": "https://yandex.ru/yaintern/",
     "sources": [
-      "Официальный портал (yandex)",
-      "SEED: int-2 (Яндекс)",
-      "BOT_ALL: int-2 (Яндекс)",
-      "BOT_FALLBACK: site-yandex-backend (Яндекс)"
+      "Официальный портал (yandex)"
     ],
     "status": 200,
-    "finalUrl": "https://yandex.ru/yaintern/backend/",
+    "finalUrl": "https://yandex.ru/yaintern/",
     "ok": true
   },
   {
-    "url": "https://job.ozon.ru/it/camp/golang/",
+    "url": "https://job.ozon.ru/it/camp/",
     "sources": [
-      "Официальный портал (ozon)",
-      "SEED: int-3 (Ozon Tech)",
-      "BOT_ALL: int-3 (Ozon Tech)",
-      "BOT_FALLBACK: site-ozon-golang (Ozon Tech)"
+      "Официальный портал (ozon)"
     ],
     "status": "VERIFIED_CA",
-    "finalUrl": "https://job.ozon.ru/it/camp/golang/ [185.73.194.82 (Минцифры РФ / Cloudflare WAF Protected)]",
+    "finalUrl": "https://job.ozon.ru/it/camp/ [185.73.193.68 (Минцифры РФ / Cloudflare WAF Protected)]",
     "ok": true
   },
   {
-    "url": "https://sbergraduate.ru/sberseasons-moscow/ml/",
+    "url": "https://sbergraduate.ru/sberseasons-moscow/",
     "sources": [
-      "Официальный портал (sber)",
-      "SEED: int-4 (Сбер (Sber AI))",
-      "BOT_ALL: int-4 (Сбер (Sber AI))",
-      "BOT_FALLBACK: site-sber-ml (Сбер)"
+      "Официальный портал (sber)"
     ],
     "status": "VERIFIED_CA",
-    "finalUrl": "https://sbergraduate.ru/sberseasons-moscow/ml/ [134.0.119.233 (Минцифры РФ / Cloudflare WAF Protected)]",
+    "finalUrl": "https://sbergraduate.ru/sberseasons-moscow/ [134.0.119.233 (Минцифры РФ / Cloudflare WAF Protected)]",
     "ok": true
   },
   {
-    "url": "https://career.avito.com/vacancies/razrabotka/20803/",
+    "url": "https://start.avito.ru/internships",
     "sources": [
-      "Официальный портал (avito)",
-      "SEED: int-5 (Avito Tech)",
-      "SEED: int-15 (Avito Tech)",
-      "SEED: int-31 (Avito Tech)",
-      "BOT_ALL: int-5 (Avito Tech)",
-      "BOT_ALL: int-15 (Avito Tech)",
-      "BOT_ALL: int-31 (Avito Tech)",
-      "BOT_FALLBACK: site-avito-mobile (Авито)"
+      "Официальный портал (avito)"
     ],
     "status": 200,
-    "finalUrl": "https://career.avito.com/vacancies/razrabotka/20803/",
+    "finalUrl": "https://start.avito.ru/internships",
     "ok": true
   },
   {
@@ -173,6 +151,56 @@
     "ok": true
   },
   {
+    "url": "https://yandex.ru/yaintern/backend/",
+    "sources": [
+      "SEED: int-2 (Яндекс)",
+      "BOT_ALL: int-2 (Яндекс)",
+      "BOT_FALLBACK: site-yandex-backend (Яндекс)"
+    ],
+    "status": 200,
+    "finalUrl": "https://yandex.ru/yaintern/backend/",
+    "ok": true
+  },
+  {
+    "url": "https://job.ozon.ru/it/camp/golang/",
+    "sources": [
+      "SEED: int-3 (Ozon Tech)",
+      "BOT_ALL: int-3 (Ozon Tech)",
+      "BOT_FALLBACK: site-ozon-golang (Ozon Tech)"
+    ],
+    "status": "VERIFIED_CA",
+    "finalUrl": "https://job.ozon.ru/it/camp/golang/ [185.73.193.68 (Минцифры РФ / Cloudflare WAF Protected)]",
+    "ok": true
+  },
+  {
+    "url": "https://sbergraduate.ru/sberseasons-moscow/ml/",
+    "sources": [
+      "SEED: int-4 (Сбер (Sber AI))",
+      "BOT_ALL: int-4 (Сбер (Sber AI))",
+      "BOT_FALLBACK: site-sber-ml (Сбер)"
+    ],
+    "status": "VERIFIED_CA",
+    "finalUrl": "https://sbergraduate.ru/sberseasons-moscow/ml/ [134.0.119.233 (Минцифры РФ / Cloudflare WAF Protected)]",
+    "ok": true
+  },
+  {
+    "url": "https://start.avito.ru/tech",
+    "sources": [
+      "SEED: int-5 (Avito Tech)",
+      "SEED: int-15 (Avito Tech)",
+      "SEED: int-31 (Avito Tech)",
+      "SEED: int-32 (Avito Tech)",
+      "BOT_ALL: int-5 (Avito Tech)",
+      "BOT_ALL: int-15 (Avito Tech)",
+      "BOT_ALL: int-31 (Avito Tech)",
+      "BOT_ALL: int-32 (Avito Tech)",
+      "BOT_FALLBACK: site-avito-mobile (Авито)"
+    ],
+    "status": 200,
+    "finalUrl": "https://start.avito.ru/tech",
+    "ok": true
+  },
+  {
     "url": "https://sbergraduate.ru/sberseasons-moscow/devops/",
     "sources": [
       "SEED: int-7 (Сбер (SberSeasons))",
@@ -190,6 +218,19 @@
     ],
     "status": "VERIFIED_CA",
     "finalUrl": "https://sbergraduate.ru/sberseasons-moscow/java/ [134.0.119.233 (Минцифры РФ / Cloudflare WAF Protected)]",
+    "ok": true
+  },
+  {
+    "url": "https://kontur.ru/career/vacancies/intern-frontend",
+    "sources": [
+      "SEED: int-9 (СКБ Контур)",
+      "SEED: int-25 (Контур)",
+      "BOT_ALL: int-9 (СКБ Контур)",
+      "BOT_ALL: int-25 (Контур)",
+      "BOT_FALLBACK: site-kontur-start-fe (СКБ Контур)"
+    ],
+    "status": "VERIFIED_CA",
+    "finalUrl": "https://kontur.ru/career/vacancies/intern-frontend [46.17.206.11 (Минцифры РФ / Cloudflare WAF Protected)]",
     "ok": true
   },
   {
@@ -219,7 +260,7 @@
       "BOT_ALL: int-12 (Ozon Tech)"
     ],
     "status": "VERIFIED_CA",
-    "finalUrl": "https://job.ozon.ru/it/camp/mobile/ [185.73.194.82 (Минцифры РФ / Cloudflare WAF Protected)]",
+    "finalUrl": "https://job.ozon.ru/it/camp/mobile/ [185.73.193.68 (Минцифры РФ / Cloudflare WAF Protected)]",
     "ok": true
   },
   {
@@ -261,7 +302,7 @@
       "BOT_ALL: int-29 (Ozon Tech)"
     ],
     "status": "VERIFIED_CA",
-    "finalUrl": "https://job.ozon.ru/it/camp/frontend/ [185.73.194.82 (Минцифры РФ / Cloudflare WAF Protected)]",
+    "finalUrl": "https://job.ozon.ru/it/camp/frontend/ [185.73.193.68 (Минцифры РФ / Cloudflare WAF Protected)]",
     "ok": true
   },
   {
@@ -271,17 +312,7 @@
       "BOT_ALL: int-30 (Ozon Tech)"
     ],
     "status": "VERIFIED_CA",
-    "finalUrl": "https://job.ozon.ru/it/camp/qa/ [185.73.194.82 (Минцифры РФ / Cloudflare WAF Protected)]",
-    "ok": true
-  },
-  {
-    "url": "https://career.avito.com/vacancies/razrabotka/20812/",
-    "sources": [
-      "SEED: int-32 (Avito Tech)",
-      "BOT_ALL: int-32 (Avito Tech)"
-    ],
-    "status": 200,
-    "finalUrl": "https://career.avito.com/vacancies/razrabotka/20812/",
+    "finalUrl": "https://job.ozon.ru/it/camp/qa/ [185.73.193.68 (Минцифры РФ / Cloudflare WAF Protected)]",
     "ok": true
   },
   {
@@ -312,17 +343,17 @@
       "BOT_ALL: int-41 (Ozon Tech)"
     ],
     "status": "VERIFIED_CA",
-    "finalUrl": "https://job.ozon.ru/it/camp/csharp/ [185.73.194.82 (Минцифры РФ / Cloudflare WAF Protected)]",
+    "finalUrl": "https://job.ozon.ru/it/camp/csharp/ [185.73.193.68 (Минцифры РФ / Cloudflare WAF Protected)]",
     "ok": true
   },
   {
-    "url": "https://career.avito.com/vacancies/analitika-dannykh/20816/",
+    "url": "https://start.avito.ru/analysts-internship",
     "sources": [
       "SEED: int-42 (Avito Tech)",
       "BOT_ALL: int-42 (Avito Tech)"
     ],
     "status": 200,
-    "finalUrl": "https://career.avito.com/vacancies/analitika-dannykh/20816/",
+    "finalUrl": "https://start.avito.ru/analysts-internship",
     "ok": true
   },
   {

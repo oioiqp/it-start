@@ -146,29 +146,29 @@ describe('Vacancy Quality & Link Integrity Verification', () => {
       expect(sberDirect).toBe('https://sbergraduate.ru/sberseasons-moscow/ml/');
 
       const directumDirect = resolveApplyUrl('https://career.directum.ru', 'Directum', undefined, 'frontend');
-      expect(directumDirect).toBe('https://career.directum.ru/');
+      expect(directumDirect).toBe('https://vk.com/student_directum');
 
       const directumLead = resolveApplyUrl('https://career.directum.ru/lead_product_ownerRX', 'Directum', undefined, 'backend');
-      expect(directumLead).toBe('https://career.directum.ru/');
+      expect(directumLead).toBe('https://vk.com/student_directum');
 
       const directumVacancySlash = resolveApplyUrl('https://career.directum.ru/vacancy/', 'Directum', undefined, 'backend');
-      expect(directumVacancySlash).toBe('https://career.directum.ru/');
+      expect(directumVacancySlash).toBe('https://vk.com/student_directum');
 
       const directumVacancyNoSlash = resolveApplyUrl('https://career.directum.ru/vacancy', 'Directum', undefined, 'qa');
-      expect(directumVacancyNoSlash).toBe('https://career.directum.ru/');
+      expect(directumVacancyNoSlash).toBe('https://vk.com/student_directum');
     });
 
     it('resolves official internship portals for target companies according to specifications', () => {
       // 1. Company official portals configuration
       expect(COMPANY_OFFICIAL_PORTALS.tbank).toBe('https://education.tbank.ru/start/');
       expect(COMPANY_OFFICIAL_PORTALS.kontur).toBe('https://kontur.ru/career/students');
-      expect(COMPANY_OFFICIAL_PORTALS.directum).toBe('https://career.directum.ru/');
-      expect(COMPANY_OFFICIAL_PORTALS.t1).toBe('https://career.t1.ru/vacancies/');
+      expect(COMPANY_OFFICIAL_PORTALS.directum).toBe('https://vk.com/student_directum');
+      expect(COMPANY_OFFICIAL_PORTALS.t1).toBe('https://career.t1.ru/debut/open-school/');
       expect(COMPANY_OFFICIAL_PORTALS.yandex).toBe('https://yandex.ru/yaintern/');
       expect(COMPANY_OFFICIAL_PORTALS.ozon).toBe('https://job.ozon.ru/it/camp/');
       expect(COMPANY_OFFICIAL_PORTALS.sber).toBe('https://sbergraduate.ru/sberseasons-moscow/');
-      expect(COMPANY_OFFICIAL_PORTALS.avito).toBe('https://start.avito.ru/internships');
-      expect(COMPANY_OFFICIAL_PORTALS.vk).toBe('https://internship.vk.company/internship/');
+      expect(COMPANY_OFFICIAL_PORTALS.avito).toBe('https://start.avito.ru/tech');
+      expect(COMPANY_OFFICIAL_PORTALS.vk).toBe('https://internship.vk.company/vacancy');
 
       // 2. Avito specialized internship endpoints
       expect(getDirectVacancyPortalUrl('avito', 'mobile')).toBe('https://start.avito.ru/tech');
@@ -178,7 +178,7 @@ describe('Vacancy Quality & Link Integrity Verification', () => {
       expect(getDirectVacancyPortalUrl('avito', 'qa')).toBe('https://start.avito.ru/tech');
       expect(getDirectVacancyPortalUrl('avito', 'data_science')).toBe('https://start.avito.ru/datascience-internship');
       expect(getDirectVacancyPortalUrl('avito', 'data_science', undefined, 'analytics')).toBe('https://start.avito.ru/analysts-internship');
-      expect(getDirectVacancyPortalUrl('avito')).toBe('https://start.avito.ru/internships');
+      expect(getDirectVacancyPortalUrl('avito')).toBe('https://start.avito.ru/tech');
 
       // 3. Stale / senior Avito links are strictly intercepted
       expect(resolveApplyUrl('https://career.avito.com/vacancies/razrabotka/20803/', 'Авито', undefined, 'mobile'))
@@ -188,15 +188,15 @@ describe('Vacancy Quality & Link Integrity Verification', () => {
       expect(resolveApplyUrl('https://career.avito.com/vacancies/analitika-dannykh/20816/', 'Авито', undefined, 'data_science', 'analytics'))
         .toBe('https://start.avito.ru/analysts-internship');
       expect(resolveApplyUrl('https://career.avito.com/vacancies/razrabotka/20803/', 'Авито'))
-        .toBe('https://start.avito.ru/internships');
+        .toBe('https://start.avito.ru/tech');
 
       // 4. Kontur student portal fallback
       expect(getDirectVacancyPortalUrl('kontur')).toBe('https://kontur.ru/career/students');
       expect(resolveApplyUrl('https://kontur.ru/career/', 'Контур')).toBe('https://kontur.ru/career/students');
 
-      // 5. Directum portal fallback
-      expect(getDirectVacancyPortalUrl('directum')).toBe('https://career.directum.ru/');
-      expect(resolveApplyUrl('https://career.directum.ru/vacancy/', 'Directum')).toBe('https://career.directum.ru/');
+      // 5. Directum portal fallback (verified student community)
+      expect(getDirectVacancyPortalUrl('directum')).toBe('https://vk.com/student_directum');
+      expect(resolveApplyUrl('https://career.directum.ru/vacancy/', 'Directum')).toBe('https://vk.com/student_directum');
 
       // 6. Yandex internship portal
       expect(getDirectVacancyPortalUrl('yandex')).toBe('https://yandex.ru/yaintern/');
@@ -206,27 +206,27 @@ describe('Vacancy Quality & Link Integrity Verification', () => {
       expect(getDirectVacancyPortalUrl('ozon')).toBe('https://job.ozon.ru/it/camp/');
       expect(resolveApplyUrl('https://job.ozon.ru/it/', 'Ozon')).toBe('https://job.ozon.ru/it/camp/');
 
-      // 8. T1 career portal
-      expect(getDirectVacancyPortalUrl('t1')).toBe('https://career.t1.ru/vacancies/');
-      expect(resolveApplyUrl('https://career.t1.ru/', 'Холдинг Т1')).toBe('https://career.t1.ru/vacancies/');
+      // 8. T1 Open School portal
+      expect(getDirectVacancyPortalUrl('t1')).toBe('https://career.t1.ru/debut/open-school/');
+      expect(resolveApplyUrl('https://career.t1.ru/', 'Холдинг Т1')).toBe('https://career.t1.ru/debut/open-school/');
 
       // 9. Sber Seasons portal
       expect(getDirectVacancyPortalUrl('sber')).toBe('https://sbergraduate.ru/sberseasons-moscow/');
 
-      // 10. VK internship portal
-      expect(getDirectVacancyPortalUrl('vk')).toBe('https://internship.vk.company/internship/');
-      expect(resolveApplyUrl('https://internship.vk.company/', 'VK')).toBe('https://internship.vk.company/internship/');
+      // 10. VK internship portal (vacancy catalog)
+      expect(getDirectVacancyPortalUrl('vk')).toBe('https://internship.vk.company/vacancy');
+      expect(resolveApplyUrl('https://internship.vk.company/', 'VK')).toBe('https://internship.vk.company/vacancy');
 
       // 11. Monitored websites list canonical URLs for all target employers
       const siteMap = Object.fromEntries(MONITORED_WEBSITES_LIST.map((w) => [w.id, w.url]));
       expect(siteMap['site-kontur']).toBe('https://kontur.ru/career/students');
       expect(siteMap['site-tbank']).toBe('https://education.tbank.ru/start/');
-      expect(siteMap['site-t1']).toBe('https://career.t1.ru/vacancies/');
-      expect(siteMap['site-directum']).toBe('https://career.directum.ru/');
+      expect(siteMap['site-t1']).toBe('https://career.t1.ru/debut/open-school/');
+      expect(siteMap['site-directum']).toBe('https://vk.com/student_directum');
       expect(siteMap['site-yandex']).toBe('https://yandex.ru/yaintern/');
       expect(siteMap['site-ozon']).toBe('https://job.ozon.ru/it/camp/');
       expect(siteMap['site-sber']).toBe('https://sbergraduate.ru/sberseasons-moscow/');
-      expect(siteMap['site-avito']).toBe('https://start.avito.ru/internships');
+      expect(siteMap['site-avito']).toBe('https://start.avito.ru/tech');
     });
 
     it('preserves valid Telegram post URLs with post IDs', () => {

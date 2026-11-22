@@ -1448,7 +1448,7 @@ describe('13. Real Employer Positions & Liquid Glass Bento Dark/Light Theme Syst
     directumItems.forEach((i) => {
       expect(i.location).toContain('Ижевск');
       expect(i.sourceChannel).toBe('@Life_in_Directum');
-      expect(i.applyUrl).toContain('directum.ru');
+      expect(i.applyUrl).toContain('student_directum');
     });
 
     // 4. Холдинг Т1: Java, DevOps/Linux, QA Auto
@@ -1851,11 +1851,11 @@ describe('15. Telegram Mini App & VK Cross-Platform Integration & Modal Geometry
     // 2. Direct Avito tech internship URL is preserved as-is, while obsolete senior vacancy IDs are intercepted
     const techAvito = 'https://start.avito.ru/tech';
     expect(resolveApplyUrl(techAvito, 'Авито')).toBe(techAvito);
-    expect(resolveApplyUrl('https://career.avito.com/vacancies/razrabotka/20803/', 'Авито')).toBe('https://start.avito.ru/internships');
+    expect(resolveApplyUrl('https://career.avito.com/vacancies/razrabotka/20803/', 'Авито')).toBe('https://start.avito.ru/tech');
 
-    // 3. Directum empty /vacancy/ paths resolve to official career portal
-    expect(resolveApplyUrl('https://career.directum.ru/vacancy/', 'Directum')).toBe('https://career.directum.ru/');
-    expect(resolveApplyUrl('https://career.directum.ru/vacancy', 'Directum')).toBe('https://career.directum.ru/');
+    // 3. Directum empty /vacancy/ paths resolve to official student community
+    expect(resolveApplyUrl('https://career.directum.ru/vacancy/', 'Directum')).toBe('https://vk.com/student_directum');
+    expect(resolveApplyUrl('https://career.directum.ru/vacancy', 'Directum')).toBe('https://vk.com/student_directum');
 
     // 4. Fallback to specific Telegram post when available
     const tgPost = 'https://t.me/avito_tech/745';
@@ -1872,17 +1872,19 @@ describe('15. Telegram Mini App & VK Cross-Platform Integration & Modal Geometry
       const isDirectPath =
         item.applyUrl.endsWith('/') ||
         item.applyUrl.includes('/vacancies/') ||
-        item.applyUrl.includes('/vacancy/') ||
+        item.applyUrl.includes('/vacancy') ||
         item.applyUrl.includes('/internship') ||
         item.applyUrl.includes('/pages/internship') ||
         item.applyUrl.includes('/start/') ||
         item.applyUrl.includes('/camp/') ||
         item.applyUrl.includes('/tech') ||
-        item.applyUrl.includes('start.avito.ru');
+        item.applyUrl.includes('start.avito.ru') ||
+        item.applyUrl.includes('student_directum') ||
+        item.applyUrl.includes('open-school');
       expect(isDirectPath).toBe(true);
       expect(item.applyUrl.startsWith('https://')).toBe(true);
       expect(item.applyUrl).not.toContain('20803');
-      expect(item.applyUrl).not.toContain('career.directum.ru/vacancy');
+      expect(item.applyUrl).not.toContain('career.directum.ru');
     }
 
     // 7. Verify bot ALL_INTERNSHIPS has exact parity with direct URLs
@@ -1893,8 +1895,8 @@ describe('15. Telegram Mini App & VK Cross-Platform Integration & Modal Geometry
       expect(botItem.sourceChannel).toBeDefined();
       expect(botItem.url).not.toContain('20803');
       expect(botItem.applyUrl).not.toContain('20803');
-      expect(botItem.url).not.toContain('career.directum.ru/vacancy');
-      expect(botItem.applyUrl).not.toContain('career.directum.ru/vacancy');
+      expect(botItem.url).not.toContain('career.directum.ru');
+      expect(botItem.applyUrl).not.toContain('career.directum.ru');
     }
   });
 });

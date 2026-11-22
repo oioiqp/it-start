@@ -384,8 +384,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@vk_team",
     "directionId": "qa",
     "subTrackId": "auto_qa",
-    "url": "https://internship.vk.company/internship/",
-    "applyUrl": "https://internship.vk.company/internship/",
+    "url": "https://internship.vk.company/vacancy",
+    "applyUrl": "https://internship.vk.company/vacancy",
     "sourceChannel": "@vk_team",
     "description": "Автоматизация тестирования сервисов сообществ и видео в VK. Вы будете создавать надежные автотесты для веба и REST API.",
     "tags": [
@@ -568,8 +568,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@vk_team",
     "directionId": "backend",
     "subTrackId": "nodejs",
-    "url": "https://internship.vk.company/internship/",
-    "applyUrl": "https://internship.vk.company/internship/",
+    "url": "https://internship.vk.company/vacancy",
+    "applyUrl": "https://internship.vk.company/vacancy",
     "sourceChannel": "@vk_team",
     "description": "Разработка микросервисов стриминга и каталога музыки. Асинхронные очереди, кэширование метаданных треков и плейлистов.",
     "tags": [
@@ -683,8 +683,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@t1career",
     "directionId": "backend",
     "subTrackId": "java",
-    "url": "https://career.t1.ru/vacancies/",
-    "applyUrl": "https://career.t1.ru/vacancies/",
+    "url": "https://career.t1.ru/debut/open-school/",
+    "applyUrl": "https://career.t1.ru/debut/open-school/",
     "sourceChannel": "@t1career",
     "description": "Обучение и стажировка в Открытой школе Т1 с переходом в штат. Разработка надежных Enterprise-сервисов для крупнейших корпоративных заказчиков.",
     "tags": [
@@ -706,8 +706,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@t1career",
     "directionId": "devops",
     "subTrackId": "cicd_docker",
-    "url": "https://career.t1.ru/vacancies/",
-    "applyUrl": "https://career.t1.ru/vacancies/",
+    "url": "https://career.t1.ru/debut/open-school/",
+    "applyUrl": "https://career.t1.ru/debut/open-school/",
     "sourceChannel": "@t1career",
     "description": "Поддержка и автоматизация инфраструктуры масштабируемых облачных решений Т1 Облако.",
     "tags": [
@@ -729,8 +729,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@t1career",
     "directionId": "qa",
     "subTrackId": "auto_qa",
-    "url": "https://career.t1.ru/vacancies/",
-    "applyUrl": "https://career.t1.ru/vacancies/",
+    "url": "https://career.t1.ru/debut/open-school/",
+    "applyUrl": "https://career.t1.ru/debut/open-school/",
     "sourceChannel": "@t1career",
     "description": "Автоматизация тестирования банковских и интеграционных платформ группы Т1.",
     "tags": [
@@ -752,8 +752,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@Life_in_Directum",
     "directionId": "frontend",
     "subTrackId": "react",
-    "url": "https://career.directum.ru/",
-    "applyUrl": "https://career.directum.ru/",
+    "url": "https://vk.com/student_directum",
+    "applyUrl": "https://vk.com/student_directum",
     "sourceChannel": "@Life_in_Directum",
     "description": "Разработка веб-клиента флагманской платформы управления цифровыми процессами и документами Directum RX в Ижевске.",
     "tags": [
@@ -778,8 +778,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@Life_in_Directum",
     "directionId": "backend",
     "subTrackId": "java",
-    "url": "https://career.directum.ru/",
-    "applyUrl": "https://career.directum.ru/",
+    "url": "https://vk.com/student_directum",
+    "applyUrl": "https://vk.com/student_directum",
     "sourceChannel": "@Life_in_Directum",
     "description": "Разработка масштабируемого бэкенда интеллектуальной системы управления документами Directum RX. Микросервисы, асинхронная обработка и AI-модули.",
     "tags": [
@@ -805,8 +805,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@Life_in_Directum",
     "directionId": "qa",
     "subTrackId": "manual_qa",
-    "url": "https://career.directum.ru/",
-    "applyUrl": "https://career.directum.ru/",
+    "url": "https://vk.com/student_directum",
+    "applyUrl": "https://vk.com/student_directum",
     "sourceChannel": "@Life_in_Directum",
     "description": "Тестирование веб- и десктоп-клиентов Directum RX, поиск дефектов в бизнес-процессах электронного документооборота.",
     "tags": [
@@ -877,8 +877,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@tbank_team",
     "directionId": "backend",
     "subTrackId": "python",
-    "url": "https://education.tbank.ru/start/",
-    "applyUrl": "https://education.tbank.ru/start/",
+    "url": "https://education.tbank.ru/start/python/",
+    "applyUrl": "https://education.tbank.ru/start/python/",
     "sourceChannel": "@tbank_team",
     "description": "Разработка ключевых сервисов процессинга и кредитных конвейеров банка. Высокая нагрузка и строгие требования к надежности.",
     "tags": [
@@ -900,8 +900,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@tbank_team",
     "directionId": "devops",
     "subTrackId": "k8s_iac",
-    "url": "https://education.tbank.ru/start/",
-    "applyUrl": "https://education.tbank.ru/start/",
+    "url": "https://education.tbank.ru/start/python/",
+    "applyUrl": "https://education.tbank.ru/start/python/",
     "sourceChannel": "@tbank_team",
     "description": "Обеспечение бесперебойной работы критических сервисов Т-Банка. Автоматизация развертывания и мониторинга сотен микросервисов.",
     "tags": [
@@ -1016,8 +1016,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@vk_team",
     "directionId": "frontend",
     "subTrackId": "react",
-    "url": "https://internship.vk.company/internship/",
-    "applyUrl": "https://internship.vk.company/internship/",
+    "url": "https://internship.vk.company/vacancy",
+    "applyUrl": "https://internship.vk.company/vacancy",
     "sourceChannel": "@vk_team",
     "description": "Оплачиваемая стажировка VK Team: создание веб-интерфейсов ВКонтакте, VK Видео и VK Мессенджера на стеке React, TypeScript и библиотеки VKUI.",
     "tags": [
@@ -1039,8 +1039,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@vk_team",
     "directionId": "data_science",
     "subTrackId": "ml",
-    "url": "https://internship.vk.company/internship/",
-    "applyUrl": "https://internship.vk.company/internship/",
+    "url": "https://internship.vk.company/vacancy",
+    "applyUrl": "https://internship.vk.company/vacancy",
     "sourceChannel": "@vk_team",
     "description": "Разработка рекомендательных систем ленты, клипов и музыки ВКонтакте. Обучение моделей ранжирования на огромных графах социальных связей.",
     "tags": [
@@ -1063,8 +1063,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@tbank_team",
     "directionId": "backend",
     "subTrackId": "golang",
-    "url": "https://education.tbank.ru/start/",
-    "applyUrl": "https://education.tbank.ru/start/",
+    "url": "https://education.tbank.ru/start/go/",
+    "applyUrl": "https://education.tbank.ru/start/go/",
     "sourceChannel": "@tbank_team",
     "description": "Разработка высокопроизводительных микросервисов платежного контура Т-Банка. Экстремальные нагрузки, строгая отказоустойчивость и менторская программа.",
     "tags": [
@@ -1086,8 +1086,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@tbank_team",
     "directionId": "qa",
     "subTrackId": "auto_qa",
-    "url": "https://education.tbank.ru/start/",
-    "applyUrl": "https://education.tbank.ru/start/",
+    "url": "https://education.tbank.ru/start/java/",
+    "applyUrl": "https://education.tbank.ru/start/java/",
     "sourceChannel": "@tbank_team",
     "description": "Автоматизация тестирования банковских платформ, инвестиций и мобильного банка. Создание надежных автотестов и интеграция в CI/CD.",
     "tags": [
@@ -1132,8 +1132,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@Life_in_Directum",
     "directionId": "backend",
     "subTrackId": "python",
-    "url": "https://career.directum.ru/",
-    "applyUrl": "https://career.directum.ru/",
+    "url": "https://vk.com/student_directum",
+    "applyUrl": "https://vk.com/student_directum",
     "sourceChannel": "@Life_in_Directum",
     "description": "Официальная программа стажировок Directum: разработка ядра интеллектуальной платформы управления цифровыми процессами и документами Directum RX в Ижевске под менторством экспертов.",
     "tags": [
@@ -1159,8 +1159,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@tbank_team",
     "directionId": "backend",
     "subTrackId": "java",
-    "url": "https://education.tbank.ru/start/",
-    "applyUrl": "https://education.tbank.ru/start/",
+    "url": "https://education.tbank.ru/start/java/",
+    "applyUrl": "https://education.tbank.ru/start/java/",
     "sourceChannel": "@tbank_team",
     "description": "Оплачиваемая финтех-стажировка Т-Банк Старт: разработка отказоустойчивых бэкенд-микросервисов на Java 21, Spring Boot 3 и Kafka для платежных и расчетных систем с ментором.",
     "tags": [
@@ -1252,8 +1252,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@vk_team",
     "directionId": "mobile",
     "subTrackId": "android",
-    "url": "https://internship.vk.company/internship/",
-    "applyUrl": "https://internship.vk.company/internship/",
+    "url": "https://internship.vk.company/vacancy",
+    "applyUrl": "https://internship.vk.company/vacancy",
     "sourceChannel": "@vk_team",
     "description": "Официальная программа стажировок VK Team: разработка ключевых фичей мобильных приложений ВКонтакте, VK Музыка и VK Видео на Kotlin и Swift под менторством экспертов.",
     "tags": [
@@ -1974,13 +1974,13 @@ export function detectVacancyTrack(title = '', text = '') {
 export const COMPANY_OFFICIAL_PORTALS = {
   tbank: 'https://education.tbank.ru/start/',
   kontur: 'https://kontur.ru/career/students',
-  directum: 'https://career.directum.ru/',
-  t1: 'https://career.t1.ru/vacancies/',
+  directum: 'https://vk.com/student_directum',
+  t1: 'https://career.t1.ru/debut/open-school/',
   yandex: 'https://yandex.ru/yaintern/',
   ozon: 'https://job.ozon.ru/it/camp/',
   sber: 'https://sbergraduate.ru/sberseasons-moscow/',
-  avito: 'https://start.avito.ru/internships',
-  vk: 'https://internship.vk.company/internship/',
+  avito: 'https://start.avito.ru/tech',
+  vk: 'https://internship.vk.company/vacancy',
 };
 
 export function getCompanyKey(companyName = '') {
@@ -1999,26 +1999,30 @@ export function getCompanyKey(companyName = '') {
   return 'other';
 }
 
-export function getDirectVacancyPortalUrl(companyKey, directionId = undefined, fallback = 'https://career.directum.ru/', subTrackId = undefined) {
+export function getDirectVacancyPortalUrl(companyKey, directionId = undefined, fallback = 'https://vk.com/student_directum', subTrackId = undefined) {
   switch (companyKey) {
     case 'avito':
       if (directionId === 'data_science') {
         if (subTrackId === 'analytics') return 'https://start.avito.ru/analysts-internship';
         return 'https://start.avito.ru/datascience-internship';
       }
-      if (
-        directionId === 'mobile' ||
-        directionId === 'frontend' ||
-        directionId === 'backend' ||
-        directionId === 'devops' ||
-        directionId === 'qa'
-      ) {
-        return 'https://start.avito.ru/tech';
-      }
-      return 'https://start.avito.ru/internships';
+      return 'https://start.avito.ru/tech';
     case 'tbank':
+      if (subTrackId === 'python') return 'https://education.tbank.ru/start/python/';
+      if (subTrackId === 'java') return 'https://education.tbank.ru/start/java/';
+      if (subTrackId === 'golang' || subTrackId === 'go') return 'https://education.tbank.ru/start/go/';
+      if (subTrackId === 'ios') return 'https://education.tbank.ru/start/ios/';
+      if (subTrackId === 'android') return 'https://education.tbank.ru/start/android/';
       if (directionId === 'frontend') return 'https://education.tbank.ru/start/frontend/';
       if (directionId === 'data_science') return 'https://education.tbank.ru/start/analyst/';
+      if (directionId === 'qa') return 'https://education.tbank.ru/start/java/';
+      if (directionId === 'devops') return 'https://education.tbank.ru/start/python/';
+      if (directionId === 'mobile') return 'https://education.tbank.ru/start/android/';
+      if (directionId === 'backend') {
+        if (subTrackId === 'java') return 'https://education.tbank.ru/start/java/';
+        if (subTrackId === 'golang') return 'https://education.tbank.ru/start/go/';
+        return 'https://education.tbank.ru/start/python/';
+      }
       return 'https://education.tbank.ru/start/';
     case 'kontur':
       if (directionId === 'backend') return 'https://kontur.ru/career/vacancies/intern-backend';
@@ -2026,11 +2030,9 @@ export function getDirectVacancyPortalUrl(companyKey, directionId = undefined, f
       if (directionId === 'frontend') return 'https://kontur.ru/career/vacancies/intern-frontend';
       return 'https://kontur.ru/career/students';
     case 'directum':
-      return 'https://career.directum.ru/';
+      return 'https://vk.com/student_directum';
     case 't1':
-      if (directionId === 'devops') return 'https://career.t1.ru/vacancies/';
-      if (directionId === 'qa') return 'https://career.t1.ru/vacancies/';
-      return 'https://career.t1.ru/vacancies/';
+      return 'https://career.t1.ru/debut/open-school/';
     case 'yandex':
       if (directionId === 'frontend') return 'https://yandex.ru/yaintern/frontend/';
       if (directionId === 'mobile') return 'https://yandex.ru/yaintern/mobile/';
@@ -2051,7 +2053,7 @@ export function getDirectVacancyPortalUrl(companyKey, directionId = undefined, f
       if (directionId === 'data_science') return 'https://sbergraduate.ru/sberseasons-moscow/ml/';
       return 'https://sbergraduate.ru/sberseasons-moscow/';
     case 'vk':
-      return 'https://internship.vk.company/internship/';
+      return 'https://internship.vk.company/vacancy';
     default:
       return fallback;
   }
