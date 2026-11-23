@@ -7,7 +7,7 @@ export const COMPANY_OFFICIAL_PORTALS: Record<string, string> = {
   tbank: 'https://education.tbank.ru/start/',
   kontur: 'https://kontur.ru/education/internship',
   directum: 'https://vk.com/student_directum',
-  t1: 'https://career.t1.ru/debut/open-school/',
+  t1: 'https://career.t1.ru/vacancies/',
   yandex: 'https://yandex.ru/yaintern/',
   ozon: 'https://job.ozon.ru/it/camp/',
   sber: 'https://sbergraduate.ru/sberseasons-moscow/',
@@ -100,7 +100,7 @@ export function getDirectVacancyPortalUrl(
     case 'directum':
       return 'https://vk.com/student_directum';
     case 't1':
-      return 'https://career.t1.ru/debut/open-school/';
+      return 'https://career.t1.ru/vacancies/';
     case 'yandex':
       if (directionId === 'frontend') return 'https://yandex.ru/yaintern/frontend/';
       if (directionId === 'mobile') return 'https://yandex.ru/yaintern/mobile/';
@@ -247,8 +247,7 @@ export function resolveApplyUrl(
     // Kontur generic
     lower === 'https://kontur.ru/career/' ||
     lower === 'https://kontur.ru/career' ||
-    lower === 'https://kontur.ru/career/vacancies' ||
-    lower === 'https://kontur.ru/career/vacancies/' ||
+    lower.includes('kontur.ru/career/vacancies') ||
     // T1 generic
     lower === 'https://career.t1.ru/' ||
     lower === 'https://career.t1.ru' ||
@@ -270,6 +269,7 @@ export function resolveApplyUrl(
     lower === 'https://sbergraduate.ru/sberseasons-moscow/' ||
     lower === 'https://sbergraduate.ru/sberseasons-moscow' ||
     // Obsolete employer links that must be rerouted to live verified portals
+    lower.includes('career.t1.ru/debut/open-school') ||
     lower.includes('kontur.ru/career/students') ||
     lower.includes('kontur.ru/career/vacancies/intern-') ||
     lower.includes('education.tbank.ru/start/sre') ||
@@ -940,6 +940,10 @@ export function isVacancyActive(item: VacancyFreshnessInput | null | undefined):
   if ((compLower.includes('directum') || compLower.includes('директум')) && item.isActive !== true) {
     return false;
   }
+  // Kontur off-season: seasonal round closed (screenshot: "Набор закрыт")
+  if ((compLower.includes('контур') || compLower.includes('kontur')) && item.isActive !== true) {
+    return false;
+  }
   // Sber off-season
   if ((compLower.includes('сбер') || compLower.includes('sber')) && item.isActive !== true) {
     return false;
@@ -1041,10 +1045,10 @@ export function getInternshipRecruitmentStatus(internship: {
 
   if (comp.includes('контур') || comp.includes('kontur')) {
     return {
-      type: 'constant',
-      deadline: 'Круглый год',
-      note: 'Контур.Старт • Официальная программа стажировок',
-      displayBadge: 'Постоянный набор • Контур.Старт',
+      type: 'scheduled',
+      deadline: 'Набор закрыт',
+      note: 'Сезон стажировок завершён • Ожидается новый сезон',
+      displayBadge: 'Набор закрыт • Ожидается новый сезон',
     };
   }
 
@@ -1052,8 +1056,8 @@ export function getInternshipRecruitmentStatus(internship: {
     return {
       type: 'constant',
       deadline: 'Круглый год',
-      note: 'Открытая школа Т1 • Обучение и оффер в штат',
-      displayBadge: 'Постоянный набор • Открытая школа Т1',
+      note: 'Карьерный портал Т1 • Вакансии и стажировки',
+      displayBadge: 'Постоянный набор • Вакансии Т1',
     };
   }
 

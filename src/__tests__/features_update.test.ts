@@ -370,5 +370,26 @@ describe('IT-Старт Features Update & Polish Suite', () => {
       expect(html).toContain('Вопросы собеседований к теме');
       expect(html).toContain('изучено');
     });
+
+    it('verifies HTML5 and CSS topics only receive relevant interview questions without React/TS leak', () => {
+      const htmlTopic = ROADMAP_TOPICS.find((t) => t.id === 'fe-core-2')!;
+      const cssTopic = ROADMAP_TOPICS.find((t) => t.id === 'fe-core-3')!;
+
+      // Render RoadmapViewer and check question relevance
+      expect(htmlTopic).toBeDefined();
+      expect(cssTopic).toBeDefined();
+
+      const htmlQuestions = QUESTIONS.filter(
+        (q) => q.directionId === 'frontend' && q.subTrackId === 'core' && (q.category.includes('HTML') || q.title.includes('HTML') || q.title.includes('article'))
+      );
+      expect(htmlQuestions.length).toBeGreaterThanOrEqual(3);
+
+      const cssQuestions = QUESTIONS.filter(
+        (q) => q.directionId === 'frontend' && q.subTrackId === 'core' && (q.category.includes('CSS') || q.title.includes('CSS') || q.title.includes('Flexbox'))
+      );
+      expect(cssQuestions.length).toBeGreaterThanOrEqual(2);
+      expect(cssQuestions.some((q) => q.title.includes('Box Model') || q.title.includes('Блочная модель'))).toBe(true);
+      expect(cssQuestions.some((q) => q.title.includes('Flexbox'))).toBe(true);
+    });
   });
 });

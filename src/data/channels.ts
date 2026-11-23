@@ -373,10 +373,10 @@ export const MONITORED_WEBSITES_LIST: MonitoredWebsite[] = [
   },
   {
     id: 'site-t1',
-    name: 'Открытая школа Т1 & Карьера',
+    name: 'Карьерный портал Т1 & Вакансии',
     company: 'Холдинг Т1',
-    url: 'https://career.t1.ru/debut/open-school/',
-    category: 'Официальный образовательный интенсив Т1',
+    url: 'https://career.t1.ru/vacancies/',
+    category: 'Официальный карьерный портал Т1',
     status: 'active',
     vacanciesCount: 19,
     lastChecked: '3 мин назад',

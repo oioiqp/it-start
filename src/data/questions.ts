@@ -99,6 +99,166 @@ app.use((req, res, next) => {
     ],
   },
   {
+    id: 'q-fe-html-semantic',
+    directionId: 'frontend',
+    subTrackId: 'core',
+    title: 'Семантическая вёрстка в HTML5: теги, отличия article от section',
+    question: 'Зачем нужна семантическая разметка в HTML5, чем семантические теги лучше div и в чем разница между <article> и <section>?',
+    category: 'HTML5 & Семантика',
+    difficulty: 'Junior',
+    answer: 'Семантические теги явно описывают смысл содержимого для браузера, поисковых систем (SEO) и скринридеров (Accessibility / a11y). В отличие от нейтрального <div>, теги <header>, <nav>, <main>, <footer> создают дерево ориентиров (Landmarks) на странице. Разница между <article> и <section>: <article> представляет собой самостоятельную, независимую единицу контента, которую можно перенести на другую страницу или в RSS-ленту без потери смысла (статья, пост, карточка товара, комментарий). <section> — это смысловой тематический раздел внутри большего документа или статьи, обычно имеющий собственный заголовок (h1-h6).',
+    codeSnippet: `<!-- Пример правильной семантической структуры документа: -->
+<main>
+  <section aria-labelledby="latest-posts-title">
+    <h2 id="latest-posts-title">Свежие публикации</h2>
+    <article class="post-card">
+      <header>
+        <h3>Запуск новой дизайн-системы</h3>
+        <time datetime="2026-11-20">20 ноября 2026</time>
+      </header>
+      <p>Краткий анонс статьи с описанием компонентов...</p>
+      <footer>
+        <a href="/posts/design-system" aria-label="Читать статью о дизайн-системе">Подробнее</a>
+      </footer>
+    </article>
+  </section>
+</main>`,
+    codeLanguage: 'html',
+    keyTakeaways: [
+      'Семантика критична для SEO-индексации и доступности скринридерами (a11y)',
+      '<article> независим и самодостаточен, а <section> группирует связанный контент внутри раздела',
+      'Кнопки и ссылки должны верстаться тегами <button> и <a>, а не <div onclick="...">',
+    ],
+  },
+  {
+    id: 'q-fe-html-a11y',
+    directionId: 'frontend',
+    subTrackId: 'core',
+    title: 'Доступность (Accessibility / a11y) и ARIA-атрибуты',
+    question: 'Что такое доступность (a11y), зачем нужны атрибуты ARIA (aria-label, role, aria-expanded) и когда их НЕ следует применять?',
+    category: 'HTML5 & Доступность',
+    difficulty: 'Junior',
+    answer: 'a11y — это практика создания веб-интерфейсов, доступных для людей с ограниченными возможностями (нарушения зрения, моторики) с помощью клавиатуры и программ экранного доступа (Screen Readers). Первое правило ARIA: если есть нативный HTML-элемент (<button>, <nav>, <dialog>, <input>), используйте его, а не div с ARIA-атрибутами! ARIA не меняет поведение или фокус в браузере — она меняет только дерево доступности (Accessibility Tree). Атрибуты ARIA нужны там, где нативного HTML недостаточно: кастомные дропдауны (aria-expanded, aria-haspopup), бейджи со счетчиками (aria-label="3 новых сообщения"), модальные окна.',
+    codeSnippet: `<!-- Использование aria-expanded и aria-controls для интерактивного аккордеона: -->
+<button
+  type="button"
+  aria-expanded="false"
+  aria-controls="topic-details"
+  id="topic-btn"
+>
+  Подтемы раздела
+</button>
+
+<div
+  id="topic-details"
+  role="region"
+  aria-labelledby="topic-btn"
+  hidden
+>
+  <p>Список подтем и материалы для подготовки...</p>
+</div>`,
+    codeLanguage: 'html',
+    keyTakeaways: [
+      'Первое правило ARIA: отдавайте предпочтение нативным семантическим HTML-элементам',
+      'aria-label даёт текстовое описание элементам без видимого текста (например, кнопкам-иконкам)',
+      'Интерфейс должен быть полностью управляем с клавиатуры (клавиши Tab, Enter, Space, Escape)',
+    ],
+  },
+  {
+    id: 'q-fe-html-meta-viewport',
+    directionId: 'frontend',
+    subTrackId: 'core',
+    title: 'Метатег viewport, Open Graph и базовое SEO в HTML5',
+    question: 'Зачем нужен метатег viewport и метатеги Open Graph в теге <head>?',
+    category: 'HTML5 & SEO',
+    difficulty: 'Junior',
+    answer: 'Метатег <meta name="viewport" content="width=device-width, initial-scale=1.0"> сообщает мобильным браузерам, что ширина области просмотра (viewport) равна физической ширине экрана устройства, а начальный масштаб — 100%. Без него мобильный браузер эмулирует экран десктопа шириной 980px, уменьшая всю страницу и делая текст нечитаемым. Метатеги Open Graph (og:title, og:description, og:image, og:url) задают внешний вид превью-карточки страницы при отправке ссылки в Telegram, VK, WhatsApp и соцсетях.',
+    codeSnippet: `<!-- Базовый head с адаптивностью и Open Graph превью: -->
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IT Start — Стажировки и Roadmaps</title>
+  
+  <!-- Open Graph для красивых карточек в Telegram / соцсетях: -->
+  <meta property="og:title" content="IT Start — Твой старт карьеры в IT">
+  <meta property="og:description" content="Агрегатор стажировок и дорожные карты для джуниоров">
+  <meta property="og:image" content="https://it-start.ru/og-image.png">
+</head>`,
+    codeLanguage: 'html',
+    keyTakeaways: [
+      '<meta name="viewport"> обязателен для корректной мобильной верстки',
+      'Open Graph теги формируют привлекательное превью при шеринге ссылок',
+      'Тег <title> и <meta name="description"> критичны для поисковой выдачи Google и Яндекс',
+    ],
+  },
+  {
+    id: 'q-fe-css-box-model',
+    directionId: 'frontend',
+    subTrackId: 'core',
+    title: 'Блочная модель в CSS (Box Model): content-box против border-box',
+    question: 'В чем разница между content-box и border-box, как рассчитывается итоговый размер элемента и что такое схлопывание отступов (margin collapsing)?',
+    category: 'CSS3 & Верстка',
+    difficulty: 'Junior',
+    answer: 'В стандартной модели content-box ширина (width) применяется только к содержимому: padding и border прибавляются поверх, увеличивая реальный размер блока на экране (итог = width + padding + border). При box-sizing: border-box ширина width включает в себя padding и border, поэтому блок никогда не «распирает» за заданный размер. Схлопывание отступов (margin collapsing) — механизм, при котором вертикальные margins соседних блоков в нормальном потоке объединяются в один, равный максимальному из них.',
+    codeSnippet: `/* Золотой стандарт сброса блочной модели для всех элементов: */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* Демонстрация разницы: */
+.box-content {
+  box-sizing: content-box;
+  width: 200px;
+  padding: 20px;
+  border: 5px solid black;
+  /* Итоговая ширина = 200 + 40 + 10 = 250px */
+}
+
+.box-border {
+  box-sizing: border-box;
+  width: 200px;
+  padding: 20px;
+  border: 5px solid black;
+  /* Итоговая ширина ровно 200px (контент сожмется до 150px) */
+}`,
+    codeLanguage: 'css',
+    keyTakeaways: [
+      'box-sizing: border-box упрощает расчет сеток и предотвращает случайное переполнение контейнеров',
+      'Горизонтальные margins никогда не схлопываются, только вертикальные',
+      'Схлопывание margin не происходит во Flexbox, Grid, абсолютно позиционированных элементах и элементах с overflow !== visible',
+    ],
+  },
+  {
+    id: 'q-fe-css-flex-grid',
+    directionId: 'frontend',
+    subTrackId: 'core',
+    title: 'Flexbox против CSS Grid: различия одномерной и двумерной раскладки',
+    question: 'Чем принципиально отличаются Flexbox и CSS Grid и когда следует выбирать каждый инструмент?',
+    category: 'CSS3 & Сетки',
+    difficulty: 'Junior',
+    answer: 'Flexbox — одномерная система позиционирования (1D): она управляет потоком элементов либо по строке (row), либо по столбцу (column). Flexbox идеален для компонентов интерфейса: навбары, панели кнопок, центрирование контента, распределение свободного пространства. CSS Grid — двумерная система (2D): позволяет одновременно управлять и строками, и столбцами, задавая жесткую структуру макета страницы, адаптивные карточные галереи (через repeat(auto-fit, minmax(280px, 1fr))) и наложение областей (grid-template-areas).',
+    codeSnippet: `/* Адаптивная карточная сетка без медиа-запросов на CSS Grid: */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Идеальное центрирование и распределение тулбара на Flexbox: */
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}`,
+    codeLanguage: 'css',
+    keyTakeaways: [
+      'Flexbox (1D) — для отдельных компонентов и одномерных цепочек элементов',
+      'CSS Grid (2D) — для комплексных макетов страниц и адаптивных сеток карточек',
+      'Flexbox отталкивается от контента (content-first), а Grid — от заранее заданной сетки (layout-first)',
+    ],
+  },
+  {
     id: 'q-fe-1',
     directionId: 'frontend',
     subTrackId: 'core',

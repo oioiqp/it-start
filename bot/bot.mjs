@@ -683,8 +683,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@t1career",
     "directionId": "backend",
     "subTrackId": "java",
-    "url": "https://career.t1.ru/debut/open-school/",
-    "applyUrl": "https://career.t1.ru/debut/open-school/",
+    "url": "https://career.t1.ru/vacancies/",
+    "applyUrl": "https://career.t1.ru/vacancies/",
     "sourceChannel": "@t1career",
     "description": "Обучение и стажировка в Открытой школе Т1 с переходом в штат. Разработка надежных Enterprise-сервисов для крупнейших корпоративных заказчиков.",
     "tags": [
@@ -706,8 +706,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@t1career",
     "directionId": "devops",
     "subTrackId": "cicd_docker",
-    "url": "https://career.t1.ru/debut/open-school/",
-    "applyUrl": "https://career.t1.ru/debut/open-school/",
+    "url": "https://career.t1.ru/vacancies/",
+    "applyUrl": "https://career.t1.ru/vacancies/",
     "sourceChannel": "@t1career",
     "description": "Поддержка и автоматизация инфраструктуры масштабируемых облачных решений Т1 Облако.",
     "tags": [
@@ -729,8 +729,8 @@ export const ALL_INTERNSHIPS = [
     "channel": "@t1career",
     "directionId": "qa",
     "subTrackId": "auto_qa",
-    "url": "https://career.t1.ru/debut/open-school/",
-    "applyUrl": "https://career.t1.ru/debut/open-school/",
+    "url": "https://career.t1.ru/vacancies/",
+    "applyUrl": "https://career.t1.ru/vacancies/",
     "sourceChannel": "@t1career",
     "description": "Автоматизация тестирования банковских и интеграционных платформ группы Т1.",
     "tags": [
@@ -1975,7 +1975,7 @@ export const COMPANY_OFFICIAL_PORTALS = {
   tbank: 'https://education.tbank.ru/start/',
   kontur: 'https://kontur.ru/education/internship',
   directum: 'https://vk.com/student_directum',
-  t1: 'https://career.t1.ru/debut/open-school/',
+  t1: 'https://career.t1.ru/vacancies/',
   yandex: 'https://yandex.ru/yaintern/',
   ozon: 'https://job.ozon.ru/it/camp/',
   sber: 'https://sbergraduate.ru/sberseasons-moscow/',
@@ -2029,7 +2029,7 @@ export function getDirectVacancyPortalUrl(companyKey, directionId = undefined, f
     case 'directum':
       return 'https://vk.com/student_directum';
     case 't1':
-      return 'https://career.t1.ru/debut/open-school/';
+      return 'https://career.t1.ru/vacancies/';
     case 'yandex':
       if (directionId === 'frontend') return 'https://yandex.ru/yaintern/frontend/';
       if (directionId === 'mobile') return 'https://yandex.ru/yaintern/mobile/';
@@ -2627,6 +2627,10 @@ export function isVacancyActive(item) {
   }
 
   const compLower = (item.company || '').toLowerCase();
+  // Kontur off-season: seasonal round closed
+  if ((compLower.includes('контур') || compLower.includes('kontur')) && item.isActive !== true) {
+    return false;
+  }
   if (compLower.includes('directum') || compLower.includes('директум')) {
     if (
       title.includes('frontend') ||

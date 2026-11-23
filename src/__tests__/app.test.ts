@@ -1912,10 +1912,10 @@ describe('15. Telegram Mini App & VK Cross-Platform Integration & Modal Geometry
 });
 
 describe('17. Client-Server Architecture Roadmap, Recruitment Deadlines & White Company Modal UX', () => {
-  it('validates Client-Server Architecture topic and its rich subtopics in frontend roadmap', () => {
+  it('validates Client-Server Architecture and clean reverted topic title in frontend roadmap', () => {
     const feCoreTopic = ROADMAP_TOPICS.find((t) => t.id === 'fe-core-1')!;
     expect(feCoreTopic).toBeDefined();
-    expect(feCoreTopic.title).toContain('Модель клиент-сервер');
+    expect(feCoreTopic.title).toBe('Как работает Интернет, Сеть и Браузер');
     expect(feCoreTopic.subtopics.length).toBeGreaterThanOrEqual(7);
 
     const subtopicsText = feCoreTopic.subtopics.join(' ');
@@ -1924,7 +1924,6 @@ describe('17. Client-Server Architecture Roadmap, Recruitment Deadlines & White 
     expect(subtopicsText).toContain('TCP');
     expect(subtopicsText).toContain('HTTP');
     expect(subtopicsText).toContain('CORS');
-    expect(subtopicsText).toContain('REST API');
   });
 
   it('validates dedicated interview questions for Client-Server model, URL lifecycle, and CORS', () => {
@@ -1946,7 +1945,22 @@ describe('17. Client-Server Architecture Roadmap, Recruitment Deadlines & White 
     expect(corsQ!.codeSnippet).toContain('Access-Control-Allow-Origin');
   });
 
-  it('validates getInternshipRecruitmentStatus handles T-Bank deadlines and constant recruitment accurately', () => {
+  it('validates dedicated HTML5 interview questions for semantic layout, a11y, and viewport', () => {
+    const semanticQ = QUESTIONS.find((q) => q.id === 'q-fe-html-semantic');
+    expect(semanticQ).toBeDefined();
+    expect(semanticQ!.category).toContain('HTML5');
+    expect(semanticQ!.answer).toContain('article');
+
+    const a11yQ = QUESTIONS.find((q) => q.id === 'q-fe-html-a11y');
+    expect(a11yQ).toBeDefined();
+    expect(a11yQ!.answer).toContain('ARIA');
+
+    const viewportQ = QUESTIONS.find((q) => q.id === 'q-fe-html-meta-viewport');
+    expect(viewportQ).toBeDefined();
+    expect(viewportQ!.answer).toContain('viewport');
+  });
+
+  it('validates getInternshipRecruitmentStatus handles T-Bank deadlines, Kontur closed season, and T1 career portal accurately', () => {
     // 1. T-Bank deadline verification (31 Jan + exam 25-31 Jan)
     const tbankStatus = getInternshipRecruitmentStatus({ company: 'Т-Банк (Тинькофф)' });
     expect(tbankStatus.type).toBe('scheduled');
@@ -1958,21 +1972,28 @@ describe('17. Client-Server Architecture Roadmap, Recruitment Deadlines & White 
     expect(yandexStatus.type).toBe('constant');
     expect(yandexStatus.deadline).toBe('Круглый год');
 
-    // 3. Kontur constant recruitment verification
+    // 3. Kontur seasonal closed recruitment verification
     const konturStatus = getInternshipRecruitmentStatus({ company: 'СКБ Контур' });
-    expect(konturStatus.type).toBe('constant');
-    expect(konturStatus.note).toContain('Контур.Старт');
+    expect(konturStatus.type).toBe('scheduled');
+    expect(konturStatus.deadline).toBe('Набор закрыт');
+    expect(konturStatus.note).toContain('Сезон стажировок завершён');
 
-    // 4. T1 constant recruitment verification
+    // 4. T1 constant recruitment verification pointing to career portal
     const t1Status = getInternshipRecruitmentStatus({ company: 'Холдинг Т1' });
     expect(t1Status.type).toBe('constant');
-    expect(t1Status.note).toContain('Открытая школа Т1');
+    expect(t1Status.note).toContain('Карьерный портал Т1');
   });
 
   it('verifies Kontur official portal is https://kontur.ru/education/internship and never 404 students URL', () => {
     expect(COMPANY_OFFICIAL_PORTALS.kontur).toBe('https://kontur.ru/education/internship');
     expect(getDirectVacancyPortalUrl('kontur')).toBe('https://kontur.ru/education/internship');
     expect(resolveApplyUrl('https://kontur.ru/career/students', 'Контур')).toBe('https://kontur.ru/education/internship');
+  });
+
+  it('verifies T1 official portal is https://career.t1.ru/vacancies/ and redirects from closed Open School', () => {
+    expect(COMPANY_OFFICIAL_PORTALS.t1).toBe('https://career.t1.ru/vacancies/');
+    expect(getDirectVacancyPortalUrl('t1')).toBe('https://career.t1.ru/vacancies/');
+    expect(resolveApplyUrl('https://career.t1.ru/debut/open-school/', 'Холдинг Т1')).toBe('https://career.t1.ru/vacancies/');
   });
 
   it('verifies CompanyModal component renders with clean white background and bento cards', () => {

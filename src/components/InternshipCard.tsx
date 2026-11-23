@@ -281,7 +281,7 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
               )}
             </div>
 
-            {/* Location & Format badges & Publication Date */}
+            {/* Location & Format badges & Sleek Recruitment Chip & Publication Date */}
             <div className="flex items-center gap-2 text-xs text-neutral-600 dark:text-neutral-400 mt-1.5 flex-wrap font-medium">
               <span className="flex items-center gap-1">
                 <MapPin className="w-3 h-3 opacity-70" />
@@ -289,6 +289,29 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
               </span>
               <span>•</span>
               {renderFormatBadge()}
+              <span>•</span>
+              {/* Sleek compact recruitment chip integrated seamlessly into metadata */}
+              {recruitmentInfo.type === 'scheduled' ? (
+                <span
+                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20"
+                  title={recruitmentInfo.note || `Приём заявок ${recruitmentInfo.deadline}`}
+                >
+                  <Clock className="w-3 h-3 text-amber-600 dark:text-amber-400 shrink-0" />
+                  <span>
+                    {recruitmentInfo.deadline.startsWith('до ') || recruitmentInfo.deadline === 'Набор закрыт'
+                      ? recruitmentInfo.deadline
+                      : `Набор ${recruitmentInfo.deadline}`}
+                  </span>
+                </span>
+              ) : (
+                <span
+                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20"
+                  title={recruitmentInfo.note || 'Постоянный круглогодичный набор'}
+                >
+                  <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                  <span>Постоянный набор</span>
+                </span>
+              )}
               <span>•</span>
               <span className="flex items-center gap-1 text-[11px] text-neutral-500 dark:text-neutral-400">
                 <Calendar className="w-3 h-3 opacity-70" />
@@ -326,31 +349,6 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
             </div>
           </div>
         </div>
-
-        {/* Recruitment Status & Deadline Badge (Always displayed with verified dates) */}
-        {recruitmentInfo.type === 'scheduled' ? (
-          <div className="mb-2.5 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold bg-amber-500/10 text-amber-900 dark:text-amber-200 border border-amber-500/25">
-            <Clock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
-            <span className="font-bold">Набор {recruitmentInfo.deadline}</span>
-            {recruitmentInfo.note && (
-              <>
-                <span className="opacity-40">•</span>
-                <span className="text-[11px] font-medium opacity-90">{recruitmentInfo.note}</span>
-              </>
-            )}
-          </div>
-        ) : (
-          <div className="mb-2.5 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold bg-emerald-500/10 text-emerald-900 dark:text-emerald-200 border border-emerald-500/25">
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-            <span className="font-bold">Постоянный набор</span>
-            {recruitmentInfo.note && (
-              <>
-                <span className="opacity-40">•</span>
-                <span className="text-[11px] font-medium opacity-90">{recruitmentInfo.note}</span>
-              </>
-            )}
-          </div>
-        )}
 
         {/* Position Title (clean and concise) */}
         <h3 className="text-sm sm:text-base font-bold transition-colors tracking-tight line-clamp-2 mb-2 leading-snug text-neutral-950 group-hover:text-black dark:text-white dark:group-hover:text-neutral-100 font-sans">

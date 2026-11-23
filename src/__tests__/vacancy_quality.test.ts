@@ -163,7 +163,7 @@ describe('Vacancy Quality & Link Integrity Verification', () => {
       expect(COMPANY_OFFICIAL_PORTALS.tbank).toBe('https://education.tbank.ru/start/');
       expect(COMPANY_OFFICIAL_PORTALS.kontur).toBe('https://kontur.ru/education/internship');
       expect(COMPANY_OFFICIAL_PORTALS.directum).toBe('https://vk.com/student_directum');
-      expect(COMPANY_OFFICIAL_PORTALS.t1).toBe('https://career.t1.ru/debut/open-school/');
+      expect(COMPANY_OFFICIAL_PORTALS.t1).toBe('https://career.t1.ru/vacancies/');
       expect(COMPANY_OFFICIAL_PORTALS.yandex).toBe('https://yandex.ru/yaintern/');
       expect(COMPANY_OFFICIAL_PORTALS.ozon).toBe('https://job.ozon.ru/it/camp/');
       expect(COMPANY_OFFICIAL_PORTALS.sber).toBe('https://sbergraduate.ru/sberseasons-moscow/');
@@ -206,9 +206,10 @@ describe('Vacancy Quality & Link Integrity Verification', () => {
       expect(getDirectVacancyPortalUrl('ozon')).toBe('https://job.ozon.ru/it/camp/');
       expect(resolveApplyUrl('https://job.ozon.ru/it/', 'Ozon')).toBe('https://job.ozon.ru/it/camp/');
 
-      // 8. T1 Open School portal
-      expect(getDirectVacancyPortalUrl('t1')).toBe('https://career.t1.ru/debut/open-school/');
-      expect(resolveApplyUrl('https://career.t1.ru/', 'Холдинг Т1')).toBe('https://career.t1.ru/debut/open-school/');
+      // 8. T1 live career vacancies portal
+      expect(getDirectVacancyPortalUrl('t1')).toBe('https://career.t1.ru/vacancies/');
+      expect(resolveApplyUrl('https://career.t1.ru/', 'Холдинг Т1')).toBe('https://career.t1.ru/vacancies/');
+      expect(resolveApplyUrl('https://career.t1.ru/debut/open-school/', 'Холдинг Т1')).toBe('https://career.t1.ru/vacancies/');
 
       // 9. Sber Seasons portal
       expect(getDirectVacancyPortalUrl('sber')).toBe('https://sbergraduate.ru/sberseasons-moscow/');
@@ -221,7 +222,7 @@ describe('Vacancy Quality & Link Integrity Verification', () => {
       const siteMap = Object.fromEntries(MONITORED_WEBSITES_LIST.map((w) => [w.id, w.url]));
       expect(siteMap['site-kontur']).toBe('https://kontur.ru/education/internship');
       expect(siteMap['site-tbank']).toBe('https://education.tbank.ru/start/');
-      expect(siteMap['site-t1']).toBe('https://career.t1.ru/debut/open-school/');
+      expect(siteMap['site-t1']).toBe('https://career.t1.ru/vacancies/');
       expect(siteMap['site-directum']).toBe('https://vk.com/student_directum');
       expect(siteMap['site-yandex']).toBe('https://yandex.ru/yaintern/');
       expect(siteMap['site-ozon']).toBe('https://job.ozon.ru/it/camp/');

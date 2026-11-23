@@ -413,7 +413,7 @@ export function App() {
       deadlineAction = 'Заполнить анкету на портале и решить вступительный контест (7 дней с момента старта)';
     } else if (compLower.includes('т1')) {
       deadlineDateStr = '';
-      deadlineAction = 'Подать заявку в Открытую школу Т1 и пройти онлайн-тестирование';
+      deadlineAction = 'Подать резюме на карьерном портале Т1 (career.t1.ru/vacancies)';
     } else if (compLower.includes('контур')) {
       deadlineDateStr = '';
       deadlineAction = 'Заполнить анкету студента в программу Контур.Старт на сайте kontur.ru/education/internship';
@@ -1093,12 +1093,18 @@ export function App() {
                         {selectedCompany !== 'all' &&
                         (selectedCompany.toLowerCase().includes('directum') || selectedCompany.toLowerCase().includes('директ'))
                           ? 'Набор на стажировки в Directum на данный момент завершён'
+                          : selectedCompany !== 'all' &&
+                            (selectedCompany.toLowerCase().includes('контур') || selectedCompany.toLowerCase().includes('kontur'))
+                          ? 'Приём заявок на стажировку в Контуре завершён (набор закрыт)'
                           : 'Стажировки по заданным фильтрам не найдены'}
                       </h3>
                       <p className="text-xs text-neutral-500 dark:text-neutral-400 max-w-md mx-auto leading-relaxed">
                         {selectedCompany !== 'all' &&
                         (selectedCompany.toLowerCase().includes('directum') || selectedCompany.toLowerCase().includes('директ'))
                           ? 'Компания Directum проводит набор волнами (студенческие лаборатории). Новые анонсы и старт отборов публикуются в официальном канале @Life_in_Directum.'
+                          : selectedCompany !== 'all' &&
+                            (selectedCompany.toLowerCase().includes('контур') || selectedCompany.toLowerCase().includes('kontur'))
+                          ? 'Официальная программа стажировок «Контур.Старт» открывает приём заявок сезонно. Следите за стартом нового сезона в канале @KonturTech или на странице стажировок.'
                           : 'Попробуйте сбросить фильтры или выберите другое направление!'}
                       </p>
                       <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
@@ -1113,6 +1119,28 @@ export function App() {
                               <Send className="w-3 h-3" />
                               Канал @Life_in_Directum
                             </a>
+                          )}
+                        {selectedCompany !== 'all' &&
+                          (selectedCompany.toLowerCase().includes('контур') || selectedCompany.toLowerCase().includes('kontur')) && (
+                            <>
+                              <a
+                                href="https://t.me/KonturTech"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="px-5 py-2 rounded-full text-xs font-semibold transition-all bg-[#0088cc] text-white hover:bg-[#0077b5] shadow-xs inline-flex items-center gap-1.5 cursor-pointer"
+                              >
+                                <Send className="w-3 h-3" />
+                                Канал @KonturTech
+                              </a>
+                              <a
+                                href="https://kontur.ru/education/internship"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="px-5 py-2 rounded-full text-xs font-semibold transition-all bg-neutral-900 text-white hover:bg-black dark:bg-white dark:text-neutral-950 shadow-xs inline-flex items-center gap-1.5 cursor-pointer"
+                              >
+                                <span>Страница стажировок Контура</span>
+                              </a>
+                            </>
                           )}
                         <button
                           onClick={() => {
