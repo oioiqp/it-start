@@ -35,13 +35,13 @@ export const CompanyModal: React.FC<CompanyModalProps> = ({ companyName, onClose
   const info = getCompanyInfo(companyName);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/40 backdrop-blur-md animate-fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-md animate-fade-in">
       <div
-        className="relative w-full max-w-2xl max-h-[92vh] sm:max-h-[90vh] rounded-3xl overflow-hidden flex flex-col shadow-2xl transition-all duration-300 liquid-glass border border-white/20 dark:border-white/10"
+        className="relative w-full max-w-2xl max-h-[92vh] sm:max-h-[90vh] rounded-3xl overflow-hidden flex flex-col shadow-2xl transition-all duration-300 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-neutral-100"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="p-4 sm:p-6 border-b border-black/5 dark:border-white/10 flex items-start justify-between gap-3">
+        <div className="p-4 sm:p-6 border-b border-neutral-100 dark:border-neutral-800 flex items-start justify-between gap-3 bg-white dark:bg-neutral-900">
           <div className="flex items-center gap-3 min-w-0">
             <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl flex items-center justify-center shrink-0 bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 font-bold shadow-xs">
               <CircleAlert className="w-5 h-5" />
@@ -51,7 +51,7 @@ export const CompanyModal: React.FC<CompanyModalProps> = ({ companyName, onClose
                 <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                   О работодателе
                 </span>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold liquid-glass-pill text-neutral-800 dark:text-neutral-200">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 border border-neutral-200 dark:border-neutral-700">
                   Аккредитованная IT-компания
                 </span>
               </div>
@@ -63,7 +63,7 @@ export const CompanyModal: React.FC<CompanyModalProps> = ({ companyName, onClose
 
           <button
             onClick={onClose}
-            className="p-2 rounded-full transition-all duration-150 hover:bg-black/5 dark:hover:bg-white/10 text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white shrink-0 cursor-pointer"
+            className="p-2 rounded-full transition-all duration-150 hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-400 hover:text-neutral-900 dark:text-neutral-500 dark:hover:text-white shrink-0 cursor-pointer"
             aria-label="Закрыть"
           >
             <X className="w-5 h-5" />
@@ -71,13 +71,13 @@ export const CompanyModal: React.FC<CompanyModalProps> = ({ companyName, onClose
         </div>
 
         {/* Modal Body */}
-        <div className="p-4 sm:p-6 overflow-y-auto space-y-4 sm:space-y-5 text-sm">
+        <div className="p-4 sm:p-6 overflow-y-auto space-y-4 sm:space-y-5 text-sm bg-white dark:bg-neutral-900">
           {/* Key Facts Bento Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {/* Employees */}
-            <div className="p-4 rounded-2xl liquid-glass-subtle space-y-1">
-              <div className="flex items-center gap-2 text-xs font-semibold text-neutral-500 dark:text-neutral-400">
-                <Users className="w-4 h-4 text-blue-500" />
+            <div className="p-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800/60 border border-neutral-200/80 dark:border-neutral-700/60 shadow-xs space-y-1.5">
+              <div className="flex items-center gap-2 text-xs font-semibold text-neutral-600 dark:text-neutral-400">
+                <Users className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                 <span>Штат сотрудников</span>
               </div>
               <p className="font-bold text-neutral-900 dark:text-white text-sm sm:text-base leading-snug">
@@ -86,8 +86,8 @@ export const CompanyModal: React.FC<CompanyModalProps> = ({ companyName, onClose
             </div>
 
             {/* Market Position */}
-            <div className="p-4 rounded-2xl liquid-glass-subtle space-y-1">
-              <div className="flex items-center gap-2 text-xs font-semibold text-neutral-500 dark:text-neutral-400">
+            <div className="p-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800/60 border border-neutral-200/80 dark:border-neutral-700/60 shadow-xs space-y-1.5">
+              <div className="flex items-center gap-2 text-xs font-semibold text-neutral-600 dark:text-neutral-400">
                 <Trophy className="w-4 h-4 text-amber-500" />
                 <span>Место на рынке</span>
               </div>
@@ -98,7 +98,7 @@ export const CompanyModal: React.FC<CompanyModalProps> = ({ companyName, onClose
           </div>
 
           {/* Headquarters */}
-          <div className="flex items-start gap-2.5 p-3 rounded-2xl liquid-glass-subtle text-xs text-neutral-700 dark:text-neutral-300">
+          <div className="flex items-start gap-2.5 p-3.5 rounded-2xl bg-neutral-50 dark:bg-neutral-800/60 border border-neutral-200/80 dark:border-neutral-700/60 shadow-xs text-xs text-neutral-700 dark:text-neutral-300">
             <MapPin className="w-4 h-4 shrink-0 text-rose-500 mt-0.5" />
             <div>
               <span className="font-semibold text-neutral-900 dark:text-white">Локации и хабы: </span>
@@ -107,7 +107,7 @@ export const CompanyModal: React.FC<CompanyModalProps> = ({ companyName, onClose
           </div>
 
           {/* About Company */}
-          <div className="space-y-1.5">
+          <div className="p-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800/60 border border-neutral-200/80 dark:border-neutral-700/60 shadow-xs space-y-1.5">
             <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
               О компании
             </h3>
@@ -117,9 +117,9 @@ export const CompanyModal: React.FC<CompanyModalProps> = ({ companyName, onClose
           </div>
 
           {/* Internship Program & Perks */}
-          <div className="p-4 rounded-2xl space-y-3 liquid-glass-subtle">
+          <div className="p-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800/60 border border-neutral-200/80 dark:border-neutral-700/60 shadow-xs space-y-3">
             <div className="flex items-center gap-2">
-              <GraduationCap className="w-4 h-4 text-emerald-500" />
+              <GraduationCap className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-white">
                 Программа стажировок: {info.internshipProgram}
               </h3>
@@ -143,7 +143,7 @@ export const CompanyModal: React.FC<CompanyModalProps> = ({ companyName, onClose
               {info.selectionSteps.map((step, idx) => (
                 <div
                   key={idx}
-                  className="flex items-center gap-2.5 p-2.5 rounded-xl liquid-glass-pill text-xs font-medium text-neutral-800 dark:text-neutral-200"
+                  className="flex items-center gap-2.5 p-3 rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200/80 dark:border-neutral-700/60 text-xs font-medium text-neutral-800 dark:text-neutral-200 shadow-2xs"
                 >
                   <span className="w-5 h-5 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 flex items-center justify-center text-[10px] font-bold shrink-0">
                     {idx + 1}
@@ -157,10 +157,10 @@ export const CompanyModal: React.FC<CompanyModalProps> = ({ companyName, onClose
         </div>
 
         {/* Footer actions */}
-        <div className="p-4 sm:p-5 border-t border-black/5 dark:border-white/10 flex items-center justify-between gap-3 bg-white/40 dark:bg-neutral-900/40">
+        <div className="p-4 sm:p-5 border-t border-neutral-100 dark:border-neutral-800 flex items-center justify-between gap-3 bg-neutral-50/80 dark:bg-neutral-900/80">
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-full text-xs font-semibold liquid-glass-pill hover:bg-white/60 text-neutral-700 dark:text-neutral-300 cursor-pointer"
+            className="px-4 py-2 rounded-full text-xs font-semibold bg-white dark:bg-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 border border-neutral-200 dark:border-neutral-700 cursor-pointer shadow-xs"
           >
             Закрыть
           </button>

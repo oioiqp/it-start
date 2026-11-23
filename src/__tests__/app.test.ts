@@ -1,5 +1,7 @@
 // @vitest-environment happy-dom
 import { describe, it, expect } from 'vitest';
+import React from 'react';
+import { renderToString } from 'react-dom/server';
 import {
   SUPABASE_URL,
   SUPABASE_ANON_KEY,
@@ -13,6 +15,13 @@ import { SEED_INTERNSHIPS } from '../data/internships';
 import { QUESTIONS } from '../data/questions';
 import { TEAM_MEMBERS } from '../data/team';
 import { getLocalProgress, saveLocalProgress, getLocalTheme, saveLocalTheme } from '../lib/storage';
+import {
+  COMPANY_OFFICIAL_PORTALS,
+  getDirectVacancyPortalUrl,
+  resolveApplyUrl,
+  getInternshipRecruitmentStatus,
+} from '../lib/vacancyUrl';
+import { CompanyModal } from '../components/CompanyModal';
 
 describe('1. Configuration & Embedded Constants', () => {
   it('has exact Supabase URL matching requirements', () => {
@@ -742,7 +751,7 @@ describe('11. Target Companies & Telegram Channels Tracking', () => {
     expect(botModule.CAREER_WEBSITES_DATA.length).toBeGreaterThanOrEqual(10);
     const siteUrls = botModule.CAREER_WEBSITES_DATA.map((s: any) => s.url);
     expect(siteUrls.some((u: string) => u.includes('career.directum.ru'))).toBe(true);
-    expect(siteUrls.some((u: string) => u.includes('kontur.ru/career/students'))).toBe(true);
+    expect(siteUrls.some((u: string) => u.includes('kontur.ru/education/internship'))).toBe(true);
     expect(siteUrls.some((u: string) => u.includes('education.tbank.ru'))).toBe(true);
     expect(siteUrls.some((u: string) => u.includes('career.t1.ru/vacancies'))).toBe(true);
     expect(siteUrls.some((u: string) => u.includes('yandex.ru/yaintern'))).toBe(true);
@@ -1899,6 +1908,87 @@ describe('15. Telegram Mini App & VK Cross-Platform Integration & Modal Geometry
       expect(botItem.url).not.toContain('career.directum.ru');
       expect(botItem.applyUrl).not.toContain('career.directum.ru');
     }
+  });
+});
+
+describe('17. Client-Server Architecture Roadmap, Recruitment Deadlines & White Company Modal UX', () => {
+  it('validates Client-Server Architecture topic and its rich subtopics in frontend roadmap', () => {
+    const feCoreTopic = ROADMAP_TOPICS.find((t) => t.id === 'fe-core-1')!;
+    expect(feCoreTopic).toBeDefined();
+    expect(feCoreTopic.title).toContain('Модель клиент-сервер');
+    expect(feCoreTopic.subtopics.length).toBeGreaterThanOrEqual(7);
+
+    const subtopicsText = feCoreTopic.subtopics.join(' ');
+    expect(subtopicsText).toContain('клиент-сервер');
+    expect(subtopicsText).toContain('DNS');
+    expect(subtopicsText).toContain('TCP');
+    expect(subtopicsText).toContain('HTTP');
+    expect(subtopicsText).toContain('CORS');
+    expect(subtopicsText).toContain('REST API');
+  });
+
+  it('validates dedicated interview questions for Client-Server model, URL lifecycle, and CORS', () => {
+    const clientServerQ = QUESTIONS.find((q) => q.id === 'q-fe-client-server');
+    expect(clientServerQ).toBeDefined();
+    expect(clientServerQ!.title).toContain('клиент-сервер');
+    expect(clientServerQ!.answer).toContain('stateless');
+    expect(clientServerQ!.codeSnippet).toContain('fetch(');
+
+    const urlLifecycleQ = QUESTIONS.find((q) => q.id === 'q-fe-url-lifecycle');
+    expect(urlLifecycleQ).toBeDefined();
+    expect(urlLifecycleQ!.title).toContain('URL');
+    expect(urlLifecycleQ!.answer).toContain('Critical Rendering Path');
+
+    const corsQ = QUESTIONS.find((q) => q.id === 'q-fe-cors-preflight');
+    expect(corsQ).toBeDefined();
+    expect(corsQ!.title).toContain('CORS');
+    expect(corsQ!.answer).toContain('OPTIONS');
+    expect(corsQ!.codeSnippet).toContain('Access-Control-Allow-Origin');
+  });
+
+  it('validates getInternshipRecruitmentStatus handles T-Bank deadlines and constant recruitment accurately', () => {
+    // 1. T-Bank deadline verification (31 Jan + exam 25-31 Jan)
+    const tbankStatus = getInternshipRecruitmentStatus({ company: 'Т-Банк (Тинькофф)' });
+    expect(tbankStatus.type).toBe('scheduled');
+    expect(tbankStatus.deadline).toContain('31 января');
+    expect(tbankStatus.note).toContain('25 по 31 января');
+
+    // 2. Yandex constant recruitment verification
+    const yandexStatus = getInternshipRecruitmentStatus({ company: 'Яндекс' });
+    expect(yandexStatus.type).toBe('constant');
+    expect(yandexStatus.deadline).toBe('Круглый год');
+
+    // 3. Kontur constant recruitment verification
+    const konturStatus = getInternshipRecruitmentStatus({ company: 'СКБ Контур' });
+    expect(konturStatus.type).toBe('constant');
+    expect(konturStatus.note).toContain('Контур.Старт');
+
+    // 4. T1 constant recruitment verification
+    const t1Status = getInternshipRecruitmentStatus({ company: 'Холдинг Т1' });
+    expect(t1Status.type).toBe('constant');
+    expect(t1Status.note).toContain('Открытая школа Т1');
+  });
+
+  it('verifies Kontur official portal is https://kontur.ru/education/internship and never 404 students URL', () => {
+    expect(COMPANY_OFFICIAL_PORTALS.kontur).toBe('https://kontur.ru/education/internship');
+    expect(getDirectVacancyPortalUrl('kontur')).toBe('https://kontur.ru/education/internship');
+    expect(resolveApplyUrl('https://kontur.ru/career/students', 'Контур')).toBe('https://kontur.ru/education/internship');
+  });
+
+  it('verifies CompanyModal component renders with clean white background and bento cards', () => {
+    const html = renderToString(
+      React.createElement(CompanyModal, {
+        companyName: 'Яндекс',
+        onClose: () => {},
+      })
+    );
+
+    expect(html).toContain('bg-white');
+    expect(html).toContain('Штат сотрудников');
+    expect(html).toContain('Место на рынке');
+    expect(html).toContain('Локации и хабы');
+    expect(html).toContain('Программа стажировок');
+    expect(html).toContain('Карьерный сайт');
   });
 });
 

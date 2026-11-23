@@ -5,6 +5,100 @@ export const QUESTIONS: Question[] = [
   // FRONTEND (REACT, ANGULAR, VUE, CORE)
   // ==========================================
   {
+    id: 'q-fe-client-server',
+    directionId: 'frontend',
+    subTrackId: 'core',
+    title: 'Модель клиент-сервер: принципы работы и сетевой обмен в вебе',
+    question: 'Что такое модель клиент-сервер, какие роли выполняют клиент и сервер и как организован протокол взаимодействия между ними?',
+    category: 'Сети и веб-архитектура',
+    difficulty: 'Junior',
+    answer: 'Модель клиент-сервер — это сетевая архитектура, в которой задачи распределены между поставщиками ресурсов (серверами) и заказчиками услуг (клиентами). Клиент (например, браузер или мобильное приложение) формирует HTTP-запрос (Request) с методом, заголовками и телом, отправляет его по сети серверу и ждет ответа. Сервер (Node.js, C#, Python, Go) слушает сетевой порт, валидирует запрос, обращается к базе данных или другим сервисам, генерирует ответ (Response) со статус-кодом, заголовками и данными (JSON/HTML) и отправляет обратно. Протокол HTTP является stateless (не сохраняет состояние между запросами): идентификация клиента происходит через cookies, сессии или токены (JWT).',
+    codeSnippet: `// Клиентский HTTP-запрос через fetch к REST API сервера:
+async function fetchUserProfile(userId) {
+  try {
+    const response = await fetch(\`https://api.company.ru/v1/users/\${userId}\`, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer <auth_token>'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(\`Ошибка сервера: \${response.status} (\${response.statusText})\`);
+    }
+
+    const user = await response.json();
+    return user;
+  } catch (err) {
+    console.error('Сетевой сбой при обращении к серверу:', err.message);
+  }
+}`,
+    codeLanguage: 'javascript',
+    keyTakeaways: [
+      'Клиент инициирует связь и отображает интерфейс; сервер хранит данные, бизнес-логику и защищает ресурсы',
+      'HTTP — протокол без сохранения состояния (stateless), сессии реализуются через токены/cookies',
+      'Коды состояния стандартизированы: 2xx — успех, 4xx — ошибка на стороне клиента, 5xx — ошибка сервера',
+    ],
+  },
+  {
+    id: 'q-fe-url-lifecycle',
+    directionId: 'frontend',
+    subTrackId: 'core',
+    title: 'Что происходит, когда вы вводите URL в браузер и нажимаете Enter?',
+    question: 'Опишите пошагово, что происходит в сети и в браузере с момента ввода URL до появления отрисованной страницы?',
+    category: 'Сети и браузер',
+    difficulty: 'Junior',
+    answer: '1. DNS-резолвинг: браузер ищет IP-адрес для доменного имени (кэш браузера -> кэш ОС -> hosts -> DNS-сервер провайдера -> root DNS). 2. TCP-рукопожатие: установление соединения с сервером через 3-way handshake (SYN -> SYN-ACK -> ACK). 3. TLS-рукопожатие: согласование шифрования для HTTPS (обмен сертификатами, выработка сессионного ключа). 4. HTTP-запрос: браузер отправляет GET-запрос с заголовками. 5. Ответ сервера: сервер формирует HTML и возвращает статус 200 OK. 6. Critical Rendering Path в браузере: парсинг HTML -> построение DOM-дерева; параллельный парсинг CSS -> построение CSSOM; объединение в Render Tree; вычисление геометрии (Layout / Reflow); растеризация и отрисовка пикселей (Paint); композиция слоёв на GPU (Composite).',
+    codeSnippet: `// Анализ таймингов этапов сетевого запроса через Performance Navigation Timing API:
+const [navTiming] = performance.getEntriesByType('navigation');
+if (navTiming) {
+  console.log({
+    'DNS поиск (мс)': navTiming.domainLookupEnd - navTiming.domainLookupStart,
+    'TCP соединение (мс)': navTiming.connectEnd - navTiming.connectStart,
+    'Ожидание ответа (TTFB) (мс)': navTiming.responseStart - navTiming.requestStart,
+    'Загрузка контента (мс)': navTiming.responseEnd - navTiming.responseStart,
+    'DOM Ready (мс)': navTiming.domContentLoadedEventEnd - navTiming.startTime,
+    'Полная загрузка (мс)': navTiming.loadEventEnd - navTiming.startTime
+  });
+}`,
+    codeLanguage: 'javascript',
+    keyTakeaways: [
+      'Основные сетевые задержки: DNS, TCP/TLS handshake и TTFB (Time to First Byte)',
+      'Critical Rendering Path включает 5 фаз: DOM, CSSOM, Render Tree, Layout, Paint',
+      'Теги <script> без async/defer блокируют парсинг HTML-документа',
+    ],
+  },
+  {
+    id: 'q-fe-cors-preflight',
+    directionId: 'frontend',
+    subTrackId: 'core',
+    title: 'CORS и механизм Preflight (OPTIONS): почему возникает ошибка CORS policy?',
+    question: 'Что такое CORS (Cross-Origin Resource Sharing), почему возникает ошибка blocked by CORS policy и когда браузер отправляет Preflight-запрос?',
+    category: 'Сетевая безопасность',
+    difficulty: 'Junior',
+    answer: 'CORS — это механизм безопасности браузера, который регулирует доступ к ресурсам другого источника (домен, протокол или порт отличаются от текущего origin). Политика Same-Origin Policy (SOP) по умолчанию запрещает сайту читать ответы API с другого домена. Если запрос не является «простым» (например, содержит метод PUT/DELETE/PATCH, нестандартный заголовок вроде Authorization или Content-Type: application/json), браузер ПЕРЕД основным запросом автоматически отправляет Preflight-запрос методом OPTIONS. Сервер должен ответить статусом 200/204 и вернуть заголовки Access-Control-Allow-Origin, Access-Control-Allow-Methods, Access-Control-Allow-Headers. Если сервер их не возвращает, браузер блокирует чтение ответа фронтендом.',
+    codeSnippet: `// Серверная настройка CORS на Node.js (Express):
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', 'https://it-start.ru');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+
+  // Ответ на Preflight-запрос браузера:
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(204);
+  }
+  next();
+});`,
+    codeLanguage: 'javascript',
+    keyTakeaways: [
+      'CORS — это ограничение БРАУЗЕРА, а не сервера. Postman или curl успешно получают ответ без заголовков CORS',
+      'Origin определяется комбинацией: протокол + хост + порт',
+      'Preflight (OPTIONS) выполняется автоматически браузером для любых non-simple запросов',
+    ],
+  },
+  {
     id: 'q-fe-1',
     directionId: 'frontend',
     subTrackId: 'core',

@@ -416,7 +416,7 @@ export function App() {
       deadlineAction = 'Подать заявку в Открытую школу Т1 и пройти онлайн-тестирование';
     } else if (compLower.includes('контур')) {
       deadlineDateStr = '';
-      deadlineAction = 'Заполнить анкету студента в программу Контур.Старт на сайте kontur.ru/career/students';
+      deadlineAction = 'Заполнить анкету студента в программу Контур.Старт на сайте kontur.ru/education/internship';
     } else if (internship.expiresAt) {
       deadlineDateStr = internship.expiresAt;
       deadlineAction = 'Подать заявку до окончания приёма';

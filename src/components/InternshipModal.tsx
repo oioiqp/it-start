@@ -28,6 +28,7 @@ import {
   getCompanyMonogram,
   formatSalary,
   getVacancySourceDetails,
+  getInternshipRecruitmentStatus,
 } from '../lib/vacancyUrl';
 import { getCompanyInfo } from '../data/companies';
 import { useScrollLock } from '../lib/useScrollLock';
@@ -81,6 +82,8 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
   }, [internship, onClose]);
 
   if (!internship) return null;
+
+  const recruitmentInfo = getInternshipRecruitmentStatus(internship);
 
   // Filter relevant roadmap topics matching direction and subtrack
   const relevantTopics = roadmapTopics.filter(
@@ -279,13 +282,12 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
             <span className="text-xs font-semibold px-2.5 py-1 rounded-full liquid-glass-pill text-neutral-800 dark:text-neutral-200">
               {formatSalary(internship.salary)}
             </span>
-            {internship.recruitmentType === 'scheduled' && (
+            {recruitmentInfo.type === 'scheduled' ? (
               <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-800 dark:text-amber-200 border border-amber-500/20 flex items-center gap-1">
                 <Clock className="w-3 h-3 text-amber-600 dark:text-amber-400" />
-                Набор: {internship.applicationDeadline || 'до 31 января'}
+                Набор {recruitmentInfo.deadline}
               </span>
-            )}
-            {internship.recruitmentType === 'constant' && (
+            ) : (
               <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-800 dark:text-emerald-200 border border-emerald-500/20 flex items-center gap-1">
                 <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                 Постоянный набор

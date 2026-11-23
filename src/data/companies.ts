@@ -28,13 +28,13 @@ export const COMPANIES_DATA: Record<string, CompanyInfo> = {
       'Технологичный современный стек (C#, TypeScript, React, Python, Go)',
     ],
     selectionSteps: [
-      'Подача анкеты студента в программу Контур.Старт на сайте kontur.ru/career/students',
+      'Подача анкеты студента в программу Контур.Старт на сайте kontur.ru/education/internship',
       'Профильное онлайн-тестирование по выбранному стеку',
       'Практическое тестовое задание в Контур',
       'Техническое интервью с ментором и командой',
       'Оффер на стажировку с гибким графиком от 20 ч/нед',
     ],
-    websiteUrl: 'https://kontur.ru/career/students',
+    websiteUrl: 'https://kontur.ru/education/internship',
   },
   tbank: {
     name: 'Т-Банк (Тинькофф)',

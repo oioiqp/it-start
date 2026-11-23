@@ -140,7 +140,7 @@ describe('Vacancy Quality & Link Integrity Verification', () => {
       expect(tbankDirect).toBe('https://education.tbank.ru/start/frontend/');
 
       const konturDirect = resolveApplyUrl('https://kontur.ru', 'Контур', undefined, 'frontend');
-      expect(konturDirect).toBe('https://kontur.ru/career/students');
+      expect(konturDirect).toBe('https://kontur.ru/education/internship');
 
       const sberDirect = resolveApplyUrl('https://sbergraduate.ru', 'Сбер', undefined, 'data_science');
       expect(sberDirect).toBe('https://sbergraduate.ru/sberseasons-moscow/ml/');
@@ -161,7 +161,7 @@ describe('Vacancy Quality & Link Integrity Verification', () => {
     it('resolves official internship portals for target companies according to specifications', () => {
       // 1. Company official portals configuration
       expect(COMPANY_OFFICIAL_PORTALS.tbank).toBe('https://education.tbank.ru/start/');
-      expect(COMPANY_OFFICIAL_PORTALS.kontur).toBe('https://kontur.ru/career/students');
+      expect(COMPANY_OFFICIAL_PORTALS.kontur).toBe('https://kontur.ru/education/internship');
       expect(COMPANY_OFFICIAL_PORTALS.directum).toBe('https://vk.com/student_directum');
       expect(COMPANY_OFFICIAL_PORTALS.t1).toBe('https://career.t1.ru/debut/open-school/');
       expect(COMPANY_OFFICIAL_PORTALS.yandex).toBe('https://yandex.ru/yaintern/');
@@ -191,8 +191,8 @@ describe('Vacancy Quality & Link Integrity Verification', () => {
         .toBe('https://start.avito.ru/tech');
 
       // 4. Kontur student portal fallback
-      expect(getDirectVacancyPortalUrl('kontur')).toBe('https://kontur.ru/career/students');
-      expect(resolveApplyUrl('https://kontur.ru/career/', 'Контур')).toBe('https://kontur.ru/career/students');
+      expect(getDirectVacancyPortalUrl('kontur')).toBe('https://kontur.ru/education/internship');
+      expect(resolveApplyUrl('https://kontur.ru/career/', 'Контур')).toBe('https://kontur.ru/education/internship');
 
       // 5. Directum portal fallback (verified student community)
       expect(getDirectVacancyPortalUrl('directum')).toBe('https://vk.com/student_directum');
@@ -219,7 +219,7 @@ describe('Vacancy Quality & Link Integrity Verification', () => {
 
       // 11. Monitored websites list canonical URLs for all target employers
       const siteMap = Object.fromEntries(MONITORED_WEBSITES_LIST.map((w) => [w.id, w.url]));
-      expect(siteMap['site-kontur']).toBe('https://kontur.ru/career/students');
+      expect(siteMap['site-kontur']).toBe('https://kontur.ru/education/internship');
       expect(siteMap['site-tbank']).toBe('https://education.tbank.ru/start/');
       expect(siteMap['site-t1']).toBe('https://career.t1.ru/debut/open-school/');
       expect(siteMap['site-directum']).toBe('https://vk.com/student_directum');

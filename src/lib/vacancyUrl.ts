@@ -5,7 +5,7 @@ import type { DirectionId, SubTrackId } from '../types';
  */
 export const COMPANY_OFFICIAL_PORTALS: Record<string, string> = {
   tbank: 'https://education.tbank.ru/start/',
-  kontur: 'https://kontur.ru/career/students',
+  kontur: 'https://kontur.ru/education/internship',
   directum: 'https://vk.com/student_directum',
   t1: 'https://career.t1.ru/debut/open-school/',
   yandex: 'https://yandex.ru/yaintern/',
@@ -96,7 +96,7 @@ export function getDirectVacancyPortalUrl(
       }
       return 'https://education.tbank.ru/start/';
     case 'kontur':
-      return 'https://kontur.ru/career/students';
+      return 'https://kontur.ru/education/internship';
     case 'directum':
       return 'https://vk.com/student_directum';
     case 't1':
@@ -270,6 +270,7 @@ export function resolveApplyUrl(
     lower === 'https://sbergraduate.ru/sberseasons-moscow/' ||
     lower === 'https://sbergraduate.ru/sberseasons-moscow' ||
     // Obsolete employer links that must be rerouted to live verified portals
+    lower.includes('kontur.ru/career/students') ||
     lower.includes('kontur.ru/career/vacancies/intern-') ||
     lower.includes('education.tbank.ru/start/sre') ||
     lower.includes('fintech.tbank.ru') ||
@@ -979,5 +980,99 @@ export function isVacancyActive(item: VacancyFreshnessInput | null | undefined):
 
   return true;
 }
+
+export interface InternshipRecruitmentStatus {
+  type: 'scheduled' | 'constant';
+  deadline: string;
+  note: string;
+  displayBadge: string;
+}
+
+/**
+ * Returns normalized recruitment status (scheduled vs constant year-round) with deadlines.
+ * Guarantees that users clearly see whether a vacancy is continuous or has a strict cutoff date.
+ */
+export function getInternshipRecruitmentStatus(internship: {
+  recruitmentType?: 'constant' | 'scheduled' | 'seasonal';
+  applicationDeadline?: string;
+  deadlineNote?: string;
+  company?: string;
+}): InternshipRecruitmentStatus {
+  if (internship.recruitmentType === 'scheduled') {
+    const deadline = internship.applicationDeadline || 'до 31 января';
+    const note = internship.deadlineNote || 'Подача заявки и вступительные испытания';
+    return {
+      type: 'scheduled',
+      deadline,
+      note,
+      displayBadge: `Приём заявок ${deadline} • ${note}`,
+    };
+  }
+
+  if (internship.recruitmentType === 'constant') {
+    const deadline = internship.applicationDeadline || 'Круглый год';
+    const note = internship.deadlineNote || 'Постоянный круглогодичный набор';
+    return {
+      type: 'constant',
+      deadline,
+      note,
+      displayBadge: `Постоянный набор • ${note}`,
+    };
+  }
+
+  const comp = (internship.company || '').toLowerCase();
+  if (comp.includes('т-банк') || comp.includes('тинькофф') || comp.includes('tbank')) {
+    return {
+      type: 'scheduled',
+      deadline: 'до 31 января',
+      note: 'Экзамен с 25 по 31 января включительно',
+      displayBadge: 'Приём заявок до 31 января • Экзамен с 25 по 31 января',
+    };
+  }
+
+  if (comp.includes('сбер') || comp.includes('sber')) {
+    return {
+      type: 'scheduled',
+      deadline: 'до 28 февраля',
+      note: 'Весенний сезон стажировок SberSeasons',
+      displayBadge: 'Приём заявок до 28 февраля • SberSeasons',
+    };
+  }
+
+  if (comp.includes('контур') || comp.includes('kontur')) {
+    return {
+      type: 'constant',
+      deadline: 'Круглый год',
+      note: 'Контур.Старт • Официальная программа стажировок',
+      displayBadge: 'Постоянный набор • Контур.Старт',
+    };
+  }
+
+  if (comp.includes('т1') || comp.includes('t1')) {
+    return {
+      type: 'constant',
+      deadline: 'Круглый год',
+      note: 'Открытая школа Т1 • Обучение и оффер в штат',
+      displayBadge: 'Постоянный набор • Открытая школа Т1',
+    };
+  }
+
+  if (comp.includes('directum') || comp.includes('директ')) {
+    return {
+      type: 'constant',
+      deadline: 'Круглый год',
+      note: 'Студенческое IT-сообщество Directum',
+      displayBadge: 'Постоянный набор • Студенты Directum',
+    };
+  }
+
+  return {
+    type: 'constant',
+    deadline: 'Круглый год',
+    note: 'Постоянный круглогодичный набор',
+    displayBadge: 'Постоянный набор • Круглый год',
+  };
+}
+
 
 

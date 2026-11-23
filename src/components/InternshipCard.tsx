@@ -21,6 +21,7 @@ import { triggerHaptic } from '../lib/telegram';
 import {
   formatSalary,
   getVacancySourceDetails,
+  getInternshipRecruitmentStatus,
 } from '../lib/vacancyUrl';
 import { getCompanyInfo } from '../data/companies';
 
@@ -144,7 +145,9 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
   onRemoveApplication,
 }) => {
   const [showSteps, setShowSteps] = React.useState(false);
+  const [showApplyConfirm, setShowApplyConfirm] = React.useState(false);
   const companyInfo = getCompanyInfo(internship.company);
+  const recruitmentInfo = getInternshipRecruitmentStatus(internship);
   const selectionSteps = companyInfo.selectionSteps && companyInfo.selectionSteps.length > 0
     ? companyInfo.selectionSteps
     : [
@@ -194,7 +197,9 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
 
   const handleApplyClick = () => {
     triggerHaptic('medium');
-    // Opens official vacancy portal in new tab without creating unintended fake applications
+    if (!isApplied) {
+      setShowApplyConfirm(true);
+    }
   };
 
   const handleRemoveApply = (e: React.MouseEvent) => {
@@ -322,28 +327,26 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
           </div>
         </div>
 
-        {/* Recruitment Status & Deadline Badge */}
-        {internship.recruitmentType === 'scheduled' && (
+        {/* Recruitment Status & Deadline Badge (Always displayed with verified dates) */}
+        {recruitmentInfo.type === 'scheduled' ? (
           <div className="mb-2.5 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold bg-amber-500/10 text-amber-900 dark:text-amber-200 border border-amber-500/25">
             <Clock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
-            <span className="font-bold">Набор: {internship.applicationDeadline || 'до 31 января'}</span>
-            {internship.deadlineNote && (
+            <span className="font-bold">Набор {recruitmentInfo.deadline}</span>
+            {recruitmentInfo.note && (
               <>
                 <span className="opacity-40">•</span>
-                <span className="text-[11px] font-medium opacity-90">{internship.deadlineNote}</span>
+                <span className="text-[11px] font-medium opacity-90">{recruitmentInfo.note}</span>
               </>
             )}
           </div>
-        )}
-
-        {internship.recruitmentType === 'constant' && (
+        ) : (
           <div className="mb-2.5 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold bg-emerald-500/10 text-emerald-900 dark:text-emerald-200 border border-emerald-500/25">
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
             <span className="font-bold">Постоянный набор</span>
-            {internship.deadlineNote && (
+            {recruitmentInfo.note && (
               <>
                 <span className="opacity-40">•</span>
-                <span className="text-[11px] font-medium opacity-90">{internship.deadlineNote}</span>
+                <span className="text-[11px] font-medium opacity-90">{recruitmentInfo.note}</span>
               </>
             )}
           </div>
@@ -518,6 +521,40 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
             );
           })()}
         </div>
+
+        {/* Post-Apply Confirmation Banner (Intentional application registration) */}
+        {showApplyConfirm && !isApplied && (
+          <div className="mt-2.5 p-3 rounded-2xl bg-blue-500/10 border border-blue-500/25 text-xs text-neutral-800 dark:text-neutral-200 animate-fade-in space-y-2">
+            <div className="flex items-center gap-2 font-semibold text-blue-800 dark:text-blue-300">
+              <CheckCircle2 className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
+              <span>Вы перешли на сайт {internship.company}. Добавить в трекер откликов?</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  triggerHaptic('success');
+                  onApplyVacancy?.(internship);
+                  setShowApplyConfirm(false);
+                }}
+                className="px-3 py-1.5 rounded-full text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white cursor-pointer shadow-xs active:scale-95"
+              >
+                ✓ Да, отметить отклик
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowApplyConfirm(false);
+                }}
+                className="px-3 py-1.5 rounded-full text-xs font-medium text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200 cursor-pointer"
+              >
+                Позже
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
