@@ -11,6 +11,13 @@ definition:
       regions:
         - fra # Frankfurt (Europe) for low latency across CIS & Europe
       plan: nano # Free tier 512MB RAM nano instance (Always active / No sleep)
+      instance_types:
+        - type: nano
+      git:
+        repository: github.com/oioiqp/it-start
+        branch: main
+        builder: docker
+        dockerfile: Dockerfile
       docker:
         dockerfile: Dockerfile
       ports:
@@ -24,11 +31,10 @@ definition:
         - http:
             path: /health
             port: 8000
-          initial_delay: 10
+          grace_period: 10
           interval: 30
           timeout: 5
-          unhealthy_threshold: 3
-          healthy_threshold: 1
+          restart_limit: 3
       env:
         - key: NODE_ENV
           value: production

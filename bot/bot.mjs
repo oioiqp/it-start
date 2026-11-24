@@ -80,10 +80,12 @@ if (dns.setDefaultResultOrder) {
   dns.setDefaultResultOrder('ipv4first');
 }
 
-const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || process.argv[2] || '';
+const rawCliToken = process.argv.slice(2).find((arg) => typeof arg === 'string' && !arg.startsWith('-')) || '';
+export const BOT_TOKEN = (process.env.TELEGRAM_BOT_TOKEN || rawCliToken).trim().replace(/^['"]|['"]$/g, '');
 const GITHUB_PAGES_URL = 'https://oioiqp.github.io/it-start/';
 export const BACKEND_URL =
   process.env.KOYEB_PUBLIC_URL ||
+  (process.env.KOYEB_PUBLIC_DOMAIN ? `https://${process.env.KOYEB_PUBLIC_DOMAIN.replace(/\/+$/, '')}/` : '') ||
   process.env.PUBLIC_URL ||
   process.env.BACKEND_URL ||
   process.env.RENDER_URL ||
@@ -91,7 +93,11 @@ export const BACKEND_URL =
 export const RENDER_URL = BACKEND_URL;
 export const WEBAPP_URL = process.env.WEBAPP_URL || BACKEND_URL;
 const BOT_USERNAME = 'IT_start_izh_bot';
-export const PORT = process.env.PORT ? Number(process.env.PORT) : 8000;
+export const PORT = process.env.PORT ? (Number(process.env.PORT) || 8000) : 8000;
+export let isRunning = true;
+export function stopBot() {
+  isRunning = false;
+}
 const __botFilename = fileURLToPath(import.meta.url);
 const __botDirname = path.dirname(__botFilename);
 export const DIST_DIR = path.resolve(__botDirname, '..', 'dist');
@@ -1516,8 +1522,14 @@ export const server = http.createServer(async (req, res) => {
   }
 
   const urlPath = (req.url || '/').split('?')[0];
+  const normalizedPath = urlPath.replace(/\/+$/, '') || '/';
 
-  if (urlPath === '/health') {
+  if (
+    normalizedPath === '/health' ||
+    normalizedPath === '/healthz' ||
+    normalizedPath === '/live' ||
+    normalizedPath === '/ready'
+  ) {
     res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
     if (req.method === 'HEAD') {
       res.end();
@@ -1857,10 +1869,10 @@ if (process.env.NODE_ENV !== 'test') {
   const isDirectRun =
     process.argv[1] &&
     !process.argv[1].includes('vk_bot') &&
-    (process.argv[1].endsWith('bot.mjs') || process.argv[1].endsWith('bot.js'));
+    (process.argv[1].endsWith('bot.mjs') || process.argv[1].endsWith('bot.js') || process.argv[1].includes('bot'));
 
   if (isDirectRun) {
-    server.listen(PORT, () => {
+    server.listen(PORT, '0.0.0.0', () => {
       console.log(`🌐 HTTP сервер запущен на порту ${PORT} (Koyeb / Cloud Health Check & Parser API)`);
     }).on('error', (err) => {
       if (err.code === 'EADDRINUSE') {
@@ -1873,6 +1885,17 @@ if (process.env.NODE_ENV !== 'test') {
     // Graceful shutdown handling for container environments (Koyeb / Docker / Kubernetes)
     const gracefulShutdown = (signal) => {
       console.log(`[Shutdown] Получен сигнал ${signal}, корректное завершение работы сервиса...`);
+      isRunning = false;
+      try {
+        import('./vk_bot.mjs')
+          .then(({ stopVkBot }) => {
+            try {
+              stopVkBot();
+            } catch {}
+          })
+          .catch(() => {});
+      } catch {}
+
       if (server && server.listening) {
         server.close(() => {
           console.log('[Shutdown] HTTP сервер успешно закрыт.');
@@ -4966,7 +4989,6 @@ export async function handleCallbackQuery(query) {
 }
 
 let offset = 0;
-let isRunning = true;
 
 /**
  * Main long polling loop
@@ -5013,16 +5035,7 @@ async function pollUpdates() {
   }
 }
 
-process.on('SIGINT', () => {
-  console.log('\nОстановка бота...');
-  isRunning = false;
-  process.exit(0);
-});
-
-process.on('SIGTERM', () => {
-  isRunning = false;
-  process.exit(0);
-});
+// Clean signal handling for SIGTERM/SIGINT is registered above with graceful server shutdown
 
 const isDirectRun =
   Boolean(process.argv[1]) &&

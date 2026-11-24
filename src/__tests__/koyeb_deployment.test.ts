@@ -28,17 +28,19 @@ describe('Koyeb Deployment & Health Check Parity Suite', () => {
       expect(content).toContain('ENTRYPOINT ["/usr/bin/dumb-init", "--"]');
     });
 
-    it('configures port 8000 and HTTP health check probe', () => {
+    it('configures port 8000 and HTTP health check probe with curl -fsS', () => {
       const content = fs.readFileSync(dockerfilePath, 'utf-8');
       expect(content).toContain('EXPOSE 8000');
       expect(content).toContain('ENV PORT=8000');
       expect(content).toContain('HEALTHCHECK');
+      expect(content).toContain('curl -fsS');
       expect(content).toContain('/health');
     });
 
-    it('runs as non-root user for container security', () => {
+    it('runs as non-root user and ensures directory permissions', () => {
       const content = fs.readFileSync(dockerfilePath, 'utf-8');
       expect(content).toContain('USER node');
+      expect(content).toContain('chown -R node:node /app');
     });
 
     it('sets correct entry command for unified Telegram & VK bot runner', () => {
@@ -61,13 +63,26 @@ describe('Koyeb Deployment & Health Check Parity Suite', () => {
       expect(content).toContain('fra');
       expect(content).toContain('port: 8000');
       expect(content).toContain('plan: nano');
+      expect(content).toContain('instance_types:');
+      expect(content).toContain('type: nano');
     });
 
-    it('configures automated HTTP health checks on /health', () => {
+    it('configures automated HTTP health checks with valid Koyeb parameters', () => {
       const content = fs.readFileSync(koyebYamlPath, 'utf-8');
       expect(content).toContain('health_checks:');
       expect(content).toContain('path: /health');
       expect(content).toContain('port: 8000');
+      expect(content).toContain('grace_period: 10');
+      expect(content).toContain('interval: 30');
+      expect(content).toContain('timeout: 5');
+      expect(content).toContain('restart_limit: 3');
+    });
+
+    it('defines git/docker builder mapping for repository continuous delivery', () => {
+      const content = fs.readFileSync(koyebYamlPath, 'utf-8');
+      expect(content).toContain('git:');
+      expect(content).toContain('builder: docker');
+      expect(content).toContain('dockerfile: Dockerfile');
     });
 
     it('specifies essential environment variables', () => {
@@ -80,10 +95,16 @@ describe('Koyeb Deployment & Health Check Parity Suite', () => {
     });
   });
 
-  describe('3. Docker Build Context (.dockerignore)', () => {
-    const dockerignorePath = path.join(rootDir, '.dockerignore');
+  describe('3. Buildpack & Docker Context (Procfile & .dockerignore)', () => {
+    it('provides Procfile for Koyeb buildpack compatibility', () => {
+      const procfilePath = path.join(rootDir, 'Procfile');
+      expect(fs.existsSync(procfilePath)).toBe(true);
+      const content = fs.readFileSync(procfilePath, 'utf-8');
+      expect(content.trim()).toBe('web: npm start');
+    });
 
-    it('exists and excludes heavy / sensitive files', () => {
+    it('exists and excludes heavy / sensitive files in .dockerignore', () => {
+      const dockerignorePath = path.join(rootDir, '.dockerignore');
       expect(fs.existsSync(dockerignorePath)).toBe(true);
       const content = fs.readFileSync(dockerignorePath, 'utf-8');
       expect(content).toContain('node_modules');
@@ -91,6 +112,7 @@ describe('Koyeb Deployment & Health Check Parity Suite', () => {
       expect(content).toContain('.env');
       expect(content).toContain('videos');
       expect(content).toContain('dist');
+      expect(content).toContain('FULL_PROJECT_CODEBASE.md');
     });
   });
 
@@ -151,6 +173,25 @@ describe('Koyeb Deployment & Health Check Parity Suite', () => {
       expect(data.lastScan).toBeDefined();
     });
 
+    it('responds to GET /health/ (trailing slash) with HTTP 200 JSON', async () => {
+      const res = await fetch(`http://127.0.0.1:${serverPort}/health/`);
+      expect(res.status).toBe(200);
+      const data = await res.json();
+      expect(data.status).toBe('ok');
+    });
+
+    it('responds to GET /healthz and /live endpoints for cloud probes', async () => {
+      const resHealthz = await fetch(`http://127.0.0.1:${serverPort}/healthz`);
+      expect(resHealthz.status).toBe(200);
+      const dataHealthz = await resHealthz.json();
+      expect(dataHealthz.status).toBe('ok');
+
+      const resLive = await fetch(`http://127.0.0.1:${serverPort}/live`);
+      expect(resLive.status).toBe(200);
+      const dataLive = await resLive.json();
+      expect(dataLive.status).toBe('ok');
+    });
+
     it('responds to HEAD /health with HTTP 200 and empty body', async () => {
       const res = await fetch(`http://127.0.0.1:${serverPort}/health`, { method: 'HEAD' });
       expect(res.status).toBe(200);
@@ -201,9 +242,33 @@ describe('Koyeb Deployment & Health Check Parity Suite', () => {
       expect(Array.isArray(data)).toBe(true);
       expect(data.length).toBeGreaterThanOrEqual(8);
     });
+
+    it('exports isRunning state and clean stopBot shutdown method', () => {
+      expect(typeof botModule.isRunning).toBe('boolean');
+      expect(typeof botModule.stopBot).toBe('function');
+    });
   });
 
-  describe('5. VK Bot Runner Parity on Koyeb', () => {
+  describe('5. CLI Argument Parsing & Fallback Resilience', () => {
+    it('does not treat CLI flags (--all, --no-vk) as bot token', () => {
+      const rawArg1 = ['--all'].find((arg) => typeof arg === 'string' && !arg.startsWith('-')) || '';
+      expect(rawArg1).toBe('');
+
+      const rawArg2 = ['--all', '--no-vk'].find((arg) => typeof arg === 'string' && !arg.startsWith('-')) || '';
+      expect(rawArg2).toBe('');
+
+      const rawArg3 = ['--all', '123456:ABCdefGhI'].find((arg) => typeof arg === 'string' && !arg.startsWith('-')) || '';
+      expect(rawArg3).toBe('123456:ABCdefGhI');
+    });
+
+    it('supports KOYEB_PUBLIC_DOMAIN auto-interpolation', () => {
+      const domain = 'it-start-demo.koyeb.app';
+      const autoUrl = `https://${domain.replace(/\/+$/, '')}/`;
+      expect(autoUrl).toBe('https://it-start-demo.koyeb.app/');
+    });
+  });
+
+  describe('6. VK Bot Runner Parity on Koyeb', () => {
     it('exports BACKEND_URL and RENDER_URL matching Koyeb config', async () => {
       // @ts-ignore
       const vkBot = await import('../../bot/vk_bot.mjs');
@@ -221,7 +286,7 @@ describe('Koyeb Deployment & Health Check Parity Suite', () => {
     });
   });
 
-  describe('6. Frontend Koyeb URL Compatibility', () => {
+  describe('7. Frontend Koyeb URL Compatibility', () => {
     it('subscriptionService points to Koyeb by default with RENDER_URL alias', async () => {
       const subService = await import('../services/subscriptionService');
       expect(subService.BACKEND_URL).toBeDefined();

@@ -5,6 +5,8 @@ dist
 .agents
 videos
 *.mp4
+FULL_PROJECT_CODEBASE.md
+ARCHITECTURE.md
 .env
 .env.*
 !.env.example

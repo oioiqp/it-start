@@ -35,7 +35,7 @@ ENV NODE_ENV=production
 ENV PORT=8000
 
 # Install production dependencies only to fit strictly within 512MB RAM
-COPY package*.json ./
+COPY --chown=node:node package*.json ./
 RUN npm ci --omit=dev && npm cache clean --force
 
 # Copy pre-built frontend distribution from builder
@@ -44,12 +44,15 @@ COPY --from=builder --chown=node:node /app/dist ./dist
 # Copy bot server and parser files
 COPY --chown=node:node bot ./bot
 
+# Ensure all application files are properly owned by non-root node user
+RUN chown -R node:node /app
+
 # Expose HTTP port for Koyeb web routing (default 8000)
 EXPOSE 8000
 
 # Container health check probe for Koyeb / Docker
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD curl -f http://localhost:${PORT}/health || exit 1
+  CMD curl -fsS http://localhost:${PORT}/health || exit 1
 
 # Run with non-privileged user for enhanced container security
 USER node

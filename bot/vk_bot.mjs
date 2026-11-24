@@ -115,6 +115,7 @@ export const VK_API_BASE = 'https://api.vk.com/method';
 export const GITHUB_PAGES_URL = 'https://oioiqp.github.io/it-start/';
 export const BACKEND_URL =
   process.env.KOYEB_PUBLIC_URL ||
+  (process.env.KOYEB_PUBLIC_DOMAIN ? `https://${process.env.KOYEB_PUBLIC_DOMAIN.replace(/\/+$/, '')}/` : '') ||
   process.env.PUBLIC_URL ||
   process.env.BACKEND_URL ||
   process.env.RENDER_URL ||
@@ -2207,7 +2208,7 @@ if (process.env.NODE_ENV !== 'test') {
       }
 
       res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
-      res.end('IT-Старт VK Bot работает 24/7! (Render Health Check OK)\n');
+      res.end('IT-Старт VK Bot работает 24/7! (Koyeb & Cloud Health Check OK)\n');
     });
 
     httpServer.listen(VK_PORT, () => {
