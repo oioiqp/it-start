@@ -32,6 +32,7 @@ import {
 } from '../lib/vacancyUrl';
 import { getCompanyInfo } from '../data/companies';
 import { useScrollLock } from '../lib/useScrollLock';
+import { cleanLocation } from './InternshipCard';
 
 interface InternshipModalProps {
   internship: Internship | null;
@@ -218,22 +219,24 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1 flex-wrap">
-                <span className="font-bold text-sm text-neutral-950 dark:text-white font-sans tracking-tight">
-                  {internship.company}
-                </span>
+                <div className="inline-flex items-center gap-1.5 max-w-full min-w-0">
+                  <span className="font-bold text-sm text-neutral-950 dark:text-white font-sans tracking-tight truncate min-w-0">
+                    {internship.company}
+                  </span>
 
-                {/* Company Info Button: circle with exclamation mark as specified */}
-                {onOpenCompanyInfo && (
-                  <button
-                    type="button"
-                    onClick={() => onOpenCompanyInfo(internship.company)}
-                    className="p-1 rounded-full text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-black/5 transition-colors cursor-pointer"
-                    title={`Информация о компании ${internship.company}: штат, позиция на рынке`}
-                    aria-label={`О компании ${internship.company}`}
-                  >
-                    <CircleAlert className="w-3.5 h-3.5" />
-                  </button>
-                )}
+                  {/* Company Info Button: circle with exclamation mark as specified */}
+                  {onOpenCompanyInfo && (
+                    <button
+                      type="button"
+                      onClick={() => onOpenCompanyInfo(internship.company)}
+                      className="p-0.5 rounded-full text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer shrink-0"
+                      title={`Информация о компании ${internship.company}: штат, позиция на рынке`}
+                      aria-label={`О компании ${internship.company}`}
+                    >
+                      <CircleAlert className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
 
                 {/* Favorite Yellow Star Button */}
                 {onToggleFavorite && (
@@ -249,28 +252,30 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                   </button>
                 )}
 
-                <span className="text-xs text-neutral-500 dark:text-neutral-400 flex items-center gap-1 font-medium">
-                  <MapPin className="w-3.5 h-3.5 opacity-70" />
-                  {internship.location}
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-neutral-100 text-neutral-700 dark:bg-white/10 dark:text-neutral-300 shrink-0">
+                  <MapPin className="w-3 h-3 opacity-60 shrink-0" />
+                  <span>{cleanLocation(internship.location)}</span>
                 </span>
 
-                {/* Format icon badge */}
-                {internship.format === 'Удаленно' ? (
-                  <span className="text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-1 font-medium">
-                    <Home className="w-3.5 h-3.5" />
-                    Дома
-                  </span>
-                ) : internship.format === 'Офис' ? (
-                  <span className="text-xs text-blue-600 dark:text-blue-400 flex items-center gap-1 font-medium">
-                    <Building2 className="w-3.5 h-3.5" />
-                    В офисе
-                  </span>
-                ) : (
-                  <span className="text-xs text-violet-600 dark:text-violet-400 flex items-center gap-1 font-medium">
-                    <Home className="w-3 h-3" />+<Building2 className="w-3 h-3" />
-                    Гибрид
-                  </span>
-                )}
+                {/* Clean minimalist format badge */}
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-neutral-100 text-neutral-700 dark:bg-white/10 dark:text-neutral-300 shrink-0">
+                  {internship.format === 'Удаленно' ? (
+                    <>
+                      <Home className="w-3 h-3 opacity-60 shrink-0" />
+                      <span>Дома</span>
+                    </>
+                  ) : internship.format === 'Офис' ? (
+                    <>
+                      <Building2 className="w-3 h-3 opacity-60 shrink-0" />
+                      <span>В офисе</span>
+                    </>
+                  ) : (
+                    <>
+                      <Building2 className="w-3 h-3 opacity-60 shrink-0" />
+                      <span>Гибрид</span>
+                    </>
+                  )}
+                </span>
               </div>
               <h2 className="text-lg sm:text-2xl font-bold tracking-tight text-neutral-900 dark:text-white font-sans break-words leading-snug">
                 План подготовки: {internship.title}
@@ -283,14 +288,14 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
               {formatSalary(internship.salary)}
             </span>
             {recruitmentInfo.type === 'scheduled' ? (
-              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-800 dark:text-amber-200 border border-amber-500/20 flex items-center gap-1">
-                <Clock className="w-3 h-3 text-amber-600 dark:text-amber-400" />
-                Набор {recruitmentInfo.deadline}
+              <span className="text-xs font-medium px-2.5 py-1 rounded-md bg-neutral-100 text-neutral-700 dark:bg-white/10 dark:text-neutral-300 flex items-center gap-1 shrink-0">
+                <Clock className="w-3 h-3 opacity-60" />
+                <span>{recruitmentInfo.deadline.startsWith('до ') ? recruitmentInfo.deadline : `до ${recruitmentInfo.deadline}`}</span>
               </span>
             ) : (
-              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-800 dark:text-emerald-200 border border-emerald-500/20 flex items-center gap-1">
-                <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
-                Постоянный набор
+              <span className="text-xs font-medium px-2.5 py-1 rounded-md bg-neutral-100 text-neutral-700 dark:bg-white/10 dark:text-neutral-300 flex items-center gap-1 shrink-0">
+                <Clock className="w-3 h-3 opacity-60" />
+                <span>Постоянно</span>
               </span>
             )}
             {isApplied && (

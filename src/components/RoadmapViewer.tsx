@@ -82,25 +82,6 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
   // Track open question details (code snippet & answer)
   const [openQuestionDetailId, setOpenQuestionDetailId] = useState<string | null>(null);
 
-  // Track expanded roadmap topics (with arrow toggle: default idx === 0 open, others collapsed)
-  const [expandedTopicIds, setExpandedTopicIds] = useState<Record<string, boolean>>({});
-
-  const isTopicExpanded = (topicId: string, idx: number) => {
-    if (expandedTopicIds[topicId] !== undefined) {
-      return expandedTopicIds[topicId];
-    }
-    return idx === 0;
-  };
-
-  const toggleTopicExpanded = (topicId: string, idx: number) => {
-    triggerHaptic('light');
-    const currentlyExpanded = isTopicExpanded(topicId, idx);
-    setExpandedTopicIds((prev) => ({
-      ...prev,
-      [topicId]: !currentlyExpanded,
-    }));
-  };
-
   const currentDirection = DIRECTIONS.find((d) => d.id === selectedDirectionId) || DIRECTIONS[0];
 
   // If subtrack doesn't belong to current direction, pick first subtrack
@@ -401,7 +382,6 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
 
             {coreTopics.map((topic, idx) => {
               const { total, checked, percent, isDone } = getTopicProgress(topic);
-              const isExpanded = isTopicExpanded(topic.id, idx);
 
               return (
                 <div key={topic.id} className="relative group">
@@ -430,10 +410,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                     }`}
                   >
                     {/* Header */}
-                    <div
-                      onClick={() => toggleTopicExpanded(topic.id, idx)}
-                      className="flex items-start justify-between gap-2.5 sm:gap-3 mb-2 cursor-pointer select-none"
-                    >
+                    <div className="flex items-start justify-between gap-2.5 sm:gap-3 mb-2">
                       <div className="flex items-center gap-2 flex-wrap min-w-0 flex-1">
                         <span className="text-xs font-semibold text-neutral-500 dark:text-neutral-400">
                           Узел #{idx + 1}
@@ -446,7 +423,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                         </span>
                       </div>
 
-                      <div className="flex items-center gap-1.5 shrink-0" onClick={(e) => e.stopPropagation()}>
+                      <div className="flex items-center gap-1.5 shrink-0">
                         <a
                           href={topic.externalDocUrl}
                           target="_blank"
@@ -456,20 +433,6 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                         >
                           <ExternalLink className="w-3.5 h-3.5" />
                         </a>
-
-                        <button
-                          type="button"
-                          onClick={() => toggleTopicExpanded(topic.id, idx)}
-                          className="p-1.5 rounded-full transition-colors shrink-0 liquid-glass-pill hover:bg-white/80 dark:hover:bg-white/15 text-neutral-700 dark:text-neutral-200 cursor-pointer"
-                          title={isExpanded ? 'Свернуть подтемы' : 'Раскрыть подтемы'}
-                          aria-expanded={isExpanded}
-                        >
-                          <ChevronDown
-                            className={`w-4 h-4 transition-transform duration-200 ${
-                              isExpanded ? 'rotate-180' : ''
-                            }`}
-                          />
-                        </button>
                       </div>
                     </div>
 
@@ -478,16 +441,10 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                     </p>
 
                     {/* Progress Bar */}
-                    <div
-                      onClick={() => toggleTopicExpanded(topic.id, idx)}
-                      className="rounded-2xl p-2.5 mb-3.5 transition-colors liquid-glass-subtle cursor-pointer select-none"
-                    >
+                    <div className="rounded-2xl p-2.5 mb-3.5 transition-colors liquid-glass-subtle">
                       <div className="flex items-center justify-between text-[11px] mb-1">
-                        <span className="text-neutral-600 dark:text-neutral-400 font-medium flex items-center gap-1.5">
-                          <span>Прогресс темы:</span>
-                          <span className="text-[10px] text-neutral-500 font-normal">
-                            ({isExpanded ? 'нажмите, чтобы скрыть' : 'нажмите, чтобы раскрыть подтемы'})
-                          </span>
+                        <span className="text-neutral-600 dark:text-neutral-400 font-medium">
+                          Прогресс темы:
                         </span>
                         <span
                           className={`font-semibold ${
@@ -509,81 +466,76 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                       </div>
                     </div>
 
-                    {/* Expandable Subtopics, Interview Tip & Questions */}
-                    {isExpanded && (
-                      <div className="animate-fade-in space-y-3.5 pt-1">
-                        {/* Subtopics Checklist */}
-                        <div className="space-y-2">
-                          <span className="text-[11px] font-medium uppercase tracking-wider block text-neutral-500 dark:text-neutral-400">
-                            Ключевые темы (отметьте галочками):
-                          </span>
-                          <div className="grid grid-cols-1 gap-1.5">
-                            {topic.subtopics.map((sub, sIdx) => {
-                              const isSubChecked = getSubtopicChecked(topic, sIdx);
-                              return (
-                                <div
-                                  key={sIdx}
-                                  onClick={() => handleToggleSubtopicClick(topic, sIdx)}
-                                  className={`flex items-start gap-2.5 p-2 rounded-xl border text-xs cursor-pointer select-none transition-all ${
-                                    isSubChecked
-                                      ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-900 dark:bg-emerald-500/15 dark:border-emerald-500/30 dark:text-emerald-300'
-                                      : 'bg-neutral-100/70 border-neutral-200/70 text-neutral-700 hover:bg-neutral-200/60 dark:bg-white/[0.03] dark:border-white/[0.06] dark:text-neutral-300 dark:hover:bg-white/[0.07]'
-                                  }`}
-                                >
-                                  <button type="button" className="mt-0.5 shrink-0">
-                                    {isSubChecked ? (
-                                      <CheckSquare className="w-4 h-4 text-emerald-500" />
-                                    ) : (
-                                      <Square className="w-4 h-4 text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200" />
-                                    )}
-                                  </button>
-                                  <span className={isSubChecked ? 'line-through opacity-75' : ''}>
-                                    {sub}
-                                  </span>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </div>
-
-                        {/* Interview Callout */}
-                        <div className="p-3 rounded-2xl text-[11px] space-y-1 transition-colors bg-amber-500/10 border border-amber-500/20 text-amber-900 dark:bg-amber-500/15 dark:border-amber-500/25 dark:text-amber-300">
-                          <span className="font-semibold flex items-center gap-1.5 text-amber-800 dark:text-amber-300">
-                            <HelpCircle className="w-3.5 h-3.5" />
-                            На что смотрят на собеседовании:
-                          </span>
-                          <p className="text-neutral-700 dark:text-neutral-300 leading-relaxed">
-                            {topic.interviewTip}
-                          </p>
-                        </div>
-
-                        {/* Interview Questions block for this topic */}
-                        {renderTopicQuestions(topic)}
-
-                        {/* Section Mark Button */}
-                        <button
-                          type="button"
-                          onClick={() => handleToggleTopicClick(topic)}
-                          className={`w-full mt-3 flex items-center justify-center gap-2 px-4 py-2 rounded-full text-xs font-semibold transition-all active:scale-95 ${
-                            isDone
-                              ? 'bg-neutral-900 text-white shadow-xs dark:bg-white dark:text-neutral-950'
-                              : 'liquid-glass-pill hover:bg-white/50 text-neutral-800 dark:text-neutral-200'
-                          }`}
-                        >
-                          {isDone ? (
-                            <>
-                              <CheckCircle2 className="w-4 h-4" />
-                              <span>Раздел полностью изучен (100%)</span>
-                            </>
-                          ) : (
-                            <>
-                              <Circle className="w-4 h-4" />
-                              <span>Отметить раздел изученным (100%)</span>
-                            </>
-                          )}
-                        </button>
+                    {/* Subtopics Checklist */}
+                    <div className="space-y-2 mb-3.5">
+                      <span className="text-[11px] font-medium uppercase tracking-wider block text-neutral-500 dark:text-neutral-400">
+                        Ключевые темы (отметьте галочками):
+                      </span>
+                      <div className="grid grid-cols-1 gap-1.5">
+                        {topic.subtopics.map((sub, sIdx) => {
+                          const isSubChecked = getSubtopicChecked(topic, sIdx);
+                          return (
+                            <div
+                              key={sIdx}
+                              onClick={() => handleToggleSubtopicClick(topic, sIdx)}
+                              className={`flex items-start gap-2.5 p-2 rounded-xl border text-xs cursor-pointer select-none transition-all ${
+                                isSubChecked
+                                  ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-900 dark:bg-emerald-500/15 dark:border-emerald-500/30 dark:text-emerald-300'
+                                  : 'bg-neutral-100/70 border-neutral-200/70 text-neutral-700 hover:bg-neutral-200/60 dark:bg-white/[0.03] dark:border-white/[0.06] dark:text-neutral-300 dark:hover:bg-white/[0.07]'
+                              }`}
+                            >
+                              <button type="button" className="mt-0.5 shrink-0">
+                                {isSubChecked ? (
+                                  <CheckSquare className="w-4 h-4 text-emerald-500" />
+                                ) : (
+                                  <Square className="w-4 h-4 text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200" />
+                                )}
+                              </button>
+                              <span className={isSubChecked ? 'line-through opacity-75' : ''}>
+                                {sub}
+                              </span>
+                            </div>
+                          );
+                        })}
                       </div>
-                    )}
+                    </div>
+
+                    {/* Interview Callout */}
+                    <div className="p-3 rounded-2xl text-[11px] mb-3.5 space-y-1 transition-colors bg-amber-500/10 border border-amber-500/20 text-amber-900 dark:bg-amber-500/15 dark:border-amber-500/25 dark:text-amber-300">
+                      <span className="font-semibold flex items-center gap-1.5 text-amber-800 dark:text-amber-300">
+                        <HelpCircle className="w-3.5 h-3.5" />
+                        На что смотрят на собеседовании:
+                      </span>
+                      <p className="text-neutral-700 dark:text-neutral-300 leading-relaxed">
+                        {topic.interviewTip}
+                      </p>
+                    </div>
+
+                    {/* Interview Questions block for this topic */}
+                    {renderTopicQuestions(topic)}
+
+                    {/* Section Mark Button */}
+                    <button
+                      type="button"
+                      onClick={() => handleToggleTopicClick(topic)}
+                      className={`w-full mt-3 flex items-center justify-center gap-2 px-4 py-2 rounded-full text-xs font-semibold transition-all active:scale-95 ${
+                        isDone
+                          ? 'bg-neutral-900 text-white shadow-xs dark:bg-white dark:text-neutral-950'
+                          : 'liquid-glass-pill hover:bg-white/50 text-neutral-800 dark:text-neutral-200'
+                      }`}
+                    >
+                      {isDone ? (
+                        <>
+                          <CheckCircle2 className="w-4 h-4" />
+                          <span>Раздел полностью изучен (100%)</span>
+                        </>
+                      ) : (
+                        <>
+                          <Circle className="w-4 h-4" />
+                          <span>Отметить раздел изученным (100%)</span>
+                        </>
+                      )}
+                    </button>
                   </div>
                 </div>
               );
@@ -688,7 +640,6 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
             {subTrackTopics.map((topic, idx) => {
               const { total, checked, percent, isDone } = getTopicProgress(topic);
               const nodeNumber = coreTopics.length + idx + 1;
-              const isExpanded = isTopicExpanded(topic.id, coreTopics.length + idx);
 
               return (
                 <div key={topic.id} className="relative group">
@@ -713,10 +664,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                         : 'liquid-glass liquid-glass-interactive'
                     }`}
                   >
-                    <div
-                      onClick={() => toggleTopicExpanded(topic.id, coreTopics.length + idx)}
-                      className="flex items-start justify-between gap-2.5 sm:gap-3 mb-2 cursor-pointer select-none"
-                    >
+                    <div className="flex items-start justify-between gap-2.5 sm:gap-3 mb-2">
                       <div className="flex items-center gap-2 flex-wrap min-w-0 flex-1">
                         <span className="text-xs font-semibold text-neutral-500 dark:text-neutral-400">
                           Узел #{nodeNumber}
@@ -732,7 +680,7 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                         </span>
                       </div>
 
-                      <div className="flex items-center gap-1.5 shrink-0" onClick={(e) => e.stopPropagation()}>
+                      <div className="flex items-center gap-1.5 shrink-0">
                         <a
                           href={topic.externalDocUrl}
                           target="_blank"
@@ -742,20 +690,6 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                         >
                           <ExternalLink className="w-3.5 h-3.5" />
                         </a>
-
-                        <button
-                          type="button"
-                          onClick={() => toggleTopicExpanded(topic.id, coreTopics.length + idx)}
-                          className="p-1.5 rounded-full transition-colors shrink-0 liquid-glass-pill hover:bg-white/80 dark:hover:bg-white/15 text-neutral-700 dark:text-neutral-200 cursor-pointer"
-                          title={isExpanded ? 'Свернуть подтемы' : 'Раскрыть подтемы'}
-                          aria-expanded={isExpanded}
-                        >
-                          <ChevronDown
-                            className={`w-4 h-4 transition-transform duration-200 ${
-                              isExpanded ? 'rotate-180' : ''
-                            }`}
-                          />
-                        </button>
                       </div>
                     </div>
 
@@ -763,16 +697,10 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                       {topic.description}
                     </p>
 
-                    <div
-                      onClick={() => toggleTopicExpanded(topic.id, coreTopics.length + idx)}
-                      className="rounded-2xl p-2.5 mb-3.5 transition-colors liquid-glass-subtle cursor-pointer select-none"
-                    >
+                    <div className="rounded-2xl p-2.5 mb-3.5 transition-colors liquid-glass-subtle">
                       <div className="flex items-center justify-between text-[11px] mb-1">
-                        <span className="text-neutral-600 dark:text-neutral-400 font-medium flex items-center gap-1.5">
-                          <span>Прогресс темы:</span>
-                          <span className="text-[10px] text-neutral-500 font-normal">
-                            ({isExpanded ? 'нажмите, чтобы скрыть' : 'нажмите, чтобы раскрыть подтемы'})
-                          </span>
+                        <span className="text-neutral-600 dark:text-neutral-400 font-medium">
+                          Прогресс темы:
                         </span>
                         <span
                           className={`font-semibold ${
@@ -794,77 +722,73 @@ export const RoadmapViewer: React.FC<RoadmapViewerProps> = ({
                       </div>
                     </div>
 
-                    {isExpanded && (
-                      <div className="animate-fade-in space-y-3.5 pt-1">
-                        <div className="space-y-2">
-                          <span className="text-[11px] font-medium uppercase tracking-wider block text-neutral-500 dark:text-neutral-400">
-                            Ключевые темы (отметьте галочками):
-                          </span>
-                          <div className="grid grid-cols-1 gap-1.5">
-                            {topic.subtopics.map((sub, sIdx) => {
-                              const isSubChecked = getSubtopicChecked(topic, sIdx);
-                              return (
-                                <div
-                                  key={sIdx}
-                                  onClick={() => handleToggleSubtopicClick(topic, sIdx)}
-                                  className={`flex items-start gap-2.5 p-2 rounded-xl border text-xs cursor-pointer select-none transition-all ${
-                                    isSubChecked
-                                      ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-900 dark:bg-emerald-500/15 dark:border-emerald-500/30 dark:text-emerald-300'
-                                      : 'bg-neutral-100/70 border-neutral-200/70 text-neutral-700 hover:bg-neutral-200/60 dark:bg-white/[0.03] dark:border-white/[0.06] dark:text-neutral-300 dark:hover:bg-white/[0.07]'
-                                  }`}
-                                >
-                                  <button type="button" className="mt-0.5 shrink-0">
-                                    {isSubChecked ? (
-                                      <CheckSquare className="w-4 h-4 text-emerald-500" />
-                                    ) : (
-                                      <Square className="w-4 h-4 text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200" />
-                                    )}
-                                  </button>
-                                  <span className={isSubChecked ? 'line-through opacity-75' : ''}>
-                                    {sub}
-                                  </span>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </div>
-
-                        <div className="p-3 rounded-2xl text-[11px] space-y-1 transition-colors bg-amber-500/10 border border-amber-500/20 text-amber-900 dark:bg-amber-500/15 dark:border-amber-500/25 dark:text-amber-300">
-                          <span className="font-semibold flex items-center gap-1.5 text-amber-800 dark:text-amber-300">
-                            <HelpCircle className="w-3.5 h-3.5" />
-                            На что смотрят на собеседовании:
-                          </span>
-                          <p className="text-neutral-700 dark:text-neutral-300 leading-relaxed">
-                            {topic.interviewTip}
-                          </p>
-                        </div>
-
-                        {/* Interview Questions block for this topic */}
-                        {renderTopicQuestions(topic)}
-
-                        <button
-                          type="button"
-                          onClick={() => handleToggleTopicClick(topic)}
-                          className={`w-full mt-3 flex items-center justify-center gap-2 px-4 py-2 rounded-full text-xs font-semibold transition-all active:scale-95 ${
-                            isDone
-                              ? 'bg-neutral-900 text-white shadow-xs dark:bg-white dark:text-neutral-950'
-                              : 'liquid-glass-pill hover:bg-white/50 text-neutral-800 dark:text-neutral-200'
-                          }`}
-                        >
-                          {isDone ? (
-                            <>
-                              <CheckCircle2 className="w-4 h-4" />
-                              <span>Раздел полностью изучен (100%)</span>
-                            </>
-                          ) : (
-                            <>
-                              <Circle className="w-4 h-4" />
-                              <span>Отметить раздел изученным (100%)</span>
-                            </>
-                          )}
-                        </button>
+                    <div className="space-y-2 mb-3.5">
+                      <span className="text-[11px] font-medium uppercase tracking-wider block text-neutral-500 dark:text-neutral-400">
+                        Ключевые темы (отметьте галочками):
+                      </span>
+                      <div className="grid grid-cols-1 gap-1.5">
+                        {topic.subtopics.map((sub, sIdx) => {
+                          const isSubChecked = getSubtopicChecked(topic, sIdx);
+                          return (
+                            <div
+                              key={sIdx}
+                              onClick={() => handleToggleSubtopicClick(topic, sIdx)}
+                              className={`flex items-start gap-2.5 p-2 rounded-xl border text-xs cursor-pointer select-none transition-all ${
+                                isSubChecked
+                                  ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-900 dark:bg-emerald-500/15 dark:border-emerald-500/30 dark:text-emerald-300'
+                                  : 'bg-neutral-100/70 border-neutral-200/70 text-neutral-700 hover:bg-neutral-200/60 dark:bg-white/[0.03] dark:border-white/[0.06] dark:text-neutral-300 dark:hover:bg-white/[0.07]'
+                              }`}
+                            >
+                              <button type="button" className="mt-0.5 shrink-0">
+                                {isSubChecked ? (
+                                  <CheckSquare className="w-4 h-4 text-emerald-500" />
+                                ) : (
+                                  <Square className="w-4 h-4 text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200" />
+                                )}
+                              </button>
+                              <span className={isSubChecked ? 'line-through opacity-75' : ''}>
+                                {sub}
+                              </span>
+                            </div>
+                          );
+                        })}
                       </div>
-                    )}
+                    </div>
+
+                    <div className="p-3 rounded-2xl text-[11px] mb-3.5 space-y-1 transition-colors bg-amber-500/10 border border-amber-500/20 text-amber-900 dark:bg-amber-500/15 dark:border-amber-500/25 dark:text-amber-300">
+                      <span className="font-semibold flex items-center gap-1.5 text-amber-800 dark:text-amber-300">
+                        <HelpCircle className="w-3.5 h-3.5" />
+                        На что смотрят на собеседовании:
+                      </span>
+                      <p className="text-neutral-700 dark:text-neutral-300 leading-relaxed">
+                        {topic.interviewTip}
+                      </p>
+                    </div>
+
+                    {/* Interview Questions block for this topic */}
+                    {renderTopicQuestions(topic)}
+
+                    <button
+                      type="button"
+                      onClick={() => handleToggleTopicClick(topic)}
+                      className={`w-full mt-3 flex items-center justify-center gap-2 px-4 py-2 rounded-full text-xs font-semibold transition-all active:scale-95 ${
+                        isDone
+                          ? 'bg-neutral-900 text-white shadow-xs dark:bg-white dark:text-neutral-950'
+                          : 'liquid-glass-pill hover:bg-white/50 text-neutral-800 dark:text-neutral-200'
+                      }`}
+                    >
+                      {isDone ? (
+                        <>
+                          <CheckCircle2 className="w-4 h-4" />
+                          <span>Раздел полностью изучен (100%)</span>
+                        </>
+                      ) : (
+                        <>
+                          <Circle className="w-4 h-4" />
+                          <span>Отметить раздел изученным (100%)</span>
+                        </>
+                      )}
+                    </button>
                   </div>
                 </div>
               );

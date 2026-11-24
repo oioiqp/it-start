@@ -1183,7 +1183,7 @@ export function App() {
                               ? `Дедлайн: ${formatPublishedDate(appliedItem.deadlineDate)}`
                               : internship.applicationDeadline
                               ? `Набор: ${internship.applicationDeadline}`
-                              : 'Постоянный набор'
+                              : 'Постоянно'
                             : undefined
                         }
                         onApplyVacancy={(item) => handleAddApplication(item)}

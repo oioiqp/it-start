@@ -17,6 +17,7 @@ import {
 import type { Internship, JobApplication } from '../types';
 import { triggerHaptic } from '../lib/telegram';
 import { formatSalary } from '../lib/vacancyUrl';
+import { cleanLocation } from './InternshipCard';
 
 interface ApplicationsViewProps {
   applications: JobApplication[];
@@ -157,7 +158,7 @@ export const ApplicationsView: React.FC<ApplicationsViewProps> = ({
             <span className="text-[11px] font-medium text-neutral-500 dark:text-neutral-400 block mb-0.5">
               Тестовое / Собеседование
             </span>
-            <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
+            <span className="text-lg font-bold text-neutral-900 dark:text-white">
               {applications.filter((a) => a.status === 'test_task' || a.status === 'interview').length}
             </span>
           </div>
@@ -166,7 +167,7 @@ export const ApplicationsView: React.FC<ApplicationsViewProps> = ({
             <span className="text-[11px] font-medium text-neutral-500 dark:text-neutral-400 block mb-0.5">
               Получено офферов 🎉
             </span>
-            <span className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
+            <span className="text-lg font-bold text-neutral-900 dark:text-white">
               {applications.filter((a) => a.status === 'offer').length}
             </span>
           </div>
@@ -234,25 +235,26 @@ export const ApplicationsView: React.FC<ApplicationsViewProps> = ({
             const originalInternship = allInternships.find((i) => i.id === app.vacancyId);
             const daysLeft = getDaysLeft(app.deadlineDate);
 
-            // Format badge helper
+            // Clean minimalist format badge helper
             const renderFormat = () => {
+              let label = 'Гибрид';
+              let icon = <Building2 className="w-3 h-3 opacity-60 shrink-0" />;
+
               if (app.format === 'Удаленно') {
-                return (
-                  <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-                    <Home className="w-3.5 h-3.5" /> Дома
-                  </span>
-                );
+                label = 'Дома';
+                icon = <Home className="w-3 h-3 opacity-60 shrink-0" />;
+              } else if (app.format === 'Офис') {
+                label = 'В офисе';
+                icon = <Building2 className="w-3 h-3 opacity-60 shrink-0" />;
               }
-              if (app.format === 'Офис') {
-                return (
-                  <span className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 dark:text-blue-400">
-                    <Building2 className="w-3.5 h-3.5" /> В офисе
-                  </span>
-                );
-              }
+
               return (
-                <span className="inline-flex items-center gap-1 text-xs font-semibold text-violet-600 dark:text-violet-400">
-                  <Home className="w-3 h-3" />+<Building2 className="w-3 h-3" /> Гибрид
+                <span
+                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-neutral-100 text-neutral-700 dark:bg-white/10 dark:text-neutral-300 shrink-0"
+                  title={`Формат: ${app.format}`}
+                >
+                  {icon}
+                  <span>{label}</span>
                 </span>
               );
             };
@@ -265,8 +267,9 @@ export const ApplicationsView: React.FC<ApplicationsViewProps> = ({
                 {/* Header: Company, Info, Salary, Remove */}
                 <div className="flex items-start justify-between gap-3 flex-wrap">
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 flex-wrap mb-1">
-                      <span className="font-bold text-sm text-neutral-950 dark:text-white">
+                    {/* Company & Info button (bound in inline-flex to prevent wrapping circle) */}
+                    <div className="inline-flex items-center gap-1.5 max-w-full min-w-0">
+                      <span className="font-bold text-sm text-neutral-950 dark:text-white font-sans tracking-tight truncate min-w-0">
                         {app.company}
                       </span>
 
@@ -274,27 +277,24 @@ export const ApplicationsView: React.FC<ApplicationsViewProps> = ({
                       <button
                         type="button"
                         onClick={() => onOpenCompanyInfo?.(app.company)}
-                        className="p-1 rounded-full text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer"
+                        className="p-0.5 rounded-full text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer shrink-0"
                         title={`Информация о компании ${app.company}`}
                         aria-label={`О компании ${app.company}`}
                       >
                         <CircleAlert className="w-3.5 h-3.5" />
                       </button>
-
-                      <span className="text-xs text-neutral-400">•</span>
-
-                      {/* Format badge */}
-                      {renderFormat()}
-
-                      <span className="text-xs text-neutral-400">•</span>
-
-                      <span className="flex items-center gap-1 text-xs text-neutral-500 dark:text-neutral-400">
-                        <MapPin className="w-3 h-3 opacity-70" />
-                        <span>{app.location}</span>
-                      </span>
                     </div>
 
-                    <h3 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white leading-snug">
+                    {/* Clean minimalist metadata row without stray dots */}
+                    <div className="flex items-center gap-1.5 text-xs text-neutral-600 dark:text-neutral-400 mt-2 flex-wrap font-medium">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-neutral-100 text-neutral-700 dark:bg-white/10 dark:text-neutral-300 shrink-0">
+                        <MapPin className="w-3 h-3 opacity-60 shrink-0" />
+                        <span className="truncate max-w-[140px] sm:max-w-[200px]">{cleanLocation(app.location)}</span>
+                      </span>
+                      {renderFormat()}
+                    </div>
+
+                    <h3 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white leading-snug mt-2">
                       {app.title}
                     </h3>
                   </div>

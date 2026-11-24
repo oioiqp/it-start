@@ -2,9 +2,10 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import React from 'react';
 import { renderToString } from 'react-dom/server';
-import { InternshipCard, cleanVacancyTitle, cleanVacancyTags, formatPublishedDate } from '../components/InternshipCard';
+import { InternshipCard, cleanVacancyTitle, cleanVacancyTags, formatPublishedDate, cleanLocation } from '../components/InternshipCard';
 import { CompanyModal } from '../components/CompanyModal';
 import { ApplicationsView } from '../components/ApplicationsView';
+import { InternshipModal } from '../components/InternshipModal';
 import { RoadmapViewer } from '../components/RoadmapViewer';
 import { getCompanyInfo } from '../data/companies';
 import { SEED_INTERNSHIPS } from '../data/internships';
@@ -390,6 +391,166 @@ describe('IT-Старт Features Update & Polish Suite', () => {
       expect(cssQuestions.length).toBeGreaterThanOrEqual(2);
       expect(cssQuestions.some((q) => q.title.includes('Box Model') || q.title.includes('Блочная модель'))).toBe(true);
       expect(cssQuestions.some((q) => q.title.includes('Flexbox'))).toBe(true);
+    });
+  });
+
+  describe('7. Minimalist Vacancy Card & Open Roadmap Verification', () => {
+    it('verifies RoadmapViewer displays topics open by default without collapsed accordions', () => {
+      const html = renderToString(
+        React.createElement(RoadmapViewer, {
+          topics: ROADMAP_TOPICS,
+          userProgress: mockProgress,
+          onToggleTopic: () => {},
+          questions: QUESTIONS,
+          onToggleQuestion: () => {},
+        })
+      );
+
+      // Accordion toggle text must not exist
+      expect(html).not.toContain('нажмите, чтобы раскрыть подтемы');
+      expect(html).not.toContain('Свернуть подтемы');
+      // Subtopics checklist and interview tips must be open and rendered immediately
+      expect(html).toContain('Ключевые темы');
+      expect(html).toContain('На что смотрят на собеседовании:');
+    });
+
+    it('verifies InternshipCard eliminates HOT badge, stray dots, and bright neon colors', () => {
+      // 1. Scheduled vacancy (T-Bank: deadline до 31 янв.)
+      const scheduledInternship: Internship = {
+        ...SEED_INTERNSHIPS[0],
+        company: 'Т-Банк',
+        isHot: true,
+        format: 'Офис',
+      };
+
+      const scheduledHtml = renderToString(
+        React.createElement(InternshipCard, {
+          internship: scheduledInternship,
+          userProgress: mockProgress,
+          roadmapTopics: ROADMAP_TOPICS,
+          questions: QUESTIONS,
+          onOpenPlan: () => {},
+        })
+      );
+
+      // HOT badge must NOT be rendered
+      expect(scheduledHtml).not.toContain('>HOT<');
+
+      // No lonely bullet point spans in metadata row
+      expect(scheduledHtml).not.toContain('<span>•</span>');
+
+      // Deadline chip for scheduled recruitment
+      expect(scheduledHtml).toContain('до 31 января');
+
+      // Clean monochrome format badge (no neon colors)
+      expect(scheduledHtml).toContain('В офисе');
+      expect(scheduledHtml).not.toContain('bg-blue-500/10 text-blue-700');
+      expect(scheduledHtml).not.toContain('bg-emerald-500/10 text-emerald-700');
+      expect(scheduledHtml).not.toContain('bg-violet-500/10 text-violet-700');
+
+      // Company info icon is bound to company name in inline-flex
+      expect(scheduledHtml).toContain('inline-flex items-center gap-1.5 max-w-full');
+
+      // 2. Constant recruitment vacancy (Yandex / T1)
+      const constantInternship: Internship = {
+        ...SEED_INTERNSHIPS[1],
+        isHot: true,
+        format: 'Удаленно',
+      };
+
+      const constantHtml = renderToString(
+        React.createElement(InternshipCard, {
+          internship: constantInternship,
+          userProgress: mockProgress,
+          roadmapTopics: ROADMAP_TOPICS,
+          questions: QUESTIONS,
+          onOpenPlan: () => {},
+        })
+      );
+
+      // Constant recruitment must be short "Постоянно"
+      expect(constantHtml).toContain('Постоянно');
+      expect(constantHtml).not.toContain('Постоянный набор');
+      expect(constantHtml).toContain('Дома');
+    });
+
+    it('verifies cleanLocation removes redundant street addresses and trailing format annotations', () => {
+      expect(cleanLocation('Москва (ул. Льва Толстого)')).toBe('Москва');
+      expect(cleanLocation('Москва (Кутузовский проспект)')).toBe('Москва');
+      expect(cleanLocation('Санкт-Петербург (Зингер) / Удаленно')).toBe('Санкт-Петербург');
+      expect(cleanLocation('Ижевск (Офис / Гибрид)')).toBe('Ижевск');
+      expect(cleanLocation('Москва / Санкт-Петербург / Удаленно')).toBe('Москва / Санкт-Петербург');
+      expect(cleanLocation('Москва')).toBe('Москва');
+      expect(cleanLocation('')).toBe('');
+    });
+
+    it('verifies ApplicationsView eliminates stray dots and neon colors and keeps company info icon inline', () => {
+      const mockApp: JobApplication = {
+        id: 'app-test-1',
+        vacancyId: 'int-1',
+        company: 'Яндекс (Yandex GPT)',
+        title: 'Стажёр NLP Engineer',
+        salary: '100 000 ₽',
+        format: 'Офис',
+        location: 'Москва (ул. Льва Толстого)',
+        status: 'applied',
+        appliedAt: new Date().toISOString(),
+        deadlineDate: '2026-04-01',
+        applyUrl: 'https://yandex.ru/yandexintern',
+        deadlineAction: 'Сдать тестовое',
+      };
+
+      const html = renderToString(
+        React.createElement(ApplicationsView, {
+          applications: [mockApp],
+          allInternships: SEED_INTERNSHIPS,
+          onUpdateApplication: () => {},
+          onRemoveApplication: () => {},
+          onOpenPlan: () => {},
+          onOpenCompanyInfo: () => {},
+          onNavigateToCatalog: () => {},
+        })
+      );
+
+      // No lonely dots in metadata row
+      expect(html).not.toContain('<span>•</span>');
+      // No glowing colored text
+      expect(html).not.toContain('text-blue-600 dark:text-blue-400');
+      expect(html).not.toContain('text-emerald-600 dark:text-emerald-400');
+      // Minimalist format badge
+      expect(html).toContain('В офисе');
+      // Clean location without street address
+      expect(html).toContain('Москва');
+      expect(html).not.toContain('Москва (ул. Льва Толстого)');
+      // Company info icon is bound in inline-flex
+      expect(html).toContain('inline-flex items-center gap-1.5 max-w-full');
+    });
+
+    it('verifies InternshipModal binds company info icon and uses clean format badges', () => {
+      const html = renderToString(
+        React.createElement(InternshipModal, {
+          internship: {
+            ...SEED_INTERNSHIPS[1],
+            location: 'Москва (ул. Льва Толстого)',
+          },
+          onClose: () => {},
+          roadmapTopics: ROADMAP_TOPICS,
+          questions: QUESTIONS,
+          userProgress: mockProgress,
+          onToggleTopic: () => {},
+          onToggleQuestion: () => {},
+          onOpenCompanyInfo: () => {},
+        })
+      );
+
+      // Company info icon is bound in inline-flex
+      expect(html).toContain('inline-flex items-center gap-1.5 max-w-full min-w-0');
+      // Clean location
+      expect(html).toContain('Москва');
+      expect(html).not.toContain('Москва (ул. Льва Толстого)');
+      // Monochrome recruitment badge (no glowing green)
+      expect(html).not.toContain('bg-emerald-500/10 text-emerald-800');
+      expect(html).toContain('Постоянно');
     });
   });
 });
