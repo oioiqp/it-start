@@ -218,9 +218,15 @@ export async function sendVkMessage(
       messageId: typeof data.response === 'number' ? data.response : data.response?.[0]?.message_id || 1,
     };
   } catch (err: any) {
-    // In browser with CORS restrictions on direct api.vk.com, proxy through Render server
+    // In browser with CORS restrictions on direct api.vk.com, proxy through Koyeb server
     try {
-      const renderRes = await fetch('https://it-start-bot.onrender.com/notify', {
+      const notifyBaseUrl =
+        (typeof import.meta !== 'undefined' && import.meta.env?.VITE_BACKEND_URL) ||
+        (typeof import.meta !== 'undefined' && import.meta.env?.VITE_KOYEB_URL) ||
+        (typeof import.meta !== 'undefined' && import.meta.env?.VITE_RENDER_URL) ||
+        'https://it-start-bot.koyeb.app';
+
+      const renderRes = await fetch(`${notifyBaseUrl.replace(/\/+$/, '')}/notify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -262,8 +268,12 @@ export async function autoDetectVkPeerId(): Promise<{
   error?: string;
 }> {
   try {
-    const serverUrl = 'https://it-start-bot.onrender.com';
-    const res = await fetch(`${serverUrl}/vk/latest-user`);
+    const serverUrl =
+      (typeof import.meta !== 'undefined' && import.meta.env?.VITE_BACKEND_URL) ||
+      (typeof import.meta !== 'undefined' && import.meta.env?.VITE_KOYEB_URL) ||
+      (typeof import.meta !== 'undefined' && import.meta.env?.VITE_RENDER_URL) ||
+      'https://it-start-bot.koyeb.app';
+    const res = await fetch(`${serverUrl.replace(/\/+$/, '')}/vk/latest-user`);
     if (res.ok) {
       const data = await res.json();
       if (data.ok && data.peerId) {

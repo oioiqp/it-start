@@ -113,7 +113,13 @@ export const VK_APP_ID = process.env.VK_APP_ID || '54857681';
 export const VK_API_VERSION = '5.199';
 export const VK_API_BASE = 'https://api.vk.com/method';
 export const GITHUB_PAGES_URL = 'https://oioiqp.github.io/it-start/';
-export const RENDER_URL = process.env.RENDER_URL || 'https://it-start-bot.onrender.com/';
+export const BACKEND_URL =
+  process.env.KOYEB_PUBLIC_URL ||
+  process.env.PUBLIC_URL ||
+  process.env.BACKEND_URL ||
+  process.env.RENDER_URL ||
+  'https://it-start-bot.koyeb.app/';
+export const RENDER_URL = BACKEND_URL;
 export const VK_COMMUNITY_URL = process.env.VK_COMMUNITY_URL || 'https://vk.com/club242573933';
 
 export const VK_BOT_CONFIG = {
@@ -2007,7 +2013,7 @@ export async function startVkBot(token = VK_BOT_TOKEN, options = {}) {
     console.log('Чтобы подключить бота к реальной группе ВКонтакте:');
     console.log('  1. Зайдите в Управление сообществом VK -> Работа с API.');
     console.log('  2. Нажмите «Создать ключ доступа» с правами «Сообщения сообщества».');
-    console.log('  3. Запустите: VK_BOT_TOKEN="vk1.a..." npm run bot:vk');
+    console.log('  3. Укажите VK_BOT_TOKEN в Koyeb (Environment Variables) или .env для локального запуска.');
     console.log('='.repeat(70));
     isPollingActive = false;
     return {

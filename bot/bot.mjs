@@ -82,10 +82,16 @@ if (dns.setDefaultResultOrder) {
 
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || process.argv[2] || '';
 const GITHUB_PAGES_URL = 'https://oioiqp.github.io/it-start/';
-export const RENDER_URL = process.env.RENDER_URL || 'https://it-start-bot.onrender.com/';
-export const WEBAPP_URL = process.env.WEBAPP_URL || RENDER_URL;
+export const BACKEND_URL =
+  process.env.KOYEB_PUBLIC_URL ||
+  process.env.PUBLIC_URL ||
+  process.env.BACKEND_URL ||
+  process.env.RENDER_URL ||
+  'https://it-start-bot.koyeb.app/';
+export const RENDER_URL = BACKEND_URL;
+export const WEBAPP_URL = process.env.WEBAPP_URL || BACKEND_URL;
 const BOT_USERNAME = 'IT_start_izh_bot';
-const PORT = process.env.PORT || 3000;
+export const PORT = process.env.PORT ? Number(process.env.PORT) : 8000;
 const __botFilename = fileURLToPath(import.meta.url);
 const __botDirname = path.dirname(__botFilename);
 export const DIST_DIR = path.resolve(__botDirname, '..', 'dist');
@@ -1496,11 +1502,11 @@ const notifiedKeys = new Set();
 // In-memory cache for pre-gzipped static assets to optimize TTFB and eliminate CPU spikes on Render
 const staticGzipCache = new Map();
 
-// HTTP Health Check and Parser API server for Render.com Web Service
-const server = http.createServer(async (req, res) => {
+// HTTP Health Check and Parser API server for Koyeb / Cloud Web Service
+export const server = http.createServer(async (req, res) => {
   // CORS headers for WebApp integration
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, HEAD');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   if (req.method === 'OPTIONS') {
@@ -1513,6 +1519,10 @@ const server = http.createServer(async (req, res) => {
 
   if (urlPath === '/health') {
     res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+    if (req.method === 'HEAD') {
+      res.end();
+      return;
+    }
     res.end(
       JSON.stringify({
         status: 'ok',
@@ -1836,7 +1846,11 @@ const server = http.createServer(async (req, res) => {
   }
 
   res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
-  res.end('IT-Старт Telegram & VK Bot & Parser работает 24/7! (Render Health Check OK)\n');
+  if (req.method === 'HEAD') {
+    res.end();
+    return;
+  }
+  res.end('IT-Старт Telegram & VK Bot & Parser работает 24/7! (Koyeb & Cloud Health Check OK)\n');
 });
 
 if (process.env.NODE_ENV !== 'test') {
@@ -1847,7 +1861,7 @@ if (process.env.NODE_ENV !== 'test') {
 
   if (isDirectRun) {
     server.listen(PORT, () => {
-      console.log(`🌐 HTTP сервер запущен на порту ${PORT} (Render Health Check & Parser API)`);
+      console.log(`🌐 HTTP сервер запущен на порту ${PORT} (Koyeb / Cloud Health Check & Parser API)`);
     }).on('error', (err) => {
       if (err.code === 'EADDRINUSE') {
         console.warn(`[HTTP] Порт ${PORT} уже занят, процесс продолжает работу.`);
@@ -1856,6 +1870,26 @@ if (process.env.NODE_ENV !== 'test') {
       }
     });
 
+    // Graceful shutdown handling for container environments (Koyeb / Docker / Kubernetes)
+    const gracefulShutdown = (signal) => {
+      console.log(`[Shutdown] Получен сигнал ${signal}, корректное завершение работы сервиса...`);
+      if (server && server.listening) {
+        server.close(() => {
+          console.log('[Shutdown] HTTP сервер успешно закрыт.');
+          process.exit(0);
+        });
+        setTimeout(() => {
+          console.warn('[Shutdown] Принудительное завершение по таймауту.');
+          process.exit(0);
+        }, 5000).unref();
+      } else {
+        process.exit(0);
+      }
+    };
+
+    process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+    process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
     // Check if bot tokens are provided
     if (!BOT_TOKEN) {
       console.log('='.repeat(70));
@@ -1863,8 +1897,8 @@ if (process.env.NODE_ENV !== 'test') {
       console.log('='.repeat(70));
       console.log('⚠️  Внимание: TELEGRAM_BOT_TOKEN не указан!');
       console.log('');
-      console.log('HTTP Health Check сервер продолжает работать на порту ' + PORT + ' (Render Web Service).');
-      console.log('Чтобы бот отвечал в Telegram, укажите токен в переменных окружения Render:');
+      console.log(`HTTP Health Check сервер продолжает работать на порту ${PORT} (Koyeb / Cloud Web Service).`);
+      console.log('Чтобы бот отвечал в Telegram, укажите токен в переменных окружения Koyeb (Environment Variables):');
       console.log('  TELEGRAM_BOT_TOKEN=<ТОКЕН_БОТА>');
       console.log('Для VK-бота укажите:');
       console.log('  VK_BOT_TOKEN=<ТОКЕН_СООБЩЕСТВА_VK>');

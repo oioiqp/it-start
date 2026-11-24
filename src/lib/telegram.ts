@@ -357,9 +357,15 @@ export async function sendTelegramMessage(
     }
   }
 
-  // 2. Client has no local bot token -> attempt sending via backend /notify on Render
+  // 2. Client has no local bot token -> attempt sending via backend /notify on Koyeb
   try {
-    const notifyRes = await fetch('https://it-start-bot.onrender.com/notify', {
+    const notifyBaseUrl =
+      (typeof import.meta !== 'undefined' && import.meta.env?.VITE_BACKEND_URL) ||
+      (typeof import.meta !== 'undefined' && import.meta.env?.VITE_KOYEB_URL) ||
+      (typeof import.meta !== 'undefined' && import.meta.env?.VITE_RENDER_URL) ||
+      'https://it-start-bot.koyeb.app';
+
+    const notifyRes = await fetch(`${notifyBaseUrl.replace(/\/+$/, '')}/notify`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

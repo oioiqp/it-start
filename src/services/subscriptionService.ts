@@ -13,7 +13,13 @@ import { saveLocalSubscription, getLocalSubscription } from '../lib/storage';
 import { saveVkPeerId, getSavedVkToken, sendVkMessage } from '../lib/vk';
 import { getSavedBotToken, sendTelegramMessage } from '../lib/telegram';
 
-export const RENDER_URL = 'https://it-start-bot.onrender.com';
+export const BACKEND_URL =
+  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_BACKEND_URL) ||
+  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_KOYEB_URL) ||
+  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_RENDER_URL) ||
+  'https://it-start-bot.koyeb.app';
+
+export const RENDER_URL = BACKEND_URL;
 
 export type SubscriptionPlatform = 'telegram' | 'vk';
 
