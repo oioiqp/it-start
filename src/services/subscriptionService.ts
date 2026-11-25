@@ -8,7 +8,12 @@
  */
 
 import type { DirectionId, SubTrackId, TelegramSubscription } from '../types';
-import { saveSubscriptionToSupabase, TELEGRAM_BOT_USERNAME, GITHUB_PAGES_URL } from '../lib/supabase';
+import {
+  saveSubscriptionToSupabase,
+  fetchSubscriptionByChatIdFromSupabase,
+  TELEGRAM_BOT_USERNAME,
+  GITHUB_PAGES_URL,
+} from '../lib/supabase';
 import { saveLocalSubscription, getLocalSubscription } from '../lib/storage';
 import { saveVkPeerId, getSavedVkToken, sendVkMessage } from '../lib/vk';
 import { getSavedBotToken, sendTelegramMessage } from '../lib/telegram';
@@ -28,9 +33,10 @@ export interface SaveSubscriptionParams {
   id: string | number;
   username?: string;
   firstName?: string;
-  directions: DirectionId[];
-  subTracks: SubTrackId[];
+  directions?: DirectionId[];
+  subTracks?: SubTrackId[];
   notificationsEnabled?: boolean;
+  preserveBotPreferences?: boolean;
 }
 
 export interface TestNotificationParams {
@@ -98,16 +104,41 @@ export async function saveUnifiedSubscription(
   const isVk = params.platform === 'vk';
   const cleanId = isVk ? stripVkPrefix(rawId) : rawId;
   const storageChatId = isVk ? normalizeVkChatId(cleanId) : cleanId;
-  const notificationsEnabled = params.notificationsEnabled !== false;
+
+  let existingRemote: TelegramSubscription | null = null;
+  if (params.preserveBotPreferences) {
+    try {
+      existingRemote = await fetchSubscriptionByChatIdFromSupabase(storageChatId);
+    } catch {}
+  }
+
+  const notificationsEnabled =
+    existingRemote !== null
+      ? Boolean(existingRemote.is_active)
+      : params.notificationsEnabled !== false;
+
+  const directions: DirectionId[] =
+    existingRemote?.directions?.length
+      ? existingRemote.directions
+      : params.directions?.length
+      ? params.directions
+      : ['frontend', 'backend'];
+
+  const subTracks: SubTrackId[] =
+    existingRemote?.sub_tracks?.length
+      ? existingRemote.sub_tracks
+      : params.subTracks?.length
+      ? params.subTracks
+      : ['react', 'python'];
 
   const subData: TelegramSubscription = {
     chat_id: storageChatId,
-    username: (params.username || '').trim(),
-    first_name: (params.firstName || (isVk ? 'Пользователь VK' : 'Пользователь Telegram')).trim(),
-    directions: params.directions,
-    sub_tracks: params.subTracks,
+    username: (params.username || existingRemote?.username || '').trim(),
+    first_name: (params.firstName || existingRemote?.first_name || (isVk ? 'Пользователь VK' : 'Пользователь Telegram')).trim(),
+    directions,
+    sub_tracks: subTracks,
     is_active: notificationsEnabled,
-    created_at: new Date().toISOString(),
+    created_at: existingRemote?.created_at || new Date().toISOString(),
   };
 
   try {

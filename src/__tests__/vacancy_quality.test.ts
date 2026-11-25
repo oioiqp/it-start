@@ -639,5 +639,99 @@ describe('Vacancy Quality & Link Integrity Verification', () => {
       expect(htmlNoDeadline).not.toContain('Сдать тестовое до ');
       expect(htmlNoDeadline).toContain('Пройти тестовое / отбор');
     });
+
+    it('separates Fintech vs IT employers and routes Telegram vacancies directly to Telegram post CTA', async () => {
+      const { getCompanySegment, getVacancySourceCategory } = await import('../lib/vacancyUrl');
+      const { InternshipModal } = await import('../components/InternshipModal');
+
+      expect(getCompanySegment('Т-Банк')).toBe('fintech');
+      expect(getCompanySegment('Сбер')).toBe('fintech');
+      expect(getCompanySegment('Альфа-Банк')).toBe('fintech');
+      expect(getCompanySegment('Яндекс')).toBe('it');
+      expect(getCompanySegment('Холдинг Т1')).toBe('it');
+      expect(getCompanySegment('Контур')).toBe('it');
+
+      expect(
+        getVacancySourceCategory({
+          sourceType: 'telegram',
+          sourceChannel: '@young_june',
+          applyUrl: 'https://youngjunior.ru/python/jobs/128798',
+          sourcePostUrl: 'https://t.me/young_june/3706',
+        })
+      ).toBe('telegram');
+      expect(
+        getVacancySourceCategory({
+          sourceType: 'api',
+          applyUrl: 'https://hh.ru/vacancy/123456',
+        })
+      ).toBe('hh');
+      expect(
+        getVacancySourceCategory({
+          sourceType: 'portal',
+          applyUrl: 'https://career.habr.com/vacancies/999999',
+        })
+      ).toBe('habr');
+      expect(
+        getVacancySourceCategory({
+          sourceType: 'portal',
+          applyUrl: 'https://yandex.ru/yaintern/backend',
+        })
+      ).toBe('official');
+
+      const tgVacancyWithSite = {
+        id: 'tg-young-june-post-cta',
+        company: 'Т-Банк',
+        companyLogo: '💳',
+        title: 'Junior Python разработчик (стажёр)',
+        directionId: 'backend' as const,
+        subTrackId: 'python' as const,
+        format: 'Удаленно' as const,
+        location: 'Москва',
+        salary: 'от 80 000 ₽',
+        tags: ['Python', 'FastAPI'],
+        description: 'Тест перехода прямо к посту в Telegram',
+        requirements: ['Python 3.11+'],
+        responsibilities: ['Разработка backend-сервисов'],
+        sourceType: 'telegram' as const,
+        sourceChannel: '@young_june',
+        sourcePostUrl: 'https://t.me/young_june/3706',
+        applyUrl: 'https://youngjunior.ru/python/jobs/128798',
+        publishedAt: new Date().toISOString(),
+      };
+
+      const progress: UserProgress = { completedTopics: [], completedSubtopics: [], completedQuestions: [], repeatQuestions: [] };
+
+      const cardHtml = renderToString(
+        React.createElement(InternshipCard, {
+          internship: tgVacancyWithSite,
+          userProgress: progress,
+          roadmapTopics: [],
+          questions: [],
+          onOpenPlan: () => {},
+        })
+      );
+
+      expect(cardHtml).toContain('К посту в TG');
+      expect(cardHtml).toContain('href="https://t.me/young_june/3706"');
+      expect(cardHtml).toContain('href="https://youngjunior.ru/python/jobs/128798"');
+
+      const modalHtml = renderToString(
+        React.createElement(InternshipModal, {
+          internship: tgVacancyWithSite,
+          onClose: () => {},
+          isFavorite: false,
+          onToggleFavorite: () => {},
+          roadmapTopics: [],
+          questions: [],
+          userProgress: progress,
+          onToggleTopic: () => {},
+          onToggleQuestion: () => {},
+        })
+      );
+
+      expect(modalHtml).toContain('Открыть пост в TG');
+      expect(modalHtml).toContain('href="https://t.me/young_june/3706"');
+      expect(modalHtml).toContain('Сайт вакансии');
+    });
   });
 });

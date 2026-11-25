@@ -34,12 +34,31 @@ import {
   supabase,
   DIRECTION_ALIASES,
   DIRECTION_TITLES,
+  DIRECTION_SUBTRACK_MAP,
+  ALL_DIRECTION_IDS,
+  SHORT_DIRECTION_LABELS,
   resolveDirectionByQuery,
   formatSalary,
   resolveChannelHandle,
+  getCompanySegmentBot,
+  getVacancySourceCategoryBot,
 } from './bot.mjs';
 
-export { ALL_INTERNSHIPS, SEED_INTERNSHIPS, PORTAL_FALLBACK_VACANCIES, DIRECTION_ALIASES, DIRECTION_TITLES, resolveDirectionByQuery, formatSalary, resolveChannelHandle };
+export {
+  ALL_INTERNSHIPS,
+  SEED_INTERNSHIPS,
+  PORTAL_FALLBACK_VACANCIES,
+  DIRECTION_ALIASES,
+  DIRECTION_TITLES,
+  DIRECTION_SUBTRACK_MAP,
+  ALL_DIRECTION_IDS,
+  SHORT_DIRECTION_LABELS,
+  resolveDirectionByQuery,
+  formatSalary,
+  resolveChannelHandle,
+  getCompanySegmentBot,
+  getVacancySourceCategoryBot,
+};
 
 // Auto-load .env configuration if present
 function autoLoadEnv() {
@@ -138,8 +157,9 @@ export const VK_BOT_CONFIG = {
   botName: 'IT-Старт VK Бот',
 };
 
-// In-memory subscribers store for VK push notifications
+// In-memory subscribers store & notification prefs for VK push notifications
 export const vkSubscribers = new Map();
+export const vkUserPrefsStore = new Map();
 export const mutedVkSubscribers = new Set();
 
 // In-memory user menu tracking for contextual numbered commands (main, vacancies, companies)
@@ -147,6 +167,46 @@ export const userMenuState = new Map();
 
 export function clearUserMenuState() {
   userMenuState.clear();
+}
+
+/**
+ * Send a new VK message or edit an existing one on inline callback
+ */
+async function sendVkOrEdit(peerId, message, keyboard, token, conversationMessageId = null) {
+  const basePayload = {
+    peer_id: peerId,
+    message,
+    ...(keyboard ? { keyboard } : {}),
+  };
+
+  if (token && conversationMessageId) {
+    const editRes = await callVk(
+      'messages.edit',
+      {
+        ...basePayload,
+        conversation_message_id: conversationMessageId,
+      },
+      token
+    );
+    if (editRes.ok) {
+      return {
+        edited: true,
+        reply: {
+          ...basePayload,
+          random_id: Math.floor(Math.random() * 2147483647),
+        },
+      };
+    }
+  }
+
+  const sendPayload = {
+    ...basePayload,
+    random_id: Math.floor(Math.random() * 2147483647),
+  };
+  if (token) {
+    await callVk('messages.send', sendPayload, token);
+  }
+  return { edited: false, reply: sendPayload };
 }
 
 // Helper: strip HTML tags & entities for VK messages
@@ -270,7 +330,7 @@ export function formatLocation(item) {
   return `${format} (${rawLoc})`;
 }
 
-// Predefined Keyboards
+// Predefined Keyboards (each <= 10 buttons for VK API limits)
 export const MAIN_VK_INLINE_KEYBOARD = createVkKeyboard({
   inline: true,
   buttons: [
@@ -282,11 +342,11 @@ export const MAIN_VK_INLINE_KEYBOARD = createVkKeyboard({
       { label: '🏢 Компании', payload: { cmd: 'companies' }, color: 'primary' },
     ],
     [
+      { label: '🔔 Уведомления', payload: { cmd: 'notifications' }, color: 'positive' },
       { label: '🗺 Роадмапы', payload: { cmd: 'roadmaps' }, color: 'secondary' },
       { label: '❓ Вопросы', payload: { cmd: 'questions' }, color: 'secondary' },
     ],
     [
-      { label: '🔔 Подписка', payload: { cmd: 'subscribe' }, color: 'positive' },
       { label: '🌐 Веб-сайт', link: PUBLIC_WEB_URL },
     ],
   ],
@@ -304,16 +364,13 @@ export const MAIN_VK_KEYBOARD = createVkKeyboard({
       { label: '🏢 Компании', payload: { cmd: 'companies' }, color: 'primary' },
     ],
     [
+      { label: '🔔 Уведомления', payload: { cmd: 'notifications' }, color: 'positive' },
       { label: '🗺 Роадмапы', payload: { cmd: 'roadmaps' }, color: 'secondary' },
       { label: '❓ Вопросы', payload: { cmd: 'questions' }, color: 'secondary' },
     ],
     [
-      { label: '🔔 Подписка', payload: { cmd: 'subscribe' }, color: 'positive' },
       { label: '📊 Статус', payload: { cmd: 'status' }, color: 'secondary' },
-    ],
-    [
       { label: 'ℹ️ Помощь', payload: { cmd: 'help' }, color: 'secondary' },
-      { label: '⚡ Скан', payload: { cmd: 'scan' }, color: 'secondary' },
     ],
   ],
 });
@@ -325,41 +382,151 @@ export const VACANCIES_VK_KEYBOARD = createVkKeyboard({
       { label: '🚀 Открыть в Mini App', app_id: VK_APP_ID },
     ],
     [
-      { label: '💻 Frontend', payload: { cmd: 'direction', id: 'frontend' }, color: 'primary' },
-      { label: '⚙️ Backend', payload: { cmd: 'direction', id: 'backend' }, color: 'primary' },
+      { label: '💳 Финтех', payload: { cmd: 'vacancies', filter: 'fintech' }, color: 'primary' },
+      { label: '💻 IT-компании', payload: { cmd: 'vacancies', filter: 'it' }, color: 'primary' },
+      { label: '💬 Telegram', payload: { cmd: 'vacancies', source: 'telegram' }, color: 'positive' },
     ],
     [
+      { label: '💻 Frontend', payload: { cmd: 'direction', id: 'frontend' }, color: 'secondary' },
+      { label: '⚙️ Backend', payload: { cmd: 'direction', id: 'backend' }, color: 'secondary' },
       { label: '📱 Mobile', payload: { cmd: 'direction', id: 'mobile' }, color: 'secondary' },
-      { label: '🤖 Data Science', payload: { cmd: 'direction', id: 'data_science' }, color: 'secondary' },
     ],
     [
+      { label: '🤖 Data Science', payload: { cmd: 'direction', id: 'data_science' }, color: 'secondary' },
       { label: '🧪 QA', payload: { cmd: 'direction', id: 'qa' }, color: 'secondary' },
       { label: '☁️ DevOps', payload: { cmd: 'direction', id: 'devops' }, color: 'secondary' },
-    ],
-    [
-      { label: '🏢 Компании', payload: { cmd: 'companies' }, color: 'primary' },
-      { label: '🌐 Веб-сайт', link: PUBLIC_WEB_URL },
     ],
   ],
 });
 
+export function buildVkVacanciesKeyboard(filter = 'all', sourceFilter = 'all', page = 0, totalPages = 1) {
+  const f = String(filter || 'all').toLowerCase();
+  const s = String(sourceFilter || 'all').toLowerCase();
+  const rows = [
+    [
+      {
+        type: 'callback',
+        label: f === 'all' ? '• Все' : 'Все',
+        payload: { cmd: 'vacancies', filter: 'all', source: s, page: 0 },
+        color: f === 'all' ? 'primary' : 'secondary',
+      },
+      {
+        type: 'callback',
+        label: f === 'fintech' ? '• Финтех' : '💳 Финтех',
+        payload: { cmd: 'vacancies', filter: 'fintech', source: s, page: 0 },
+        color: f === 'fintech' ? 'primary' : 'secondary',
+      },
+      {
+        type: 'callback',
+        label: f === 'it' ? '• IT' : '💻 IT',
+        payload: { cmd: 'vacancies', filter: 'it', source: s, page: 0 },
+        color: f === 'it' ? 'primary' : 'secondary',
+      },
+    ],
+    [
+      {
+        type: 'callback',
+        label: s === 'all' ? '• Все ист.' : 'Все ист.',
+        payload: { cmd: 'vacancies', filter: f, source: 'all', page: 0 },
+        color: s === 'all' ? 'positive' : 'secondary',
+      },
+      {
+        type: 'callback',
+        label: s === 'official' ? '• Оф. сайты' : '🌐 Оф. сайты',
+        payload: { cmd: 'vacancies', filter: f, source: 'official', page: 0 },
+        color: s === 'official' ? 'positive' : 'secondary',
+      },
+      {
+        type: 'callback',
+        label: s === 'telegram' ? '• Telegram' : '💬 Telegram',
+        payload: { cmd: 'vacancies', filter: f, source: 'telegram', page: 0 },
+        color: s === 'telegram' ? 'positive' : 'secondary',
+      },
+      {
+        type: 'callback',
+        label: s === 'hh' ? '• hh.ru' : '📄 hh.ru',
+        payload: { cmd: 'vacancies', filter: f, source: 'hh', page: 0 },
+        color: s === 'hh' ? 'positive' : 'secondary',
+      },
+    ],
+  ];
+
+  const bottomRow = [];
+  if (totalPages > 1 && page > 0) {
+    bottomRow.push({
+      type: 'callback',
+      label: '⬅️ Назад',
+      payload: { cmd: 'vacancies', filter: f, source: s, page: page - 1 },
+      color: 'secondary',
+    });
+  }
+  if (totalPages > 1 && page < totalPages - 1) {
+    bottomRow.push({
+      type: 'callback',
+      label: 'Вперёд ➡️',
+      payload: { cmd: 'vacancies', filter: f, source: s, page: page + 1 },
+      color: 'secondary',
+    });
+  }
+  bottomRow.push({ type: 'callback', label: '🏢 Компании', payload: { cmd: 'companies' }, color: 'primary' });
+  if (bottomRow.length < 3) {
+    bottomRow.push({ type: 'callback', label: '🔔 Пуши', payload: { cmd: 'notifications' }, color: 'positive' });
+  }
+  rows.push(bottomRow);
+
+  return createVkKeyboard({ inline: true, buttons: rows });
+}
+
+export function buildVkNotificationKeyboard(prefs = {}) {
+  const selected = new Set(Array.isArray(prefs.directions) ? prefs.directions : []);
+  const isActive = Boolean(prefs.is_active);
+  const dirBtn = (id) => ({
+    type: 'callback',
+    label: `${selected.has(id) ? '✅' : '⬜'} ${SHORT_DIRECTION_LABELS[id] || id}`,
+    payload: { cmd: 'notify_dir', id },
+    color: selected.has(id) ? 'positive' : 'secondary',
+  });
+
+  return createVkKeyboard({
+    inline: true,
+    buttons: [
+      [
+        {
+          type: 'callback',
+          label: isActive ? '🔕 Выключить пуш-уведомления' : '🔔 Включить пуш-уведомления',
+          payload: { cmd: 'notify_toggle' },
+          color: isActive ? 'negative' : 'positive',
+        },
+      ],
+      [dirBtn('frontend'), dirBtn('backend'), dirBtn('mobile')],
+      [dirBtn('data_science'), dirBtn('qa'), dirBtn('devops')],
+      [
+        { type: 'callback', label: '✅ Все', payload: { cmd: 'notify_all' }, color: 'primary' },
+        { type: 'callback', label: '🗑 Сброс', payload: { cmd: 'notify_clear' }, color: 'secondary' },
+        { type: 'callback', label: '💼 Вакансии', payload: { cmd: 'vacancies' }, color: 'primary' },
+      ],
+    ],
+  });
+}
+
+// Grouped Fintech (row 1) vs IT companies (rows 2-3), 10 buttons total
 export const COMPANIES_VK_KEYBOARD = createVkKeyboard({
   inline: true,
   buttons: [
     [
+      { label: '💳 Т-Банк', payload: { cmd: 'company', id: 'tbank' }, color: 'positive' },
+      { label: '🟢 Сбер', payload: { cmd: 'company', id: 'sber' }, color: 'positive' },
+    ],
+    [
+      { label: '🔍 Яндекс', payload: { cmd: 'company', id: 'yandex' }, color: 'primary' },
       { label: '🏢 Т1', payload: { cmd: 'company', id: 't1' }, color: 'primary' },
       { label: '💼 Контур', payload: { cmd: 'company', id: 'kontur' }, color: 'primary' },
-      { label: '💳 Т-Банк', payload: { cmd: 'company', id: 'tbank' }, color: 'primary' },
+      { label: '📦 Ozon', payload: { cmd: 'company', id: 'ozon' }, color: 'primary' },
     ],
     [
-      { label: '⚡ Directum', payload: { cmd: 'company', id: 'directum' }, color: 'positive' },
-      { label: '🔍 Яндекс', payload: { cmd: 'company', id: 'yandex' }, color: 'secondary' },
-      { label: '📦 Ozon', payload: { cmd: 'company', id: 'ozon' }, color: 'secondary' },
-    ],
-    [
-      { label: '🟢 Сбер', payload: { cmd: 'company', id: 'sber' }, color: 'positive' },
+      { label: '⚡ Directum', payload: { cmd: 'company', id: 'directum' }, color: 'secondary' },
       { label: '🟣 Авито', payload: { cmd: 'company', id: 'avito' }, color: 'secondary' },
-      { label: '🔷 VK', payload: { cmd: 'company', id: 'vk' }, color: 'primary' },
+      { label: '🔷 VK', payload: { cmd: 'company', id: 'vk' }, color: 'secondary' },
     ],
     [
       { label: '🚀 Открыть в Mini App', app_id: VK_APP_ID },
@@ -387,46 +554,70 @@ export function formatVkVacancyMessage(item) {
 }
 
 /**
- * Format a list of vacancies
+ * Format a paginated list of vacancies for VK chat
  */
-export function formatVkVacanciesList(items = [], title = 'Актуальные стажировки', limit = 5) {
-  const slice = items.slice(0, limit);
+export function formatVkVacanciesList(items = [], title = 'Актуальные стажировки', limit = 5, page = 0) {
+  const totalPages = Math.max(1, Math.ceil(items.length / limit));
+  const safePage = Math.max(0, Math.min(Number(page) || 0, totalPages - 1));
+  const slice = items.slice(safePage * limit, (safePage + 1) * limit);
+
   if (slice.length === 0) {
     return (
-      `🔍 По вашему запросу стажировок пока не найдено.\n` +
+      `🔍 ${title} (0)\n` +
       `━━━━━━━━━━━━━━━━━━━━\n` +
-      `Попробуйте выбрать другое направление или компанию на клавиатуре ниже, либо откройте каталог в VK Mini App!`
+      `По выбранному фильтру стажировок пока не найдено.\n` +
+      `Попробуйте выбрать «Все» или другой источник на клавиатуре ниже, либо откройте каталог в VK Mini App!`
     );
   }
 
-  let text = `🔥 ${title} (${slice.length} из ${items.length}):\n`;
+  let text = `🔥 ${title} (${items.length}) • Стр. ${safePage + 1}/${totalPages}:\n`;
   text += '━━━━━━━━━━━━━━━━━━━━\n\n';
 
   slice.forEach((item, idx) => {
+    const globalNum = safePage * limit + idx + 1;
     const verifiedApplyUrl = item.applyUrl || item.url || PUBLIC_WEB_URL;
     const channel = resolveChannelHandle(item.sourceChannel || item.channel, item.company);
     const loc = formatLocation(item);
-    const isTgPost = verifiedApplyUrl.includes('t.me/');
-    const isPortal = !isTgPost && !verifiedApplyUrl.includes('hh.ru');
-    const sourceLabel = isTgPost ? `📢 Пост в ${channel}` : isPortal ? `🌐 Сайт ${item.company}` : `📄 HeadHunter`;
+    const srcCat = getVacancySourceCategoryBot(item);
+    const segBadge = getCompanySegmentBot(item.company || item.companyId) === 'fintech' ? '💳' : '💻';
+    const tgPostUrl =
+      item.sourcePostUrl && item.sourcePostUrl.includes('t.me/')
+        ? item.sourcePostUrl
+        : verifiedApplyUrl.includes('t.me/')
+        ? verifiedApplyUrl
+        : '';
 
-    text += `[${idx + 1}] 🏢 ${item.company}\n`;
+    text += `[${globalNum}] ${segBadge} ${item.company}\n`;
     text += `💼 ${item.title}\n`;
     text += `💰 ${formatSalary(item.salary)} | 📍 ${loc}\n`;
+    if (item.recruitmentType === 'scheduled' && item.applicationDeadline) {
+      text += `⏳ Набор: ${item.applicationDeadline}\n`;
+    }
     if (Array.isArray(item.tags) && item.tags.length > 0) {
       text += `🏷 Стек: ${item.tags.slice(0, 4).join(' • ')}\n`;
     }
-    text += `${sourceLabel} ➔ ${verifiedApplyUrl}\n`;
+    if (srcCat === 'telegram' && tgPostUrl) {
+      text += `💬 К посту в TG (${channel}) ➔ ${tgPostUrl}\n`;
+      if (verifiedApplyUrl && verifiedApplyUrl !== tgPostUrl && !verifiedApplyUrl.includes('t.me/')) {
+        text += `🌐 Сайт подачи ➔ ${verifiedApplyUrl}\n`;
+      }
+    } else {
+      const sourceLabel =
+        srcCat === 'hh'
+          ? '📄 hh.ru'
+          : srcCat === 'habr'
+          ? '📘 Хабр Карьера'
+          : `🌐 Оф. сайт ${item.company}`;
+      text += `${sourceLabel} ➔ ${verifiedApplyUrl}\n`;
+    }
     text += '─────────────────────\n';
   });
 
-  if (items.length > limit) {
-    text += `\n... и ещё ${items.length - limit} стажировок доступно в VK Mini App!\n`;
+  if (items.length > (safePage + 1) * limit) {
+    text += `\n... ещё ${items.length - (safePage + 1) * limit} на следующих страницах или в Mini App\n`;
   }
 
-  text += `\n💡 Все вакансии с фильтрами, роадмапами и тренажёром доступны в приложении:\n`;
-  text += `🚀 VK Mini App: https://vk.com/app${VK_APP_ID}\n`;
-  text += `🌐 Веб-сайт: ${PUBLIC_WEB_URL}`;
+  text += `\n🚀 VK Mini App: https://vk.com/app${VK_APP_ID}\n🌐 Веб-сайт: ${PUBLIC_WEB_URL}`;
   return text;
 }
 
@@ -584,21 +775,89 @@ export async function callVk(method, params = {}, token = VK_BOT_TOKEN) {
 }
 
 /**
+ * Read VK user notification preferences (active or muted) from memory/Supabase
+ */
+export async function getVkUserPrefs(peerId, fallbackMeta = {}) {
+  const id = String(cleanVkPeerId(peerId));
+  if (vkUserPrefsStore.has(id)) {
+    return vkUserPrefsStore.get(id);
+  }
+
+  if (supabase && process.env.NODE_ENV !== 'test' && !process.env.VITEST) {
+    try {
+      const { data, error } = await supabase
+        .from('tg_subscriptions')
+        .select('*')
+        .eq('chat_id', `vk_${id}`)
+        .maybeSingle();
+      if (!error && data) {
+        const prefs = {
+          peer_id: id,
+          first_name: data.first_name || fallbackMeta.first_name || 'Пользователь VK',
+          username: data.username || fallbackMeta.username || '',
+          directions: Array.isArray(data.directions) ? data.directions : [...ALL_DIRECTION_IDS],
+          sub_tracks: Array.isArray(data.sub_tracks) ? data.sub_tracks : [],
+          is_active: Boolean(data.is_active),
+          subscribed_at: data.updated_at || new Date().toISOString(),
+        };
+        vkUserPrefsStore.set(id, prefs);
+        if (prefs.is_active) {
+          vkSubscribers.set(id, prefs);
+          mutedVkSubscribers.delete(id);
+        } else {
+          vkSubscribers.delete(id);
+          mutedVkSubscribers.add(id);
+        }
+        return prefs;
+      }
+    } catch {}
+  }
+
+  if (vkSubscribers.has(id)) {
+    const existing = vkSubscribers.get(id);
+    vkUserPrefsStore.set(id, existing);
+    return existing;
+  }
+
+  return {
+    peer_id: id,
+    first_name: fallbackMeta.first_name || 'Пользователь VK',
+    username: fallbackMeta.username || '',
+    directions: [...ALL_DIRECTION_IDS],
+    sub_tracks: ALL_DIRECTION_IDS.flatMap((d) => DIRECTION_SUBTRACK_MAP[d] || []),
+    is_active: false,
+    subscribed_at: new Date().toISOString(),
+  };
+}
+
+/**
  * Register a user as a VK push subscriber (synced with Supabase & in-memory)
  */
 export async function registerVkSubscriber(peerId, meta = {}) {
   const cleanId = cleanVkPeerId(peerId);
   const id = String(cleanId);
-  const isActive = meta.is_active !== false;
+  const existing = vkUserPrefsStore.get(id) || vkSubscribers.get(id);
+  const isActive = meta.is_active !== undefined ? Boolean(meta.is_active) : meta.is_active !== false;
+  const directions = Array.isArray(meta.directions)
+    ? meta.directions
+    : existing?.directions?.length
+    ? existing.directions
+    : [...ALL_DIRECTION_IDS];
+  const subTracks = Array.isArray(meta.sub_tracks)
+    ? meta.sub_tracks
+    : directions.flatMap((d) => DIRECTION_SUBTRACK_MAP[d] || []);
+
   const sub = {
     peer_id: id,
-    first_name: meta.first_name || 'Пользователь VK',
-    username: meta.username || '',
-    directions: meta.directions || ['frontend', 'backend', 'mobile', 'qa', 'devops', 'data_science'],
-    sub_tracks: meta.sub_tracks || ['react', 'python', 'nodejs', 'golang', 'auto_qa', 'cicd_docker'],
+    first_name: meta.first_name || existing?.first_name || 'Пользователь VK',
+    username: meta.username || existing?.username || '',
+    directions,
+    sub_tracks: subTracks,
     subscribed_at: new Date().toISOString(),
     is_active: isActive,
   };
+
+  vkUserPrefsStore.set(id, sub);
   if (isActive) {
     vkSubscribers.set(id, sub);
     mutedVkSubscribers.delete(id);
@@ -611,7 +870,7 @@ export async function registerVkSubscriber(peerId, meta = {}) {
     if (supabase && process.env.NODE_ENV !== 'test' && !process.env.VITEST) {
       const row = {
         chat_id: `vk_${id}`,
-        username: meta.username || '',
+        username: sub.username || '',
         first_name: sub.first_name,
         directions: sub.directions,
         sub_tracks: sub.sub_tracks,
@@ -628,12 +887,16 @@ export async function registerVkSubscriber(peerId, meta = {}) {
 }
 
 /**
- * Unregister a VK push subscriber
+ * Unregister a VK push subscriber (disables pushes while keeping direction selections)
  */
 export async function unregisterVkSubscriber(peerId) {
   const id = String(cleanVkPeerId(peerId));
+  const existing = vkUserPrefsStore.get(id) || vkSubscribers.get(id);
   const deleted = vkSubscribers.delete(id);
   mutedVkSubscribers.add(id);
+  if (existing) {
+    vkUserPrefsStore.set(id, { ...existing, is_active: false, subscribed_at: new Date().toISOString() });
+  }
 
   try {
     if (supabase && process.env.NODE_ENV !== 'test' && !process.env.VITEST) {
@@ -644,7 +907,7 @@ export async function unregisterVkSubscriber(peerId) {
     // Graceful offline fallback
   }
 
-  return Boolean(deleted);
+  return Boolean(deleted || existing);
 }
 
 /**
@@ -961,26 +1224,18 @@ export async function notifyVkSubscribers(vacancies = [], token = VK_BOT_TOKEN) 
     // Filter vacancies matching this subscriber's preferences
     const matching = vacancies.filter((vac) => {
       if (!vac) return false;
+      if (subDirs.length === 0 && subTracks.length === 0) return true;
       const vacDir = vac.directionId || vac.direction;
       const vacSub = vac.subTrackId || vac.sub_track;
-
-      // If subscriber has no direction preferences set, or vacancy specifies no direction/track, match all
-      if (subDirs.length === 0 && subTracks.length === 0) return true;
       if (!vacDir && !vacSub) return true;
 
       const dirMatch = vacDir ? subDirs.includes(vacDir) : false;
       const trackMatch = vacSub ? subTracks.includes(vacSub) : false;
 
-      if (vacDir && vacSub) {
-        return dirMatch || trackMatch;
+      if (subDirs.length > 0 && vacDir) {
+        return dirMatch;
       }
-      if (vacDir) {
-        return subDirs.length === 0 || dirMatch;
-      }
-      if (vacSub) {
-        return subTracks.length === 0 || trackMatch;
-      }
-      return true;
+      return dirMatch || trackMatch;
     });
 
     // Send up to 2 unnotified matching vacancies per subscriber
@@ -994,27 +1249,53 @@ export async function notifyVkSubscribers(vacancies = [], token = VK_BOT_TOKEN) 
       const tagsStr = Array.isArray(vac.tags) && vac.tags.length > 0
         ? vac.tags.slice(0, 4).join(' • ')
         : 'Junior / Стажировка';
-      const isWeb = vac.sourceType === 'portal' || vac.sourceType === 'website';
-      const sourceLabel = isWeb ? 'Карьерный сайт' : 'Telegram-канал';
+      const srcCat = getVacancySourceCategoryBot(vac);
+      const segLabel = getCompanySegmentBot(vac.company || vac.companyId) === 'fintech' ? '💳 Финтех' : '💻 IT';
+      const sourceLabel =
+        srcCat === 'telegram'
+          ? 'Telegram-канал'
+          : srcCat === 'hh'
+          ? 'hh.ru'
+          : srcCat === 'habr'
+          ? 'Хабр Карьера'
+          : 'Официальный сайт';
       const sourceChannel = resolveChannelHandle(vac.sourceChannel || vac.channel, vac.company);
       const applyUrl = vac.applyUrl || vac.url || PUBLIC_WEB_URL;
+      const tgPostUrl =
+        vac.sourcePostUrl && vac.sourcePostUrl.includes('t.me/')
+          ? vac.sourcePostUrl
+          : applyUrl.includes('t.me/')
+          ? applyUrl
+          : '';
+      const primaryUrl = srcCat === 'telegram' && tgPostUrl ? tgPostUrl : applyUrl;
+      const linkBtnLabel =
+        srcCat === 'telegram' && tgPostUrl
+          ? '💬 К посту в TG'
+          : srcCat === 'hh'
+          ? '📄 Открыть на hh.ru'
+          : srcCat === 'habr'
+          ? '📘 На Хабр Карьере'
+          : '🌐 На сайт компании';
+
       const msg =
         `🔥 Новая стажировка!\n` +
         `━━━━━━━━━━━━━━━━━━━━\n` +
-        `💼 ${vac.company} — ${vac.title}\n` +
+        `💼 ${vac.company} (${segLabel}) — ${vac.title}\n` +
         `💰 Зарплата: ${formatSalary(vac.salary)}\n` +
         `📍 Формат: ${formatLocation(vac)}\n` +
+        (vac.recruitmentType === 'scheduled' && vac.applicationDeadline
+          ? `⏳ Набор: ${vac.applicationDeadline}\n`
+          : '') +
         `🏷 Стек: ${tagsStr}\n` +
         `📢 Источник: ${sourceChannel} (${sourceLabel})\n\n` +
-        `🎯 В IT-Старт подготовлен персональный план вопросов для этого направления!\n` +
-        `🔗 Откликнуться: ${applyUrl}`;
+        `🔗 ${srcCat === 'telegram' && tgPostUrl ? 'К посту в TG' : 'Откликнуться'}: ${primaryUrl}`;
 
       try {
         const res = await sendVkNotification(
           cleanPeerId,
           msg,
           {
-            applyUrl,
+            applyUrl: primaryUrl,
             keyboard: createVkKeyboard({
               inline: true,
               buttons: [
@@ -1022,11 +1303,11 @@ export async function notifyVkSubscribers(vacancies = [], token = VK_BOT_TOKEN) 
                   { label: '🚀 Открыть в Mini App', app_id: VK_APP_ID },
                 ],
                 [
-                  { label: isWeb ? '🔗 Откликнуться на сайте' : '🔗 Открыть вакансию', link: applyUrl },
+                  { label: linkBtnLabel, link: primaryUrl },
                 ],
                 [
                   { label: '💼 Вакансии', payload: { cmd: 'vacancies' }, color: 'primary' },
-                  { label: '🔔 Подписка', payload: { cmd: 'subscribe' }, color: 'secondary' },
+                  { label: '🔔 Настройки пушей', payload: { cmd: 'notifications' }, color: 'secondary' },
                 ],
               ],
             }),
@@ -1072,30 +1353,41 @@ export async function sendVkCompanyDetails(peerId, targetCompany, token = VK_BOT
       findCompanyByQuery(v.company)?.id === targetCompany.id
   );
 
-  let text = `🏢 Работодатель: ${targetCompany.name} (${targetCompany.shortName})\n`;
+  const segLabel = getCompanySegmentBot(targetCompany.name) === 'fintech' ? '💳 Финтех' : '💻 IT-компания';
+  let text = `🏢 ${targetCompany.name} (${segLabel})\n`;
   text += '━━━━━━━━━━━━━━━━━━━━\n';
-  text += `📝 О компании:\n${targetCompany.description}\n\n`;
-  text += `🛠 Основной стек: ${targetCompany.stack}\n`;
-  text += `📢 Канал работодателя: ${targetCompany.channel}\n\n`;
+  text += `📝 ${targetCompany.description}\n`;
+  text += `🛠 Стек: ${targetCompany.stack}\n`;
+  text += `📢 Канал: ${targetCompany.channel}\n\n`;
 
   if (companyVacancies.length > 0) {
     text += `🔥 Открытые позиции (${companyVacancies.length}):\n`;
     companyVacancies.slice(0, 5).forEach((v, idx) => {
       const tagsStr = Array.isArray(v.tags) && v.tags.length > 0 ? v.tags.slice(0, 4).join(' • ') : '';
+      const applyUrl = v.applyUrl || v.url || PUBLIC_WEB_URL;
+      const srcCat = getVacancySourceCategoryBot(v);
+      const tgPostUrl =
+        v.sourcePostUrl && v.sourcePostUrl.includes('t.me/')
+          ? v.sourcePostUrl
+          : applyUrl.includes('t.me/')
+          ? applyUrl
+          : '';
       text += `\n[${idx + 1}] 💼 ${v.title}\n`;
       text += `💰 ${formatSalary(v.salary)} | 📍 ${formatLocation(v)}\n`;
+      if (v.recruitmentType === 'scheduled' && v.applicationDeadline) {
+        text += `⏳ Набор: ${v.applicationDeadline}\n`;
+      }
       if (tagsStr) {
         text += `🏷 Стек: ${tagsStr}\n`;
       }
-      text += `🔗 ${v.applyUrl || v.url || PUBLIC_WEB_URL}\n`;
+      text += srcCat === 'telegram' && tgPostUrl ? `💬 Пост в TG ➔ ${tgPostUrl}\n` : `🔗 Ссылка ➔ ${applyUrl}\n`;
       text += `─────────────────────\n`;
     });
   } else {
     text += `🔍 Сейчас прямых позиций в базе нет, но парсер отслеживает канал ${targetCompany.channel} 24/7!\n`;
   }
 
-  text += `\n━━━━━━━━━━━━━━━━━━━━\n`;
-  text += `🚀 VK Mini App: https://vk.com/app${VK_APP_ID}\n🌐 Веб-сайт: ${PUBLIC_WEB_URL}`;
+  text += `\n🚀 VK Mini App: https://vk.com/app${VK_APP_ID}\n🌐 Веб-сайт: ${PUBLIC_WEB_URL}`;
 
   const keyboard = createVkKeyboard({
     inline: true,
@@ -1103,10 +1395,10 @@ export async function sendVkCompanyDetails(peerId, targetCompany, token = VK_BOT
       [{ label: '🚀 Открыть в Mini App', app_id: VK_APP_ID }],
       [
         { label: '💼 Вакансии', payload: { cmd: 'vacancies' }, color: 'primary' },
-        { label: '🏢 Компании', payload: { cmd: 'companies' }, color: 'secondary' },
+        { label: '◀️ К компаниям', payload: { cmd: 'companies' }, color: 'secondary' },
       ],
       [
-        { label: '🔔 Подписка', payload: { cmd: 'subscribe' }, color: 'positive' },
+        { label: '🔔 Уведомления', payload: { cmd: 'notifications' }, color: 'positive' },
         { label: '🌐 Веб-сайт', link: PUBLIC_WEB_URL },
       ],
     ],
@@ -1124,6 +1416,45 @@ export async function sendVkCompanyDetails(peerId, targetCompany, token = VK_BOT
   }
   userMenuState.set(String(peerId), 'companies');
   return finish({ ok: true, type: 'company_details', company: targetCompany.id, reply });
+}
+
+/**
+ * Interactive notification settings screen for VK bot
+ */
+export async function sendVkNotificationSettings(
+  peerId,
+  fallbackMeta = {},
+  token = VK_BOT_TOKEN,
+  finish = (x) => x,
+  conversationMessageId = null
+) {
+  const cleanId = cleanVkPeerId(peerId);
+  let prefs = await getVkUserPrefs(peerId, fallbackMeta);
+  if (!vkUserPrefsStore.has(String(cleanId))) {
+    prefs = await registerVkSubscriber(peerId, {
+      ...fallbackMeta,
+      directions: prefs.directions,
+      sub_tracks: prefs.sub_tracks,
+      is_active: false,
+    });
+  }
+
+  const selectedDirs = Array.isArray(prefs.directions) ? prefs.directions : [];
+  const selectedNames = selectedDirs.map((id) => SHORT_DIRECTION_LABELS[id]).filter(Boolean);
+  const text =
+    `🔔 Настройка уведомлений IT-Старт (VK)\n` +
+    `━━━━━━━━━━━━━━━━━━━━\n` +
+    `Статус рассылки: ${prefs.is_active ? '✅ Включены' : '🔕 Отключены'}\n` +
+    `Направления (${selectedDirs.length}/${ALL_DIRECTION_IDS.length}): ${
+      selectedNames.length > 0 ? selectedNames.join(', ') : 'не выбраны'
+    }\n\n` +
+    `Нажимайте на кнопки ниже — настройки сразу сохраняются для вашего VK профиля (${cleanId}).` +
+    (prefs.is_active && selectedDirs.length === 0 ? '\n⚠️ Выберите хотя бы одно направление, чтобы получать пуши.' : '');
+
+  const keyboard = buildVkNotificationKeyboard(prefs);
+  const { reply } = await sendVkOrEdit(peerId, text, keyboard, token, conversationMessageId);
+  userMenuState.set(String(peerId), 'main');
+  return finish({ ok: true, type: 'notifications', prefs, reply });
 }
 
 /**
@@ -1154,24 +1485,11 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
 
   if (!peerId) return { ok: false, error: 'Missing peer_id' };
 
-  // Auto-register user as active subscriber on ANY incoming message or event ONLY if they haven't muted pushes
-  const cleanPeerIdStr = String(peerId).replace(/^vk_/, '');
-  const existingSub = vkSubscribers.get(cleanPeerIdStr);
-  if ((!existingSub || !existingSub.is_active) && !mutedVkSubscribers.has(cleanPeerIdStr)) {
-    const firstName =
-      message.from?.first_name ||
-      rawInput.from?.first_name ||
-      rawInput.first_name ||
-      'Пользователь VK';
-    const username =
-      message.from?.username ||
-      rawInput.from?.username ||
-      rawInput.username ||
-      '';
-    registerVkSubscriber(peerId, { first_name: firstName, username }).catch((e) =>
-      console.warn('[VK Bot Auto-Sub]', e.message)
-    );
-  }
+  // State helpers for auto-subscription (evaluated after parsing command below)
+  const cleanPeerIdStr = String(cleanVkPeerId(peerId));
+  const existingSub = vkUserPrefsStore.get(cleanPeerIdStr) || vkSubscribers.get(cleanPeerIdStr);
+  const conversationMessageId =
+    message.conversation_message_id || rawInput.conversation_message_id || rawInput.object?.conversation_message_id || null;
 
   // Acknowledge inline callback button event to dismiss loading spinner in VK app
   const eventId = message.event_id || rawInput.event_id || rawInput.object?.event_id;
@@ -1195,6 +1513,10 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
     .trim();
   const textLower = textRaw.toLowerCase();
   const textClean = textLower.replace(/[!.,?]+$/g, '').trim();
+  const strippedText = textLower
+    .replace(/^[\p{Extended_Pictographic}\p{Emoji}\p{Symbol}\s_.-]+/u, '')
+    .replace(/[!.,?]+$/g, '')
+    .trim();
 
   // Extract and parse payload from both message and event object formats
   const rawPayload =
@@ -1229,7 +1551,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
   const num = numMatch ? parseInt(numMatch[1] || numMatch[2], 10) : null;
 
   // Support returning to main menu on 0 or 'назад' / 'главная'
-  if (!cmd && (num === 0 || textClean === '0' || textClean === 'назад' || textClean === 'главная' || textClean === 'в меню' || textClean === 'меню')) {
+  if (!cmd && (num === 0 || textClean === '0' || strippedText === 'назад' || strippedText === 'главная' || strippedText === 'в меню' || strippedText === 'меню')) {
     cmd = 'start';
   }
 
@@ -1256,12 +1578,11 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
       }
     } else {
       // Main menu shortcuts:
-      // [1] Стажировки, [2] Компании, [3] Роадмапы, [4] Вопросы, [5] Подписка, [6] Открыть сайт, [7] Статус, [8] Помощь, [9] Мой ID, [10] Синхронизация
       if (num === 1) cmd = 'vacancies';
       else if (num === 2) cmd = 'companies';
       else if (num === 3) cmd = 'roadmaps';
       else if (num === 4) cmd = 'questions';
-      else if (num === 5) cmd = 'subscribe';
+      else if (num === 5) cmd = 'notifications';
       else if (num === 6) cmd = 'site';
       else if (num === 7) cmd = 'status';
       else if (num === 8) cmd = 'help';
@@ -1269,8 +1590,6 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
       else if (num === 10) cmd = 'scan';
     }
   }
-
-  const strippedText = textLower.replace(/^[\p{Extended_Pictographic}\p{Emoji}\p{Symbol}\s_.-]+/u, '').trim();
 
   const isGreeting =
     strippedText === 'здравствуйте' ||
@@ -1292,38 +1611,110 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
     (!textClean || textClean.length === 0) &&
     (Boolean(message.attachments?.length) || Boolean(rawInput.attachments?.length) || !cmd);
 
+  // 0. Notification Settings & Interactive Toggles
+  if (
+    cmd === 'notifications' ||
+    textClean === '/notifications' ||
+    textClean === '/settings' ||
+    strippedText === 'уведомления' ||
+    strippedText === 'настроить уведомления' ||
+    strippedText === 'настройки уведомлений'
+  ) {
+    return sendVkNotificationSettings(peerId, {}, token, finish, conversationMessageId);
+  }
+
+  if (cmd === 'notify_toggle') {
+    const prefs = await getVkUserPrefs(peerId);
+    if (prefs.is_active) {
+      await unregisterVkSubscriber(peerId);
+    } else {
+      await registerVkSubscriber(peerId, { ...prefs, is_active: true });
+    }
+    return sendVkNotificationSettings(peerId, {}, token, finish, conversationMessageId);
+  }
+
+  if (cmd === 'notify_dir' && payload?.id) {
+    const prefs = await getVkUserPrefs(peerId);
+    const set = new Set(Array.isArray(prefs.directions) ? prefs.directions : []);
+    if (set.has(payload.id)) set.delete(payload.id);
+    else set.add(payload.id);
+    const nextDirs = ALL_DIRECTION_IDS.filter((id) => set.has(id));
+    await registerVkSubscriber(peerId, {
+      ...prefs,
+      directions: nextDirs,
+      is_active: prefs.is_active,
+    });
+    return sendVkNotificationSettings(peerId, {}, token, finish, conversationMessageId);
+  }
+
+  if (cmd === 'notify_all') {
+    const prefs = await getVkUserPrefs(peerId);
+    await registerVkSubscriber(peerId, {
+      ...prefs,
+      directions: [...ALL_DIRECTION_IDS],
+      is_active: prefs.is_active,
+    });
+    return sendVkNotificationSettings(peerId, {}, token, finish, conversationMessageId);
+  }
+
+  if (cmd === 'notify_clear') {
+    const prefs = await getVkUserPrefs(peerId);
+    await registerVkSubscriber(peerId, {
+      ...prefs,
+      directions: [],
+      sub_tracks: [],
+      is_active: false,
+    });
+    return sendVkNotificationSettings(peerId, {}, token, finish, conversationMessageId);
+  }
+
   // 1. «Начать» / /start / Привет / Меню / Старт / Здравствуйте / Стикеры
   if (
     cmd === 'start' ||
-    textClean === 'начать' ||
-    textClean === 'старт' ||
+    strippedText === 'начать' ||
+    strippedText === 'старт' ||
     textClean.startsWith('/start') ||
     textClean === 'start' ||
-    textClean === 'привет' ||
-    textClean === 'меню' ||
+    strippedText === 'привет' ||
+    strippedText === 'меню' ||
     textClean === 'hello' ||
     isGreeting ||
     hasAttachmentsNoText
   ) {
-    // Auto-register user as subscriber on /start with extracted name
+    const startArg = textClean.startsWith('/start ') ? textClean.slice(7).trim() : '';
     const firstName = message.from?.first_name || rawInput.from?.first_name || rawInput.first_name || 'Студент';
     const username = message.from?.username || rawInput.from?.username || rawInput.username || '';
-    await registerVkSubscriber(peerId, { first_name: firstName, username });
+
+    const prefs = await getVkUserPrefs(peerId, { first_name: firstName, username });
+    const isKnownUser = vkUserPrefsStore.has(cleanPeerIdStr) || mutedVkSubscribers.has(cleanPeerIdStr);
+    const targetIsActive = isKnownUser ? prefs.is_active : startArg !== 'auth';
+
+    const syncedSub = await registerVkSubscriber(peerId, {
+      first_name: firstName,
+      username,
+      directions: isKnownUser ? prefs.directions : undefined,
+      sub_tracks: isKnownUser ? prefs.sub_tracks : undefined,
+      is_active: targetIsActive,
+    });
+
+    if (startArg === 'notifications' || startArg === 'notify' || startArg === 'settings') {
+      return sendVkNotificationSettings(peerId, { first_name: firstName, username }, token, finish, null);
+    }
+
+    const activeDirNames = (syncedSub.directions || []).map((id) => SHORT_DIRECTION_LABELS[id]).filter(Boolean);
+    const notifyLine = syncedSub.is_active
+      ? `✅ Включены (${activeDirNames.length > 0 ? activeDirNames.join(', ') : 'выберите направления'})`
+      : '🔕 Отключены (настройка — «🔔 Уведомления»)';
 
     const welcomeText =
       '🚀 IT-Старт | Карьерный навигатор в IT\n' +
       '━━━━━━━━━━━━━━━━━━━━\n' +
-      `Привет, ${firstName}! Здесь собраны реальные оплачиваемые IT-стажировки и Junior-вакансии:\n\n` +
-      '🏢 9 IT-компаний России:\n' +
-      '• Холдинг Т1 • СКБ Контур • Т-Банк\n' +
-      '• Directum • Яндекс • Ozon Tech\n' +
-      '• Сбер • Авито • VK\n\n' +
-      '🎯 В платформе доступно:\n' +
-      '• Интерактивные роадмапы по 6 направлениям\n' +
-      '• База из 55+ вопросов к собеседованиям\n' +
-      '• Мониторинг каналов и сайтов 24/7\n' +
-      '• Мгновенные пуш-уведомления о вакансиях\n\n' +
-      '👇 Запустите VK Mini App или выберите команду:\n';
+      `Привет, ${firstName}! Здесь собраны реальные IT-стажировки и Junior-вакансии.\n` +
+      `🔔 Уведомления: ${notifyLine}\n\n` +
+      '💳 Финтех: Т-Банк, Сбер\n' +
+      '💻 IT-компании: Яндекс, Т1, Контур, Ozon, Directum, Авито, VK\n\n' +
+      '📡 Источники: Официальные сайты, hh.ru, Хабр Карьера и Telegram-каналы.\n\n' +
+      '👇 Запустите VK Mini App или воспользуйтесь меню команд внизу:';
 
     const reply = {
       peer_id: peerId,
@@ -1339,29 +1730,64 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
     return finish({ ok: true, type: 'start', reply });
   }
 
+  // Auto-subscribe completely new users on normal browsing commands (not notification/auth toggles)
+  if (
+    !existingSub &&
+    !mutedVkSubscribers.has(cleanPeerIdStr) &&
+    cmd !== 'unsubscribe' &&
+    textClean !== '/unsubscribe' &&
+    strippedText !== 'отписаться'
+  ) {
+    const firstName =
+      message.from?.first_name ||
+      rawInput.from?.first_name ||
+      rawInput.first_name ||
+      'Пользователь VK';
+    const username =
+      message.from?.username ||
+      rawInput.from?.username ||
+      rawInput.username ||
+      '';
+    registerVkSubscriber(peerId, { first_name: firstName, username }).catch((e) =>
+      console.warn('[VK Bot Auto-Sub]', e.message)
+    );
+  }
+
   // 2. «Стажировки» / /vacancies / Вакансии
   if (
     cmd === 'vacancies' ||
     textClean.startsWith('/vacancies') ||
-    textClean === 'стажировки' ||
-    textClean.startsWith('стажировки ') ||
-    textClean === 'вакансии' ||
-    textClean.startsWith('вакансии ') ||
-    textClean === 'каталог' ||
-    textClean.startsWith('каталог ')
+    strippedText === 'стажировки' ||
+    strippedText.startsWith('стажировки ') ||
+    strippedText === 'вакансии' ||
+    strippedText.startsWith('вакансии ') ||
+    strippedText === 'каталог' ||
+    strippedText.startsWith('каталог ')
   ) {
-    // Check if arguments supplied (e.g. /vacancies t1 or /vacancies frontend)
     const parts = textRaw.split(/\s+/);
-    const arg = parts.length > 1 ? parts.slice(1).join(' ').trim().toLowerCase() : '';
+    const hasTextArg =
+      parts.length > 1 && (textRaw.startsWith('/') || !/^\p{Extended_Pictographic}/u.test(parts[0]));
+    const arg = hasTextArg ? parts.slice(1).join(' ').trim().toLowerCase() : '';
+    const normalizedFilter = String(payload?.filter || arg || 'all').toLowerCase();
+    const normalizedSource = ['official', 'hh', 'habr', 'telegram'].includes(String(payload?.source || 'all').toLowerCase())
+      ? String(payload.source).toLowerCase()
+      : 'all';
+    const page = Number(payload?.page || 0) || 0;
 
     const allVacancies = await getActiveInternships();
 
     let filtered = allVacancies;
     let listTitle = 'Все свежие стажировки';
 
-    if (arg) {
-      const company = findCompanyByQuery(arg);
-      const dirMatch = resolveDirectionByQuery(arg);
+    if (normalizedFilter === 'fintech') {
+      filtered = allVacancies.filter((v) => getCompanySegmentBot(v.company || v.companyId) === 'fintech');
+      listTitle = 'Финтех-стажировки';
+    } else if (normalizedFilter === 'it') {
+      filtered = allVacancies.filter((v) => getCompanySegmentBot(v.company || v.companyId) === 'it');
+      listTitle = 'Стажировки в IT-компаниях';
+    } else if (normalizedFilter !== 'all') {
+      const company = findCompanyByQuery(normalizedFilter);
+      const dirMatch = resolveDirectionByQuery(normalizedFilter);
       if (company) {
         filtered = allVacancies.filter(
           (v) =>
@@ -1378,27 +1804,32 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
       } else {
         filtered = allVacancies.filter(
           (v) =>
-            (v.directionId || '').toLowerCase() === arg ||
-            (v.subTrackId || '').toLowerCase() === arg ||
-            (v.title || '').toLowerCase().includes(arg) ||
-            (v.tags || []).some((t) => t.toLowerCase().includes(arg))
+            (v.directionId || '').toLowerCase() === normalizedFilter ||
+            (v.subTrackId || '').toLowerCase() === normalizedFilter ||
+            (v.title || '').toLowerCase().includes(normalizedFilter) ||
+            (v.tags || []).some((t) => t.toLowerCase().includes(normalizedFilter))
         );
-        listTitle = `Стажировки по запросу «${arg}»`;
+        listTitle = `Стажировки по запросу «${normalizedFilter}»`;
       }
     }
 
-    const replyText = formatVkVacanciesList(filtered, listTitle, 5);
-
-    const reply = {
-      peer_id: peerId,
-      random_id: Math.floor(Math.random() * 2147483647),
-      message: replyText,
-      keyboard: VACANCIES_VK_KEYBOARD,
-    };
-
-    if (token) {
-      await callVk('messages.send', reply, token);
+    if (normalizedSource !== 'all') {
+      filtered = filtered.filter((v) => getVacancySourceCategoryBot(v) === normalizedSource);
+      const srcMap = {
+        official: 'Официальные сайты',
+        hh: 'hh.ru',
+        habr: 'Хабр Карьера',
+        telegram: 'Telegram-каналы',
+      };
+      listTitle += ` • ${srcMap[normalizedSource]}`;
     }
+
+    const totalPages = Math.max(1, Math.ceil(filtered.length / 5));
+    const safePage = Math.max(0, Math.min(page, totalPages - 1));
+    const replyText = formatVkVacanciesList(filtered, listTitle, 5, safePage);
+    const kb = buildVkVacanciesKeyboard(normalizedFilter, normalizedSource, safePage, totalPages);
+
+    const { reply } = await sendVkOrEdit(peerId, replyText, kb, token, payload?.page !== undefined || payload?.filter !== undefined || payload?.source !== undefined ? conversationMessageId : null);
     userMenuState.set(String(peerId), 'vacancies');
     return finish({ ok: true, type: 'vacancies', reply, count: filtered.length });
   }
@@ -1419,7 +1850,8 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
     const replyText = formatVkVacanciesList(
       filtered,
       DIRECTION_TITLES[dirId] || `Направление ${dirId}`,
-      5
+      5,
+      0
     );
 
     const reply = {
@@ -1436,30 +1868,34 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
     return finish({ ok: true, type: 'direction', directionId: dirId, reply });
   }
 
-  // 4. «Компании» / /companies
-  if (cmd === 'companies' || textClean === '/companies' || textClean === 'компании') {
-    let text = `🏢 Целевые IT-компании и программы стажировок:\n`;
-    text += `━━━━━━━━━━━━━━━━━━━━\n\n`;
+  // 4. «Компании» / /companies (grouped by Fintech vs IT)
+  if (cmd === 'companies' || textClean === '/companies' || strippedText === 'компании' || strippedText === 'работодатели') {
+    const allVacancies = await getActiveInternships();
+    const countFor = (compId) =>
+      allVacancies.filter(
+        (v) =>
+          (v.companyId || '').toLowerCase() === compId ||
+          findCompanyByQuery(v.company)?.id === compId
+      ).length;
 
-    COMPANIES_DATA.forEach((c, idx) => {
-      text += `[${idx + 1}] 🏢 ${c.name} (${c.shortName})\n`;
-      text += `🛠 Стек: ${c.stack}\n`;
-      text += `📢 Канал: ${c.channel}\n\n`;
+    const fintechList = COMPANIES_DATA.filter((c) => getCompanySegmentBot(c.name) === 'fintech');
+    const itList = COMPANIES_DATA.filter((c) => getCompanySegmentBot(c.name) !== 'fintech');
+
+    let text = `🏢 Работодатели и программы стажировок\n`;
+    text += `━━━━━━━━━━━━━━━━━━━━\n\n`;
+    text += `💳 Финтех-компании:\n`;
+    fintechList.forEach((c) => {
+      text += `• ${c.name} — ${countFor(c.id)} вак. (${c.channel})\n`;
+    });
+    text += `\n💻 IT-компании и бигтех:\n`;
+    itList.forEach((c) => {
+      text += `• ${c.name} — ${countFor(c.id)} вак. (${c.channel})\n`;
     });
 
-    text += `━━━━━━━━━━━━━━━━━━━━\n`;
-    text += `💡 Выберите компанию на клавиатуре или напишите её название (например, «директум» или «т1»), чтобы посмотреть открытые стажировки!`;
+    text += `\n━━━━━━━━━━━━━━━━━━━━\n`;
+    text += `💡 Выберите компанию на клавиатуре ниже или напишите её название (например, «т-банк», «яндекс», «контур»)!`;
 
-    const reply = {
-      peer_id: peerId,
-      random_id: Math.floor(Math.random() * 2147483647),
-      message: text,
-      keyboard: COMPANIES_VK_KEYBOARD,
-    };
-
-    if (token) {
-      await callVk('messages.send', reply, token);
-    }
+    const { reply } = await sendVkOrEdit(peerId, text, COMPANIES_VK_KEYBOARD, token, conversationMessageId);
     userMenuState.set(String(peerId), 'companies');
     return finish({ ok: true, type: 'companies', reply });
   }
@@ -1474,7 +1910,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
   }
 
   // 6. «Роадмапы» / /roadmaps
-  if (cmd === 'roadmaps' || textClean === '/roadmaps' || textClean === 'роадмапы') {
+  if (cmd === 'roadmaps' || textClean === '/roadmaps' || strippedText === 'роадмапы') {
     const text =
       `🗺 Интерактивные роадмапы IT-Старт\n` +
       `━━━━━━━━━━━━━━━━━━━━\n` +
@@ -1499,7 +1935,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
           { label: '❓ Вопросы', payload: { cmd: 'questions' }, color: 'secondary' },
         ],
         [
-          { label: '🔔 Подписка', payload: { cmd: 'subscribe' }, color: 'positive' },
+          { label: '🔔 Уведомления', payload: { cmd: 'notifications' }, color: 'positive' },
           { label: '🌐 Веб-сайт', link: PUBLIC_WEB_URL },
         ],
       ],
@@ -1520,7 +1956,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
   }
 
   // 7. «Вопросы» / /questions
-  if (cmd === 'questions' || textClean === '/questions' || textClean === 'вопросы' || textClean === 'собеседование') {
+  if (cmd === 'questions' || textClean === '/questions' || strippedText === 'вопросы' || strippedText === 'собеседование') {
     const text =
       `❓ Тренажёр вопросов к собеседованию IT-Старт\n` +
       `━━━━━━━━━━━━━━━━━━━━\n` +
@@ -1544,7 +1980,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
           { label: '🗺 Роадмапы', payload: { cmd: 'roadmaps' }, color: 'secondary' },
         ],
         [
-          { label: '🔔 Подписка', payload: { cmd: 'subscribe' }, color: 'positive' },
+          { label: '🔔 Уведомления', payload: { cmd: 'notifications' }, color: 'positive' },
           { label: '🌐 Веб-сайт', link: PUBLIC_WEB_URL },
         ],
       ],
@@ -1565,30 +2001,35 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
   }
 
   // 8. «Подписка» / /subscribe
-  if (cmd === 'subscribe' || textClean === '/subscribe' || textClean === 'подписка' || textClean === 'подписаться') {
-    await registerVkSubscriber(peerId, { first_name: 'Пользователь VK' });
+  if (cmd === 'subscribe' || textClean === '/subscribe' || strippedText === 'подписка' || strippedText === 'подписаться') {
+    const existingPrefs = await getVkUserPrefs(peerId);
+    const hasSavedDirs = vkUserPrefsStore.has(cleanPeerIdStr) && Array.isArray(existingPrefs.directions);
+    const sub = await registerVkSubscriber(peerId, {
+      first_name: existingPrefs.first_name || 'Пользователь VK',
+      directions: hasSavedDirs ? existingPrefs.directions : [...ALL_DIRECTION_IDS],
+      is_active: true,
+    });
+    const activeNames = (sub.directions || []).map((id) => SHORT_DIRECTION_LABELS[id]).filter(Boolean);
 
     const text =
       `✅ Вы успешно подписались на уведомления ВКонтакте!\n` +
       `━━━━━━━━━━━━━━━━━━━━\n` +
-      `Бот IT-Старт будет присылать вам мгновенные уведомления о новых оплачиваемых стажировках.\n\n` +
-      `📡 Источники мониторинга 24/7:\n` +
-      `• Холдинг Т1, СКБ Контур, Т-Банк, Directum\n` +
-      `• Яндекс, Ozon Tech, Сбер, Авито, VK\n\n` +
-      `⚙️ Настроить фильтр по стеку можно в приложении: /site\n` +
-      `❌ Для отключения рассылки отправьте /unsubscribe.`;
+      `Активные направления: ${activeNames.length > 0 ? activeNames.join(', ') : 'все'}\n\n` +
+      `Вы можете в 1 клик выбрать нужные направления (Frontend, Backend, Mobile, DS, QA, DevOps) или выключить пуши кнопкой «⚙️ Настроить направления»:`;
 
     const keyboard = createVkKeyboard({
       inline: true,
       buttons: [
-        [{ label: '🚀 Открыть IT-Старт (Mini App)', app_id: VK_APP_ID }],
+        [
+          { label: '⚙️ Настроить направления', payload: { cmd: 'notifications' }, color: 'positive' },
+          { label: '🔕 Выключить', payload: { cmd: 'notify_toggle' }, color: 'secondary' },
+        ],
         [
           { label: '💼 Стажировки', payload: { cmd: 'vacancies' }, color: 'primary' },
           { label: '🏢 Компании', payload: { cmd: 'companies' }, color: 'secondary' },
         ],
         [
-          { label: '🌐 Веб-сайт', link: PUBLIC_WEB_URL },
-          { label: '🔕 Отписаться', payload: { cmd: 'unsubscribe' }, color: 'negative' },
+          { label: '🚀 Открыть IT-Старт (Mini App)', app_id: VK_APP_ID },
         ],
       ],
     });
@@ -1608,19 +2049,19 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
   }
 
   // 9. «Отписаться» / /unsubscribe
-  if (cmd === 'unsubscribe' || textClean === '/unsubscribe' || textClean === 'отписаться') {
+  if (cmd === 'unsubscribe' || textClean === '/unsubscribe' || strippedText === 'отписаться') {
     await unregisterVkSubscriber(peerId);
 
     const text =
       `❌ Вы отписались от уведомлений в VK.\n` +
       `━━━━━━━━━━━━━━━━━━━━\n` +
-      `Чтобы возобновить рассылку вакансий, отправьте команду /subscribe.`;
+      `Ваши направления и профиль сохранены. Включить рассылку снова можно кнопкой ниже или командой /notifications:`;
 
     const keyboard = createVkKeyboard({
       inline: true,
       buttons: [
         [
-          { label: '🔔 Подписаться', payload: { cmd: 'subscribe' }, color: 'positive' },
+          { label: '🔔 Включить и настроить', payload: { cmd: 'notifications' }, color: 'positive' },
           { label: '💼 Стажировки', payload: { cmd: 'vacancies' }, color: 'primary' },
         ],
         [
@@ -1936,30 +2377,25 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
   }
 
   // 16. «Помощь» / /help
-  if (cmd === 'help' || textClean === '/help' || textClean === 'помощь' || textClean === 'справка' || textClean === 'команды') {
+  if (cmd === 'help' || textClean === '/help' || strippedText === 'помощь' || strippedText === 'справка' || strippedText === 'команды') {
     const text =
       `ℹ️ Команды бота IT-Старт\n` +
       `━━━━━━━━━━━━━━━━━━━━\n` +
-      `• Стажировки (/vacancies) — каталог с фильтрами\n` +
-      `• Компании (/companies) — список IT-работодателей\n` +
+      `• Стажировки (/vacancies) — каталог с фильтрами (Финтех / IT / источники)\n` +
+      `• Компании (/companies) — список работодателей (Финтех и IT-компании)\n` +
+      `• Уведомления (/notifications) — выбор направлений и пуши в 1 клик\n` +
       `• Роадмапы (/roadmaps) — карты развития\n` +
       `• Вопросы (/questions) — база 55+ вопросов\n` +
-      `• Подписка (/subscribe) — пуши о новых стажировках\n` +
-      `• Отписаться (/unsubscribe) — отключить пуши\n` +
       `• Статус (/status) — состояние системы\n` +
       `• ID (/id) — узнать свой VK Peer ID\n` +
       `• Сайт (/site) — веб-платформа без VPN\n` +
       `• Telegram (/tg) — открыть бота в Telegram\n` +
       `• Помощь (/help) — эта справка\n\n` +
       `━━━━━━━━━━━━━━━━━━━━\n` +
-      `🏢 Быстрый переход к компании:\n` +
-      `• /company_t1 • /company_kontur • /company_tbank\n` +
-      `• /company_directum • /company_yandex • /company_ozon\n` +
-      `• /company_sber • /company_avito • /company_vk\n\n` +
-      `💻 Быстрый переход по направлениям:\n` +
-      `• /frontend • /backend • /mobile\n` +
-      `• /data_science • /qa • /devops\n\n` +
-      `💡 Быстрый поиск: отправьте название («яндекс», «т1», «контур», «директум») или направление («фронтенд», «бэкенд»)!`;
+      `💳 Финтех: /company_tbank • /company_sber\n` +
+      `💻 IT-компании: /company_yandex • /company_t1 • /company_kontur • /company_ozon • /company_directum • /company_avito • /company_vk\n\n` +
+      `🌐 Направления: /frontend • /backend • /mobile • /data_science • /qa • /devops\n` +
+      `💡 Быстрый поиск: напишите «яндекс», «т-банк», «контур» или «фронтенд»!`;
 
     const reply = {
       peer_id: peerId,
@@ -2160,7 +2596,11 @@ export async function startVkBot(token = VK_BOT_TOKEN, options = {}) {
           if (Array.isArray(data.updates)) {
             for (const upd of data.updates) {
               if (upd.type === 'message_new' || upd.type === 'message_event') {
-                const msg = upd.object?.message || upd.object || upd;
+                const rawObj = upd.object?.message || upd.object || upd;
+                const msg =
+                  upd.type === 'message_event' && upd.object?.conversation_message_id
+                    ? { ...rawObj, conversation_message_id: upd.object.conversation_message_id }
+                    : rawObj;
                 if (upd.type === 'message_event' && (upd.object?.event_id || msg.event_id)) {
                   const eventId = upd.object?.event_id || msg.event_id;
                   const userId = upd.object?.user_id || msg.user_id;

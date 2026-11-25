@@ -15,6 +15,8 @@ export const COMPANY_OFFICIAL_PORTALS: Record<string, string> = {
   vk: 'https://internship.vk.company/vacancy',
 };
 
+export type CompanySegment = 'fintech' | 'it';
+
 /**
  * Normalizes company identifier from company name or text
  */
@@ -30,6 +32,70 @@ export function getCompanyKey(companyName = ''): string {
   if (c.includes('авито') || c.includes('avito')) return 'avito';
   if (c.includes('vk') || c.includes('вконтакте')) return 'vk';
   return 'other';
+}
+
+/**
+ * Classifies an employer into Fintech (banks, financial services) vs general IT companies.
+ */
+export function getCompanySegment(companyName = ''): CompanySegment {
+  const key = getCompanyKey(companyName);
+  const c = companyName.toLowerCase();
+
+  if (key === 'tbank' || key === 'sber') return 'fintech';
+  if (
+    c.includes('альфа-банк') ||
+    c.includes('альфа банк') ||
+    c.includes('alfabank') ||
+    c.includes('alfa-bank') ||
+    c.includes('втб') ||
+    c.includes('vtb') ||
+    c.includes('модульбанк') ||
+    c.includes('modulbank') ||
+    c.includes('совкомбанк') ||
+    c.includes('райффайзен') ||
+    c.includes('raiffeisen') ||
+    c.includes('газпромбанк') ||
+    c.includes('банк точка') ||
+    c.includes('юmoney') ||
+    c.includes('yoomoney') ||
+    c.includes('финтех') ||
+    c.includes('fintech') ||
+    /\bбанк\b/i.test(c)
+  ) {
+    return 'fintech';
+  }
+  return 'it';
+}
+
+export type VacancySourceCategory = 'official' | 'hh' | 'habr' | 'telegram';
+
+/**
+ * Classifies vacancy origin into human-readable categories:
+ * - telegram: discovered from a Telegram channel/group
+ * - hh: HeadHunter (hh.ru)
+ * - habr: Хабр Карьера (career.habr.com)
+ * - official: Official company career portal (education.tbank.ru, yandex.ru/yaintern, career.t1.ru, kontur.ru, etc.)
+ */
+export function getVacancySourceCategory(item: {
+  sourceType?: string;
+  applyUrl?: string;
+  url?: string;
+  source_url?: string;
+  sourceChannel?: string;
+  sourcePostUrl?: string;
+}): VacancySourceCategory {
+  const url = String(item.applyUrl || item.url || item.source_url || '').toLowerCase();
+  const postUrl = String(item.sourcePostUrl || '').toLowerCase();
+  if (item.sourceType === 'telegram' || url.includes('t.me/') || postUrl.includes('t.me/')) {
+    return 'telegram';
+  }
+  if (url.includes('hh.ru/')) {
+    return 'hh';
+  }
+  if (url.includes('career.habr.com')) {
+    return 'habr';
+  }
+  return 'official';
 }
 
 /**
@@ -999,11 +1065,11 @@ export function getVacancySourceDetails(
     const cleanSourceCh = officialChannelHandle && officialChannelHandle.startsWith('@') ? officialChannelHandle : '';
     return {
       type: 'hh',
-      badgeLabel: explicitPostUrl && cleanSourceCh ? `TG ${cleanSourceCh}` : 'HeadHunter (hh.ru)',
+      badgeLabel: explicitPostUrl && cleanSourceCh ? `TG ${cleanSourceCh}` : 'hh.ru',
       badgeUrl: explicitPostUrl || resolvedUrl,
       badgeTooltip: explicitPostUrl
         ? `Открыть сообщение в Telegram (${explicitPostUrl})`
-        : `Открыть вакансию на HeadHunter: ${resolvedUrl}`,
+        : `Открыть вакансию на hh.ru: ${resolvedUrl}`,
       actionLabel: 'Откликнуться на hh.ru',
       actionMobileLabel: 'На hh.ru',
       applyUrl: resolvedUrl,
@@ -1127,7 +1193,7 @@ export function getVacancySourceDetails(
   // 3. Official employer career portal
   return {
     type: 'portal',
-    badgeLabel: explicitPostUrl ? `TG ${officialChannelHandle}` : `Сайт ${companyName || 'работодателя'}`,
+    badgeLabel: explicitPostUrl ? `TG ${officialChannelHandle}` : `Оф. сайт ${companyName || 'компании'}`,
     badgeUrl: explicitPostUrl || resolvedUrl,
     badgeTooltip: explicitPostUrl || `Открыть страницу вакансии на официальном сайте ${companyName}: ${resolvedUrl}`,
     actionLabel: `Подать заявку на сайте ${companyName || ''}`.trim(),

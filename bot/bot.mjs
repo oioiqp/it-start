@@ -263,6 +263,60 @@ export const DIRECTION_TITLES = {
   devops: 'DevOps & Инфраструктура',
 };
 
+export const DIRECTION_SUBTRACK_MAP = {
+  frontend: ['react', 'angular', 'vue'],
+  backend: ['python', 'golang', 'java', 'nodejs'],
+  mobile: ['android', 'ios', 'flutter'],
+  data_science: ['ml', 'analytics'],
+  qa: ['manual_qa', 'auto_qa'],
+  devops: ['cicd_docker', 'k8s_iac'],
+};
+
+export const ALL_DIRECTION_IDS = Object.keys(DIRECTION_SUBTRACK_MAP);
+
+export const SHORT_DIRECTION_LABELS = {
+  frontend: 'Frontend',
+  backend: 'Backend',
+  mobile: 'Mobile',
+  data_science: 'DS / ML',
+  qa: 'QA',
+  devops: 'DevOps',
+};
+
+export function getCompanySegmentBot(companyName = '') {
+  const c = String(companyName || '').toLowerCase();
+  const key = getCompanyKey(c);
+  if (key === 'tbank' || key === 'sber') return 'fintech';
+  if (
+    c.includes('альфа-банк') ||
+    c.includes('альфа банк') ||
+    c.includes('alfabank') ||
+    c.includes('втб') ||
+    c.includes('vtb') ||
+    c.includes('модульбанк') ||
+    c.includes('modulbank') ||
+    c.includes('совкомбанк') ||
+    c.includes('райффайзен') ||
+    c.includes('газпромбанк') ||
+    c.includes('финтех') ||
+    /\bбанк\b/i.test(c)
+  ) {
+    return 'fintech';
+  }
+  return 'it';
+}
+
+export function getVacancySourceCategoryBot(item) {
+  if (!item) return 'official';
+  const url = String(item.applyUrl || item.url || item.source_url || '').toLowerCase();
+  if (item.sourceType === 'telegram' || item.source_type === 'telegram' || url.includes('t.me/')) {
+    return 'telegram';
+  }
+  if (url.includes('hh.ru/')) return 'hh';
+  if (url.includes('career.habr.com')) return 'habr';
+  return 'official';
+}
+
 export function resolveDirectionByQuery(query = '') {
   const clean = String(query).toLowerCase().trim();
   if (!clean) return null;
@@ -4511,9 +4565,10 @@ export async function scanChannelsAndSyncSupabase(notifySubscribers = true) {
           const subDirs = Array.isArray(sub.directions) ? sub.directions : [];
           const subTracks = Array.isArray(sub.sub_tracks) ? sub.sub_tracks : [];
 
-          const matching = allToSync.filter(
-            (v) => subDirs.includes(v.directionId) || subTracks.includes(v.subTrackId)
-          );
+          const matching = allToSync.filter((v) => {
+            if (subDirs.length === 0 && subTracks.length === 0) return true;
+            return subDirs.includes(v.directionId) || (subDirs.length === 0 && subTracks.includes(v.subTrackId));
+          });
 
           let sentForSub = 0;
           for (const item of matching) {
@@ -4521,31 +4576,48 @@ export async function scanChannelsAndSyncSupabase(notifySubscribers = true) {
             const key = `${sub.chat_id}_${item.id}`;
             if (notifiedKeys.has(key)) continue;
 
-            const isWeb = item.sourceType === 'portal' || item.sourceType === 'website';
-            const sourceLabel = isWeb ? 'Карьерный сайт' : 'Telegram-канал';
-            const sourceChannel = item.sourceChannel || item.channel || (isWeb ? 'Сайт работодателя' : 'Telegram-канал');
+            const srcCat = getVacancySourceCategoryBot(item);
+            const segLabel = getCompanySegmentBot(item.company || item.companyId) === 'fintech' ? '💳 Финтех' : '💻 IT';
+            const sourceLabel =
+              srcCat === 'telegram'
+                ? 'Telegram-канал'
+                : srcCat === 'hh'
+                ? 'hh.ru'
+                : srcCat === 'habr'
+                ? 'Хабр Карьера'
+                : 'Официальный сайт';
+            const sourceChannel = item.sourceChannel || item.channel || (srcCat === 'telegram' ? 'Telegram-канал' : 'Сайт работодателя');
             const directApplyUrl = item.applyUrl || item.url || WEBAPP_URL;
+            const tgPostUrl =
+              item.sourcePostUrl && item.sourcePostUrl.includes('t.me/')
+                ? item.sourcePostUrl
+                : directApplyUrl.includes('t.me/')
+                ? directApplyUrl
+                : '';
 
             const pushText =
               `🔥 <b>Новая стажировка!</b>\n` +
               `━━━━━━━━━━━━━━━━━━━━\n` +
-              `🏢 <b>${item.company}</b>\n` +
+              `🏢 <b>${item.company}</b> (${segLabel})\n` +
               `💼 <b>${item.title}</b>\n` +
               `💰 <b>${item.salary}</b> | 📍 ${formatLocation(item)}\n` +
               (item.recruitmentType === 'scheduled' && item.applicationDeadline
                 ? `⏳ <b>Набор:</b> ${item.applicationDeadline}\n`
                 : '') +
               `📢 <code>${sourceChannel}</code> (${sourceLabel})\n\n` +
-              `🎯 <i>В IT-Старт подготовлен персональный план вопросов для этого направления!</i>`;
+              `🎯 <i>Подготовься по вопросам в IT-Старт!</i>`;
 
-            const linkRow = [
-              {
-                text: isWeb ? '🔗 Откликнуться на сайте' : '🔗 Открыть вакансию',
+            const linkRow = [];
+            if (srcCat === 'telegram' && tgPostUrl) {
+              linkRow.push({ text: '💬 К посту в TG', url: tgPostUrl });
+              if (directApplyUrl && directApplyUrl !== tgPostUrl && !directApplyUrl.includes('t.me/')) {
+                linkRow.push({ text: '🔗 Сайт отклика', url: directApplyUrl });
+              }
+            } else {
+              linkRow.push({
+                text: srcCat === 'hh' ? '📄 Открыть на hh.ru' : srcCat === 'habr' ? '📘 Открыть на Хабре' : '🌐 На сайт компании',
                 url: directApplyUrl,
-              },
-            ];
-            if (!isWeb && item.sourcePostUrl && item.sourcePostUrl !== directApplyUrl) {
-              linkRow.push({ text: '💬 К посту в TG', url: item.sourcePostUrl });
+              });
             }
 
             const sendRes = await callTelegram('sendMessage', {
@@ -4563,7 +4635,7 @@ export async function scanChannelsAndSyncSupabase(notifySubscribers = true) {
                   linkRow,
                   [
                     { text: '💼 Вакансии', callback_data: 'vacancies:all' },
-                    { text: '🔔 Подписка', callback_data: 'subscribe' },
+                    { text: '🔔 Настройки пушей', callback_data: 'notify:menu' },
                   ],
                 ],
               },
@@ -4629,6 +4701,101 @@ export async function scanChannelsAndSyncSupabase(notifySubscribers = true) {
 
 // In-memory subscribers store for Telegram push notifications (offline fallback)
 export const tgSubscribers = new Map();
+export const tgUserPrefsStore = new Map();
+
+/**
+ * Send a new message or edit an existing inline message smoothly in place
+ */
+async function sendOrEditTelegram(chatId, text, replyMarkup, messageId = null, extraParams = {}) {
+  if (messageId) {
+    const editRes = await callTelegram('editMessageText', {
+      chat_id: chatId,
+      message_id: messageId,
+      text,
+      parse_mode: 'HTML',
+      disable_web_page_preview: true,
+      ...(replyMarkup ? { reply_markup: replyMarkup } : {}),
+    });
+    if (editRes.ok || String(editRes.description || '').includes('message is not modified')) {
+      return editRes;
+    }
+  }
+  return callTelegram('sendMessage', {
+    chat_id: chatId,
+    text,
+    parse_mode: 'HTML',
+    disable_web_page_preview: true,
+    ...(replyMarkup ? { reply_markup: replyMarkup } : {}),
+    ...extraParams,
+  });
+}
+
+/**
+ * Build consistent persistent reply keyboard for Telegram chat
+ */
+export function getMainTgReplyKeyboard(webAppUrl = WEBAPP_URL) {
+  return {
+    keyboard: [
+      [{ text: '💼 Стажировки' }, { text: '🏢 Компании' }],
+      [{ text: '🔔 Уведомления' }, { text: '🚀 Открыть IT-Старт', web_app: { url: webAppUrl } }],
+      [{ text: '🗺 Роадмапы' }, { text: '❓ Тренажёр' }, { text: 'ℹ️ Помощь' }],
+    ],
+    resize_keyboard: true,
+    is_persistent: true,
+  };
+}
+
+/**
+ * Read Telegram user preferences (active or muted) from memory/Supabase
+ */
+export async function getTgUserPrefs(chatId, fallbackMeta = {}) {
+  const id = String(chatId);
+  if (tgUserPrefsStore.has(id)) {
+    return tgUserPrefsStore.get(id);
+  }
+
+  if (supabase && process.env.NODE_ENV !== 'test' && !process.env.VITEST) {
+    try {
+      const { data, error } = await supabase
+        .from('tg_subscriptions')
+        .select('*')
+        .eq('chat_id', id)
+        .maybeSingle();
+      if (!error && data) {
+        const prefs = {
+          chat_id: id,
+          username: data.username || fallbackMeta.username || '',
+          first_name: data.first_name || fallbackMeta.first_name || 'Пользователь Telegram',
+          directions: Array.isArray(data.directions) ? data.directions : [...ALL_DIRECTION_IDS],
+          sub_tracks: Array.isArray(data.sub_tracks) ? data.sub_tracks : [],
+          is_active: Boolean(data.is_active),
+          updated_at: data.updated_at || new Date().toISOString(),
+        };
+        tgUserPrefsStore.set(id, prefs);
+        if (prefs.is_active) tgSubscribers.set(id, prefs);
+        else tgSubscribers.delete(id);
+        return prefs;
+      }
+    } catch {}
+  }
+
+  if (tgSubscribers.has(id)) {
+    const sub = tgSubscribers.get(id);
+    tgUserPrefsStore.set(id, sub);
+    return sub;
+  }
+
+  const defaults = {
+    chat_id: id,
+    username: fallbackMeta.username || '',
+    first_name: fallbackMeta.first_name || 'Пользователь Telegram',
+    directions: [...ALL_DIRECTION_IDS],
+    sub_tracks: ALL_DIRECTION_IDS.flatMap((d) => DIRECTION_SUBTRACK_MAP[d] || []),
+    is_active: false,
+    updated_at: new Date().toISOString(),
+  };
+  return defaults;
+}
 
 /**
  * Get all active Telegram subscribers (with Supabase fetch & in-memory fallback)
@@ -4640,15 +4807,17 @@ export async function getTgSubscribers() {
       if (!error && Array.isArray(data)) {
         for (const row of data) {
           if (!String(row.chat_id).startsWith('vk_')) {
-            tgSubscribers.set(String(row.chat_id), {
+            const sub = {
               chat_id: String(row.chat_id),
               username: row.username || '',
               first_name: row.first_name || 'Пользователь Telegram',
-              directions: row.directions || ['frontend', 'backend', 'mobile', 'qa', 'devops', 'data_science'],
-              sub_tracks: row.sub_tracks || [],
+              directions: Array.isArray(row.directions) ? row.directions : [...ALL_DIRECTION_IDS],
+              sub_tracks: Array.isArray(row.sub_tracks) ? row.sub_tracks : [],
               is_active: true,
               updated_at: row.updated_at || new Date().toISOString(),
-            });
+            };
+            tgSubscribers.set(String(row.chat_id), sub);
+            tgUserPrefsStore.set(String(row.chat_id), sub);
           }
         }
       }
@@ -4662,17 +4831,28 @@ export async function getTgSubscribers() {
  */
 export async function registerTgSubscriber(chatId, meta = {}) {
   const id = String(chatId);
-  const isActive = meta.is_active !== false;
+  const existing = tgUserPrefsStore.get(id) || tgSubscribers.get(id);
+  const isActive = meta.is_active !== undefined ? Boolean(meta.is_active) : true;
+  const directions = Array.isArray(meta.directions)
+    ? meta.directions
+    : existing?.directions?.length
+    ? existing.directions
+    : [...ALL_DIRECTION_IDS];
+  const subTracks = Array.isArray(meta.sub_tracks)
+    ? meta.sub_tracks
+    : directions.flatMap((d) => DIRECTION_SUBTRACK_MAP[d] || []);
+
   const sub = {
     chat_id: id,
-    username: meta.username || '',
-    first_name: meta.first_name || 'Пользователь Telegram',
-    directions: meta.directions || ['frontend', 'backend', 'mobile', 'qa', 'devops', 'data_science'],
-    sub_tracks: meta.sub_tracks || ['react', 'python', 'nodejs', 'golang', 'auto_qa', 'cicd_docker'],
+    username: meta.username || existing?.username || '',
+    first_name: meta.first_name || existing?.first_name || 'Пользователь Telegram',
+    directions,
+    sub_tracks: subTracks,
     is_active: isActive,
     updated_at: new Date().toISOString(),
   };
 
+  tgUserPrefsStore.set(id, sub);
   if (isActive) {
     tgSubscribers.set(id, sub);
   } else {
@@ -4685,7 +4865,7 @@ export async function registerTgSubscriber(chatId, meta = {}) {
       if (error) {
         console.warn('[Telegram Bot] Ошибка сохранения подписчика в Supabase:', error.message);
       } else {
-        console.log(`[Telegram Bot] ✅ Подписчик ${id} (@${meta.username || 'unknown'}) успешно сохранен в Supabase`);
+        console.log(`[Telegram Bot] ✅ Профиль ${id} (@${sub.username || 'unknown'}) синхронизирован (push=${isActive})`);
       }
     }
   } catch (err) {
@@ -4696,11 +4876,15 @@ export async function registerTgSubscriber(chatId, meta = {}) {
 }
 
 /**
- * Unregister a Telegram subscriber
+ * Unregister a Telegram subscriber (disables pushes while keeping direction preferences)
  */
 export async function unregisterTgSubscriber(chatId) {
   const id = String(chatId);
+  const existing = tgUserPrefsStore.get(id) || tgSubscribers.get(id);
   tgSubscribers.delete(id);
+  if (existing) {
+    tgUserPrefsStore.set(id, { ...existing, is_active: false, updated_at: new Date().toISOString() });
+  }
 
   try {
     if (supabase && process.env.NODE_ENV !== 'test' && !process.env.VITEST) {
@@ -4754,7 +4938,7 @@ export async function handleMessage(msg) {
 
   const textLower = textRaw.toLowerCase();
   const textClean = textLower.replace(/[!.,?]+$/g, '').trim();
-  const strippedText = textLower.replace(/^[\p{Extended_Pictographic}\p{Emoji}\p{Symbol}\s_.-]+/u, '').trim();
+  const strippedText = textLower.replace(/^[\p{Extended_Pictographic}\p{Emoji}\p{Symbol}\s_.-]+/u, '').replace(/[!.,?]+$/g, '').trim();
 
   const isGreeting =
     strippedText === 'здравствуйте' ||
@@ -4780,7 +4964,7 @@ export async function handleMessage(msg) {
     if (num === 2) return sendCompanies(chatId);
     if (num === 3) return sendRoadmaps(chatId);
     if (num === 4) return sendQuestions(chatId);
-    if (num === 5) return sendSubscribe(chatId, firstName, username);
+    if (num === 5) return sendNotificationSettings(chatId, { first_name: firstName, username });
     if (num === 6) return sendSite(chatId);
     if (num === 7) return sendStatus(chatId);
     if (num === 8) return sendHelp(chatId);
@@ -4792,31 +4976,46 @@ export async function handleMessage(msg) {
   if (
     textClean === '/start' ||
     textClean.startsWith('/start ') ||
-    textClean === 'старт' ||
-    textClean === 'начать' ||
-    textClean === 'меню' ||
-    textClean === 'главное меню' ||
-    textClean === 'привет' ||
-    textClean === 'hello' ||
+    strippedText === 'старт' ||
+    strippedText === 'начать' ||
+    strippedText === 'меню' ||
+    strippedText === 'главное меню' ||
+    strippedText === 'привет' ||
+    strippedText === 'hello' ||
     isGreeting
   ) {
-    const isAuthOnlyStart = textClean === '/start auth' || textClean.startsWith('/start auth_');
-    // Auto-register subscriber in Supabase (without enabling push notifications when opened via ?start=auth)
-    await registerTgSubscriber(chatId, {
+    const startArg = textClean.startsWith('/start ') ? textClean.slice(7).trim() : '';
+    const isAuthOnlyStart = startArg === 'auth' || startArg.startsWith('auth_');
+    const isNotificationsStart = startArg === 'notifications' || startArg === 'notify' || startArg === 'settings';
+
+    const existingPrefs = await getTgUserPrefs(chatId, { username, first_name: firstName });
+    const isKnownUser = tgUserPrefsStore.has(String(chatId));
+
+    const targetIsActive = isKnownUser
+      ? existingPrefs.is_active
+      : !isAuthOnlyStart;
+
+    const syncedSub = await registerTgSubscriber(chatId, {
       username,
       first_name: firstName,
-      is_active: !isAuthOnlyStart,
+      directions: isKnownUser ? existingPrefs.directions : undefined,
+      sub_tracks: isKnownUser ? existingPrefs.sub_tracks : undefined,
+      is_active: targetIsActive,
     });
 
-    const webAppUrlWithParams = `${WEBAPP_URL}${WEBAPP_URL.includes('?') ? '&' : '?'}tg_chat_id=${chatId}&tg_username=${encodeURIComponent(username || '')}&tg_first_name=${encodeURIComponent(firstName || '')}${isAuthOnlyStart ? '&auth_only=1' : '&subscribed=1'}#tg_chat_id=${chatId}`;
+    const webAppUrlWithParams = `${WEBAPP_URL}${WEBAPP_URL.includes('?') ? '&' : '?'}tg_chat_id=${chatId}&tg_username=${encodeURIComponent(username || '')}&tg_first_name=${encodeURIComponent(firstName || '')}&subscribed=${syncedSub.is_active ? '1' : '0'}#tg_chat_id=${chatId}`;
+
+    if (isNotificationsStart) {
+      return sendNotificationSettings(chatId, { first_name: firstName, username });
+    }
 
     if (isAuthOnlyStart) {
       const authText =
         `🔑 <b>Авторизация в IT-Старт</b>\n\n` +
         `👤 Профиль: <b>${firstName}</b>${username ? ` (@${username})` : ''}\n` +
         `🆔 Ваш Telegram ID: <code>${chatId}</code>\n` +
-        `🔕 Уведомления о вакансиях <b>отключены</b> (можно включить на сайте по желанию).\n\n` +
-        `Нажмите кнопку ниже, чтобы сразу войти на сайт или в WebApp под своим профилем — история просмотров, отклики, избранное и прогресс роадмапов будут сохраняться в облаке.`;
+        `🔔 Пуш-уведомления: ${syncedSub.is_active ? '<b>включены</b>' : '<b>отключены</b>'} (настраиваются в боте по команде /notifications)\n\n` +
+        `Нажмите кнопку ниже, чтобы войти на сайт или в WebApp — история просмотров, отклики, избранное и прогресс роадмапов будут сохраняться в облаке.`;
 
       await callTelegram('sendMessage', {
         chat_id: chatId,
@@ -4824,70 +5023,89 @@ export async function handleMessage(msg) {
         parse_mode: 'HTML',
         reply_markup: {
           inline_keyboard: [
-            [{ text: '🚀 Открыть IT-Старт с этим профилем', web_app: { url: webAppUrlWithParams } }],
-            [{ text: '🌐 Войти в браузере (с историей)', url: webAppUrlWithParams }],
+            [{ text: '🚀 Открыть IT-Старт (WebApp)', web_app: { url: webAppUrlWithParams } }],
+            [{ text: '🌐 Войти в браузере', url: webAppUrlWithParams }],
+            [{ text: '🔔 Настроить уведомления в боте', callback_data: 'notify:menu' }],
           ],
         },
       });
-      return;
+      return { ok: true, type: 'start', authOnly: true, chatId, replyText: authText };
     }
 
+    const activeDirNames = (syncedSub.directions || [])
+      .map((d) => SHORT_DIRECTION_LABELS[d])
+      .filter(Boolean);
+    const notifySummary = syncedSub.is_active
+      ? `✅ <b>Включены</b> (${activeDirNames.length > 0 ? activeDirNames.join(', ') : 'выберите направления'})`
+      : `🔕 <b>Отключены</b> (можно включить в «🔔 Уведомления»)`;
+
     const welcomeText =
-      `👋 <b>Привет, ${firstName}!</b>\n\n` +
-      `✅ <b>Вы подписаны на уведомления IT-Старт!</b>\n` +
-      `🆔 Telegram Chat ID: <code>${chatId}</code>\n` +
+      `👋 <b>Привет, ${firstName}!</b>\n` +
+      `🆔 Chat ID: <code>${chatId}</code>\n` +
+      `🔔 Уведомления: ${notifySummary}\n` +
       `━━━━━━━━━━━━━━━━━━━━\n` +
-      `Мгновенные персональные пуши о стажировках Т1, Контур, Т-Банк, Directum, Яндекс, Ozon, Сбер, Авито и VK.\n\n` +
-      `🎯 <b>Что доступно прямо сейчас:</b>\n` +
-      `• 🚀 <b>WebApp:</b> роадмапы, тренажёр и база вакансий\n` +
-      `• 🏢 <b>9 IT-гигантов:</b> мониторинг каналов и сайтов 24/7\n` +
-      `• 🗺 <b>Роадмапы:</b> интерактивные деревья навыков\n` +
-      `• ❓ <b>Интервью:</b> 55+ вопросов с самопроверкой\n\n` +
-      `👇 <i>Запустите приложение кнопкой ниже (ID уже подставлен):</i>`;
+      `IT-Старт собирает стажировки и Junior-вакансии с <b>официальных сайтов компаний</b>, <b>hh.ru</b>, <b>Хабр Карьеры</b> и <b>Telegram-каналов</b>.\n\n` +
+      `💳 <b>Финтех:</b> Т-Банк, Сбер\n` +
+      `💻 <b>IT-компании:</b> Яндекс, Т1, Контур, Ozon, Directum, Авито, VK\n\n` +
+      `👇 Пользуйтесь удобным меню внизу экрана или выберите действие:`;
 
     const keyboard = {
       inline_keyboard: [
         [
           {
-            text: '🚀 Запустить IT-Старт WebApp',
+            text: '🚀 Открыть IT-Старт WebApp',
             web_app: { url: webAppUrlWithParams },
           },
         ],
         [
           { text: '💼 Стажировки', callback_data: 'vacancies:all' },
-          { text: '🏢 Компании', callback_data: 'companies' },
+          { text: '🏢 Компании (Финтех / IT)', callback_data: 'companies' },
         ],
         [
-          { text: '🗺 Роадмапы', callback_data: 'roadmaps' },
-          { text: '❓ Тренажёр', callback_data: 'questions' },
-        ],
-        [
-          { text: '🔔 Подписка', callback_data: 'subscribe' },
-          { text: '⚡ Скан', callback_data: 'scan' },
-        ],
-        [
-          { text: '🌐 Веб-сайт', url: PUBLIC_WEB_URL },
-          { text: 'ℹ️ Помощь', callback_data: 'help' },
+          { text: '🔔 Настроить уведомления', callback_data: 'notify:menu' },
+          { text: '🌐 Сайт', url: PUBLIC_WEB_URL },
         ],
       ],
     };
 
+    // Set/refresh persistent bottom ReplyKeyboard cleanly alongside main inline actions
     await callTelegram('sendMessage', {
       chat_id: chatId,
       text: welcomeText,
       parse_mode: 'HTML',
       reply_markup: keyboard,
     });
+    // Send lightweight reply keyboard hint only on explicit /start command so bottom navigation is always pinned
+    if (textClean.startsWith('/start') || strippedText === 'меню' || strippedText === 'главное меню') {
+      await callTelegram('sendMessage', {
+        chat_id: chatId,
+        text: '🧭 Быстрая панель навигации закреплена внизу ↓',
+        reply_markup: getMainTgReplyKeyboard(webAppUrlWithParams),
+      });
+    }
     return { ok: true, type: 'start', chatId, replyText: welcomeText };
+  }
+
+  // 1.5 /notifications or /settings or «🔔 Уведомления»
+  if (
+    textClean === '/notifications' ||
+    textClean === '/settings' ||
+    textClean === '/notify' ||
+    strippedText === 'уведомления' ||
+    strippedText === 'настроить уведомления' ||
+    strippedText === 'настройки уведомлений' ||
+    strippedText === 'настройки'
+  ) {
+    return sendNotificationSettings(chatId, { first_name: firstName, username });
   }
 
   // 2. /subscribe command
   if (
     textClean === '/subscribe' ||
     textClean.startsWith('/subscribe ') ||
-    textClean === 'подписка' ||
-    textClean === 'подписаться' ||
-    textClean === 'включить уведомления'
+    strippedText === 'подписка' ||
+    strippedText === 'подписаться' ||
+    strippedText === 'включить уведомления'
   ) {
     return sendSubscribe(chatId, firstName, username);
   }
@@ -4896,22 +5114,22 @@ export async function handleMessage(msg) {
   if (
     textClean === '/unsubscribe' ||
     textClean.startsWith('/unsubscribe ') ||
-    textClean === 'отписаться' ||
-    textClean === 'отписка' ||
-    textClean === 'отключить уведомления'
+    strippedText === 'отписаться' ||
+    strippedText === 'отписка' ||
+    strippedText === 'отключить уведомления'
   ) {
     await unregisterTgSubscriber(chatId);
     await callTelegram('sendMessage', {
       chat_id: chatId,
       text:
-        `🔕 <b>Вы отписались от уведомлений IT-Старт.</b>\n` +
+        `🔕 <b>Пуш-уведомления отключены.</b>\n` +
         `━━━━━━━━━━━━━━━━━━━━\n` +
-        `Чтобы возобновить подписку в любой момент, отправьте /subscribe или нажмите кнопку ниже.`,
+        `Выбранные вами направления и история на сайте сохранены. Включить рассылку обратно можно в любой момент:`,
       parse_mode: 'HTML',
       reply_markup: {
         inline_keyboard: [
           [
-            { text: '🔔 Подписаться', callback_data: 'subscribe' },
+            { text: '🔔 Включить и настроить', callback_data: 'notify:toggle' },
             { text: '💼 Стажировки', callback_data: 'vacancies:all' },
           ],
           [
@@ -4932,10 +5150,10 @@ export async function handleMessage(msg) {
   if (
     textClean === '/id' ||
     textClean === '/myid' ||
-    textClean === 'id' ||
-    textClean === 'мой id' ||
-    textClean === 'chat_id' ||
-    textClean === 'айди'
+    strippedText === 'id' ||
+    strippedText === 'мой id' ||
+    strippedText === 'chat_id' ||
+    strippedText === 'айди'
   ) {
     return sendId(chatId, firstName, username);
   }
@@ -4946,12 +5164,12 @@ export async function handleMessage(msg) {
     textClean.startsWith('/vacancies ') ||
     textClean === '/internships' ||
     textClean.startsWith('/internships ') ||
-    textClean === 'стажировки' ||
-    textClean === 'вакансии' ||
-    textClean === 'каталог'
+    strippedText === 'стажировки' ||
+    strippedText === 'вакансии' ||
+    strippedText === 'каталог'
   ) {
     const parts = textRaw.split(/\s+/);
-    if (parts.length > 1) {
+    if (parts.length > 1 && textRaw.startsWith('/')) {
       const arg = parts.slice(1).join(' ').trim().toLowerCase();
       const matchedComp = findCompanyByQuery(arg);
       const matchedDir = resolveDirectionByQuery(arg);
@@ -4975,9 +5193,9 @@ export async function handleMessage(msg) {
   // 7. /companies or «компании» or «работодатели»
   if (
     textClean === '/companies' ||
-    textClean === 'компании' ||
-    textClean === 'работодатели' ||
-    textClean === 'список компаний'
+    strippedText === 'компании' ||
+    strippedText === 'работодатели' ||
+    strippedText === 'список компаний'
   ) {
     return sendCompanies(chatId);
   }
@@ -4992,10 +5210,10 @@ export async function handleMessage(msg) {
   // 9. /roadmaps or «роадмапы» or «дорожные карты»
   if (
     textClean === '/roadmaps' ||
-    textClean === 'роадмапы' ||
-    textClean === 'роадмап' ||
-    textClean === 'дорожные карты' ||
-    textClean === 'план обучения'
+    strippedText === 'роадмапы' ||
+    strippedText === 'роадмап' ||
+    strippedText === 'дорожные карты' ||
+    strippedText === 'план обучения'
   ) {
     return sendRoadmaps(chatId);
   }
@@ -5005,11 +5223,11 @@ export async function handleMessage(msg) {
     textClean === '/questions' ||
     textClean === '/quiz' ||
     textClean === '/trainer' ||
-    textClean === 'вопросы' ||
-    textClean === 'тренажёр' ||
-    textClean === 'тренажер' ||
-    textClean === 'собеседование' ||
-    textClean === 'интервью'
+    strippedText === 'вопросы' ||
+    strippedText === 'тренажёр' ||
+    strippedText === 'тренажер' ||
+    strippedText === 'собеседование' ||
+    strippedText === 'интервью'
   ) {
     return sendQuestions(chatId);
   }
@@ -5020,11 +5238,11 @@ export async function handleMessage(msg) {
     textClean === '/sync' ||
     textClean === '/parse' ||
     textClean === '/track' ||
-    textClean === 'сканировать' ||
-    textClean === 'скан' ||
-    textClean === 'парсинг' ||
-    textClean === 'синхронизация' ||
-    textClean === 'обновить'
+    strippedText === 'сканировать' ||
+    strippedText === 'скан' ||
+    strippedText === 'парсинг' ||
+    strippedText === 'синхронизация' ||
+    strippedText === 'обновить'
   ) {
     return runManualScan(chatId);
   }
@@ -5032,9 +5250,9 @@ export async function handleMessage(msg) {
   // 12. /status or «статус» or «состояние»
   if (
     textClean === '/status' ||
-    textClean === 'статус' ||
-    textClean === 'состояние' ||
-    textClean === 'сервер'
+    strippedText === 'статус' ||
+    strippedText === 'состояние' ||
+    strippedText === 'сервер'
   ) {
     return sendStatus(chatId);
   }
@@ -5044,11 +5262,11 @@ export async function handleMessage(msg) {
     textClean === '/site' ||
     textClean === '/web' ||
     textClean === '/app' ||
-    textClean === 'сайт' ||
-    textClean === 'веб' ||
-    textClean === 'платформа' ||
-    textClean.includes('открыть сайт') ||
-    textClean.includes('веб-версия')
+    strippedText === 'сайт' ||
+    strippedText === 'веб' ||
+    strippedText === 'платформа' ||
+    strippedText.includes('открыть сайт') ||
+    strippedText.includes('веб-версия')
   ) {
     return sendSite(chatId);
   }
@@ -5128,9 +5346,9 @@ export async function handleMessage(msg) {
   // 16. /help or «помощь» or «справка»
   if (
     textClean === '/help' ||
-    textClean === 'помощь' ||
-    textClean === 'справка' ||
-    textClean === 'команды'
+    strippedText === 'помощь' ||
+    strippedText === 'справка' ||
+    strippedText === 'команды'
   ) {
     return sendHelp(chatId);
   }
@@ -5176,21 +5394,96 @@ export async function handleMessage(msg) {
 }
 
 /**
- * Send subscription confirmation and WebApp link
+ * Build compact inline keyboard for in-bot notification setup
+ */
+export function buildTgNotificationKeyboard(chatId, prefs = {}) {
+  const selected = new Set(Array.isArray(prefs.directions) ? prefs.directions : []);
+  const isActive = Boolean(prefs.is_active);
+  const webAppUrlWithParams = `${WEBAPP_URL}${WEBAPP_URL.includes('?') ? '&' : '?'}tg_chat_id=${chatId}&subscribed=${isActive ? '1' : '0'}#tg_chat_id=${chatId}`;
+  const dirBtn = (id) => ({
+    text: `${selected.has(id) ? '✅' : '⬜'} ${SHORT_DIRECTION_LABELS[id] || id}`,
+    callback_data: `notify:dir:${id}`,
+  });
+
+  return {
+    inline_keyboard: [
+      [
+        {
+          text: isActive ? '🔕 Выключить пуш-уведомления' : '🔔 Включить пуш-уведомления',
+          callback_data: 'notify:toggle',
+        },
+      ],
+      [dirBtn('frontend'), dirBtn('backend')],
+      [dirBtn('mobile'), dirBtn('data_science')],
+      [dirBtn('qa'), dirBtn('devops')],
+      [
+        { text: '✅ Выбрать все', callback_data: 'notify:all' },
+        { text: '🗑 Сбросить', callback_data: 'notify:clear' },
+      ],
+      [
+        { text: '💼 Вакансии', callback_data: 'vacancies:all' },
+        { text: '🚀 Открыть WebApp', web_app: { url: webAppUrlWithParams } },
+      ],
+    ],
+  };
+}
+
+/**
+ * Interactive notification configurator inside Telegram bot
+ */
+export async function sendNotificationSettings(chatId, fallbackMeta = {}, messageId = null) {
+  let prefs = await getTgUserPrefs(chatId, fallbackMeta);
+  if (!tgUserPrefsStore.has(String(chatId))) {
+    prefs = await registerTgSubscriber(chatId, {
+      username: fallbackMeta.username || prefs.username || '',
+      first_name: fallbackMeta.first_name || prefs.first_name || 'Разработчик',
+      directions: prefs.directions,
+      sub_tracks: prefs.sub_tracks,
+      is_active: false,
+    });
+  }
+
+  const selectedDirs = Array.isArray(prefs.directions) ? prefs.directions : [];
+  const selectedNames = selectedDirs.map((id) => SHORT_DIRECTION_LABELS[id]).filter(Boolean);
+  const statusLine = prefs.is_active ? '✅ <b>Включены</b>' : '🔕 <b>Отключены</b>';
+
+  const text =
+    `🔔 <b>Настройка уведомлений IT-Старт</b>\n` +
+    `━━━━━━━━━━━━━━━━━━━━\n` +
+    `• Статус рассылки: ${statusLine}\n` +
+    `• Направления (${selectedDirs.length}/${ALL_DIRECTION_IDS.length}): <code>${
+      selectedNames.length > 0 ? selectedNames.join(', ') : 'не выбраны'
+    }</code>\n\n` +
+    `Отмечайте нужные направления кнопками ниже — изменения сразу сохраняются для вашего профиля <code>${chatId}</code>.\n` +
+    (prefs.is_active && selectedDirs.length === 0
+      ? `\n⚠️ <i>Выберите хотя бы одно направление, чтобы получать пуши.</i>`
+      : '');
+
+  await sendOrEditTelegram(chatId, text, buildTgNotificationKeyboard(chatId, prefs), messageId);
+  return { ok: true, type: 'notifications', chatId, prefs };
+}
+
+/**
+ * Send subscription confirmation and link to notification configurator
  */
 export async function sendSubscribe(chatId, firstName = 'Разработчик', username = '') {
-  await registerTgSubscriber(chatId, {
+  const existingPrefs = await getTgUserPrefs(chatId, { username, first_name: firstName });
+  const hasSavedDirs = tgUserPrefsStore.has(String(chatId)) && Array.isArray(existingPrefs.directions);
+  const sub = await registerTgSubscriber(chatId, {
     username,
     first_name: firstName,
+    directions: hasSavedDirs ? existingPrefs.directions : [...ALL_DIRECTION_IDS],
+    is_active: true,
   });
+  const selectedNames = (sub.directions || []).map((id) => SHORT_DIRECTION_LABELS[id]).filter(Boolean);
   const webAppUrlWithParams = `${WEBAPP_URL}${WEBAPP_URL.includes('?') ? '&' : '?'}tg_chat_id=${chatId}&tg_username=${encodeURIComponent(username || '')}&tg_first_name=${encodeURIComponent(firstName || '')}&subscribed=1#tg_chat_id=${chatId}`;
   const text =
-    `🔔 <b>Уведомления успешно подключены!</b>\n` +
+    `🔔 <b>Уведомления успешно включены!</b>\n` +
     `━━━━━━━━━━━━━━━━━━━━\n` +
-    `🆔 Telegram Chat ID: <code>${chatId}</code>\n` +
-    `Вы подписаны на все направления стажировок (Frontend, Backend, Mobile, QA, DevOps, Data Science).\n\n` +
-    `Новые позиции будут приходить мгновенно в этот чат!\n` +
-    `Настроить конкретные компании и стек можно в WebApp:`;
+    `🆔 Chat ID: <code>${chatId}</code>\n` +
+    `📌 Активные направления: <code>${selectedNames.length > 0 ? selectedNames.join(', ') : 'все'}</code>\n\n` +
+    `Настроить конкретные направления (Frontend, Backend, Mobile, DS, QA, DevOps) или отключить пуши можно прямо здесь в боте:`;
+
   await callTelegram('sendMessage', {
     chat_id: chatId,
     text,
@@ -5198,18 +5491,15 @@ export async function sendSubscribe(chatId, firstName = 'Разработчик'
     reply_markup: {
       inline_keyboard: [
         [
-          {
-            text: '🚀 Настроить фильтры в WebApp',
-            web_app: { url: webAppUrlWithParams },
-          },
+          { text: '⚙️ Настроить направления', callback_data: 'notify:menu' },
+          { text: '🔕 Выключить', callback_data: 'notify:toggle' },
         ],
         [
           { text: '💼 Стажировки', callback_data: 'vacancies:all' },
           { text: '🏢 Компании', callback_data: 'companies' },
         ],
         [
-          { text: '🌐 Веб-сайт', url: PUBLIC_WEB_URL },
-          { text: '🔕 Отписаться', callback_data: 'unsubscribe' },
+          { text: '🚀 Открыть WebApp', web_app: { url: webAppUrlWithParams } },
         ],
       ],
     },
@@ -5221,16 +5511,17 @@ export async function sendSubscribe(chatId, firstName = 'Разработчик'
  * Send user Telegram Chat ID and details
  */
 export async function sendId(chatId, firstName = 'Разработчик', username = '') {
+  const prefs = await getTgUserPrefs(chatId, { first_name: firstName, username });
   const text =
-    `🆔 <b>Ваш идентификатор Telegram:</b>\n` +
+    `🆔 <b>Ваш профиль Telegram в IT-Старт:</b>\n` +
     `━━━━━━━━━━━━━━━━━━━━\n` +
     `• Chat ID: <code>${chatId}</code>\n` +
     `• Username: @${username || 'не указан'}\n` +
-    `• Имя: <b>${firstName}</b>\n\n` +
-    `Этот ID используется сервисом IT-Старт для отправки персональных пуш-уведомлений о новых стажировках.\n` +
-    `В Telegram WebApp ваш ID подставляется автоматически!`;
+    `• Имя: <b>${firstName}</b>\n` +
+    `• Уведомления: ${prefs.is_active ? '✅ Включены' : '🔕 Отключены'}\n\n` +
+    `Этот ID синхронизирует избранное, отклики и роадмапы с сайтом и Telegram WebApp.`;
 
-  const webAppUrlWithParams = `${WEBAPP_URL}${WEBAPP_URL.includes('?') ? '&' : '?'}tg_chat_id=${chatId}&tg_username=${encodeURIComponent(username || '')}&tg_first_name=${encodeURIComponent(firstName || '')}&subscribed=1#tg_chat_id=${chatId}`;
+  const webAppUrlWithParams = `${WEBAPP_URL}${WEBAPP_URL.includes('?') ? '&' : '?'}tg_chat_id=${chatId}&tg_username=${encodeURIComponent(username || '')}&tg_first_name=${encodeURIComponent(firstName || '')}&subscribed=${prefs.is_active ? '1' : '0'}#tg_chat_id=${chatId}`;
 
   await callTelegram('sendMessage', {
     chat_id: chatId,
@@ -5242,12 +5533,8 @@ export async function sendId(chatId, firstName = 'Разработчик', usern
           { text: '🚀 Запустить IT-Старт WebApp', web_app: { url: webAppUrlWithParams } },
         ],
         [
+          { text: '🔔 Уведомления', callback_data: 'notify:menu' },
           { text: '💼 Стажировки', callback_data: 'vacancies:all' },
-          { text: '🔔 Подписка', callback_data: 'subscribe' },
-        ],
-        [
-          { text: '🏢 Компании', callback_data: 'companies' },
-          { text: '🌐 Веб-сайт', url: PUBLIC_WEB_URL },
         ],
       ],
     },
@@ -5256,191 +5543,245 @@ export async function sendId(chatId, firstName = 'Разработчик', usern
 }
 
 /**
- * Send vacancies list with company and direction filter buttons
+ * Send vacancies list with segment, source, direction filters and pagination
  */
-export async function sendVacancies(chatId, filter = 'all') {
+export async function sendVacancies(chatId, filter = 'all', page = 0, sourceFilter = 'all', messageId = null) {
   const allList = await getActiveInternships();
+  const normalizedFilter = String(filter || 'all').toLowerCase();
+  const normalizedSource = ['official', 'hh', 'habr', 'telegram'].includes(String(sourceFilter || 'all').toLowerCase())
+    ? String(sourceFilter).toLowerCase()
+    : 'all';
+
   let list = allList;
-  let titleHeader = '🔥 <b>Актуальные IT-стажировки 2026:</b>\n━━━━━━━━━━━━━━━━━━━━\n\n';
+  let titlePrefix = '🔥 <b>Актуальные IT-стажировки';
 
-  const dirMatch = filter !== 'all' ? resolveDirectionByQuery(filter) : null;
-  const companyMatch = filter !== 'all' && !dirMatch ? (COMPANIES_DATA.find((c) => c.id === filter) || findCompanyByQuery(filter)) : null;
+  const dirMatch = normalizedFilter !== 'all' ? resolveDirectionByQuery(normalizedFilter) : null;
+  const companyMatch =
+    normalizedFilter !== 'all' &&
+    normalizedFilter !== 'fintech' &&
+    normalizedFilter !== 'it' &&
+    !dirMatch
+      ? COMPANIES_DATA.find((c) => c.id === normalizedFilter) || findCompanyByQuery(normalizedFilter)
+      : null;
 
-  if (dirMatch) {
-    list = allList.filter((i) => (i.directionId || '').toLowerCase() === dirMatch);
-    titleHeader = `🔥 <b>Стажировки: ${DIRECTION_TITLES[dirMatch] || dirMatch} (${list.length}):</b>\n━━━━━━━━━━━━━━━━━━━━\n\n`;
+  if (normalizedFilter === 'fintech') {
+    list = list.filter((i) => getCompanySegmentBot(i.company || i.companyId) === 'fintech');
+    titlePrefix = '💳 <b>Финтех-стажировки';
+  } else if (normalizedFilter === 'it') {
+    list = list.filter((i) => getCompanySegmentBot(i.company || i.companyId) === 'it');
+    titlePrefix = '💻 <b>Стажировки в IT-компаниях';
+  } else if (dirMatch) {
+    list = list.filter((i) => (i.directionId || '').toLowerCase() === dirMatch);
+    titlePrefix = `🔥 <b>Стажировки: ${DIRECTION_TITLES[dirMatch] || dirMatch}`;
   } else if (companyMatch) {
-    list = allList.filter((i) => i.companyId === companyMatch.id || findCompanyByQuery(i.company)?.id === companyMatch.id);
-    titleHeader = `🏢 <b>Вакансии ${companyMatch.name} (${companyMatch.channel}):</b>\n━━━━━━━━━━━━━━━━━━━━\n\n`;
-  } else if (filter !== 'all') {
-    list = allList.filter(
+    list = list.filter((i) => i.companyId === companyMatch.id || findCompanyByQuery(i.company)?.id === companyMatch.id);
+    titlePrefix = `🏢 <b>Вакансии ${companyMatch.name}`;
+  } else if (normalizedFilter !== 'all') {
+    list = list.filter(
       (i) =>
-        (i.directionId || '').toLowerCase() === filter.toLowerCase() ||
-        (i.title || '').toLowerCase().includes(filter.toLowerCase()) ||
-        (i.tags || []).some((t) => t.toLowerCase().includes(filter.toLowerCase()))
+        (i.directionId || '').toLowerCase() === normalizedFilter ||
+        (i.title || '').toLowerCase().includes(normalizedFilter) ||
+        (i.company || '').toLowerCase().includes(normalizedFilter) ||
+        (i.tags || []).some((t) => t.toLowerCase().includes(normalizedFilter))
     );
-    titleHeader = `🔍 <b>Стажировки по запросу «${filter}» (${list.length}):</b>\n━━━━━━━━━━━━━━━━━━━━\n\n`;
+    titlePrefix = `🔍 <b>Поиск «${filter}»`;
   }
 
-  let text = titleHeader;
-  if (list.length === 0) {
-    text += `🔍 По вашему запросу стажировок не найдено.\nПопробуйте выбрать другое направление или компанию ниже!`;
+  if (normalizedSource !== 'all') {
+    list = list.filter((i) => getVacancySourceCategoryBot(i) === normalizedSource);
+  }
+
+  const sourceTitleMap = {
+    all: 'Все источники',
+    official: 'Официальные сайты',
+    hh: 'hh.ru',
+    habr: 'Хабр Карьера',
+    telegram: 'Telegram-каналы',
+  };
+
+  const pageSize = 5;
+  const totalPages = Math.max(1, Math.ceil(list.length / pageSize));
+  const safePage = Math.max(0, Math.min(Number(page) || 0, totalPages - 1));
+  const slice = list.slice(safePage * pageSize, (safePage + 1) * pageSize);
+
+  let text = `${titlePrefix} (${list.length})</b>\n`;
+  text += `📡 Источник: <b>${sourceTitleMap[normalizedSource]}</b> • Стр. ${safePage + 1}/${totalPages}\n`;
+  text += `━━━━━━━━━━━━━━━━━━━━\n\n`;
+
+  if (slice.length === 0) {
+    text += `🔍 По выбранному фильтру пока нет открытых стажировок.\nПопробуйте выбрать «Все» или сменить источник ниже.`;
   } else {
-    list.slice(0, 5).forEach((item, idx) => {
+    slice.forEach((item, idx) => {
+      const globalNum = safePage * pageSize + idx + 1;
       const applyUrl = item.applyUrl || item.url || PUBLIC_WEB_URL;
       const webAppVacancyUrl = `${WEBAPP_URL}${WEBAPP_URL.includes('?') ? '&' : '?'}vacancyId=${item.id}`;
       const channel = resolveChannelHandle(item.sourceChannel || item.channel, item.company);
       const stack = Array.isArray(item.tags) && item.tags.length > 0 ? item.tags.slice(0, 4).join(' • ') : '';
       const salaryFormatted = formatSalary(item.salary);
       const loc = formatLocation(item);
-      const isTgPost = applyUrl.includes('t.me/');
-      const isPortal = !isTgPost && !applyUrl.includes('hh.ru');
-      const actionText = '🚀 Открыть в WebApp';
-      const sourceLabel = isTgPost ? `📢 Пост в ${channel}` : isPortal ? `🌐 Сайт ${item.company}` : `📄 HeadHunter`;
+      const srcCat = getVacancySourceCategoryBot(item);
+      const segBadge = getCompanySegmentBot(item.company || item.companyId) === 'fintech' ? '💳' : '💻';
+      const tgPostUrl =
+        item.sourcePostUrl && item.sourcePostUrl.includes('t.me/')
+          ? item.sourcePostUrl
+          : applyUrl.includes('t.me/')
+          ? applyUrl
+          : '';
 
-      text += `<b>${idx + 1}. 🏢 ${item.company}</b>\n`;
+      text += `<b>${globalNum}. ${segBadge} ${item.company}</b>\n`;
       text += `💼 <b>${item.title}</b>\n`;
-      text += `💰 <b>${salaryFormatted}</b> | 📍 ${loc}\n`;
+      text += `💰 ${salaryFormatted} | 📍 ${loc}\n`;
+      if (item.recruitmentType === 'scheduled' && item.applicationDeadline) {
+        text += `⏳ Набор: <i>${item.applicationDeadline}</i>\n`;
+      }
       if (stack) {
         text += `🏷 <code>${stack}</code>\n`;
       }
-      text += `${sourceLabel} ➔ <a href="${webAppVacancyUrl}"><b>${actionText}</b></a>\n`;
+
+      if (srcCat === 'telegram' && tgPostUrl) {
+        const extraSite =
+          applyUrl && applyUrl !== tgPostUrl && !applyUrl.includes('t.me/')
+            ? ` • <a href="${applyUrl}">Сайт</a>`
+            : '';
+        text += `💬 Пост в <code>${channel}</code> ➔ <a href="${tgPostUrl}"><b>К посту в TG →</b></a>${extraSite} • <a href="${webAppVacancyUrl}">WebApp</a>\n`;
+      } else {
+        const srcBadge =
+          srcCat === 'hh' ? '📄 hh.ru' : srcCat === 'habr' ? '📘 Хабр Карьера' : `🌐 Оф. сайт`;
+        text += `${srcBadge} ➔ <a href="${applyUrl}"><b>Открыть вакансию →</b></a> • <a href="${webAppVacancyUrl}">WebApp</a>\n`;
+      }
       text += `─────────────────────\n`;
     });
-    if (list.length > 5) {
-      text += `<i>... и ещё ${list.length - 5} стажировок доступно в WebApp!</i>\n\n`;
-    }
-    text += `💡 <i>Все фильтры, роадмапы и тренажёр доступны в приложении:</i>\n`;
-    text += `🌐 <a href="${PUBLIC_WEB_URL}">Веб-сайт</a> • 📱 <a href="https://vk.com/app54857681">VK Mini App</a>`;
   }
 
   if (text.length > 3900) {
-    text = text.slice(0, 3850) + '\n\n<i>(Список сокращен, откройте WebApp для полного просмотра)</i>';
+    text = text.slice(0, 3850) + '\n\n<i>(Список сокращён, откройте WebApp для полного просмотра)</i>';
   }
 
-  const webAppUrlWithParams = `${WEBAPP_URL}${WEBAPP_URL.includes('?') ? '&' : '?'}tg_chat_id=${chatId}&subscribed=1#tg_chat_id=${chatId}`;
+  const prefs = await getTgUserPrefs(chatId);
+  const webAppUrlWithParams = `${WEBAPP_URL}${WEBAPP_URL.includes('?') ? '&' : '?'}tg_chat_id=${chatId}&subscribed=${prefs.is_active ? '1' : '0'}#tg_chat_id=${chatId}`;
 
-  const isSubscribed = tgSubscribers.has(String(chatId)) && tgSubscribers.get(String(chatId)).is_active;
+  const rows = [];
+  if (totalPages > 1) {
+    const navRow = [];
+    if (safePage > 0) {
+      navRow.push({ text: '⬅️ Назад', callback_data: `vac:${normalizedFilter}:${normalizedSource}:${safePage - 1}` });
+    }
+    navRow.push({ text: `${safePage + 1} / ${totalPages}`, callback_data: 'notify:noop' });
+    if (safePage < totalPages - 1) {
+      navRow.push({ text: 'Вперёд ➡️', callback_data: `vac:${normalizedFilter}:${normalizedSource}:${safePage + 1}` });
+    }
+    rows.push(navRow);
+  }
 
-  const keyboard = {
-    inline_keyboard: [
-      [
-        { text: '💻 Frontend', callback_data: 'direction:frontend' },
-        { text: '⚙️ Backend', callback_data: 'direction:backend' },
-      ],
-      [
-        { text: '📱 Mobile', callback_data: 'direction:mobile' },
-        { text: '🤖 Data Science', callback_data: 'direction:data_science' },
-      ],
-      [
-        { text: '🧪 QA', callback_data: 'direction:qa' },
-        { text: '☁️ DevOps', callback_data: 'direction:devops' },
-      ],
-      [
-        { text: '🏢 Т1', callback_data: 'vacancies:t1' },
-        { text: '💼 Контур', callback_data: 'vacancies:kontur' },
-        { text: '💳 Т-Банк', callback_data: 'vacancies:tbank' },
-      ],
-      [
-        { text: '⚡ Directum', callback_data: 'vacancies:directum' },
-        { text: '🔍 Яндекс', callback_data: 'vacancies:yandex' },
-        { text: '📦 Ozon', callback_data: 'vacancies:ozon' },
-      ],
-      [
-        { text: '🟢 Сбер', callback_data: 'vacancies:sber' },
-        { text: '🟣 Авито', callback_data: 'vacancies:avito' },
-        { text: '🔷 VK', callback_data: 'vacancies:vk' },
-      ],
-      [
-        { text: isSubscribed ? '🔕 Отписаться' : '🔔 Подписка', callback_data: isSubscribed ? 'unsubscribe' : 'subscribe' },
-        { text: '💼 Вакансии', callback_data: 'vacancies:all' },
-        { text: '🏢 Компании', callback_data: 'companies' },
-      ],
-      [
-        { text: '🚀 Открыть в WebApp', web_app: { url: webAppUrlWithParams } },
-      ],
-      [
-        { text: '🌐 Открыть сайт', url: PUBLIC_WEB_URL },
-      ],
-    ],
-  };
+  rows.push([
+    { text: normalizedFilter === 'all' ? '• Все' : 'Все', callback_data: `vac:all:${normalizedSource}:0` },
+    { text: normalizedFilter === 'fintech' ? '• Финтех' : '💳 Финтех', callback_data: `vac:fintech:${normalizedSource}:0` },
+    { text: normalizedFilter === 'it' ? '• IT' : '💻 IT', callback_data: `vac:it:${normalizedSource}:0` },
+  ]);
 
-  await callTelegram('sendMessage', {
-    chat_id: chatId,
-    text,
-    parse_mode: 'HTML',
-    disable_web_page_preview: true,
-    reply_markup: keyboard,
-  });
+  rows.push([
+    { text: normalizedSource === 'all' ? '• Все ист.' : 'Все ист.', callback_data: `vac:${normalizedFilter}:all:0` },
+    { text: normalizedSource === 'official' ? '• Оф. сайты' : '🌐 Оф. сайты', callback_data: `vac:${normalizedFilter}:official:0` },
+    { text: normalizedSource === 'telegram' ? '• Telegram' : '💬 Telegram', callback_data: `vac:${normalizedFilter}:telegram:0` },
+  ]);
 
-  return { ok: true, type: 'vacancies', chatId, filter, count: list.length };
+  rows.push([
+    { text: normalizedSource === 'hh' ? '• hh.ru' : '📄 hh.ru', callback_data: `vac:${normalizedFilter}:hh:0` },
+    { text: normalizedSource === 'habr' ? '• Хабр' : '📘 Хабр Карьера', callback_data: `vac:${normalizedFilter}:habr:0` },
+  ]);
+
+  rows.push([
+    { text: normalizedFilter === 'frontend' ? '• Frontend' : 'Frontend', callback_data: `vac:frontend:${normalizedSource}:0` },
+    { text: normalizedFilter === 'backend' ? '• Backend' : 'Backend', callback_data: `vac:backend:${normalizedSource}:0` },
+    { text: normalizedFilter === 'mobile' ? '• Mobile' : 'Mobile', callback_data: `vac:mobile:${normalizedSource}:0` },
+  ]);
+
+  rows.push([
+    { text: normalizedFilter === 'data_science' ? '• DS/ML' : 'DS/ML', callback_data: `vac:data_science:${normalizedSource}:0` },
+    { text: normalizedFilter === 'qa' ? '• QA' : 'QA', callback_data: `vac:qa:${normalizedSource}:0` },
+    { text: normalizedFilter === 'devops' ? '• DevOps' : 'DevOps', callback_data: `vac:devops:${normalizedSource}:0` },
+  ]);
+
+  rows.push([
+    { text: '🏢 Компании', callback_data: 'companies:edit' },
+    { text: '🔔 Уведомления', callback_data: 'notify:menu' },
+    { text: '🚀 WebApp', web_app: { url: webAppUrlWithParams } },
+  ]);
+
+  await sendOrEditTelegram(chatId, text, { inline_keyboard: rows }, messageId);
+  return { ok: true, type: 'vacancies', chatId, filter: normalizedFilter, sourceFilter: normalizedSource, page: safePage, count: list.length };
 }
 
 /**
- * Send monitored companies overview
+ * Send monitored companies overview grouped by Fintech vs IT
  */
-export async function sendCompanies(chatId) {
-  let text = `🏢 <b>Целевые IT-компании и программы стажировок:</b>\n━━━━━━━━━━━━━━━━━━━━\n\n`;
+export async function sendCompanies(chatId, messageId = null) {
+  const allList = await getActiveInternships();
+  const countFor = (compId) =>
+    allList.filter((i) => i.companyId === compId || findCompanyByQuery(i.company)?.id === compId).length;
 
-  COMPANIES_DATA.forEach((c, idx) => {
-    text += `<b>${idx + 1}. 🏢 ${c.name}</b> (${c.shortName})\n`;
-    text += `🛠 <code>${c.stack}</code>\n`;
-    text += `📢 ${c.channel}\n\n`;
+  const fintechCompanies = COMPANIES_DATA.filter((c) => getCompanySegmentBot(c.name) === 'fintech');
+  const itCompanies = COMPANIES_DATA.filter((c) => getCompanySegmentBot(c.name) !== 'fintech');
+
+  let text = `🏢 <b>Работодатели и программы стажировок</b>\n━━━━━━━━━━━━━━━━━━━━\n\n`;
+  text += `💳 <b>Финтех-компании:</b>\n`;
+  fintechCompanies.forEach((c) => {
+    const cnt = countFor(c.id);
+    text += `• <b>${c.name}</b> — ${cnt} вак. (<code>${c.channel}</code>)\n`;
   });
 
-  text += `━━━━━━━━━━━━━━━━━━━━\n`;
-  text += `💡 <i>Выберите компанию ниже, чтобы посмотреть открытые стажировки и подробности:</i>`;
+  text += `\n💻 <b>IT-компании и бигтех:</b>\n`;
+  itCompanies.forEach((c) => {
+    const cnt = countFor(c.id);
+    text += `• <b>${c.name}</b> — ${cnt} вак. (<code>${c.channel}</code>)\n`;
+  });
 
-  const webAppUrlWithParams = `${WEBAPP_URL}${WEBAPP_URL.includes('?') ? '&' : '?'}tg_chat_id=${chatId}&subscribed=1#tg_chat_id=${chatId}`;
+  text += `\n━━━━━━━━━━━━━━━━━━━━\n`;
+  text += `💡 <i>Нажмите на компанию ниже для просмотра её открытых позиций:</i>`;
+
+  const prefs = await getTgUserPrefs(chatId);
+  const webAppUrlWithParams = `${WEBAPP_URL}${WEBAPP_URL.includes('?') ? '&' : '?'}tg_chat_id=${chatId}&subscribed=${prefs.is_active ? '1' : '0'}#tg_chat_id=${chatId}`;
 
   const keyboard = {
     inline_keyboard: [
       [
-        { text: '🏢 Т1', callback_data: 'company:t1' },
-        { text: '💼 Контур', callback_data: 'company:kontur' },
-        { text: '💳 Т-Банк', callback_data: 'company:tbank' },
+        { text: `💳 Т-Банк (${countFor('tbank')})`, callback_data: 'company:tbank' },
+        { text: `🟢 Сбер (${countFor('sber')})`, callback_data: 'company:sber' },
       ],
       [
-        { text: '⚡ Directum', callback_data: 'company:directum' },
-        { text: '🔍 Яндекс', callback_data: 'company:yandex' },
-        { text: '📦 Ozon', callback_data: 'company:ozon' },
+        { text: `🔍 Яндекс (${countFor('yandex')})`, callback_data: 'company:yandex' },
+        { text: `🏢 Т1 (${countFor('t1')})`, callback_data: 'company:t1' },
+        { text: `💼 Контур (${countFor('kontur')})`, callback_data: 'company:kontur' },
       ],
       [
-        { text: '🟢 Сбер', callback_data: 'company:sber' },
-        { text: '🟣 Авито', callback_data: 'company:avito' },
-        { text: '🔷 VK', callback_data: 'company:vk' },
+        { text: `📦 Ozon (${countFor('ozon')})`, callback_data: 'company:ozon' },
+        { text: `⚡ Directum (${countFor('directum')})`, callback_data: 'company:directum' },
+        { text: `🟣 Авито (${countFor('avito')})`, callback_data: 'company:avito' },
+        { text: `🔷 VK (${countFor('vk')})`, callback_data: 'company:vk' },
       ],
       [
-        { text: '💼 Вакансии', callback_data: 'vacancies:all' },
-        { text: '🔔 Подписка', callback_data: 'subscribe' },
+        { text: '💳 Все из Финтеха', callback_data: 'vac:fintech:all:0' },
+        { text: '💻 Все IT-компании', callback_data: 'vac:it:all:0' },
       ],
       [
-        { text: '🚀 Смотреть в WebApp', web_app: { url: webAppUrlWithParams } },
-      ],
-      [
-        { text: '🌐 Веб-сайт', url: PUBLIC_WEB_URL },
+        { text: '💼 Все вакансии', callback_data: 'vacancies:all' },
+        { text: '🔔 Уведомления', callback_data: 'notify:menu' },
+        { text: '🚀 WebApp', web_app: { url: webAppUrlWithParams } },
       ],
     ],
   };
 
-  await callTelegram('sendMessage', {
-    chat_id: chatId,
-    text,
-    parse_mode: 'HTML',
-    disable_web_page_preview: true,
-    reply_markup: keyboard,
-  });
-
+  await sendOrEditTelegram(chatId, text, keyboard, messageId);
   return { ok: true, type: 'companies', chatId, count: COMPANIES_DATA.length };
 }
 
 /**
- * Send vacancies and details for a specific company
+ * Send vacancies and details for a specific company with pagination
  */
-export async function sendCompanyVacancies(chatId, companyId) {
+export async function sendCompanyVacancies(chatId, companyId, page = 0, messageId = null) {
   const company = COMPANIES_DATA.find((c) => c.id === companyId) || findCompanyByQuery(companyId);
   if (!company) {
-    return sendCompanies(chatId);
+    return sendCompanies(chatId, messageId);
   }
 
   const allList = await getActiveInternships();
@@ -5448,62 +5789,75 @@ export async function sendCompanyVacancies(chatId, companyId) {
     (i) => i.companyId === company.id || findCompanyByQuery(i.company)?.id === company.id
   );
 
-  let text = `🏢 <b>Компания: ${company.name} (${company.shortName})</b>\n`;
+  const pageSize = 5;
+  const totalPages = Math.max(1, Math.ceil(list.length / pageSize));
+  const safePage = Math.max(0, Math.min(Number(page) || 0, totalPages - 1));
+  const slice = list.slice(safePage * pageSize, (safePage + 1) * pageSize);
+
+  const segLabel = getCompanySegmentBot(company.name) === 'fintech' ? '💳 Финтех' : '💻 IT-компания';
+  let text = `🏢 <b>${company.name}</b> (${segLabel})\n`;
   text += `━━━━━━━━━━━━━━━━━━━━\n`;
-  text += `📝 <i>${company.description}</i>\n\n`;
-  text += `🛠 <b>Стек:</b> <code>${company.stack}</code>\n`;
-  text += `📢 <b>Канал:</b> <code>${company.channel}</code>\n\n`;
-  text += `🔥 <b>Открытые стажировки (${list.length}):</b>\n`;
+  text += `📝 <i>${company.description}</i>\n`;
+  text += `🛠 <code>${company.stack}</code>\n\n`;
+  text += `🔥 <b>Открытые стажировки (${list.length}):</b> • Стр. ${safePage + 1}/${totalPages}\n`;
   text += `━━━━━━━━━━━━━━━━━━━━\n`;
 
-  if (list.length === 0) {
-    text += `🔍 Сейчас прямых позиций в базе нет, но парсер отслеживает <code>${company.channel}</code> 24/7!\nПроверьте WebApp или сайт компании:\n`;
+  if (slice.length === 0) {
+    text += `🔍 Сейчас прямых позиций в базе нет, но парсер отслеживает <code>${company.channel}</code> 24/7!\n`;
   } else {
-    list.slice(0, 5).forEach((item, idx) => {
+    slice.forEach((item, idx) => {
+      const globalNum = safePage * pageSize + idx + 1;
       const applyUrl = item.applyUrl || item.url || PUBLIC_WEB_URL;
       const salaryFormatted = formatSalary(item.salary);
       const loc = formatLocation(item);
       const stack = Array.isArray(item.tags) && item.tags.length > 0 ? item.tags.slice(0, 4).join(' • ') : '';
+      const srcCat = getVacancySourceCategoryBot(item);
+      const tgPostUrl =
+        item.sourcePostUrl && item.sourcePostUrl.includes('t.me/')
+          ? item.sourcePostUrl
+          : applyUrl.includes('t.me/')
+          ? applyUrl
+          : '';
 
-      text += `<b>${idx + 1}. ${item.title}</b>\n`;
-      text += `💰 <b>${salaryFormatted}</b> | 📍 ${loc}\n`;
+      text += `<b>${globalNum}. ${item.title}</b>\n`;
+      text += `💰 ${salaryFormatted} | 📍 ${loc}\n`;
+      if (item.recruitmentType === 'scheduled' && item.applicationDeadline) {
+        text += `⏳ Набор: <i>${item.applicationDeadline}</i>\n`;
+      }
       if (stack) {
         text += `🏷 <code>${stack}</code>\n`;
       }
-      text += `🔗 <a href="${applyUrl}"><b>Откликнуться →</b></a>\n`;
+      if (srcCat === 'telegram' && tgPostUrl) {
+        text += `💬 <a href="${tgPostUrl}"><b>К посту в TG →</b></a>\n`;
+      } else {
+        text += `🔗 <a href="${applyUrl}"><b>Откликнуться →</b></a>\n`;
+      }
       text += `─────────────────────\n`;
     });
   }
 
-  const webAppUrlWithParams = `${WEBAPP_URL}${WEBAPP_URL.includes('?') ? '&' : '?'}tg_chat_id=${chatId}&subscribed=1#tg_chat_id=${chatId}`;
+  const prefs = await getTgUserPrefs(chatId);
+  const webAppUrlWithParams = `${WEBAPP_URL}${WEBAPP_URL.includes('?') ? '&' : '?'}tg_chat_id=${chatId}&subscribed=${prefs.is_active ? '1' : '0'}#tg_chat_id=${chatId}`;
 
-  const keyboard = {
-    inline_keyboard: [
-      [
-        { text: `📢 Канал ${company.channel}`, url: company.channelUrl },
-      ],
-      [
-        { text: '🚀 Открыть в WebApp', web_app: { url: webAppUrlWithParams } },
-      ],
-      [
-        { text: '🏢 Компании', callback_data: 'companies' },
-        { text: '💼 Вакансии', callback_data: 'vacancies:all' },
-      ],
-      [
-        { text: '🌐 Веб-сайт', url: PUBLIC_WEB_URL },
-      ],
-    ],
-  };
+  const inline_keyboard = [];
+  if (totalPages > 1) {
+    const nav = [];
+    if (safePage > 0) nav.push({ text: '⬅️ Назад', callback_data: `company:${company.id}:${safePage - 1}` });
+    nav.push({ text: `${safePage + 1} / ${totalPages}`, callback_data: 'notify:noop' });
+    if (safePage < totalPages - 1) nav.push({ text: 'Вперёд ➡️', callback_data: `company:${company.id}:${safePage + 1}` });
+    inline_keyboard.push(nav);
+  }
+  inline_keyboard.push([
+    { text: `📢 Канал ${company.channel}`, url: company.channelUrl },
+    { text: '🚀 В WebApp', web_app: { url: webAppUrlWithParams } },
+  ]);
+  inline_keyboard.push([
+    { text: '◀️ К компаниям', callback_data: 'companies:edit' },
+    { text: '🔔 Уведомления', callback_data: 'notify:menu' },
+  ]);
 
-  await callTelegram('sendMessage', {
-    chat_id: chatId,
-    text,
-    parse_mode: 'HTML',
-    disable_web_page_preview: true,
-    reply_markup: keyboard,
-  });
-
-  return { ok: true, type: 'company_details', chatId, companyId: company.id, count: list.length };
+  await sendOrEditTelegram(chatId, text, { inline_keyboard }, messageId);
+  return { ok: true, type: 'company_details', chatId, companyId: company.id, count: list.length, page: safePage };
 }
 
 /**
@@ -5751,28 +6105,23 @@ export async function sendHelp(chatId) {
   const text =
     `ℹ️ <b>Команды бота @${BOT_USERNAME}:</b>\n` +
     `━━━━━━━━━━━━━━━━━━━━\n` +
-    `• /start — Главное меню и WebApp\n` +
-    `• /vacancies — Каталог стажировок\n` +
-    `• /companies — Список IT-работодателей\n` +
+    `• /start — Главное меню и панель внизу\n` +
+    `• /notifications — Настройка уведомлений и направлений\n` +
+    `• /vacancies — Каталог с фильтрами (Финтех / IT / Источники)\n` +
+    `• /companies — Работодатели (Финтех и IT-компании)\n` +
     `• /roadmaps — Карты развития (6 треков)\n` +
     `• /questions — 55+ вопросов собеседования\n` +
-    `• /subscribe — Включить пуши вакансий\n` +
-    `• /unsubscribe — Отключить пуши\n` +
+    `• /subscribe / /unsubscribe — Быстро вкл/выкл пуши\n` +
     `• /status — Состояние парсера и базы\n` +
     `• /id — Ваш Telegram Chat ID\n` +
     `• /scan — Запуск сканирования\n` +
     `• /site — Веб-платформа без VPN\n` +
-    `• /vk — Официальный бот ВКонтакте\n` +
-    `• /help — Список всех команд\n\n` +
+    `• /vk — Официальный бот ВКонтакте\n\n` +
     `━━━━━━━━━━━━━━━━━━━━\n` +
-    `🏢 <b>Быстрый переход к работодателям:</b>\n` +
-    `• /company_t1 • /company_kontur • /company_tbank\n` +
-    `• /company_directum • /company_yandex • /company_ozon\n` +
-    `• /company_sber • /company_avito • /company_vk\n\n` +
-    `💻 <b>Быстрый переход по направлениям:</b>\n` +
-    `• /frontend • /backend • /mobile\n` +
-    `• /data_science • /qa • /devops\n\n` +
-    `💡 <i>Вы также можете отправить название («яндекс», «т1», «контур», «директум») или стека («фронтенд», «бэкенд»)!</i>\n\n` +
+    `🏢 <b>Быстрый переход к компаниям:</b>\n` +
+    `• <b>Финтех:</b> /company_tbank • /company_sber\n` +
+    `• <b>IT:</b> /company_yandex • /company_t1 • /company_kontur • /company_ozon • /company_directum • /company_avito • /company_vk\n\n` +
+    `💻 <b>Направления:</b> /frontend • /backend • /mobile • /data_science • /qa • /devops\n` +
     `🌐 <b>Веб-сайт:</b> ${PUBLIC_WEB_URL}`;
 
   const keyboard = {
@@ -5785,11 +6134,11 @@ export async function sendHelp(chatId) {
         { text: '🏢 Компании', callback_data: 'companies' },
       ],
       [
+        { text: '🔔 Уведомления', callback_data: 'notify:menu' },
         { text: '🗺 Роадмапы', callback_data: 'roadmaps' },
-        { text: '❓ Тренажёр', callback_data: 'questions' },
       ],
       [
-        { text: '🔔 Подписка', callback_data: 'subscribe' },
+        { text: '❓ Тренажёр', callback_data: 'questions' },
         { text: '🌐 Веб-сайт', url: PUBLIC_WEB_URL },
       ],
     ],
@@ -5809,7 +6158,7 @@ export async function sendHelp(chatId) {
 export function getSubscriptionKeyboard(isSubscribed) {
   return [
     [{ text: '📋 Все вакансии', callback_data: 'vacancies:all' }],
-    [{ text: isSubscribed ? '🔕 Отписаться' : '🔔 Подписка', callback_data: isSubscribed ? 'unsubscribe' : 'subscribe' }],
+    [{ text: isSubscribed ? '🔕 Настроить / Отписаться' : '🔔 Настроить уведомления', callback_data: 'notify:menu' }],
   ];
 }
 
@@ -5818,25 +6167,115 @@ export function getSubscriptionKeyboard(isSubscribed) {
  */
 export async function handleCallbackQuery(query) {
   const chatId = query.message?.chat?.id;
-  const data = query.data;
+  const messageId = query.message?.message_id || null;
+  const data = String(query.data || '');
+  const meta = {
+    username: query.from?.username || '',
+    first_name: query.from?.first_name || 'Разработчик',
+  };
+
+  let answerText = '';
+
+  if (!chatId) {
+    await callTelegram('answerCallbackQuery', { callback_query_id: query.id });
+    return { ok: false, error: 'Missing chatId' };
+  }
+
+  if (data === 'notify:noop') {
+    await callTelegram('answerCallbackQuery', { callback_query_id: query.id });
+    return { ok: true, type: 'noop', chatId };
+  }
+
+  if (data === 'notify:menu') {
+    await callTelegram('answerCallbackQuery', { callback_query_id: query.id });
+    return sendNotificationSettings(chatId, meta, messageId);
+  }
+
+  if (data === 'notify:toggle') {
+    const prefs = await getTgUserPrefs(chatId, meta);
+    const nextActive = !prefs.is_active;
+    if (nextActive) {
+      await registerTgSubscriber(chatId, {
+        ...prefs,
+        ...meta,
+        is_active: true,
+      });
+      answerText = '🔔 Уведомления включены!';
+    } else {
+      await unregisterTgSubscriber(chatId);
+      answerText = '🔕 Уведомления отключены';
+    }
+    await callTelegram('answerCallbackQuery', { callback_query_id: query.id, text: answerText });
+    return sendNotificationSettings(chatId, meta, messageId);
+  }
+
+  if (data.startsWith('notify:dir:')) {
+    const dirId = data.replace('notify:dir:', '').trim();
+    const prefs = await getTgUserPrefs(chatId, meta);
+    const currentSet = new Set(Array.isArray(prefs.directions) ? prefs.directions : []);
+    if (currentSet.has(dirId)) {
+      currentSet.delete(dirId);
+      answerText = `Убрано: ${SHORT_DIRECTION_LABELS[dirId] || dirId}`;
+    } else {
+      currentSet.add(dirId);
+      answerText = `Добавлено: ${SHORT_DIRECTION_LABELS[dirId] || dirId}`;
+    }
+    const nextDirs = ALL_DIRECTION_IDS.filter((id) => currentSet.has(id));
+    await registerTgSubscriber(chatId, {
+      ...prefs,
+      ...meta,
+      directions: nextDirs,
+      is_active: prefs.is_active,
+    });
+    await callTelegram('answerCallbackQuery', { callback_query_id: query.id, text: answerText });
+    return sendNotificationSettings(chatId, meta, messageId);
+  }
+
+  if (data === 'notify:all') {
+    const prefs = await getTgUserPrefs(chatId, meta);
+    await registerTgSubscriber(chatId, {
+      ...prefs,
+      ...meta,
+      directions: [...ALL_DIRECTION_IDS],
+      is_active: prefs.is_active,
+    });
+    await callTelegram('answerCallbackQuery', { callback_query_id: query.id, text: 'Выбраны все направления' });
+    return sendNotificationSettings(chatId, meta, messageId);
+  }
+
+  if (data === 'notify:clear') {
+    const prefs = await getTgUserPrefs(chatId, meta);
+    await registerTgSubscriber(chatId, {
+      ...prefs,
+      ...meta,
+      directions: [],
+      sub_tracks: [],
+      is_active: false,
+    });
+    await callTelegram('answerCallbackQuery', { callback_query_id: query.id, text: 'Направления сброшены, пуши приостановлены' });
+    return sendNotificationSettings(chatId, meta, messageId);
+  }
 
   await callTelegram('answerCallbackQuery', { callback_query_id: query.id });
 
-  if (!chatId) return { ok: false, error: 'Missing chatId' };
-
-  if (data === 'vacancies' || data === 'vacancies:all') {
-    return sendVacancies(chatId, 'all');
+  if (data.startsWith('vac:')) {
+    const [, filter = 'all', sourceFilter = 'all', pageStr = '0'] = data.split(':');
+    return sendVacancies(chatId, filter, Number(pageStr) || 0, sourceFilter, messageId);
+  } else if (data === 'vacancies' || data === 'vacancies:all') {
+    return sendVacancies(chatId, 'all', 0, 'all', messageId);
   } else if (data.startsWith('direction:') || data.startsWith('vacancies:direction:')) {
     const dirId = data.replace(/^vacancies:direction:/, '').replace(/^direction:/, '');
-    return sendVacancies(chatId, dirId);
+    return sendVacancies(chatId, dirId, 0, 'all', messageId);
   } else if (data.startsWith('vacancies:')) {
     const compId = data.replace('vacancies:', '');
-    return sendVacancies(chatId, compId);
-  } else if (data === 'companies') {
-    return sendCompanies(chatId);
+    return sendVacancies(chatId, compId, 0, 'all', messageId);
+  } else if (data === 'companies' || data === 'companies:edit') {
+    return sendCompanies(chatId, data === 'companies:edit' ? messageId : null);
   } else if (data.startsWith('company:')) {
-    const compId = data.replace('company:', '');
-    return sendCompanyVacancies(chatId, compId);
+    const parts = data.split(':');
+    const compId = parts[1] || '';
+    const pageNum = Number(parts[2] || 0);
+    return sendCompanyVacancies(chatId, compId, pageNum, messageId);
   } else if (data === 'scan' || data === 'parse' || data === 'sync') {
     return runManualScan(chatId);
   } else if (data === 'status') {
@@ -5850,134 +6289,10 @@ export async function handleCallbackQuery(query) {
   } else if (data === 'site') {
     return sendSite(chatId);
   } else if (data === 'subscribe') {
-    await registerTgSubscriber(chatId, {
-      username: query.from?.username || '',
-      first_name: query.from?.first_name || 'Разработчик',
-    });
-    
-    // Update keyboard
-    if (query.message) {
-        const isSubscribed = true;
-        // Reconstruct keyboard for the vacancies list
-        const webAppUrlWithParams = `${WEBAPP_URL}${WEBAPP_URL.includes('?') ? '&' : '?'}tg_chat_id=${chatId}&subscribed=${isSubscribed ? '1' : '0'}#tg_chat_id=${chatId}`;
-        const keyboard = {
-            inline_keyboard: [
-              [
-                { text: '💻 Frontend', callback_data: 'direction:frontend' },
-                { text: '⚙️ Backend', callback_data: 'direction:backend' },
-              ],
-              [
-                { text: '📱 Mobile', callback_data: 'direction:mobile' },
-                { text: '🤖 Data Science', callback_data: 'direction:data_science' },
-              ],
-              [
-                { text: '🧪 QA', callback_data: 'direction:qa' },
-                { text: '☁️ DevOps', callback_data: 'direction:devops' },
-              ],
-              [
-                { text: '🏢 Т1', callback_data: 'vacancies:t1' },
-                { text: '💼 Контур', callback_data: 'vacancies:kontur' },
-                { text: '💳 Т-Банк', callback_data: 'vacancies:tbank' },
-              ],
-              [
-                { text: '⚡ Directum', callback_data: 'vacancies:directum' },
-                { text: '🔍 Яндекс', callback_data: 'vacancies:yandex' },
-                { text: '📦 Ozon', callback_data: 'vacancies:ozon' },
-              ],
-              [
-                { text: '🟢 Сбер', callback_data: 'vacancies:sber' },
-                { text: '🟣 Авито', callback_data: 'vacancies:avito' },
-                { text: '🔷 VK', callback_data: 'vacancies:vk' },
-              ],
-              [
-                { text: isSubscribed ? '🔕 Отписаться' : '🔔 Подписка', callback_data: isSubscribed ? 'unsubscribe' : 'subscribe' },
-                { text: '💼 Вакансии', callback_data: 'vacancies:all' },
-                { text: '🏢 Компании', callback_data: 'companies' },
-              ],
-              [
-                { text: '🚀 Открыть в WebApp', web_app: { url: webAppUrlWithParams } },
-              ],
-              [
-                { text: '🌐 Открыть сайт', url: PUBLIC_WEB_URL },
-              ],
-            ],
-          };
-
-        await callTelegram('editMessageReplyMarkup', {
-            chat_id: chatId,
-            message_id: query.message.message_id,
-            reply_markup: keyboard
-        });
-    }
-
-    return callTelegram('sendMessage', {
-      chat_id: chatId,
-      text: `🔔 <b>Подписка успешно оформлена!</b> Вы будете получать уведомления о новых стажировках.`,
-      parse_mode: 'HTML',
-    });
+    return sendSubscribe(chatId, meta.first_name, meta.username);
   } else if (data === 'unsubscribe') {
     await unregisterTgSubscriber(chatId);
-    
-    // Update keyboard
-    if (query.message) {
-        const isSubscribed = false;
-        // Reconstruct keyboard for the vacancies list
-        const webAppUrlWithParams = `${WEBAPP_URL}${WEBAPP_URL.includes('?') ? '&' : '?'}tg_chat_id=${chatId}&subscribed=${isSubscribed ? '1' : '0'}#tg_chat_id=${chatId}`;
-        const keyboard = {
-            inline_keyboard: [
-              [
-                { text: '💻 Frontend', callback_data: 'direction:frontend' },
-                { text: '⚙️ Backend', callback_data: 'direction:backend' },
-              ],
-              [
-                { text: '📱 Mobile', callback_data: 'direction:mobile' },
-                { text: '🤖 Data Science', callback_data: 'direction:data_science' },
-              ],
-              [
-                { text: '🧪 QA', callback_data: 'direction:qa' },
-                { text: '☁️ DevOps', callback_data: 'direction:devops' },
-              ],
-              [
-                { text: '🏢 Т1', callback_data: 'vacancies:t1' },
-                { text: '💼 Контур', callback_data: 'vacancies:kontur' },
-                { text: '💳 Т-Банк', callback_data: 'vacancies:tbank' },
-              ],
-              [
-                { text: '⚡ Directum', callback_data: 'vacancies:directum' },
-                { text: '🔍 Яндекс', callback_data: 'vacancies:yandex' },
-                { text: '📦 Ozon', callback_data: 'vacancies:ozon' },
-              ],
-              [
-                { text: '🟢 Сбер', callback_data: 'vacancies:sber' },
-                { text: '🟣 Авито', callback_data: 'vacancies:avito' },
-                { text: '🔷 VK', callback_data: 'vacancies:vk' },
-              ],
-              [
-                { text: isSubscribed ? '🔕 Отписаться' : '🔔 Подписка', callback_data: isSubscribed ? 'unsubscribe' : 'subscribe' },
-                { text: '💼 Вакансии', callback_data: 'vacancies:all' },
-                { text: '🏢 Компании', callback_data: 'companies' },
-              ],
-              [
-                { text: '🚀 Открыть в WebApp', web_app: { url: webAppUrlWithParams } },
-              ],
-              [
-                { text: '🌐 Открыть сайт', url: PUBLIC_WEB_URL },
-              ],
-            ],
-          };
-
-        await callTelegram('editMessageReplyMarkup', {
-            chat_id: chatId,
-            message_id: query.message.message_id,
-            reply_markup: keyboard
-        });
-    }
-
-    return callTelegram('sendMessage', {
-      chat_id: chatId,
-      text: `🔕 <b>Вы отписались от уведомлений IT-Старт.</b>\nЧтобы возобновить, отправьте /subscribe.`,
-      parse_mode: 'HTML',
-    });
+    return sendNotificationSettings(chatId, meta, messageId);
   }
 }
 
@@ -5998,6 +6313,20 @@ async function pollUpdates() {
         text: 'IT-Старт',
         web_app: { url: WEBAPP_URL },
       },
+    }).catch(() => {});
+
+    callTelegram('setMyCommands', {
+      commands: [
+        { command: 'start', description: 'Главное меню и быстрая панель' },
+        { command: 'vacancies', description: 'Стажировки (Финтех / IT / источники)' },
+        { command: 'companies', description: 'Компании (Финтех и IT-гиганты)' },
+        { command: 'notifications', description: 'Настройка пуш-уведомлений' },
+        { command: 'roadmaps', description: 'Роадмапы по 6 направлениям' },
+        { command: 'questions', description: 'Тренажёр собеседований (55+)' },
+        { command: 'site', description: 'Веб-платформа и Mini App' },
+        { command: 'status', description: 'Статус базы и источников' },
+        { command: 'help', description: 'Справка и команды' },
+      ],
     }).catch(() => {});
   }
 

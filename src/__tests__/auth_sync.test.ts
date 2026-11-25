@@ -86,7 +86,8 @@ describe('Authorization, Opt-Out Notifications, and Cloud State Sync', () => {
 
     expect(html).toContain('Авторизация через Telegram');
     expect(html).toContain('Авторизация для сохранения вашего состояния и истории');
-    expect(html).toContain('Получать уведомления о новых стажировках');
+    expect(html).toContain('Уведомления настраиваются в боте');
+    expect(html).not.toContain('Интересующие направления');
     expect(html).toContain('Войти через Telegram');
     expect(html).toContain('Telegram-бот');
     expect(html).toContain('ВКонтакте-бот');

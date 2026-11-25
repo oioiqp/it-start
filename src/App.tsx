@@ -9,10 +9,7 @@ import {
   X,
   SlidersHorizontal,
   Star,
-  LogIn,
-  ShieldCheck,
-  Bell,
-  BellOff,
+  RotateCcw,
 } from 'lucide-react';
 import type {
   AuthProfile,
@@ -50,7 +47,14 @@ import {
   TELEGRAM_BOT_URL,
   GITHUB_PAGES_URL,
 } from './lib/supabase';
-import { isVacancyActive, isDirectVacancyUrl, resolveApplicationDeadlineIso } from './lib/vacancyUrl';
+import {
+  isVacancyActive,
+  isDirectVacancyUrl,
+  resolveApplicationDeadlineIso,
+  getCompanySegment,
+  getVacancySourceCategory,
+  type VacancySourceCategory,
+} from './lib/vacancyUrl';
 import {
   getCachedInternships,
   getLocalProgress,
@@ -85,6 +89,18 @@ import {
 } from './lib/vkBridge';
 import { VK_COMMUNITY_URL, saveVkPeerId } from './lib/vk';
 import { RENDER_URL } from './services/subscriptionService';
+
+const CORE_FINTECH_COMPANIES = ['Т-Банк', 'Сбер'];
+const EXTRA_FINTECH_COMPANIES = ['Альфа-Банк', 'Модульбанк', 'ВТБ'];
+const IT_COMPANIES = [
+  'Яндекс',
+  'Холдинг Т1',
+  'Контур',
+  'Ozon Tech',
+  'Directum',
+  'Авито',
+  'VK',
+];
 
 export function App() {
   // Navigation
@@ -153,25 +169,14 @@ export function App() {
 
   // Internships Filters
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [selectedCompanySegment, setSelectedCompanySegment] = useState<'all' | 'fintech' | 'it'>('all');
   const [selectedCompany, setSelectedCompany] = useState<string>('all');
   const [selectedDirection, setSelectedDirection] = useState<DirectionId | 'all'>('all');
   const [selectedSubTrack, setSelectedSubTrack] = useState<SubTrackId | 'all'>('all');
   const [selectedFormat, setSelectedFormat] = useState<WorkFormat | 'all'>('all');
-  const [selectedSource, setSelectedSource] = useState<'all' | 'telegram' | 'portal'>('all');
+  const [selectedSource, setSelectedSource] = useState<'all' | VacancySourceCategory>('all');
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState<boolean>(false);
   const [sortConfig, setSortConfig] = useState<{ field: 'publishedAt' | 'salary', direction: 'asc' | 'desc' }>({ field: 'publishedAt', direction: 'desc' });
-
-  const TARGET_COMPANIES = [
-    'Т-Банк',
-    'Холдинг Т1',
-    'Контур',
-    'Directum',
-    'Яндекс',
-    'Ozon Tech',
-    'Сбер',
-    'Авито',
-    'VK',
-  ];
 
   // Enforce pure serene light mode (Apple Platinum Minimalist)
   useEffect(() => {
@@ -753,6 +758,9 @@ export function App() {
     if (t.includes('сбер') || t.includes('sber')) return c.includes('сбер') || c.includes('sber');
     if (t.includes('vk') || t.includes('вк') || t.includes('вконтакт')) return c.includes('vk') || c.includes('вк') || c.includes('вконтакт');
     if (t.includes('яндекс') || t.includes('yandex')) return c.includes('яндекс') || c.includes('yandex');
+    if (t.includes('альфа')) return c.includes('альфа') || c.includes('alfa');
+    if (t.includes('модуль')) return c.includes('модуль') || c.includes('modul');
+    if (t.includes('втб') || t.includes('vtb')) return c.includes('втб') || c.includes('vtb');
     return false;
   };
 
@@ -765,14 +773,18 @@ export function App() {
       // 0.1 Favorites filter
       if (onlyFavorites && !favorites.includes(item.id)) return false;
 
+      // 0.2 Company segment (Fintech vs regular IT companies)
+      if (selectedCompanySegment !== 'all' && getCompanySegment(item.company) !== selectedCompanySegment) {
+        return false;
+      }
+
       if (selectedCompany !== 'all' && !matchesCompanyFilter(item.company, selectedCompany)) {
         return false;
       }
       if (selectedDirection !== 'all' && item.directionId !== selectedDirection) return false;
       if (selectedSubTrack !== 'all' && item.subTrackId !== selectedSubTrack) return false;
       if (selectedFormat !== 'all' && item.format !== selectedFormat) return false;
-      if (selectedSource === 'telegram' && item.sourceType !== 'telegram') return false;
-      if (selectedSource === 'portal' && item.sourceType !== 'portal') return false;
+      if (selectedSource !== 'all' && getVacancySourceCategory(item) !== selectedSource) return false;
 
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase().trim();
@@ -824,7 +836,55 @@ export function App() {
     });
 
     return result;
-  }, [internships, selectedCompany, selectedDirection, selectedSubTrack, selectedFormat, selectedSource, searchQuery, sortConfig, onlyFavorites, favorites]);
+  }, [internships, selectedCompanySegment, selectedCompany, selectedDirection, selectedSubTrack, selectedFormat, selectedSource, searchQuery, sortConfig, onlyFavorites, favorites]);
+
+  const resetAllFilters = useCallback(() => {
+    triggerHaptic('light');
+    setSearchQuery('');
+    setOnlyFavorites(false);
+    setSelectedCompanySegment('all');
+    setSelectedCompany('all');
+    setSelectedDirection('all');
+    setSelectedSubTrack('all');
+    setSelectedFormat('all');
+    setSelectedSource('all');
+  }, []);
+
+  const hasActiveFilters = Boolean(
+    searchQuery ||
+      onlyFavorites ||
+      selectedCompanySegment !== 'all' ||
+      selectedCompany !== 'all' ||
+      selectedDirection !== 'all' ||
+      selectedSubTrack !== 'all' ||
+      selectedFormat !== 'all' ||
+      selectedSource !== 'all'
+  );
+
+  const visibleFintechCompanies = useMemo(() => {
+    const dynamicExtras = EXTRA_FINTECH_COMPANIES.filter((comp) =>
+      internships.some((item) => matchesCompanyFilter(item.company, comp))
+    );
+    return [...CORE_FINTECH_COMPANIES, ...dynamicExtras];
+  }, [internships]);
+
+  const fintechCount = useMemo(
+    () => internships.filter((i) => getCompanySegment(i.company) === 'fintech').length,
+    [internships]
+  );
+
+  const itCompaniesCount = useMemo(
+    () => internships.filter((i) => getCompanySegment(i.company) === 'it').length,
+    [internships]
+  );
+
+  const SOURCE_FILTER_LABELS: Record<'all' | VacancySourceCategory, string> = {
+    all: 'Все',
+    official: 'Официальные сайты',
+    hh: 'hh.ru',
+    habr: 'Хабр Карьера',
+    telegram: 'Telegram-каналы',
+  };
 
   return (
     <div className="min-h-screen flex flex-col relative light bg-[#dbe0ea] text-neutral-900 liquid-ambient selection:bg-neutral-950 selection:text-white">
@@ -862,187 +922,6 @@ export function App() {
 
       {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-7">
-        {/* Global Auth & History Sync Banner (Visible on EVERY tab so guests always see how to save history) */}
-        <div className="mb-5">
-          {vkUser && (
-            <div className="flex items-center justify-between gap-2.5 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl sm:rounded-full liquid-glass border border-blue-500/20 shadow-xs transition-all duration-300">
-              <div className="flex items-center gap-2.5 min-w-0">
-                {vkUser.photo_100 || vkUser.photo_200 ? (
-                  <img
-                    src={vkUser.photo_100 || vkUser.photo_200}
-                    alt={vkUser.first_name || 'VK'}
-                    className="w-8 h-8 rounded-full object-cover border border-blue-500/30 shrink-0 shadow-xs"
-                  />
-                ) : (
-                  <div className="w-8 h-8 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
-                    VK
-                  </div>
-                )}
-                <div className="min-w-0">
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="text-xs sm:text-sm font-bold text-neutral-900 truncate">
-                      {vkUser.first_name} {vkUser.last_name || ''}
-                    </span>
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
-                    <span className="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-blue-500/10 text-blue-600 border border-blue-500/20 shrink-0">
-                      VK Mini App • Авторизован
-                    </span>
-                  </div>
-                  <div className="text-[10px] sm:text-[11px] text-neutral-500 font-medium truncate">
-                    История и прогресс сохраняются • {userProgress.completedTopics.length} тем • {applications.length} откл. • {viewedHistory.length} просм.
-                  </div>
-                </div>
-              </div>
-
-              <button
-                onClick={() => {
-                  triggerHaptic('medium');
-                  setIsSubscribeModalOpen(true);
-                }}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-all active:scale-95 shrink-0 cursor-pointer"
-                title="Настроить профиль и уведомления ВКонтакте"
-              >
-                <Bot className="w-3.5 h-3.5" />
-                <span className="sm:hidden text-xs font-semibold">Пуши</span>
-                <span className="hidden sm:inline text-xs font-semibold">Уведомления</span>
-              </button>
-            </div>
-          )}
-
-          {telegramUser && !vkUser && (
-            <div className="flex items-center justify-between gap-2.5 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl sm:rounded-full liquid-glass border border-sky-500/25 shadow-xs transition-all duration-300">
-              <div className="flex items-center gap-2.5 min-w-0">
-                {telegramUser.photo_url ? (
-                  <img
-                    src={telegramUser.photo_url}
-                    alt={telegramUser.first_name || 'TG'}
-                    className="w-8 h-8 rounded-full object-cover border border-sky-500/30 shrink-0 shadow-xs"
-                  />
-                ) : (
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-sky-600 to-blue-500 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
-                    {telegramUser.first_name ? telegramUser.first_name.slice(0, 2).toUpperCase() : 'TG'}
-                  </div>
-                )}
-                <div className="min-w-0">
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="text-xs sm:text-sm font-bold text-neutral-900 truncate">
-                      {telegramUser.first_name} {telegramUser.last_name || ''}
-                    </span>
-                    {telegramUser.username && (
-                      <span className="text-[11px] text-neutral-500 font-medium truncate">
-                        @{telegramUser.username}
-                      </span>
-                    )}
-                    <span className="w-1.5 h-1.5 rounded-full bg-sky-500 shrink-0" />
-                    <span className="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-sky-500/10 text-sky-700 border border-sky-500/20 shrink-0">
-                      Telegram • Авторизован
-                    </span>
-                  </div>
-                  <div className="text-[10px] sm:text-[11px] text-neutral-500 font-medium truncate">
-                    История и прогресс сохраняются • {userProgress.completedTopics.length} тем • {applications.length} откл. • {viewedHistory.length} просм.
-                  </div>
-                </div>
-              </div>
-
-              <button
-                onClick={() => {
-                  triggerHaptic('medium');
-                  setIsSubscribeModalOpen(true);
-                }}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neutral-900 hover:bg-black text-white text-xs font-semibold shadow-xs transition-all active:scale-95 shrink-0 cursor-pointer"
-                title="Настроить профиль и уведомления в Telegram"
-              >
-                <Send className="w-3.5 h-3.5 text-sky-400" />
-                <span className="sm:hidden text-xs font-semibold">Пуши TG</span>
-                <span className="hidden sm:inline text-xs font-semibold">Уведомления TG</span>
-              </button>
-            </div>
-          )}
-
-          {!vkUser && !telegramUser && (
-            authProfile ? (
-              <div className="flex items-center justify-between gap-2.5 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl sm:rounded-full liquid-glass border border-emerald-500/20 shadow-xs transition-all duration-300">
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <div
-                    className={`w-8 h-8 rounded-full text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs ${
-                      authProfile.platform === 'vk' ? 'bg-blue-600' : 'bg-sky-600'
-                    }`}
-                  >
-                    {authProfile.platform === 'vk' ? 'VK' : 'TG'}
-                  </div>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-white truncate">
-                        {authProfile.firstName ||
-                          (authProfile.username ? `@${authProfile.username}` : `ID ${authProfile.id}`)}
-                      </span>
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 shrink-0">
-                        <ShieldCheck className="w-3 h-3" />
-                        <span>Авторизован</span>
-                      </span>
-                      <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium liquid-glass-pill text-neutral-600 dark:text-neutral-300 shrink-0">
-                        {authProfile.notificationsEnabled ? (
-                          <>
-                            <Bell className="w-3 h-3 text-emerald-600" />
-                            <span>Уведомления вкл</span>
-                          </>
-                        ) : (
-                          <>
-                            <BellOff className="w-3 h-3 text-neutral-400" />
-                            <span>Без уведомлений</span>
-                          </>
-                        )}
-                      </span>
-                    </div>
-                    <div className="text-[10px] sm:text-[11px] text-neutral-500 dark:text-neutral-400 font-medium truncate">
-                      История сохраняется в облаке • {userProgress.completedTopics.length} тем • {applications.length} откл. • {viewedHistory.length} просм.
-                    </div>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    triggerHaptic('medium');
-                    setIsSubscribeModalOpen(true);
-                  }}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neutral-900 hover:bg-black text-white dark:bg-white dark:text-neutral-900 text-xs font-semibold shadow-xs transition-all active:scale-95 shrink-0 cursor-pointer"
-                >
-                  <span>Профиль</span>
-                </button>
-              </div>
-            ) : (
-              <div className="flex items-center justify-between gap-2.5 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl sm:rounded-full liquid-glass border border-black/15 dark:border-white/15 shadow-xs transition-all duration-300">
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="w-8 h-8 rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 flex items-center justify-center shrink-0 shadow-xs">
-                    <LogIn className="w-4 h-4" />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-white truncate">
-                      Войдите через Telegram или ВКонтакте, чтобы сохранять историю
-                    </div>
-                    <div className="text-[10px] sm:text-[11px] text-neutral-600 dark:text-neutral-300 truncate">
-                      История просмотров, откликов, избранное и прогресс роадмапов • Можно войти без уведомлений
-                    </div>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    triggerHaptic('medium');
-                    setIsSubscribeModalOpen(true);
-                  }}
-                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-neutral-900 hover:bg-black text-white dark:bg-white dark:text-neutral-950 text-xs font-semibold shadow-xs transition-all active:scale-95 shrink-0 cursor-pointer"
-                >
-                  <LogIn className="w-3.5 h-3.5" />
-                  <span className="sm:hidden">Войти</span>
-                  <span className="hidden sm:inline">Войти (TG / VK)</span>
-                </button>
-              </div>
-            )
-          )}
-        </div>
-
         {/* TAB 1: INTERNSHIPS FEED */}
         {activeTab === 'internships' && (
           <div className="relative space-y-6">
@@ -1125,7 +1004,7 @@ export function App() {
                     setIsMobileFiltersOpen(!isMobileFiltersOpen);
                   }}
                   className={`flex items-center gap-1.5 px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 shrink-0 ${
-                    (selectedCompany !== 'all' || selectedFormat !== 'all' || selectedSource !== 'all' || isMobileFiltersOpen)
+                    (selectedCompanySegment !== 'all' || selectedCompany !== 'all' || selectedFormat !== 'all' || selectedSource !== 'all' || isMobileFiltersOpen)
                       ? 'bg-neutral-900 text-white shadow-xs dark:bg-white dark:text-neutral-950'
                       : 'liquid-glass-pill hover:bg-white/50 text-neutral-700 dark:text-neutral-300'
                   }`}
@@ -1133,9 +1012,9 @@ export function App() {
                 >
                   <SlidersHorizontal className="w-3.5 h-3.5" />
                   <span>Фильтры</span>
-                  {(selectedCompany !== 'all' || selectedFormat !== 'all' || selectedSource !== 'all') && (
+                  {(selectedCompanySegment !== 'all' || selectedCompany !== 'all' || selectedFormat !== 'all' || selectedSource !== 'all') && (
                     <span className="w-4 h-4 rounded-full bg-white text-neutral-950 text-[10px] font-bold flex items-center justify-center">
-                      {(selectedCompany !== 'all' ? 1 : 0) + (selectedFormat !== 'all' ? 1 : 0) + (selectedSource !== 'all' ? 1 : 0)}
+                      {(selectedCompanySegment !== 'all' ? 1 : 0) + (selectedCompany !== 'all' ? 1 : 0) + (selectedFormat !== 'all' ? 1 : 0) + (selectedSource !== 'all' ? 1 : 0)}
                     </span>
                   )}
                 </button>
@@ -1155,26 +1034,6 @@ export function App() {
                         {sortConfig.direction === 'asc' ? '↑' : '↓'}
                     </button>
                 </div>
-
-                {/* Reset Filters button if any active */}
-                {(searchQuery || selectedCompany !== 'all' || selectedDirection !== 'all' || selectedSubTrack !== 'all' || selectedFormat !== 'all' || selectedSource !== 'all') && (
-                  <button
-                    onClick={() => {
-                      triggerHaptic('light');
-                      setSearchQuery('');
-                      setSelectedCompany('all');
-                      setSelectedDirection('all');
-                      setSelectedSubTrack('all');
-                      setSelectedFormat('all');
-                      setSelectedSource('all');
-                    }}
-                    className="p-2.5 sm:px-3 sm:py-3 rounded-full text-xs font-semibold transition-all duration-150 active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-700 dark:text-neutral-300 shrink-0"
-                    title="Сбросить все фильтры"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                    <span className="hidden md:inline ml-1">Сброс</span>
-                  </button>
-                )}
               </div>
 
               {/* Row 2: Direction tabs (Swipeable Pill Carousel) */}
@@ -1227,23 +1086,68 @@ export function App() {
                 })}
               </div>
 
-              {/* Row 3: Active Filters Pills (Quick-dismiss tags) */}
-              {(selectedCompany !== 'all' || selectedSubTrack !== 'all' || selectedFormat !== 'all' || selectedSource !== 'all') && (
+              {/* Row 3: Active Filters Pills + Clean Integrated Reset Button */}
+              {hasActiveFilters && (
                 <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1 touch-pan-x overscroll-x-contain">
                   <span className="text-[11px] font-semibold text-neutral-500 shrink-0">Активно:</span>
+                  {onlyFavorites && (
+                    <button
+                      type="button"
+                      onClick={() => setOnlyFavorites(false)}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-amber-400 text-neutral-950 shrink-0 transition-transform active:scale-95 cursor-pointer"
+                    >
+                      <span>Избранное</span>
+                      <X className="w-3 h-3 opacity-70" />
+                    </button>
+                  )}
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setSearchQuery('')}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-neutral-900 text-white dark:bg-white dark:text-black shrink-0 transition-transform active:scale-95 cursor-pointer"
+                    >
+                      <span>Поиск: «{searchQuery.slice(0, 18)}»</span>
+                      <X className="w-3 h-3 opacity-70" />
+                    </button>
+                  )}
+                  {selectedCompanySegment !== 'all' && (
+                    <button
+                      type="button"
+                      onClick={() => setSelectedCompanySegment('all')}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-neutral-900 text-white dark:bg-white dark:text-black shrink-0 transition-transform active:scale-95 cursor-pointer"
+                    >
+                      <span>{selectedCompanySegment === 'fintech' ? 'Финтех-компании' : 'IT-компании'}</span>
+                      <X className="w-3 h-3 opacity-70" />
+                    </button>
+                  )}
                   {selectedCompany !== 'all' && (
                     <button
+                      type="button"
                       onClick={() => setSelectedCompany('all')}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-neutral-900 text-white dark:bg-white dark:text-black shrink-0 transition-transform active:scale-95"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-neutral-900 text-white dark:bg-white dark:text-black shrink-0 transition-transform active:scale-95 cursor-pointer"
                     >
                       <span>{selectedCompany}</span>
                       <X className="w-3 h-3 opacity-70" />
                     </button>
                   )}
+                  {selectedDirection !== 'all' && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedDirection('all');
+                        setSelectedSubTrack('all');
+                      }}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-neutral-900 text-white dark:bg-white dark:text-black shrink-0 transition-transform active:scale-95 cursor-pointer"
+                    >
+                      <span>{DIRECTIONS.find((d) => d.id === selectedDirection)?.title.split('-')[0] || selectedDirection}</span>
+                      <X className="w-3 h-3 opacity-70" />
+                    </button>
+                  )}
                   {selectedSubTrack !== 'all' && (
                     <button
+                      type="button"
                       onClick={() => setSelectedSubTrack('all')}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-neutral-900 text-white dark:bg-white dark:text-black shrink-0 transition-transform active:scale-95"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-neutral-900 text-white dark:bg-white dark:text-black shrink-0 transition-transform active:scale-95 cursor-pointer"
                     >
                       <span>{selectedSubTrack}</span>
                       <X className="w-3 h-3 opacity-70" />
@@ -1251,8 +1155,9 @@ export function App() {
                   )}
                   {selectedFormat !== 'all' && (
                     <button
+                      type="button"
                       onClick={() => setSelectedFormat('all')}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-neutral-900 text-white dark:bg-white dark:text-black shrink-0 transition-transform active:scale-95"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-neutral-900 text-white dark:bg-white dark:text-black shrink-0 transition-transform active:scale-95 cursor-pointer"
                     >
                       <span>{selectedFormat}</span>
                       <X className="w-3 h-3 opacity-70" />
@@ -1260,71 +1165,173 @@ export function App() {
                   )}
                   {selectedSource !== 'all' && (
                     <button
+                      type="button"
                       onClick={() => setSelectedSource('all')}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-neutral-900 text-white dark:bg-white dark:text-black shrink-0 transition-transform active:scale-95"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-neutral-900 text-white dark:bg-white dark:text-black shrink-0 transition-transform active:scale-95 cursor-pointer"
                     >
-                      <span>{selectedSource === 'telegram' ? 'Telegram' : 'Порталы'}</span>
+                      <span>{SOURCE_FILTER_LABELS[selectedSource]}</span>
                       <X className="w-3 h-3 opacity-70" />
                     </button>
                   )}
+                  <button
+                    type="button"
+                    onClick={resetAllFilters}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold liquid-glass-pill text-neutral-600 hover:text-neutral-950 hover:bg-white/70 dark:text-neutral-300 dark:hover:text-white transition-all active:scale-95 shrink-0 cursor-pointer ml-auto"
+                    title="Сбросить все активные фильтры"
+                  >
+                    <RotateCcw className="w-3 h-3 opacity-70" />
+                    <span>Сбросить</span>
+                  </button>
                 </div>
               )}
 
               {/* Secondary Filters Container (Always visible on desktop, collapsible on mobile) */}
               <div className={`space-y-3.5 pt-3 border-t border-black/5 dark:border-white/5 ${isMobileFiltersOpen ? 'block' : 'hidden sm:block'}`}>
-                {/* Company Filter */}
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-neutral-600 dark:text-neutral-400">
-                    <span className="flex items-center gap-1.5">
+                {/* Company Filter: Separated into Fintech & General IT companies */}
+                <div className="space-y-2.5">
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <span className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-neutral-600 dark:text-neutral-400">
                       <Building2 className="w-3.5 h-3.5 text-neutral-600 dark:text-neutral-400" />
-                      Работодатель (Топ IT-компании):
+                      Работодатель:
                     </span>
-                    {selectedCompany !== 'all' && (
+
+                    {/* Fintech vs Regular IT segment switcher */}
+                    <div className="flex items-center gap-1 p-0.5 rounded-full liquid-glass-subtle">
                       <button
-                        onClick={() => setSelectedCompany('all')}
-                        className="text-xs text-neutral-800 hover:text-black dark:text-neutral-300 dark:hover:text-white normal-case font-semibold underline decoration-neutral-400"
+                        type="button"
+                        onClick={() => {
+                          triggerHaptic('selection');
+                          setSelectedCompanySegment('all');
+                          setSelectedCompany('all');
+                        }}
+                        className={`px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all cursor-pointer ${
+                          selectedCompanySegment === 'all' && selectedCompany === 'all'
+                            ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-xs'
+                            : 'text-neutral-600 hover:text-neutral-950 dark:text-neutral-300'
+                        }`}
                       >
-                        Все компании
+                        Все ({internships.length})
                       </button>
-                    )}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          triggerHaptic('selection');
+                          const nextSeg = selectedCompanySegment === 'fintech' ? 'all' : 'fintech';
+                          setSelectedCompanySegment(nextSeg);
+                          if (selectedCompany !== 'all' && getCompanySegment(selectedCompany) !== 'fintech') {
+                            setSelectedCompany('all');
+                          }
+                        }}
+                        className={`px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all cursor-pointer ${
+                          selectedCompanySegment === 'fintech'
+                            ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-xs'
+                            : 'text-neutral-600 hover:text-neutral-950 dark:text-neutral-300'
+                        }`}
+                      >
+                        🏦 Финтех ({fintechCount})
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          triggerHaptic('selection');
+                          const nextSeg = selectedCompanySegment === 'it' ? 'all' : 'it';
+                          setSelectedCompanySegment(nextSeg);
+                          if (selectedCompany !== 'all' && getCompanySegment(selectedCompany) !== 'it') {
+                            setSelectedCompany('all');
+                          }
+                        }}
+                        className={`px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all cursor-pointer ${
+                          selectedCompanySegment === 'it'
+                            ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-xs'
+                            : 'text-neutral-600 hover:text-neutral-950 dark:text-neutral-300'
+                        }`}
+                      >
+                        💻 IT-компании ({itCompaniesCount})
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 touch-pan-x overscroll-x-contain">
-                    <button
-                      onClick={() => setSelectedCompany('all')}
-                      className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 shrink-0 ${
-                        selectedCompany === 'all'
-                          ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-xs'
-                          : 'liquid-glass-pill hover:bg-white/50 text-neutral-700 dark:text-neutral-300'
-                      }`}
-                    >
-                      Все ({internships.length})
-                    </button>
-                    {TARGET_COMPANIES.map((company) => {
-                      const isSelected = selectedCompany === company;
-                      const count = internships.filter((item) => matchesCompanyFilter(item.company, company)).length;
-                      return (
-                        <button
-                          key={company}
-                          onClick={() => setSelectedCompany(isSelected ? 'all' : company)}
-                          className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 shrink-0 flex items-center gap-1.5 ${
-                            isSelected
-                              ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-xs'
-                              : 'liquid-glass-pill hover:bg-white/50 text-neutral-700 dark:text-neutral-300'
-                          }`}
-                        >
-                          <span>{company}</span>
-                          <span
-                            className={`text-[10px] px-1.5 py-0.2 rounded-full font-medium ${
-                              isSelected
-                                ? 'bg-white/20 text-white dark:bg-black/10 dark:text-neutral-950'
-                                : 'bg-black/5 text-neutral-700 dark:bg-white/10 dark:text-neutral-300'
-                            }`}
-                          >
-                            {count}
-                          </span>
-                        </button>
-                      );
-                    })}
+
+                  {/* Visual split into two clear rows/groups: Fintech vs Regular IT */}
+                  <div className="space-y-2">
+                    {selectedCompanySegment !== 'it' && (
+                      <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5 touch-pan-x overscroll-x-contain">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-500 shrink-0 mr-1">
+                          Финтех:
+                        </span>
+                        {visibleFintechCompanies.map((company) => {
+                          const isSelected = selectedCompany === company;
+                          const count = internships.filter((item) => matchesCompanyFilter(item.company, company)).length;
+                          return (
+                            <button
+                              key={company}
+                              type="button"
+                              onClick={() => {
+                                triggerHaptic('selection');
+                                setSelectedCompany(isSelected ? 'all' : company);
+                              }}
+                              className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 shrink-0 flex items-center gap-1.5 cursor-pointer ${
+                                isSelected
+                                  ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-xs'
+                                  : count === 0
+                                  ? 'liquid-glass-pill opacity-55 hover:opacity-90 text-neutral-600 dark:text-neutral-400'
+                                  : 'liquid-glass-pill hover:bg-white/60 text-neutral-800 dark:text-neutral-200'
+                              }`}
+                            >
+                              <span>{company}</span>
+                              <span
+                                className={`text-[10px] px-1.5 py-0.2 rounded-full font-medium ${
+                                  isSelected
+                                    ? 'bg-white/20 text-white dark:bg-black/10 dark:text-neutral-950'
+                                    : 'bg-black/5 text-neutral-700 dark:bg-white/10 dark:text-neutral-300'
+                                }`}
+                              >
+                                {count}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {selectedCompanySegment !== 'fintech' && (
+                      <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5 touch-pan-x overscroll-x-contain">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-500 shrink-0 mr-1">
+                          IT-компании:
+                        </span>
+                        {IT_COMPANIES.map((company) => {
+                          const isSelected = selectedCompany === company;
+                          const count = internships.filter((item) => matchesCompanyFilter(item.company, company)).length;
+                          return (
+                            <button
+                              key={company}
+                              type="button"
+                              onClick={() => {
+                                triggerHaptic('selection');
+                                setSelectedCompany(isSelected ? 'all' : company);
+                              }}
+                              className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 shrink-0 flex items-center gap-1.5 cursor-pointer ${
+                                isSelected
+                                  ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-xs'
+                                  : count === 0
+                                  ? 'liquid-glass-pill opacity-55 hover:opacity-90 text-neutral-600 dark:text-neutral-400'
+                                  : 'liquid-glass-pill hover:bg-white/60 text-neutral-800 dark:text-neutral-200'
+                              }`}
+                            >
+                              <span>{company}</span>
+                              <span
+                                className={`text-[10px] px-1.5 py-0.2 rounded-full font-medium ${
+                                  isSelected
+                                    ? 'bg-white/20 text-white dark:bg-black/10 dark:text-neutral-950'
+                                    : 'bg-black/5 text-neutral-700 dark:bg-white/10 dark:text-neutral-300'
+                                }`}
+                              >
+                                {count}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -1363,7 +1370,7 @@ export function App() {
                 )}
 
                 {/* Format & Source selectors */}
-                <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-black/5 dark:border-white/5 text-xs">
+                <div className="flex flex-wrap items-center justify-between gap-2.5 pt-2 border-t border-black/5 dark:border-white/5 text-xs">
                   {/* Format Filter with Visual Badges */}
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <span className="text-neutral-600 dark:text-neutral-400 font-semibold text-[11px]">Формат:</span>
@@ -1376,7 +1383,7 @@ export function App() {
                       <button
                         key={fmt.id}
                         onClick={() => setSelectedFormat(fmt.id)}
-                        className={`px-2.5 py-1 rounded-full transition-all duration-150 active:scale-95 text-xs font-medium ${
+                        className={`px-2.5 py-1 rounded-full transition-all duration-150 active:scale-95 text-xs font-medium cursor-pointer ${
                           selectedFormat === fmt.id
                             ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-xs'
                             : 'liquid-glass-pill hover:bg-white/50 text-neutral-700 dark:text-neutral-300'
@@ -1387,20 +1394,24 @@ export function App() {
                     ))}
                   </div>
 
-                  {/* Source Filter */}
+                  {/* Clear & understandable Source Filter */}
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <span className="text-neutral-600 dark:text-neutral-400 font-semibold text-[11px]">Источник:</span>
-                    {(['all', 'telegram', 'portal'] as const).map((src) => (
+                    {(['all', 'official', 'hh', 'habr', 'telegram'] as const).map((src) => (
                       <button
                         key={src}
-                        onClick={() => setSelectedSource(src)}
+                        type="button"
+                        onClick={() => {
+                          triggerHaptic('selection');
+                          setSelectedSource(src);
+                        }}
                         className={`px-2.5 py-1 rounded-full transition-all duration-150 active:scale-95 text-xs font-medium cursor-pointer ${
                           selectedSource === src
                             ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-xs'
                             : 'liquid-glass-pill hover:bg-white/50 text-neutral-700 dark:text-neutral-300'
                         }`}
                       >
-                        {src === 'all' ? 'Все' : src === 'telegram' ? 'Telegram-каналы' : 'Сайты и API'}
+                        {SOURCE_FILTER_LABELS[src]}
                       </button>
                     ))}
                   </div>
@@ -1424,7 +1435,7 @@ export function App() {
                 <span>
                   Найдено стажировок: <strong className="text-neutral-900 dark:text-white">{filteredAndSortedInternships.length}</strong>
                   <span className="hidden sm:inline text-neutral-400 dark:text-neutral-500 ml-2">
-                    (TG-каналы: {filteredAndSortedInternships.filter((i) => i.sourceType === 'telegram').length} • Сайты: {filteredAndSortedInternships.filter((i) => i.sourceType !== 'telegram').length})
+                    (Оф. сайты: {filteredAndSortedInternships.filter((i) => getVacancySourceCategory(i) === 'official').length} • hh.ru: {filteredAndSortedInternships.filter((i) => getVacancySourceCategory(i) === 'hh').length} • Хабр: {filteredAndSortedInternships.filter((i) => getVacancySourceCategory(i) === 'habr').length} • TG: {filteredAndSortedInternships.filter((i) => getVacancySourceCategory(i) === 'telegram').length})
                   </span>
                 </span>
                 <button
@@ -1520,19 +1531,14 @@ export function App() {
                             </>
                           )}
                         <button
-                          onClick={() => {
-                            setSearchQuery('');
-                            setSelectedCompany('all');
-                            setSelectedDirection('all');
-                            setSelectedSubTrack('all');
-                            setSelectedFormat('all');
-                            setSelectedSource('all');
-                          }}
+                          type="button"
+                          onClick={resetAllFilters}
                           className="px-5 py-2 rounded-full text-xs font-semibold transition-all
                             bg-neutral-900 text-white hover:bg-black
-                            dark:bg-white dark:text-neutral-950 dark:hover:bg-neutral-200 shadow-xs cursor-pointer"
+                            dark:bg-white dark:text-neutral-950 dark:hover:bg-neutral-200 shadow-xs cursor-pointer inline-flex items-center gap-1.5"
                         >
-                          Сбросить все фильтры
+                          <RotateCcw className="w-3.5 h-3.5" />
+                          <span>Сбросить фильтры</span>
                         </button>
                       </div>
                     </>

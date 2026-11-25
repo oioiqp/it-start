@@ -1415,11 +1415,12 @@ describe('12. VKontakte (VK) Bot & VK Mini App Integration', () => {
       })
     );
 
-    expect(html).toContain('Уведомления ВКонтакте');
+    expect(html).toContain('Авторизация через ВКонтакте');
     expect(html).toContain('Ваш VK ID');
     expect(html).toContain('99887766');
     expect(html).toContain('Официальный VK-бот IT-Старт');
     expect(html).toContain('Открыть диалог с VK-ботом');
+    expect(html).toContain('Уведомления настраиваются в боте');
     expect(html).toContain('liquid-modal-overlay');
     expect(html).toContain('liquid-glass-modal');
     expect(html).toContain('touch-pan-y');
@@ -1613,9 +1614,9 @@ describe('14. Mobile VK Header Clearance, Liquid Glass Translucency & Dual Notif
       })
     );
 
-    expect(htmlVk).toContain('Уведомления ВКонтакте');
+    expect(htmlVk).toContain('Авторизация через ВКонтакте');
     expect(htmlVk).toContain('77788899');
-    expect(htmlVk).toContain('Настроить через Telegram');
+    expect(htmlVk).toContain('Переключить на Telegram');
 
     // Inside Telegram: displays TG by default and switch to VK button
     const htmlTg = renderToString(
@@ -1630,9 +1631,9 @@ describe('14. Mobile VK Header Clearance, Liquid Glass Translucency & Dual Notif
       })
     );
 
-    expect(htmlTg).toContain('Уведомления в Telegram');
+    expect(htmlTg).toContain('Авторизация через Telegram');
     expect(htmlTg).toContain('11223344');
-    expect(htmlTg).toContain('Настроить через ВКонтакте');
+    expect(htmlTg).toContain('Переключить на ВКонтакте');
   });
 
   it('validates background watermark contains whitespace-nowrap to prevent breaking into two lines', async () => {
@@ -1689,11 +1690,11 @@ describe('15. Telegram Mini App & VK Cross-Platform Integration & Modal Geometry
     );
 
     // Channel must be VK
-    expect(html).toContain('Уведомления ВКонтакте');
+    expect(html).toContain('Авторизация через ВКонтакте');
     expect(html).toContain('Тимур Латыпов');
     expect(html).toContain('482655491');
     expect(html).toContain('Подключить в VK');
-    expect(html).toContain('Настроить через Telegram');
+    expect(html).toContain('Переключить на Telegram');
 
     // No BotFather token prompt or input in VK Mini App
     expect(html).not.toContain('Bot Token для пушей в Telegram');
@@ -1718,18 +1719,18 @@ describe('15. Telegram Mini App & VK Cross-Platform Integration & Modal Geometry
     );
 
     // Channel must be Telegram
-    expect(html).toContain('Уведомления в Telegram');
+    expect(html).toContain('Авторизация через Telegram');
     expect(html).toContain('timur_izh');
     expect(html).toContain('99887711');
     expect(html).toContain('Подключить в TG');
-    expect(html).toContain('Настроить через ВКонтакте');
+    expect(html).toContain('Переключить на ВКонтакте');
 
     // No Bot Token prompt inside Telegram WebApp
     expect(html).not.toContain('@BotFather');
     expect(html).toContain('Telegram Bot API подключен');
   });
 
-  it('verifies SubscribeModal has rock-solid layout container with min-height and flex-col to prevent jumping', async () => {
+  it('verifies SubscribeModal has compact responsive layout container with flex-col and max-h-[90vh]', async () => {
     const React = await import('react');
     const { renderToString } = await import('react-dom/server');
     const { SubscribeModal } = await import('../components/SubscribeModal');
@@ -1746,7 +1747,7 @@ describe('15. Telegram Mini App & VK Cross-Platform Integration & Modal Geometry
       })
     );
 
-    expect(html).toContain('min-h-[580px]');
+    expect(html).toContain('max-h-[90vh]');
     expect(html).toContain('flex flex-col');
   });
 
@@ -1827,7 +1828,7 @@ describe('15. Telegram Mini App & VK Cross-Platform Integration & Modal Geometry
     ).resolves.not.toThrow();
   });
 
-  it('verifies SubscribeModal has rock-solid fixed height style min(620px, 90vh) and no credential contamination between VK and TG', async () => {
+  it('verifies SubscribeModal has compact responsive height max-h-[90vh] and no credential contamination between VK and TG', async () => {
     const React = await import('react');
     const { renderToString } = await import('react-dom/server');
     const { SubscribeModal } = await import('../components/SubscribeModal');
@@ -1844,10 +1845,11 @@ describe('15. Telegram Mini App & VK Cross-Platform Integration & Modal Geometry
       })
     );
 
-    // Height must be fixed via style and CSS classes
-    expect(html).toContain('min(620px, 90vh)');
-    expect(html).toContain('h-[610px]');
+    // Height adapts cleanly to compact modal without redundant notification switches
+    expect(html).toContain('max-h-[90vh]');
+    expect(html).toContain('flex flex-col');
     expect(html).toContain('overflow-hidden');
+    expect(html).not.toContain('Интересующие направления');
   });
 
   it('validates direct vacancy URLs, elimination of generic search homepages, and source channels', async () => {

@@ -529,28 +529,42 @@ export const ApplicationsView: React.FC<ApplicationsViewProps> = ({
                       </button>
                     )}
 
-                    {tgPostUrl && tgPostUrl !== app.applyUrl && (
+                    {app.sourceType === 'telegram' && tgPostUrl ? (
+                      <>
+                        {app.applyUrl && tgPostUrl !== app.applyUrl && (
+                          <a
+                            href={app.applyUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-semibold liquid-glass-pill hover:bg-white/60 text-neutral-800 dark:text-neutral-200 cursor-pointer"
+                            title={`Открыть страницу подачи: ${app.applyUrl}`}
+                          >
+                            <span>Сайт подачи</span>
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
+                        )}
+                        <a
+                          href={tgPostUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold bg-neutral-900 hover:bg-black text-white dark:bg-white dark:text-neutral-900 shadow-xs cursor-pointer"
+                          title={`Открыть сообщение в Telegram: ${tgPostUrl}`}
+                        >
+                          <span>К посту в TG</span>
+                          <ExternalLink className="w-3 h-3" />
+                        </a>
+                      </>
+                    ) : (
                       <a
-                        href={tgPostUrl}
+                        href={app.applyUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-semibold liquid-glass-pill hover:bg-white/60 text-neutral-800 dark:text-neutral-200 cursor-pointer"
-                        title={`Открыть сообщение в Telegram: ${tgPostUrl}`}
+                        className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold bg-neutral-900 hover:bg-black text-white dark:bg-white dark:text-neutral-900 shadow-xs cursor-pointer"
                       >
-                        <span>Пост в TG</span>
+                        <span>Сайт подачи</span>
                         <ExternalLink className="w-3 h-3" />
                       </a>
                     )}
-
-                    <a
-                      href={app.applyUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold bg-neutral-900 hover:bg-black text-white dark:bg-white dark:text-neutral-900 shadow-xs cursor-pointer"
-                    >
-                      <span>Сайт подачи</span>
-                      <ExternalLink className="w-3 h-3" />
-                    </a>
                   </div>
                 </div>
               </div>
@@ -617,12 +631,18 @@ export const ApplicationsView: React.FC<ApplicationsViewProps> = ({
                       План
                     </button>
                     <a
-                      href={item.applyUrl}
+                      href={
+                        item.sourceType === 'telegram' && item.sourcePostUrl
+                          ? item.sourcePostUrl
+                          : item.applyUrl
+                      }
                       target="_blank"
                       rel="noopener noreferrer"
                       className="px-3 py-1.5 rounded-full text-[11px] font-semibold bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 inline-flex items-center gap-1 cursor-pointer"
                     >
-                      <span>Открыть</span>
+                      <span>
+                        {item.sourceType === 'telegram' && item.sourcePostUrl ? 'К посту в TG' : 'Открыть'}
+                      </span>
                       <ExternalLink className="w-3 h-3" />
                     </a>
                   </div>

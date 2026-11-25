@@ -146,10 +146,10 @@ describe('16. Comprehensive Responsive & Adaptive Layout Suite', () => {
         })
       );
 
-      // Preserves required geometry tokens from Section 15
-      expect(html).toContain('min-h-[580px]');
+      // Compact responsive container without bloat when notification controls moved to bots
+      expect(html).toContain('max-h-[90vh]');
       expect(html).toContain('flex flex-col');
-      expect(html).toContain('min(620px, 90vh)');
+      expect(html).toContain('overflow-hidden');
       // Platform toggle row has flex-wrap to avoid 320px overflow
       expect(html).toContain('px-1 flex-wrap');
       // Safe area padding for notches and native app bars (VK & TG Mini Apps)
@@ -259,11 +259,12 @@ describe('16. Comprehensive Responsive & Adaptive Layout Suite', () => {
       const { App } = await import('../App');
       const html = renderToString(React.createElement(App));
 
-      // Profile capsule adapts from rounded-2xl on mobile to rounded-full on desktop
-      expect(html).toContain('rounded-2xl sm:rounded-full');
-      // Adaptive compact push button labels
-      expect(html).toContain('Пуши TG');
-      expect(html).toContain('Уведомления TG');
+      // Navbar renders compact Mini App profile capsule without redundant global banner
+      expect(html).toContain('Mini App');
+      expect(html).toContain('TG Бот');
+      expect(html).toContain('Алексей');
+      expect(html).toContain('rounded-full');
+      expect(html).not.toContain('Авторизация через Telegram или ВКонтакте');
 
       delete (window as any).Telegram;
     });

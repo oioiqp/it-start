@@ -433,7 +433,7 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
         </div>
 
         {/* Source and Actions */}
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center justify-between gap-2 flex-wrap">
           {(() => {
             const src = getVacancySourceDetails(
               internship.applyUrl,
@@ -444,6 +444,11 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
               internship.sourcePostUrl
             );
             const isTelegramOrigin = src.type === 'telegram_post' || internship.sourceType === 'telegram';
+            const primaryApplyHref = isTelegramOrigin && src.postUrl ? src.postUrl : src.applyUrl;
+            const secondarySiteHref =
+              isTelegramOrigin && src.postUrl && src.applyUrl && src.applyUrl !== src.postUrl
+                ? src.applyUrl
+                : undefined;
 
             return (
               <>
@@ -461,15 +466,15 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
                         {src.officialChannelHandle}
                       </span>
                     </a>
-                    {src.postUrl && (
+                    {secondarySiteHref && (
                       <a
-                        href={src.postUrl}
+                        href={secondarySiteHref}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-[10px] font-semibold bg-neutral-100 hover:bg-neutral-200 text-neutral-700 hover:text-black dark:bg-white/10 dark:text-neutral-300 transition-colors shrink-0"
-                        title={`Открыть именно это сообщение в Telegram: ${src.postUrl}`}
+                        title={`Открыть страницу отклика на сайте: ${secondarySiteHref}`}
                       >
-                        <span>К посту</span>
+                        <span>Сайт</span>
                         <ExternalLink className="w-2.5 h-2.5 opacity-70" />
                       </a>
                     )}
@@ -489,7 +494,7 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
                   </a>
                 )}
 
-                <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 ml-auto">
                   {/* Minimalist Tracker Toggle */}
                   <button
                     type="button"
@@ -523,14 +528,14 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
                   </button>
 
                   <a
-                    href={src.applyUrl}
+                    href={primaryApplyHref}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={handleApplyClick}
                     className="flex items-center gap-1.5 px-4 sm:px-5 py-2 min-h-[38px] rounded-full text-xs font-semibold transition-transform duration-150 active:scale-95 bg-neutral-900 hover:bg-black text-white dark:bg-white dark:hover:bg-neutral-100 dark:text-neutral-900 shadow-xs cursor-pointer"
-                    title={src.actionLabel}
+                    title={isTelegramOrigin && src.postUrl ? `Перейти к посту в Telegram: ${src.postUrl}` : src.actionLabel}
                   >
-                    <span>{src.type === 'telegram_post' ? 'В Telegram' : 'Отклик'}</span>
+                    <span>{isTelegramOrigin && src.postUrl ? 'К посту в TG' : 'Отклик'}</span>
                     <ExternalLink className="w-3 h-3" />
                   </a>
                 </div>

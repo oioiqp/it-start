@@ -582,5 +582,94 @@ describe('Bot Parity & Comprehensive Functionality Tests (Telegram & VKontakte)'
       expect(statusRes.reply.message).toContain('Статус сервиса IT-Старт');
       expect(statusRes.reply.message).toContain('Активных подписчиков в VK');
     });
+
+    it('supports interactive /notifications configuration, direction toggles, fintech filter and pagination in both bots', async () => {
+      const tgChatId = 654321;
+      const vkPeerId = 654321;
+
+      // 1. Telegram /notifications & toggle push + direction
+      const tgNotifyInit = await tgBot.handleMessage({
+        chat: { id: tgChatId },
+        text: '/notifications',
+        from: { first_name: 'Тимур', username: 'timur_dev' },
+      });
+      expect(tgNotifyInit.ok).toBe(true);
+      expect(tgNotifyInit.type).toBe('notifications');
+
+      const tgToggleOn = await tgBot.handleCallbackQuery({
+        id: 'cb_notify_toggle',
+        message: { chat: { id: tgChatId }, message_id: 10 },
+        from: { first_name: 'Тимур', username: 'timur_dev' },
+        data: 'notify:toggle',
+      });
+      expect(tgToggleOn.ok).toBe(true);
+      expect(tgToggleOn.prefs.is_active).toBe(true);
+
+      const tgRemoveFrontend = await tgBot.handleCallbackQuery({
+        id: 'cb_notify_dir',
+        message: { chat: { id: tgChatId }, message_id: 10 },
+        from: { first_name: 'Тимур', username: 'timur_dev' },
+        data: 'notify:dir:frontend',
+      });
+      expect(tgRemoveFrontend.ok).toBe(true);
+      expect(tgRemoveFrontend.prefs.directions).not.toContain('frontend');
+
+      // Regular /start should preserve saved preferences
+      await tgBot.handleMessage({
+        chat: { id: tgChatId },
+        text: '/start',
+        from: { first_name: 'Тимур', username: 'timur_dev' },
+      });
+      const preservedTg = await tgBot.getTgUserPrefs(tgChatId);
+      expect(preservedTg.is_active).toBe(true);
+      expect(preservedTg.directions).not.toContain('frontend');
+
+      // 2. VK /notifications & toggle push + direction + button count limit (<= 10)
+      const vkNotifyInit = await vkBot.handleVkMessage({
+        peer_id: vkPeerId,
+        text: '/notifications',
+      });
+      expect(vkNotifyInit.ok).toBe(true);
+      expect(vkNotifyInit.type).toBe('notifications');
+
+      const vkKb = JSON.parse(vkNotifyInit.reply.keyboard);
+      const totalVkNotifyBtns = vkKb.buttons.flat().length;
+      expect(totalVkNotifyBtns).toBeLessThanOrEqual(10);
+
+      const vkToggleOn = await vkBot.handleVkMessage({
+        peer_id: vkPeerId,
+        payload: JSON.stringify({ cmd: 'notify_toggle' }),
+      });
+      expect(vkToggleOn.ok).toBe(true);
+      expect(vkToggleOn.prefs.is_active).toBe(true);
+
+      const vkToggleDir = await vkBot.handleVkMessage({
+        peer_id: vkPeerId,
+        payload: JSON.stringify({ cmd: 'notify_dir', id: 'backend' }),
+      });
+      expect(vkToggleDir.ok).toBe(true);
+      expect(vkToggleDir.prefs.directions).not.toContain('backend');
+
+      // 3. Fintech & source filters in TG & VK
+      const tgFintech = await tgBot.sendVacancies(tgChatId, 'fintech', 0, 'all');
+      expect(tgFintech.ok).toBe(true);
+      expect(tgFintech.filter).toBe('fintech');
+
+      const vkFintech = await vkBot.handleVkMessage({
+        peer_id: vkPeerId,
+        payload: JSON.stringify({ cmd: 'vacancies', filter: 'fintech', source: 'all', page: 0 }),
+      });
+      expect(vkFintech.ok).toBe(true);
+      expect(vkFintech.type).toBe('vacancies');
+      expect(vkFintech.count).toBeGreaterThan(0);
+      expect(vkFintech.reply.message).toContain('Финтех');
+
+      const vkTelegram = await vkBot.handleVkMessage({
+        peer_id: vkPeerId,
+        payload: JSON.stringify({ cmd: 'vacancies', filter: 'all', source: 'telegram', page: 0 }),
+      });
+      expect(vkTelegram.ok).toBe(true);
+      expect(vkTelegram.reply.message).toContain('Telegram');
+    });
   });
 });

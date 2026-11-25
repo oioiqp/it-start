@@ -633,6 +633,12 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
               internship.subTrackId,
               internship.sourcePostUrl
             );
+            const isTelegramOrigin = src.type === 'telegram_post' || internship.sourceType === 'telegram';
+            const primaryHref = isTelegramOrigin && src.postUrl ? src.postUrl : src.applyUrl;
+            const externalSiteHref =
+              isTelegramOrigin && src.postUrl && src.applyUrl && src.applyUrl !== src.postUrl
+                ? src.applyUrl
+                : undefined;
 
             return (
               <>
@@ -659,22 +665,22 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                     </a>
                   )}
 
-                  {/* Direct message link in Telegram if sourced from TG post */}
-                  {src.postUrl && src.postUrl !== src.applyUrl && (
+                  {/* Secondary Website apply link for Telegram vacancies that also embed a form/board link */}
+                  {externalSiteHref && (
                     <a
-                      href={src.postUrl}
+                      href={externalSiteHref}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="min-h-[44px] flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-semibold transition-transform duration-150 active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-800 dark:text-neutral-200"
-                      title={`Перейти к сообщению в Telegram: ${src.postUrl}`}
+                      title={`Открыть страницу вакансии: ${externalSiteHref}`}
                     >
-                      <span>К посту в TG</span>
+                      <span>Сайт вакансии</span>
                       <ExternalLink className="w-3 h-3 shrink-0" />
                     </a>
                   )}
                 </div>
 
-                {/* Actions: Tracker Toggle & Portal Link */}
+                {/* Actions: Tracker Toggle & Primary Link */}
                 <div className="flex items-center gap-2 w-full sm:w-auto">
                   <button
                     type="button"
@@ -698,15 +704,19 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                   </button>
 
                   <a
-                    href={src.applyUrl}
+                    href={primaryHref}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => triggerHaptic('medium')}
                     className="flex-1 sm:flex-initial min-h-[44px] flex items-center justify-center gap-2 px-5 sm:px-6 py-2.5 rounded-full font-semibold text-xs sm:text-sm active:scale-95 transition-transform duration-150 bg-neutral-900 hover:bg-black text-white dark:bg-white dark:hover:bg-neutral-100 dark:text-neutral-900 shadow-xs cursor-pointer text-center"
-                    title={src.actionLabel}
+                    title={isTelegramOrigin && src.postUrl ? `Перейти к сообщению в Telegram: ${src.postUrl}` : src.actionLabel}
                   >
-                    <span className="sm:hidden truncate">{src.actionMobileLabel}</span>
-                    <span className="hidden sm:inline">{src.actionLabel}</span>
+                    <span className="sm:hidden truncate">
+                      {isTelegramOrigin && src.postUrl ? 'К посту в TG' : src.actionMobileLabel}
+                    </span>
+                    <span className="hidden sm:inline">
+                      {isTelegramOrigin && src.postUrl ? 'Открыть пост в TG' : src.actionLabel}
+                    </span>
                     <ExternalLink className="w-3.5 h-3.5 shrink-0" />
                   </a>
                 </div>
