@@ -10,6 +10,8 @@ import {
   SlidersHorizontal,
   Star,
   RotateCcw,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 import type {
   AuthProfile,
@@ -171,7 +173,7 @@ export function App() {
   const [selectedDirection, setSelectedDirection] = useState<DirectionId | 'all'>('all');
   const [selectedSubTrack, setSelectedSubTrack] = useState<SubTrackId | 'all'>('all');
   const [selectedFormat, setSelectedFormat] = useState<WorkFormat | 'all'>('all');
-  const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState<boolean>(false);
+  const [isFiltersExpanded, setIsFiltersExpanded] = useState<boolean>(false);
   const [sortConfig, setSortConfig] = useState<{ field: 'publishedAt' | 'salary', direction: 'asc' | 'desc' }>({ field: 'publishedAt', direction: 'desc' });
 
   // Enforce pure serene light mode (Apple Platinum Minimalist)
@@ -965,25 +967,35 @@ export function App() {
                   )}
                 </button>
 
-                {/* Mobile Filters Toggle Button */}
+                {/* Filters Toggle Button (Expand/Collapse all secondary filters on all devices) */}
                 <button
+                  type="button"
                   onClick={() => {
                     triggerHaptic('selection');
-                    setIsMobileFiltersOpen(!isMobileFiltersOpen);
+                    setIsFiltersExpanded(!isFiltersExpanded);
                   }}
-                  className={`flex items-center gap-1.5 px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 shrink-0 ${
-                    (selectedCompany !== 'all' || selectedFormat !== 'all' || isMobileFiltersOpen)
+                  className={`flex items-center gap-1.5 px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 shrink-0 cursor-pointer ${
+                    isFiltersExpanded
                       ? 'bg-neutral-900 text-white shadow-xs dark:bg-white dark:text-neutral-950'
+                      : (selectedCompany !== 'all' || selectedFormat !== 'all')
+                      ? 'bg-neutral-900/90 text-white shadow-xs dark:bg-white/90 dark:text-neutral-950'
                       : 'liquid-glass-pill hover:bg-white/50 text-neutral-700 dark:text-neutral-300'
                   }`}
-                  title="Все фильтры (Работодатели, Формат)"
+                  title={isFiltersExpanded ? 'Свернуть панель фильтров' : 'Открыть панель фильтров (Работодатели, Формат, Специализации)'}
                 >
                   <SlidersHorizontal className="w-3.5 h-3.5" />
                   <span>Фильтры</span>
                   {(selectedCompany !== 'all' || selectedFormat !== 'all') && (
-                    <span className="w-4 h-4 rounded-full bg-white text-neutral-950 text-[10px] font-bold flex items-center justify-center">
+                    <span className={`w-4 h-4 rounded-full text-[10px] font-bold flex items-center justify-center ${
+                      isFiltersExpanded ? 'bg-white text-neutral-950 dark:bg-neutral-950 dark:text-white' : 'bg-white text-neutral-950'
+                    }`}>
                       {(selectedCompany !== 'all' ? 1 : 0) + (selectedFormat !== 'all' ? 1 : 0)}
                     </span>
+                  )}
+                  {isFiltersExpanded ? (
+                    <ChevronUp className="w-3.5 h-3.5 opacity-80" />
+                  ) : (
+                    <ChevronDown className="w-3.5 h-3.5 opacity-80" />
                   )}
                 </button>
 
@@ -1133,8 +1145,8 @@ export function App() {
                 </div>
               )}
 
-              {/* Secondary Filters Container (Always visible on desktop, collapsible on mobile) */}
-              <div className={`space-y-3.5 pt-3 border-t border-black/5 dark:border-white/5 ${isMobileFiltersOpen ? 'block' : 'hidden sm:block'}`}>
+              {/* Secondary Filters Container (Toggleable on all screens via Filters button) */}
+              <div className={`space-y-3.5 pt-3 border-t border-black/5 dark:border-white/5 transition-all duration-200 ${isFiltersExpanded ? 'block animate-fade-in' : 'hidden'}`}>
                 {/* Unified Company Filter */}
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-neutral-600 dark:text-neutral-400">
@@ -1251,15 +1263,16 @@ export function App() {
                       </button>
                     ))}
                   </div>
-                </div>
 
-                {/* Mobile close button */}
-                <div className="sm:hidden pt-1">
+                  {/* Collapse button inside panel */}
                   <button
-                    onClick={() => setIsMobileFiltersOpen(false)}
-                    className="w-full py-2 rounded-full text-xs font-semibold bg-neutral-900 text-white dark:bg-white dark:text-black shadow-xs transition-transform active:scale-95"
+                    type="button"
+                    onClick={() => setIsFiltersExpanded(false)}
+                    className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-semibold liquid-glass-pill hover:bg-white/60 dark:hover:bg-white/10 text-neutral-700 dark:text-neutral-300 transition-all active:scale-95 cursor-pointer ml-auto"
+                    title="Свернуть блок фильтров"
                   >
-                    Показать стажировки ({filteredAndSortedInternships.length})
+                    <ChevronUp className="w-3.5 h-3.5 opacity-70" />
+                    <span>Свернуть</span>
                   </button>
                 </div>
               </div>
