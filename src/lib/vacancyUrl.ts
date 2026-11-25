@@ -85,9 +85,12 @@ export function getDirectVacancyPortalUrl(
       if (subTrackId === 'ios') return 'https://education.tbank.ru/start/ios/';
       if (subTrackId === 'android') return 'https://education.tbank.ru/start/android/';
       if (directionId === 'frontend') return 'https://education.tbank.ru/start/frontend/';
-      if (directionId === 'data_science') return 'https://education.tbank.ru/start/analyst/';
-      if (directionId === 'qa') return 'https://education.tbank.ru/start/java/';
-      if (directionId === 'devops') return 'https://education.tbank.ru/start/python/';
+      if (directionId === 'data_science') {
+        if (subTrackId === 'ml') return 'https://education.tbank.ru/start/ml_engineer/';
+        return 'https://education.tbank.ru/start/analyst/';
+      }
+      if (directionId === 'qa') return 'https://education.tbank.ru/start/quality_engineer/';
+      if (directionId === 'devops') return 'https://education.tbank.ru/start/sre_engineer/';
       if (directionId === 'mobile') return 'https://education.tbank.ru/start/android/';
       if (directionId === 'backend') {
         if (subTrackId === 'java') return 'https://education.tbank.ru/start/java/';
@@ -224,6 +227,16 @@ export function resolveApplyUrl(
     return `https://yandex.ru/jobs/vacancies/${yaJobMatch[1]}`;
   }
 
+  const ozTechMatch = trimmed.match(/^(?:https?:\/\/)?(?:www\.)?ozon\.tech\/vacancies\/([a-zA-Z0-9_-]+)/i);
+  if (ozTechMatch) {
+    return `https://ozon.tech/vacancies/${ozTechMatch[1]}`;
+  }
+
+  const hireHiMatch = trimmed.match(/^(?:https?:\/\/)?(?:www\.)?hirehi\.ru\/([a-z0-9_-]+\/[a-z0-9_-]+)/i);
+  if (hireHiMatch) {
+    return `https://hirehi.ru/${hireHiMatch[1]}`;
+  }
+
   // 4. Shorteners and non-career aggregators
   if (
     trimmed.includes('bit.ly') ||
@@ -239,6 +252,17 @@ export function resolveApplyUrl(
 
   // 5. Eliminate generic search and root URLs that dump users into general search
   const lower = trimmed.toLowerCase();
+  const isT1DetailOrTrack =
+    /^https?:\/\/career\.t1\.ru\/debut\/internship\/[a-z0-9_-]+/i.test(trimmed) ||
+    /^https?:\/\/career\.t1\.ru\/vacancies\/vacancy-detail\?id=\d+/i.test(trimmed);
+  if (isT1DetailOrTrack) {
+    return trimmed;
+  }
+
+  if (/^https?:\/\/kontur\.ru\/education\/internship(?:[#/].*)?$/i.test(trimmed)) {
+    return trimmed;
+  }
+
   const isGenericSearchOrRoot =
     lower.includes('?search=') ||
     lower.includes('&search=') ||
@@ -265,7 +289,7 @@ export function resolveApplyUrl(
     lower.includes('/vacancies/razrabotka/20805') ||
     lower.includes('/vacancies/razrabotka/20808') ||
     lower.includes('senior') ||
-    (lower.includes('sre') && !lower.includes('intern') && !lower.includes('стаж')) ||
+    (lower.includes('sre') && !lower.includes('intern') && !lower.includes('стаж') && !lower.includes('education.tbank.ru/start/sre_engineer')) ||
     // Directum: all career.directum.ru pages are redirected to verified student community
     lower.includes('career.directum.ru') ||
     lower.includes('lead_product_owner') ||
@@ -300,7 +324,7 @@ export function resolveApplyUrl(
     lower.includes('career.t1.ru/debut/open-school') ||
     lower.includes('kontur.ru/career/students') ||
     lower.includes('kontur.ru/career/vacancies/intern-') ||
-    lower.includes('education.tbank.ru/start/sre') ||
+    /education\.tbank\.ru\/start\/sre\/?$/i.test(lower) ||
     lower.includes('fintech.tbank.ru') ||
     lower.includes('/vacancy/web-developer') ||
     lower.includes('/vacancy/backend-csharp') ||
@@ -402,6 +426,8 @@ export const AGGREGATOR_TG_HANDLES = new Set([
   'young_june',
   'juno_jobs',
   'yuniorapp',
+  'young_intern',
+  'jun_jobs',
   'stazhirovki_it',
   'junior_it_jobs',
   'junior_vacancies',
@@ -413,6 +439,42 @@ export const AGGREGATOR_TG_HANDLES = new Set([
   'itjobsfeed',
   'yotolabqa',
 ]);
+
+/**
+ * Parses a Telegram channel reference such as "@young_june/3706", "@young_june", or "https://t.me/young_june/3706"
+ * into normalized channel handle, group URL, and exact message URL (if post ID is present).
+ */
+export function parseTelegramSource(
+  rawSource?: string,
+  companyName = ''
+): { channelHandle: string; channelUrl: string; postUrl?: string } {
+  const str = String(rawSource || '').trim();
+  const fullPostMatch = str.match(/^(?:https?:\/\/)?t\.me\/([a-zA-Z0-9_]+)\/(\d+)/i);
+  if (fullPostMatch) {
+    const clean = fullPostMatch[1];
+    return {
+      channelHandle: `@${clean}`,
+      channelUrl: `https://t.me/${clean}`,
+      postUrl: `https://t.me/${clean}/${fullPostMatch[2]}`,
+    };
+  }
+
+  const handlePostMatch = str.match(/^@?([a-zA-Z0-9_]+)\/(\d+)$/);
+  if (handlePostMatch) {
+    const clean = handlePostMatch[1];
+    return {
+      channelHandle: `@${clean}`,
+      channelUrl: `https://t.me/${clean}`,
+      postUrl: `https://t.me/${clean}/${handlePostMatch[2]}`,
+    };
+  }
+
+  const channelHandle = resolveChannelHandle(rawSource, companyName);
+  return {
+    channelHandle,
+    channelUrl: `https://t.me/${channelHandle.replace(/^@/, '')}`,
+  };
+}
 
 /**
  * Checks whether URL points directly to a concrete vacancy listing, post, or active track
@@ -440,9 +502,14 @@ export function isDirectVacancyUrl(url: string | undefined): boolean {
     /^https?:\/\/(?:www\.)?careerspace\.app\/job\/\d+/i.test(trimmed) ||
     /^https?:\/\/(?:www\.)?geekjob\.ru\/vacancy\/[a-zA-Z0-9]+/i.test(trimmed) ||
     /^https?:\/\/(?:www\.)?getmatch\.ru\/vacancies\/\d+/i.test(trimmed) ||
+    /^https?:\/\/(?:www\.)?ozon\.tech\/vacancies\/[a-zA-Z0-9_-]+/i.test(trimmed) ||
+    /^https?:\/\/(?:www\.)?hirehi\.ru\/[a-z0-9_-]+\/[a-z0-9_-]+/i.test(trimmed) ||
     /^https?:\/\/yandex\.ru\/jobs\/vacancies\/[a-zA-Z0-9_-]+/i.test(trimmed) ||
     /^https?:\/\/yandex\.ru\/yaintern\/[a-z_-]+\/?$/i.test(trimmed) ||
-    /^https?:\/\/education\.tbank\.ru\/start\/[a-z_-]+\/?$/i.test(trimmed) ||
+    /^https?:\/\/education\.tbank\.ru\/start\/[a-z0-9_-]+\/?$/i.test(trimmed) ||
+    /^https?:\/\/career\.t1\.ru\/debut\/internship\/[a-z0-9_-]+/i.test(trimmed) ||
+    /^https?:\/\/career\.t1\.ru\/vacancies\/vacancy-detail\?id=\d+/i.test(trimmed) ||
+    /^https?:\/\/kontur\.ru\/education\/internship(?:[#/].*)?$/i.test(trimmed) ||
     /^https?:\/\/t\.me\/[a-zA-Z0-9_]+\/\d+/i.test(trimmed) ||
     /^https?:\/\/career\.avito\.com\/vacancies\/[a-zA-Z0-9_-]+\/\d+/i.test(trimmed) ||
     /^https?:\/\/internship\.vk\.company\/vacancy\/\d+/i.test(trimmed) ||
@@ -456,9 +523,14 @@ export function isDirectVacancyUrl(url: string | undefined): boolean {
  * and web domains never get prepended with '@' (like @hh.ru or @career.avito.com).
  */
 export function resolveChannelHandle(channel: string | undefined, companyName = ''): string {
+  // Strip optional /<postId> suffix from encoded "@channel/12345" references
+  const normalizedInput = channel
+    ? String(channel).trim().replace(/^(?:https?:\/\/)?t\.me\/([a-zA-Z0-9_]+)\/\d+.*$/i, '@$1').replace(/^@?([a-zA-Z0-9_]+)\/\d+$/, '@$1')
+    : undefined;
+
   // Preserve verified Telegram aggregator channel handle if explicitly specified
-  if (channel) {
-    const cleanRaw = channel.trim().replace(/^@/, '');
+  if (normalizedInput) {
+    const cleanRaw = normalizedInput.trim().replace(/^@/, '');
     if (AGGREGATOR_TG_HANDLES.has(cleanRaw.toLowerCase())) {
       return `@${cleanRaw}`;
     }
@@ -469,9 +541,9 @@ export function resolveChannelHandle(channel: string | undefined, companyName = 
 
   // If company is one of the 9 target employers, always map to its canonical verified channel
   if (officialChannel) {
-    if (!channel) return officialChannel;
+    if (!normalizedInput) return officialChannel;
 
-    const clean = channel.trim().replace(/^@/, '');
+    const clean = normalizedInput.trim().replace(/^@/, '');
     const lower = clean.toLowerCase();
 
     // Check if channel is an official subchannel or alias for this company
@@ -509,9 +581,9 @@ export function resolveChannelHandle(channel: string | undefined, companyName = 
   }
 
   // For other/external companies or aggregators
-  if (!channel) return '@IT_start_izh_bot';
+  if (!normalizedInput) return '@IT_start_izh_bot';
 
-  const clean = channel.trim().replace(/^@/, '');
+  const clean = normalizedInput.trim().replace(/^@/, '');
   const lower = clean.toLowerCase();
 
   // If it looks like a web domain, don't prepend @
@@ -883,6 +955,7 @@ export interface VacancySourceDetails {
   applyUrl: string;
   officialChannelHandle: string;
   officialChannelUrl: string;
+  postUrl?: string;
 }
 
 export function getVacancySourceDetails(
@@ -890,12 +963,18 @@ export function getVacancySourceDetails(
   companyName = '',
   sourceChannel = '',
   directionId?: string,
-  subTrackId?: string
+  subTrackId?: string,
+  sourcePostUrl?: string
 ): VacancySourceDetails {
   const compKey = getCompanyKey(companyName);
   const resolvedUrl = resolveApplyUrl(rawApplyUrl, companyName, sourceChannel, directionId, subTrackId);
-  const officialChannelHandle = COMPANY_OFFICIAL_CHANNELS[compKey] || resolveChannelHandle(sourceChannel, companyName);
-  const officialChannelUrl = `https://t.me/${officialChannelHandle.replace(/^@/, '')}`;
+  const parsedTg = parseTelegramSource(sourcePostUrl || sourceChannel, companyName);
+  const officialChannelHandle = parsedTg.channelHandle;
+  const officialChannelUrl = parsedTg.channelUrl;
+  const explicitPostUrl =
+    sourcePostUrl && /^https?:\/\/t\.me\/[a-zA-Z0-9_]+\/\d+/i.test(sourcePostUrl)
+      ? sourcePostUrl.split('?')[0]
+      : parsedTg.postUrl;
 
   // 1. Direct Telegram post (e.g. https://t.me/channel/123)
   const tgPostMatch = resolvedUrl.match(/https?:\/\/t\.me\/([a-zA-Z0-9_]+)\/(\d+)/i);
@@ -911,21 +990,26 @@ export function getVacancySourceDetails(
       applyUrl: resolvedUrl,
       officialChannelHandle: postChannel,
       officialChannelUrl: `https://t.me/${postChannel.replace(/^@/, '')}`,
+      postUrl: resolvedUrl,
     };
   }
 
   // 2. HeadHunter direct vacancy
   if (resolvedUrl.includes('hh.ru/vacancy/')) {
+    const cleanSourceCh = officialChannelHandle && officialChannelHandle.startsWith('@') ? officialChannelHandle : '';
     return {
       type: 'hh',
-      badgeLabel: 'HeadHunter (hh.ru)',
-      badgeUrl: resolvedUrl,
-      badgeTooltip: `Открыть вакансию на HeadHunter: ${resolvedUrl}`,
+      badgeLabel: explicitPostUrl && cleanSourceCh ? `TG ${cleanSourceCh}` : 'HeadHunter (hh.ru)',
+      badgeUrl: explicitPostUrl || resolvedUrl,
+      badgeTooltip: explicitPostUrl
+        ? `Открыть сообщение в Telegram (${explicitPostUrl})`
+        : `Открыть вакансию на HeadHunter: ${resolvedUrl}`,
       actionLabel: 'Откликнуться на hh.ru',
       actionMobileLabel: 'На hh.ru',
       applyUrl: resolvedUrl,
       officialChannelHandle,
       officialChannelUrl,
+      postUrl: explicitPostUrl,
     };
   }
 
@@ -941,79 +1025,117 @@ export function getVacancySourceDetails(
       applyUrl: resolvedUrl,
       officialChannelHandle,
       officialChannelUrl,
+      postUrl: explicitPostUrl,
     };
   }
 
   // 2.2 Young&Junior direct vacancy (from Telegram channels)
   if (resolvedUrl.includes('youngjunior.ru/')) {
-    const cleanSourceCh = sourceChannel && sourceChannel.startsWith('@') ? sourceChannel : '';
+    const cleanSourceCh = officialChannelHandle && officialChannelHandle.startsWith('@') ? officialChannelHandle : '';
     return {
       type: 'portal',
       badgeLabel: cleanSourceCh ? `TG ${cleanSourceCh}` : 'Young&Junior',
-      badgeUrl: cleanSourceCh ? `https://t.me/${cleanSourceCh.replace(/^@/, '')}` : resolvedUrl,
-      badgeTooltip: `Прямая страница вакансии ${companyName}: ${resolvedUrl}`,
+      badgeUrl: explicitPostUrl || (cleanSourceCh ? `https://t.me/${cleanSourceCh.replace(/^@/, '')}` : resolvedUrl),
+      badgeTooltip: explicitPostUrl
+        ? `Открыть сообщение в Telegram: ${explicitPostUrl}`
+        : `Прямая страница вакансии ${companyName}: ${resolvedUrl}`,
       actionLabel: `Открыть вакансию ${companyName || ''}`.trim(),
       actionMobileLabel: 'Вакансия',
       applyUrl: resolvedUrl,
       officialChannelHandle: cleanSourceCh || officialChannelHandle,
       officialChannelUrl: cleanSourceCh ? `https://t.me/${cleanSourceCh.replace(/^@/, '')}` : officialChannelUrl,
+      postUrl: explicitPostUrl,
     };
   }
 
-  // 2.3 Careerspace / GeekJob / Getmatch / Yandex Jobs direct vacancies
+  // 2.3 Careerspace / GeekJob / Ozon Tech / HireHi / Yandex Jobs direct vacancies
   if (resolvedUrl.includes('careerspace.app/job/')) {
     return {
       type: 'portal',
-      badgeLabel: 'Careerspace',
-      badgeUrl: resolvedUrl,
-      badgeTooltip: `Открыть вакансию на Careerspace: ${resolvedUrl}`,
+      badgeLabel: explicitPostUrl ? `TG ${officialChannelHandle}` : 'Careerspace',
+      badgeUrl: explicitPostUrl || resolvedUrl,
+      badgeTooltip: explicitPostUrl || `Открыть вакансию на Careerspace: ${resolvedUrl}`,
       actionLabel: 'Откликнуться на Careerspace',
       actionMobileLabel: 'Отклик',
       applyUrl: resolvedUrl,
       officialChannelHandle,
       officialChannelUrl,
+      postUrl: explicitPostUrl,
     };
   }
 
   if (resolvedUrl.includes('geekjob.ru/vacancy/')) {
     return {
       type: 'portal',
-      badgeLabel: 'GeekJob',
-      badgeUrl: resolvedUrl,
-      badgeTooltip: `Открыть вакансию на GeekJob: ${resolvedUrl}`,
+      badgeLabel: explicitPostUrl ? `TG ${officialChannelHandle}` : 'GeekJob',
+      badgeUrl: explicitPostUrl || resolvedUrl,
+      badgeTooltip: explicitPostUrl || `Открыть вакансию на GeekJob: ${resolvedUrl}`,
       actionLabel: 'Откликнуться на GeekJob',
       actionMobileLabel: 'Отклик',
       applyUrl: resolvedUrl,
       officialChannelHandle,
       officialChannelUrl,
+      postUrl: explicitPostUrl,
     };
   }
 
-  if (resolvedUrl.includes('yandex.ru/jobs/vacancies/')) {
+  if (resolvedUrl.includes('ozon.tech/vacancies/')) {
     return {
       type: 'portal',
-      badgeLabel: 'Яндекс Команда',
-      badgeUrl: resolvedUrl,
-      badgeTooltip: `Прямая страница вакансии Яндекса: ${resolvedUrl}`,
-      actionLabel: 'Откликнуться в Яндекс',
-      actionMobileLabel: 'На Яндекс',
+      badgeLabel: explicitPostUrl ? `TG ${officialChannelHandle}` : 'Ozon Tech',
+      badgeUrl: explicitPostUrl || resolvedUrl,
+      badgeTooltip: explicitPostUrl || `Открыть вакансию Ozon Tech: ${resolvedUrl}`,
+      actionLabel: 'Откликнуться в Ozon Tech',
+      actionMobileLabel: 'В Ozon',
       applyUrl: resolvedUrl,
       officialChannelHandle,
       officialChannelUrl,
+      postUrl: explicitPostUrl,
+    };
+  }
+
+  if (resolvedUrl.includes('hirehi.ru/')) {
+    return {
+      type: 'portal',
+      badgeLabel: explicitPostUrl ? `TG ${officialChannelHandle}` : 'HireHi',
+      badgeUrl: explicitPostUrl || resolvedUrl,
+      badgeTooltip: explicitPostUrl || `Открыть вакансию на HireHi: ${resolvedUrl}`,
+      actionLabel: 'Открыть вакансию',
+      actionMobileLabel: 'Вакансия',
+      applyUrl: resolvedUrl,
+      officialChannelHandle,
+      officialChannelUrl,
+      postUrl: explicitPostUrl,
+    };
+  }
+
+  if (resolvedUrl.includes('yandex.ru/jobs/vacancies/') || resolvedUrl.includes('yandex.ru/yaintern/')) {
+    return {
+      type: 'portal',
+      badgeLabel: 'Яндекс Стажировки',
+      badgeUrl: resolvedUrl,
+      badgeTooltip: `Прямая страница стажировки Яндекса: ${resolvedUrl}`,
+      actionLabel: 'Откликнуться в Яндекс',
+      actionMobileLabel: 'В Яндекс',
+      applyUrl: resolvedUrl,
+      officialChannelHandle: COMPANY_OFFICIAL_CHANNELS[compKey] || officialChannelHandle,
+      officialChannelUrl: `https://t.me/${(COMPANY_OFFICIAL_CHANNELS[compKey] || officialChannelHandle).replace(/^@/, '')}`,
+      postUrl: explicitPostUrl,
     };
   }
 
   // 3. Official employer career portal
   return {
     type: 'portal',
-    badgeLabel: `Сайт ${companyName || 'работодателя'}`,
-    badgeUrl: resolvedUrl,
-    badgeTooltip: `Открыть страницу вакансии на официальном сайте ${companyName}: ${resolvedUrl}`,
+    badgeLabel: explicitPostUrl ? `TG ${officialChannelHandle}` : `Сайт ${companyName || 'работодателя'}`,
+    badgeUrl: explicitPostUrl || resolvedUrl,
+    badgeTooltip: explicitPostUrl || `Открыть страницу вакансии на официальном сайте ${companyName}: ${resolvedUrl}`,
     actionLabel: `Подать заявку на сайте ${companyName || ''}`.trim(),
     actionMobileLabel: `Откликнуться на ${companyName || 'сайте'}`.trim(),
     applyUrl: resolvedUrl,
     officialChannelHandle,
     officialChannelUrl,
+    postUrl: explicitPostUrl,
   };
 }
 
@@ -1096,31 +1218,25 @@ export function isVacancyActive(item: VacancyFreshnessInput | null | undefined):
     return false;
   }
 
-  // 5. Reject programs that are currently between seasons, closed, or have 0 openings
+  // 5. Reject stale/closed static templates (only when not explicitly marked active or pointing to dead campaign URLs)
   const compLower = (item.company || '').toLowerCase();
 
-  // Avito Tech closed on Aug 30 (screenshot: "Приём заявок до 30 августа")
-  if ((compLower.includes('avito') || compLower.includes('авито')) && item.isActive !== true) {
+  if ((compLower.includes('avito') || compLower.includes('авито')) && url.includes('start.avito.ru') && item.isActive !== true) {
     return false;
   }
-  // Ozon Camp currently between seasons (screenshot: "Скоро тут что-то будет...")
-  if ((compLower.includes('ozon') || compLower.includes('озон')) && item.isActive !== true) {
+  if ((compLower.includes('ozon') || compLower.includes('озон')) && url.includes('job.ozon.ru/it/camp') && item.isActive !== true) {
     return false;
   }
-  // VK Internship currently has 0 vacancies (screenshot: "0 из 0 вакансий")
-  if ((compLower.includes('vk') || compLower.includes('вконтакт')) && item.isActive !== true) {
+  if ((compLower.includes('vk') || compLower.includes('вконтакт')) && url === 'https://internship.vk.company/vacancy' && item.isActive !== true) {
     return false;
   }
-  // Directum currently has no open student internships
-  if ((compLower.includes('directum') || compLower.includes('директум')) && item.isActive !== true) {
+  if ((compLower.includes('directum') || compLower.includes('директум')) && (url.includes('career.directum.ru') || url.includes('vk.com/student_directum')) && item.isActive !== true) {
     return false;
   }
-  // Kontur off-season: seasonal round closed (screenshot: "Набор закрыт")
-  if ((compLower.includes('контур') || compLower.includes('kontur')) && item.isActive !== true) {
+  if ((compLower.includes('контур') || compLower.includes('kontur')) && url.includes('kontur.ru/career/') && item.isActive !== true) {
     return false;
   }
-  // Sber off-season
-  if ((compLower.includes('сбер') || compLower.includes('sber')) && item.isActive !== true) {
+  if ((compLower.includes('сбер') || compLower.includes('sber')) && url.includes('sbergraduate.ru/sberseasons') && item.isActive !== true) {
     return false;
   }
 
@@ -1251,6 +1367,126 @@ export function getInternshipRecruitmentStatus(internship: {
     note: 'Постоянный круглогодичный набор',
     displayBadge: 'Постоянный набор • Круглый год',
   };
+}
+
+const RUSSIAN_MONTHS_GENITIVE: Record<string, number> = {
+  января: 0,
+  февраля: 1,
+  марта: 2,
+  апреля: 3,
+  мая: 4,
+  июня: 5,
+  июля: 6,
+  августа: 7,
+  сентября: 8,
+  октября: 9,
+  ноября: 10,
+  декабря: 11,
+};
+
+/**
+ * Parses a human deadline such as "до 31 января" into the nearest upcoming ISO timestamp.
+ * Returns empty string if no exact cutoff date exists (e.g., constant year-round recruitment).
+ */
+export function resolveApplicationDeadlineIso(internship: {
+  recruitmentType?: 'constant' | 'scheduled' | 'seasonal';
+  applicationDeadline?: string;
+  expiresAt?: string;
+}): string {
+  if (internship.expiresAt) {
+    const t = new Date(internship.expiresAt).getTime();
+    if (!isNaN(t) && t > Date.now() - 86400000) {
+      return new Date(t).toISOString();
+    }
+  }
+
+  if (internship.recruitmentType === 'constant') {
+    return '';
+  }
+
+  const raw = (internship.applicationDeadline || '').toLowerCase();
+  const m = raw.match(/(?:до\s+)?(\d{1,2})\s+([а-яё]+)/i);
+  if (m) {
+    const day = parseInt(m[1], 10);
+    const month = RUSSIAN_MONTHS_GENITIVE[m[2].toLowerCase()];
+    if (!isNaN(day) && month !== undefined) {
+      const now = new Date();
+      let year = now.getFullYear();
+      let candidate = new Date(Date.UTC(year, month, day, 20, 59, 59));
+      if (candidate.getTime() < now.getTime() - 86400000) {
+        year += 1;
+        candidate = new Date(Date.UTC(year, month, day, 20, 59, 59));
+      }
+      return candidate.toISOString();
+    }
+  }
+
+  return '';
+}
+
+/**
+ * Restores recruitment metadata (scheduled deadline vs constant recruitment) from Supabase tags/description.
+ */
+export function extractRecruitmentFromTags(
+  tags: string[] = [],
+  description = ''
+): {
+  recruitmentType?: 'constant' | 'scheduled';
+  applicationDeadline?: string;
+  deadlineNote?: string;
+  expiresAt?: string;
+} {
+  for (const rawTag of tags) {
+    const tag = String(rawTag || '').trim();
+    const deadlineTagMatch = tag.match(/^Набор\s+до\s+(\d{1,2}\s+[а-яё]+)$/i);
+    if (deadlineTagMatch) {
+      const deadlineText = `до ${deadlineTagMatch[1]}`;
+      return {
+        recruitmentType: 'scheduled',
+        applicationDeadline: deadlineText,
+        deadlineNote:
+          deadlineText === 'до 31 января'
+            ? 'Приём заявок до 31 января • Экзамен 25–31 января'
+            : `Приём заявок ${deadlineText}`,
+        expiresAt: resolveApplicationDeadlineIso({
+          recruitmentType: 'scheduled',
+          applicationDeadline: deadlineText,
+        }),
+      };
+    }
+    if (/^Постоянный набор$/i.test(tag)) {
+      return {
+        recruitmentType: 'constant',
+        applicationDeadline: 'Круглый год',
+        deadlineNote: 'Постоянный круглогодичный набор',
+      };
+    }
+  }
+
+  const descLower = (description || '').toLowerCase();
+  const descDeadline = descLower.match(/до\s+(\d{1,2}\s+(?:января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря))/i);
+  if (descDeadline) {
+    const deadlineText = `до ${descDeadline[1]}`;
+    return {
+      recruitmentType: 'scheduled',
+      applicationDeadline: deadlineText,
+      deadlineNote: `Приём заявок ${deadlineText}`,
+      expiresAt: resolveApplicationDeadlineIso({
+        recruitmentType: 'scheduled',
+        applicationDeadline: deadlineText,
+      }),
+    };
+  }
+
+  if (descLower.includes('постоянный набор') || descLower.includes('круглый год')) {
+    return {
+      recruitmentType: 'constant',
+      applicationDeadline: 'Круглый год',
+      deadlineNote: 'Постоянный круглогодичный набор',
+    };
+  }
+
+  return {};
 }
 
 

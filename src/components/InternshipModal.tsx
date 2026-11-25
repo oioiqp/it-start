@@ -310,7 +310,8 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                 internship.company,
                 internship.sourceChannel,
                 internship.directionId,
-                internship.subTrackId
+                internship.subTrackId,
+                internship.sourcePostUrl
               );
 
               return (
@@ -629,12 +630,13 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
               internship.company,
               internship.sourceChannel,
               internship.directionId,
-              internship.subTrackId
+              internship.subTrackId,
+              internship.sourcePostUrl
             );
 
             return (
               <>
-                <div className="flex items-center gap-2 w-full sm:w-auto">
+                <div className="flex items-center gap-2 w-full sm:w-auto flex-wrap">
                   <button
                     onClick={onClose}
                     className="flex-1 sm:flex-initial min-h-[44px] px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-transform duration-150 active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-800 dark:text-neutral-200 cursor-pointer text-center"
@@ -642,17 +644,31 @@ export const InternshipModal: React.FC<InternshipModalProps> = ({
                     Закрыть
                   </button>
 
-                  {/* Secondary Channel Link if official verified employer channel exists */}
+                  {/* Secondary Channel Link if official verified channel exists */}
                   {src.officialChannelHandle && (
                     <a
                       href={src.officialChannelUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex-1 sm:flex-initial min-h-[44px] flex items-center justify-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-full text-xs font-semibold transition-transform duration-150 active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-800 dark:text-neutral-200 truncate"
-                      title={`Официальный Telegram-канал ${internship.company}: ${src.officialChannelHandle}`}
+                      title={`Telegram-канал ${src.officialChannelHandle}`}
                     >
                       <Bot className="w-3.5 h-3.5 shrink-0 text-neutral-600 dark:text-neutral-400" />
                       <span className="truncate">Канал {src.officialChannelHandle}</span>
+                      <ExternalLink className="w-3 h-3 shrink-0" />
+                    </a>
+                  )}
+
+                  {/* Direct message link in Telegram if sourced from TG post */}
+                  {src.postUrl && src.postUrl !== src.applyUrl && (
+                    <a
+                      href={src.postUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="min-h-[44px] flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-semibold transition-transform duration-150 active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-800 dark:text-neutral-200"
+                      title={`Перейти к сообщению в Telegram: ${src.postUrl}`}
+                    >
+                      <span>К посту в TG</span>
                       <ExternalLink className="w-3 h-3 shrink-0" />
                     </a>
                   )}

@@ -80,6 +80,7 @@ export interface Internship {
   requirements: string[];
   responsibilities: string[];
   sourceChannel: string;
+  sourcePostUrl?: string;
   sourceType: 'telegram' | 'portal';
   applyUrl: string;
   publishedAt: string;
@@ -107,6 +108,7 @@ export interface JobApplication {
   applyUrl: string;
   sourceType?: 'telegram' | 'portal';
   sourceChannel?: string;
+  sourcePostUrl?: string;
   appliedAt: string; // ISO string
   deadlineDate: string; // ISO string or human string
   deadlineAction: string; // e.g. "Предоставить тестовое задание"

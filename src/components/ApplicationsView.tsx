@@ -103,10 +103,14 @@ export const ApplicationsView: React.FC<ApplicationsViewProps> = ({
     return app.status === filterStatus;
   });
 
+  const hasAnyDeadline = applications.some((a) => Boolean(a.deadlineDate && parseAppDate(a.deadlineDate)));
   const urgentCount = applications.filter((a) => {
     const days = getDaysLeft(a.deadlineDate);
     return days !== null && days <= 3 && a.status !== 'offer' && a.status !== 'rejected';
   }).length;
+  const activeReviewCount = applications.filter(
+    (a) => a.status === 'applied' || a.status === 'test_task' || a.status === 'interview'
+  ).length;
 
   return (
     <div className="space-y-6">
@@ -118,7 +122,9 @@ export const ApplicationsView: React.FC<ApplicationsViewProps> = ({
               <span className="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                 Трекер карьерных заявок
               </span>
-              <span className="text-xs text-neutral-400 dark:text-neutral-500">• Дедлайны и задачи</span>
+              <span className="text-xs text-neutral-400 dark:text-neutral-500">
+                {hasAnyDeadline ? '• Дедлайны и задачи' : '• Статусы и подготовка'}
+              </span>
             </div>
             <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white font-sans">
               Мои отклики ({applications.length})
@@ -145,14 +151,25 @@ export const ApplicationsView: React.FC<ApplicationsViewProps> = ({
             </span>
           </div>
 
-          <div className="p-3 rounded-2xl liquid-glass-subtle">
-            <span className="text-[11px] font-medium text-neutral-500 dark:text-neutral-400 block mb-0.5">
-              Горящие дедлайны (≤3 дн.)
-            </span>
-            <span className={`text-lg font-bold ${urgentCount > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-neutral-900 dark:text-white'}`}>
-              {urgentCount}
-            </span>
-          </div>
+          {hasAnyDeadline ? (
+            <div className="p-3 rounded-2xl liquid-glass-subtle">
+              <span className="text-[11px] font-medium text-neutral-500 dark:text-neutral-400 block mb-0.5">
+                Горящие дедлайны (≤3 дн.)
+              </span>
+              <span className={`text-lg font-bold ${urgentCount > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-neutral-900 dark:text-white'}`}>
+                {urgentCount}
+              </span>
+            </div>
+          ) : (
+            <div className="p-3 rounded-2xl liquid-glass-subtle">
+              <span className="text-[11px] font-medium text-neutral-500 dark:text-neutral-400 block mb-0.5">
+                В активном отборе
+              </span>
+              <span className="text-lg font-bold text-neutral-900 dark:text-white">
+                {activeReviewCount}
+              </span>
+            </div>
+          )}
 
           <div className="p-3 rounded-2xl liquid-glass-subtle">
             <span className="text-[11px] font-medium text-neutral-500 dark:text-neutral-400 block mb-0.5">
@@ -234,6 +251,8 @@ export const ApplicationsView: React.FC<ApplicationsViewProps> = ({
           {filteredApplications.map((app) => {
             const originalInternship = allInternships.find((i) => i.id === app.vacancyId);
             const daysLeft = getDaysLeft(app.deadlineDate);
+            const hasDeadline = Boolean(app.deadlineDate && parseAppDate(app.deadlineDate));
+            const tgPostUrl = app.sourcePostUrl || originalInternship?.sourcePostUrl;
 
             // Clean minimalist format badge helper
             const renderFormat = () => {
@@ -317,7 +336,8 @@ export const ApplicationsView: React.FC<ApplicationsViewProps> = ({
                   </div>
                 </div>
 
-                {/* DEADLINE BANNER & ACTION REQUIRED */}
+                {/* DEADLINE BANNER & ACTION REQUIRED — rendered ONLY when a concrete deadline exists */}
+                {(hasDeadline || editingDeadlineId === app.vacancyId) && (
                 <div className={`p-4 rounded-2xl border transition-all ${
                   daysLeft !== null && daysLeft <= 1
                     ? 'bg-rose-500/10 border-rose-500/25 text-rose-950 dark:text-rose-200'
@@ -429,6 +449,7 @@ export const ApplicationsView: React.FC<ApplicationsViewProps> = ({
                     </span>
                   </div>
                 </div>
+                )}
 
                 {/* Preparation Steps Checklist */}
                 <div className="p-3.5 rounded-2xl liquid-glass-subtle space-y-2">
@@ -442,7 +463,9 @@ export const ApplicationsView: React.FC<ApplicationsViewProps> = ({
                     </div>
                     <div className="flex items-center gap-2 p-2 rounded-xl liquid-glass-pill text-neutral-800 dark:text-neutral-200">
                       <Clock className="w-4 h-4 text-amber-500 shrink-0" />
-                      <span>Сдать тестовое до {formatDeadlineDate(app.deadlineDate)}</span>
+                      <span>
+                        {hasDeadline ? `Сдать тестовое до ${formatDeadlineDate(app.deadlineDate)}` : 'Пройти тестовое / отбор'}
+                      </span>
                     </div>
                     <div className="flex items-center gap-2 p-2 rounded-xl liquid-glass-pill text-neutral-800 dark:text-neutral-200">
                       <GraduationCap className="w-4 h-4 text-blue-500 shrink-0" />
@@ -485,8 +508,8 @@ export const ApplicationsView: React.FC<ApplicationsViewProps> = ({
                     })}
                   </div>
 
-                  {/* Actions: Open Plan & Vacancy link */}
-                  <div className="flex items-center gap-2 shrink-0">
+                  {/* Actions: Open Plan, TG post & Vacancy link */}
+                  <div className="flex items-center gap-2 flex-wrap shrink-0">
                     {originalInternship && (
                       <button
                         type="button"
@@ -496,6 +519,19 @@ export const ApplicationsView: React.FC<ApplicationsViewProps> = ({
                         <GraduationCap className="w-3.5 h-3.5" />
                         <span>План подготовки</span>
                       </button>
+                    )}
+
+                    {tgPostUrl && tgPostUrl !== app.applyUrl && (
+                      <a
+                        href={tgPostUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-semibold liquid-glass-pill hover:bg-white/60 text-neutral-800 dark:text-neutral-200 cursor-pointer"
+                        title={`Открыть сообщение в Telegram: ${tgPostUrl}`}
+                      >
+                        <span>Пост в TG</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
                     )}
 
                     <a

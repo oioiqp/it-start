@@ -2,7 +2,8 @@ import { createClient } from '@supabase/supabase-js';
 import type { Internship, TelegramSubscription, UserProgress } from '../types';
 import {
   resolveApplyUrl,
-  resolveChannelHandle,
+  parseTelegramSource,
+  extractRecruitmentFromTags,
   formatSalary,
   isStrictVacancyPost,
   isVacancyActive,
@@ -126,9 +127,15 @@ export async function fetchInternshipsFromSupabase(): Promise<Internship[] | nul
           directApplyUrl.includes('t.me/') ||
           rawSourceName.startsWith('@');
         const derivedSourceType: 'telegram' | 'portal' = isTgSource ? 'telegram' : 'portal';
+        const parsedTg = parseTelegramSource(rawSourceName, item.company);
         const sourceChannel = isTgSource
-          ? resolveChannelHandle(rawSourceName, item.company)
+          ? parsedTg.channelHandle
           : (rawSourceName || item.company || 'portal');
+        const sourcePostUrl =
+          parsedTg.postUrl ||
+          (/^https?:\/\/t\.me\/[a-zA-Z0-9_]+\/\d+/i.test(directApplyUrl) ? directApplyUrl : undefined);
+        const parsedTags = parseArray(item.tags, [(item.sub_track || 'Junior').toUpperCase()]);
+        const recruitmentMeta = extractRecruitmentFromTags(parsedTags, item.description || '');
 
         items.push({
           id: String(item.id),
@@ -140,11 +147,12 @@ export async function fetchInternshipsFromSupabase(): Promise<Internship[] | nul
           salary: formatSalary(item.salary),
           directionId,
           subTrackId,
-          tags: parseArray(item.tags, [(item.sub_track || 'Junior').toUpperCase()]),
+          tags: parsedTags,
           description: item.description || '',
           requirements: parseArray(item.requirements, defaultRequirements),
           responsibilities: parseArray(item.responsibilities, defaultResponsibilities),
           sourceChannel,
+          sourcePostUrl,
           sourceType: derivedSourceType,
           applyUrl: directApplyUrl,
           publishedAt: item.published_at || new Date().toISOString(),
@@ -152,6 +160,7 @@ export async function fetchInternshipsFromSupabase(): Promise<Internship[] | nul
           isActive: item.is_active !== false && item.status !== 'closed' && item.status !== 'archived',
           isVerified: true,
           status: item.status || 'active',
+          ...recruitmentMeta,
         });
       }
 

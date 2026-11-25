@@ -93,6 +93,7 @@ export function cleanVacancyTags(tags: string[], company: string, _title?: strin
     'стажировка',
     'старт',
     'финтех',
+    'постоянный набор',
   ];
 
   const seen = new Set<string>();
@@ -102,7 +103,8 @@ export function cleanVacancyTags(tags: string[], company: string, _title?: strin
     const tagLower = tag.toLowerCase().trim();
     if (!tagLower) continue;
 
-    // Skip if it matches company or known company programs
+    // Skip if it matches company, known programs, or internal deadline markers
+    if (tagLower.startsWith('набор до ')) continue;
     if (excludeWords.some((w) => tagLower === w || tagLower.includes(w))) continue;
     if (companyLower && companyLower.includes(tagLower)) continue;
 
@@ -438,27 +440,54 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
               internship.company,
               internship.sourceChannel,
               internship.directionId,
-              internship.subTrackId
+              internship.subTrackId,
+              internship.sourcePostUrl
             );
+            const isTelegramOrigin = src.type === 'telegram_post' || internship.sourceType === 'telegram';
 
             return (
               <>
-                <a
-                  href={src.badgeUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 text-[11px] font-semibold truncate min-w-0 text-neutral-600 hover:text-black dark:text-neutral-400 dark:hover:text-white transition-colors"
-                  title={src.badgeTooltip}
-                >
-                  {src.type === 'telegram_post' || internship.sourceType === 'telegram' ? (
-                    <Bot className="w-3.5 h-3.5 shrink-0 text-neutral-500 dark:text-neutral-400" />
-                  ) : (
+                {isTelegramOrigin ? (
+                  <div className="flex items-center gap-1.5 min-w-0 flex-wrap">
+                    <a
+                      href={src.officialChannelUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-[11px] font-semibold text-neutral-600 hover:text-black dark:text-neutral-400 dark:hover:text-white transition-colors truncate max-w-[140px]"
+                      title={`Перейти в Telegram-канал / группу: ${src.officialChannelHandle}`}
+                    >
+                      <Bot className="w-3.5 h-3.5 shrink-0 text-neutral-500 dark:text-neutral-400" />
+                      <span className="truncate underline decoration-neutral-300 dark:decoration-neutral-700">
+                        {src.officialChannelHandle}
+                      </span>
+                    </a>
+                    {src.postUrl && (
+                      <a
+                        href={src.postUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-[10px] font-semibold bg-neutral-100 hover:bg-neutral-200 text-neutral-700 hover:text-black dark:bg-white/10 dark:text-neutral-300 transition-colors shrink-0"
+                        title={`Открыть именно это сообщение в Telegram: ${src.postUrl}`}
+                      >
+                        <span>К посту</span>
+                        <ExternalLink className="w-2.5 h-2.5 opacity-70" />
+                      </a>
+                    )}
+                  </div>
+                ) : (
+                  <a
+                    href={src.badgeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 text-[11px] font-semibold truncate min-w-0 text-neutral-600 hover:text-black dark:text-neutral-400 dark:hover:text-white transition-colors"
+                    title={src.badgeTooltip}
+                  >
                     <Globe className="w-3.5 h-3.5 shrink-0 text-neutral-500 dark:text-neutral-400" />
-                  )}
-                  <span className="truncate underline decoration-neutral-300 dark:decoration-neutral-700">
-                    {src.badgeLabel}
-                  </span>
-                </a>
+                    <span className="truncate underline decoration-neutral-300 dark:decoration-neutral-700">
+                      {src.badgeLabel}
+                    </span>
+                  </a>
+                )}
 
                 <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
                   {/* Minimalist Tracker Toggle */}

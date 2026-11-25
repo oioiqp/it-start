@@ -1,10 +1,16 @@
 import { describe, it, expect } from 'vitest';
+import React from 'react';
+import { renderToString } from 'react-dom/server';
 import {
   formatSalary,
   isStrictVacancyPost,
   isVacancyActive,
   resolveApplyUrl,
   resolveChannelHandle,
+  parseTelegramSource,
+  resolveApplicationDeadlineIso,
+  extractRecruitmentFromTags,
+  getInternshipRecruitmentStatus,
   detectVacancyTrack,
   COMPANY_OFFICIAL_PORTALS,
   getDirectVacancyPortalUrl,
@@ -13,6 +19,9 @@ import {
 } from '../lib/vacancyUrl';
 import { SEED_INTERNSHIPS } from '../data/internships';
 import { MONITORED_WEBSITES_LIST } from '../data/channels';
+import { InternshipCard } from '../components/InternshipCard';
+import { ApplicationsView } from '../components/ApplicationsView';
+import type { JobApplication, UserProgress } from '../types';
 
 describe('Vacancy Quality & Link Integrity Verification', () => {
   describe('1. formatSalary', () => {
@@ -511,6 +520,124 @@ describe('Vacancy Quality & Link Integrity Verification', () => {
           description: 'Вакансия перенесена в архив',
         })
       ).toBe(false);
+    });
+  });
+
+  describe('7. Fintech Programs, Telegram Group & Post Links, and Strict Deadlines', () => {
+    it('supports T-Bank sre_engineer, Yandex yaintern tracks, T1 debut tracks, Kontur internship, and Ozon Tech', () => {
+      expect(resolveApplyUrl('https://education.tbank.ru/start/sre_engineer/', 'Т-Банк', '@tbank_team', 'devops'))
+        .toBe('https://education.tbank.ru/start/sre_engineer/');
+      expect(isDirectVacancyUrl('https://education.tbank.ru/start/sre_engineer/')).toBe(true);
+      expect(isDirectVacancyUrl('https://yandex.ru/yaintern/backend')).toBe(true);
+      expect(isDirectVacancyUrl('https://career.t1.ru/debut/internship/java_developer')).toBe(true);
+      expect(isDirectVacancyUrl('https://kontur.ru/education/internship#backend')).toBe(true);
+      expect(isDirectVacancyUrl('https://ozon.tech/vacancies/0af69b46-af62-42cd-a46f-ffdb9f8ce8b6')).toBe(true);
+
+      // Broken Kontur students & T1 open-school remain blocked
+      expect(isDirectVacancyUrl('https://kontur.ru/career/students')).toBe(false);
+      expect(isDirectVacancyUrl('https://career.t1.ru/debut/open-school/')).toBe(false);
+    });
+
+    it('parses "@channel/postId" into channel link + exact Telegram message link and renders both on InternshipCard', () => {
+      const parsed = parseTelegramSource('@young_june/3706', 'МТС');
+      expect(parsed.channelHandle).toBe('@young_june');
+      expect(parsed.channelUrl).toBe('https://t.me/young_june');
+      expect(parsed.postUrl).toBe('https://t.me/young_june/3706');
+      expect(resolveChannelHandle('@young_june/3706', 'Сбер')).toBe('@young_june');
+
+      const src = getVacancySourceDetails(
+        'https://youngjunior.ru/python/jobs/128798',
+        'МТС',
+        '@young_june/3706',
+        'backend',
+        'python',
+        'https://t.me/young_june/3706'
+      );
+      expect(src.officialChannelUrl).toBe('https://t.me/young_june');
+      expect(src.postUrl).toBe('https://t.me/young_june/3706');
+
+      const progress: UserProgress = { completedTopics: [], completedSubtopics: [], completedQuestions: [], repeatQuestions: [] };
+      const html = renderToString(
+        React.createElement(InternshipCard, {
+          internship: {
+            ...SEED_INTERNSHIPS[0],
+            id: 'tg-test-1',
+            company: 'МТС',
+            sourceType: 'telegram',
+            sourceChannel: '@young_june',
+            sourcePostUrl: 'https://t.me/young_june/3706',
+            applyUrl: 'https://youngjunior.ru/python/jobs/128798',
+            recruitmentType: 'constant',
+            applicationDeadline: 'Круглый год',
+          },
+          userProgress: progress,
+          roadmapTopics: [],
+          questions: [],
+          onOpenPlan: () => {},
+        })
+      );
+
+      expect(html).toContain('https://t.me/young_june');
+      expect(html).toContain('https://t.me/young_june/3706');
+      expect(html).toContain('К посту');
+      expect(html).toContain('https://youngjunior.ru/python/jobs/128798');
+    });
+
+    it('distinguishes T-Bank Jan 31 deadline vs constant programs and omits deadline UI in ApplicationsView when absent', () => {
+      const tbankScheduled = getInternshipRecruitmentStatus({
+        company: 'Т-Банк',
+        recruitmentType: 'scheduled',
+        applicationDeadline: 'до 31 января',
+      });
+      expect(tbankScheduled.type).toBe('scheduled');
+      expect(tbankScheduled.deadline).toBe('до 31 января');
+
+      const tbankConstant = getInternshipRecruitmentStatus({
+        company: 'Т-Банк',
+        recruitmentType: 'constant',
+        applicationDeadline: 'Круглый год',
+      });
+      expect(tbankConstant.type).toBe('constant');
+      expect(tbankConstant.deadline).toBe('Круглый год');
+
+      expect(resolveApplicationDeadlineIso({ recruitmentType: 'scheduled', applicationDeadline: 'до 31 января' })).toMatch(/^\d{4}-01-31T/);
+      expect(resolveApplicationDeadlineIso({ recruitmentType: 'constant', applicationDeadline: 'Круглый год' })).toBe('');
+
+      expect(extractRecruitmentFromTags(['Python', 'Набор до 31 января']).recruitmentType).toBe('scheduled');
+      expect(extractRecruitmentFromTags(['Golang', 'Постоянный набор']).recruitmentType).toBe('constant');
+
+      const appWithoutDeadline: JobApplication = {
+        id: 'ya-no-deadline',
+        vacancyId: 'ya-no-deadline',
+        title: 'Стажёр Backend-разработчик',
+        company: 'Яндекс',
+        salary: 'от 75 000 до 100 000 ₽',
+        location: 'Москва',
+        format: 'Гибрид',
+        applyUrl: 'https://yandex.ru/yaintern/backend',
+        sourceType: 'portal',
+        sourceChannel: '@yandex_intern',
+        appliedAt: new Date().toISOString(),
+        deadlineDate: '',
+        deadlineAction: 'Подать заявку на сайте',
+        status: 'applied',
+      };
+
+      const htmlNoDeadline = renderToString(
+        React.createElement(ApplicationsView, {
+          applications: [appWithoutDeadline],
+          allInternships: SEED_INTERNSHIPS,
+          onUpdateApplication: () => {},
+          onRemoveApplication: () => {},
+          onOpenPlan: () => {},
+          onNavigateToCatalog: () => {},
+        })
+      );
+
+      expect(htmlNoDeadline).not.toContain('Дедлайн по предоставлению');
+      expect(htmlNoDeadline).not.toContain('Горящие дедлайны');
+      expect(htmlNoDeadline).not.toContain('Сдать тестовое до ');
+      expect(htmlNoDeadline).toContain('Пройти тестовое / отбор');
     });
   });
 });

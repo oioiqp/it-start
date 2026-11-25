@@ -41,7 +41,7 @@ import {
   TELEGRAM_BOT_URL,
   GITHUB_PAGES_URL,
 } from './lib/supabase';
-import { isVacancyActive, isDirectVacancyUrl } from './lib/vacancyUrl';
+import { isVacancyActive, isDirectVacancyUrl, resolveApplicationDeadlineIso } from './lib/vacancyUrl';
 import {
   getCachedInternships,
   getLocalProgress,
@@ -412,24 +412,23 @@ export function App() {
     const today = new Date();
     const compLower = internship.company.toLowerCase();
 
-    let deadlineDateStr = '';
+    const deadlineDateStr = resolveApplicationDeadlineIso(internship);
     let deadlineAction = 'Подать резюме и портфолио на карьерном портале компании';
 
-    if (compLower.includes('т-банк') || compLower.includes('тинькофф')) {
-      deadlineDateStr = '2027-01-31T23:59:59.000Z';
-      deadlineAction = 'Заполнить форму до 31 января включительно и сдать вступительный экзамен с 25 по 31 января';
-    } else if (internship.recruitmentType === 'constant' || compLower.includes('яндекс')) {
-      deadlineDateStr = '';
-      deadlineAction = 'Заполнить анкету на портале и решить вступительный контест (7 дней с момента старта)';
+    if (deadlineDateStr) {
+      if (compLower.includes('т-банк') || compLower.includes('тинькофф')) {
+        deadlineAction = 'Заполнить форму до 31 января включительно и сдать вступительный экзамен (25–31 января)';
+      } else {
+        deadlineAction = 'Подать заявку и выполнить отборочные задания до указанной даты';
+      }
+    } else if (compLower.includes('яндекс')) {
+      deadlineAction = 'Заполнить анкету на портале и пройти вступительные испытания (постоянный набор)';
+    } else if (compLower.includes('т-банк') || compLower.includes('тинькофф')) {
+      deadlineAction = 'Отправить отклик на открытую стажёрскую позицию (постоянный набор)';
     } else if (compLower.includes('т1')) {
-      deadlineDateStr = '';
-      deadlineAction = 'Подать резюме на карьерном портале Т1 (career.t1.ru/vacancies)';
+      deadlineAction = 'Подать заявку на стажировку или в лист ожидания на портале Т1';
     } else if (compLower.includes('контур')) {
-      deadlineDateStr = '';
-      deadlineAction = 'Заполнить анкету студента в программу Контур.Старт на сайте kontur.ru/education/internship';
-    } else if (internship.expiresAt) {
-      deadlineDateStr = internship.expiresAt;
-      deadlineAction = 'Подать заявку до окончания приёма';
+      deadlineAction = 'Заполнить анкету студента в программу «Контур.Старт»';
     }
 
     const newApp: JobApplication = {
@@ -443,6 +442,7 @@ export function App() {
       applyUrl: internship.applyUrl,
       sourceType: internship.sourceType,
       sourceChannel: internship.sourceChannel,
+      sourcePostUrl: internship.sourcePostUrl,
       appliedAt: today.toISOString(),
       deadlineDate: deadlineDateStr,
       deadlineAction: deadlineAction,
@@ -1109,19 +1109,19 @@ export function App() {
                       <h3 className="text-base font-bold text-neutral-900 dark:text-white font-sans leading-snug">
                         {selectedCompany !== 'all' &&
                         (selectedCompany.toLowerCase().includes('directum') || selectedCompany.toLowerCase().includes('директ'))
-                          ? 'Набор на стажировки в Directum на данный момент завершён'
+                          ? 'В данный момент по заданным фильтрам нет открытых стажировок Directum'
                           : selectedCompany !== 'all' &&
                             (selectedCompany.toLowerCase().includes('контур') || selectedCompany.toLowerCase().includes('kontur'))
-                          ? 'Приём заявок на стажировку в Контуре завершён (набор закрыт)'
+                          ? 'По заданным фильтрам стажировки Контура не найдены'
                           : 'Стажировки по заданным фильтрам не найдены'}
                       </h3>
                       <p className="text-xs text-neutral-500 dark:text-neutral-400 max-w-md mx-auto leading-relaxed">
                         {selectedCompany !== 'all' &&
                         (selectedCompany.toLowerCase().includes('directum') || selectedCompany.toLowerCase().includes('директ'))
-                          ? 'Компания Directum проводит набор волнами (студенческие лаборатории). Новые анонсы и старт отборов публикуются в официальном канале @Life_in_Directum.'
+                          ? 'Новые студенческие практики Directum в Ижевске анонсируются в официальном канале @Life_in_Directum.'
                           : selectedCompany !== 'all' &&
                             (selectedCompany.toLowerCase().includes('контур') || selectedCompany.toLowerCase().includes('kontur'))
-                          ? 'Официальная программа стажировок «Контур.Старт» открывает приём заявок сезонно. Следите за стартом нового сезона в канале @KonturTech или на странице стажировок.'
+                          ? 'Актуальные программы «Контур.Старт» и наборы для студентов публикуются на портале Контура и в @KonturTech.'
                           : 'Попробуйте сбросить фильтры или выберите другое направление!'}
                       </p>
                       <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
@@ -1195,12 +1195,8 @@ export function App() {
                         onOpenCompanyInfo={(comp) => setSelectedCompanyForInfo(comp)}
                         isApplied={Boolean(appliedItem)}
                         appliedDeadline={
-                          appliedItem
-                            ? appliedItem.deadlineDate
-                              ? `Дедлайн: ${formatPublishedDate(appliedItem.deadlineDate)}`
-                              : internship.applicationDeadline
-                              ? `Набор: ${internship.applicationDeadline}`
-                              : 'Постоянно'
+                          appliedItem?.deadlineDate
+                            ? `Дедлайн: ${formatPublishedDate(appliedItem.deadlineDate)}`
                             : undefined
                         }
                         onApplyVacancy={(item) => handleAddApplication(item)}
