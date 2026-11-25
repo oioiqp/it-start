@@ -665,7 +665,9 @@ describe('11. Target Companies & Telegram Channels Tracking', () => {
     expect(botModule.ALL_INTERNSHIPS.length).toBeGreaterThanOrEqual(14);
     expect(botModule.SEED_INTERNSHIPS).toBeDefined();
     expect(botModule.PORTAL_FALLBACK_VACANCIES).toBeDefined();
-    expect(botModule.PORTAL_FALLBACK_VACANCIES.length).toBeGreaterThanOrEqual(8);
+    expect(Array.isArray(botModule.PORTAL_FALLBACK_VACANCIES)).toBe(true);
+    // Unverified static fallback portals are intentionally cleared to avoid fake/generic links
+    expect(botModule.PORTAL_FALLBACK_VACANCIES.length).toBe(0);
 
     // Verify all ALL_INTERNSHIPS IDs match SEED_INTERNSHIPS to avoid database duplication
     const seedIds = new Set(SEED_INTERNSHIPS.map((i) => i.id));
@@ -742,9 +744,12 @@ describe('11. Target Companies & Telegram Channels Tracking', () => {
     expect(tgHandles).toContain('@Life_in_Directum');
     expect(tgHandles).toContain('@t1career');
     expect(tgHandles).toContain('@yandex_intern');
-    expect(tgHandles).toContain('@ozon_tech_career');
-    expect(tgHandles).toContain('@forjunior');
-    expect(tgHandles).toContain('@it_internships');
+    expect(tgHandles).toContain('@ozon_tech');
+    expect(tgHandles).toContain('@young_june');
+    expect(tgHandles).toContain('@juno_jobs');
+    expect(tgHandles).toContain('@yuniorapp');
+    expect(tgHandles).toContain('@stazhirovki_it');
+    expect(tgHandles).toContain('@careerspace');
     expect(tgHandles).toContain('@normrabota');
 
     expect(Array.isArray(botModule.CAREER_WEBSITES_DATA)).toBe(true);

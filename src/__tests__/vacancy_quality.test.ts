@@ -8,6 +8,8 @@ import {
   detectVacancyTrack,
   COMPANY_OFFICIAL_PORTALS,
   getDirectVacancyPortalUrl,
+  isDirectVacancyUrl,
+  getVacancySourceDetails,
 } from '../lib/vacancyUrl';
 import { SEED_INTERNSHIPS } from '../data/internships';
 import { MONITORED_WEBSITES_LIST } from '../data/channels';
@@ -63,6 +65,9 @@ describe('Vacancy Quality & Link Integrity Verification', () => {
       expect(isStrictVacancyPost('По следам нашей поездки на DotNext ребята сами, без ИИ, сделали ролик...', 'За два дня конференции мы выступили с докладами')).toBe(false);
       expect(isStrictVacancyPost('Делаем в Новосибирске батл для backend-разработчиков 🎉', 'Kontur Verse — архитектурная игра')).toBe(false);
       expect(isStrictVacancyPost('В ближайшие дни доля доступных файлов будет увеличиваться . При это...', 'Инженеры Яндекса делают всё возможное')).toBe(false);
+      expect(isStrictVacancyPost('Ищу 10 человек, которых научу собирать чат-ботов по шаблону', 'Стажер разработчик')).toBe(false);
+      expect(isStrictVacancyPost('Стажер тестировщика в мастерскую / сервисный центр', 'Ремонт техники')).toBe(false);
+      expect(isStrictVacancyPost('UX/UI-дизайнер Junior', 'Дизайн')).toBe(false);
     });
 
     it('rejects non-IT roles (sales, support, legal, accounting, logistics, HR, infosec)', () => {
@@ -241,6 +246,51 @@ describe('Vacancy Quality & Link Integrity Verification', () => {
 
       const directHh = 'https://hh.ru/vacancy/119567843';
       expect(resolveApplyUrl(directHh, 'СКБ Контур', undefined, 'qa')).toBe(directHh);
+
+      // Regional HH subdomain normalized to canonical hh.ru
+      expect(resolveApplyUrl('https://samara.hh.ru/vacancy/138980259?query=qa', 'Сбер', undefined, 'qa'))
+        .toBe('https://hh.ru/vacancy/138980259');
+
+      // Young&Junior direct Telegram job links stripped of UTM params cleanly
+      expect(resolveApplyUrl('https://youngjunior.ru/python/jobs/128798?utm_source=telegram&utm_medium=junejob', 'МТС', '@young_june', 'backend'))
+        .toBe('https://youngjunior.ru/python/jobs/128798');
+
+      // Careerspace, GeekJob & Yandex Jobs direct vacancy URLs
+      expect(resolveApplyUrl('https://careerspace.app/job/271910?utm_source=telegram', 'Company', '@careerspace'))
+        .toBe('https://careerspace.app/job/271910');
+      expect(resolveApplyUrl('https://yandex.ru/jobs/vacancies/yandex-research-ml-residency-1697', 'Яндекс', '@yandex_intern'))
+        .toBe('https://yandex.ru/jobs/vacancies/yandex-research-ml-residency-1697');
+
+      // Reject ad click trackers
+      expect(resolveApplyUrl('https://adsrv.hh.ru/click?b=123', 'Сбер', undefined, 'backend'))
+        .not.toContain('adsrv.hh.ru');
+    });
+
+    it('validates direct vacancy URLs vs generic stubs with isDirectVacancyUrl', () => {
+      expect(isDirectVacancyUrl('https://hh.ru/vacancy/138980259')).toBe(true);
+      expect(isDirectVacancyUrl('https://career.habr.com/vacancies/1000167264')).toBe(true);
+      expect(isDirectVacancyUrl('https://youngjunior.ru/python/jobs/128798')).toBe(true);
+      expect(isDirectVacancyUrl('https://yandex.ru/jobs/vacancies/ml-residency-1697')).toBe(true);
+      expect(isDirectVacancyUrl('https://t.me/t1career/264')).toBe(true);
+
+      expect(isDirectVacancyUrl('https://adsrv.hh.ru/click?b=123')).toBe(false);
+      expect(isDirectVacancyUrl('https://kontur.ru/career/students')).toBe(false);
+      expect(isDirectVacancyUrl('https://career.t1.ru/debut/open-school/')).toBe(false);
+      expect(isDirectVacancyUrl('https://career.t1.ru/vacancies/')).toBe(false);
+      expect(isDirectVacancyUrl('https://hh.ru/search/vacancy?text=python')).toBe(false);
+    });
+
+    it('labels sources accurately in getVacancySourceDetails and preserves aggregator TG handles', () => {
+      expect(resolveChannelHandle('@young_june', 'ПАО Сбербанк')).toBe('@young_june');
+      expect(resolveChannelHandle('@juno_jobs', 'Ozon Tech')).toBe('@juno_jobs');
+      expect(resolveChannelHandle('@yuniorapp', 'МТС')).toBe('@yuniorapp');
+
+      const yjSrc = getVacancySourceDetails('https://youngjunior.ru/data/jobs/128745', 'ПАО Сбербанк', '@young_june');
+      expect(yjSrc.badgeLabel).toBe('TG @young_june');
+      expect(yjSrc.applyUrl).toBe('https://youngjunior.ru/data/jobs/128745');
+
+      const habrSrc = getVacancySourceDetails('https://career.habr.com/vacancies/1000167264', 'МТС Банк', 'career.habr.com');
+      expect(habrSrc.badgeLabel).toBe('Хабр Карьера');
     });
   });
 

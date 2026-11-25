@@ -2,7 +2,7 @@ import type { Internship, JobApplication, TelegramSubscription, UserProgress } f
 
 const PROGRESS_STORAGE_KEY = 'it_start_user_progress';
 const SUBSCRIPTION_STORAGE_KEY = 'it_start_local_subscription';
-const INTERNSHIPS_STORAGE_KEY = 'it_start_cached_internships';
+const INTERNSHIPS_STORAGE_KEY = 'it_start_cached_internships_v2';
 const THEME_STORAGE_KEY = 'it_start_theme';
 const FAVORITES_STORAGE_KEY = 'it_start_favorites';
 const APPLICATIONS_STORAGE_KEY = 'it_start_applications';

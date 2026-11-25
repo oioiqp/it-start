@@ -1305,36 +1305,30 @@ export const MONITORED_TG_CHANNELS = [
   'tproger_jobs',
 ];
 
-// Rich metadata for all monitored Telegram channels
+// Rich metadata for all monitored Telegram channels (verified real active channels)
 export const ALL_TARGET_TG_CHANNELS = [
-  // Т-Банк
-  { handle: '@tbank_team', companyId: 'tbank', company: 'Т-Банк', name: 'Работа в Т-Банке & Финтех', category: 'Стажировки и карьера в Т-Банке', url: 'https://t.me/tbank_team' },
-  { handle: '@tbank_career', companyId: 'tbank', company: 'Т-Банк', name: 'Т-Банк Карьера', category: 'Официальный канал найма', url: 'https://t.me/tbank_career' },
-  { handle: '@tinkoff_jobs', companyId: 'tbank', company: 'Т-Банк', name: 'Tinkoff Jobs & Финтех', category: 'IT и инженерные вакансии', url: 'https://t.me/tinkoff_jobs' },
-  // Контур
+  // Крупнейшие живые Telegram-агрегаторы стажировок и Junior IT-вакансий
+  { handle: '@young_june', companyId: 'aggregator', company: 'Young & Junior', name: 'Young & Junior — вакансии IT', category: 'Живой агрегатор Junior и стажировок в РФ', url: 'https://t.me/young_june' },
+  { handle: '@juno_jobs', companyId: 'aggregator', company: 'junojobs', name: 'junojobs → стажировки в IT', category: 'Ежедневные подборки Junior и стажировок', url: 'https://t.me/juno_jobs' },
+  { handle: '@yuniorapp', companyId: 'aggregator', company: 'Юниор', name: 'Юниор: стажировки и вакансии', category: 'Стажировки и вакансии для начинающих', url: 'https://t.me/yuniorapp' },
+  { handle: '@stazhirovki_it', companyId: 'aggregator', company: 'Стажировки в IT', name: 'Стажировки в IT', category: 'Прямые стажировки со ссылками на hh.ru', url: 'https://t.me/stazhirovki_it' },
+  { handle: '@junior_it_jobs', companyId: 'aggregator', company: 'Junior IT Jobs', name: 'Junior Вакансии / Работа в IT', category: 'Junior-позиции с прямыми ссылками', url: 'https://t.me/junior_it_jobs' },
+  { handle: '@junior_vacancies', companyId: 'aggregator', company: 'Junior Vacancies', name: 'Вакансии и стажировки для начинающих', category: 'Разработка, QA и аналитика', url: 'https://t.me/junior_vacancies' },
+  { handle: '@careerspace', companyId: 'aggregator', company: 'Careerspace', name: 'Careerspace — IT и Digital', category: 'Вакансии от проверенных IT-компаний', url: 'https://t.me/careerspace' },
+  { handle: '@geekjobs', companyId: 'aggregator', company: 'GeekJob', name: 'Job in IT & Digital', category: 'IT-вакансии с прямыми откликами', url: 'https://t.me/geekjobs' },
+  { handle: '@itjobsfeed', companyId: 'aggregator', company: 'Jobs Feed', name: 'Jobs Feed IT & Digital', category: 'Прямые IT-вакансии в Telegram', url: 'https://t.me/itjobsfeed' },
+  { handle: '@itjobs_ru', companyId: 'aggregator', company: 'IT Jobs Russia', name: 'IT Jobs Russia', category: 'IT-вакансии по РФ', url: 'https://t.me/itjobs_ru' },
+  { handle: '@normrabota', companyId: 'aggregator', company: 'Норм работа', name: 'Норм работа: Стажировки и Junior', category: 'Оплачиваемые стажировки и стартапы', url: 'https://t.me/normrabota' },
+  { handle: '@habr_career', companyId: 'aggregator', company: 'Хабр Карьера', name: 'Хабр Карьера', category: 'Официальный канал Хабр Карьеры', url: 'https://t.me/habr_career' },
+  // Официальные карьерные Telegram-каналы IT-компаний РФ
+  { handle: '@avito_career', companyId: 'avito', company: 'Авито', name: 'Avito Career', category: 'Официальный карьерный канал Авито', url: 'https://t.me/avito_career' },
+  { handle: '@ozoncamp', companyId: 'ozon', company: 'Ozon Tech', name: 'Ozon Camp & Стажировки', category: 'Стажировки в Ozon Tech', url: 'https://t.me/ozoncamp' },
+  { handle: '@ozon_tech', companyId: 'ozon', company: 'Ozon Tech', name: 'Ozon Tech', category: 'Инженерный канал Ozon Tech', url: 'https://t.me/ozon_tech' },
+  { handle: '@tbank_team', companyId: 'tbank', company: 'Т-Банк', name: 'Работа в Т-Банке', category: 'Стажировки и карьера в Т-Банке', url: 'https://t.me/tbank_team' },
+  { handle: '@t1career', companyId: 't1', company: 'Холдинг Т1', name: 'Команда T1', category: 'Интенсивы и карьера в Т1', url: 'https://t.me/t1career' },
   { handle: '@KonturTech', companyId: 'kontur', company: 'СКБ Контур', name: 'Технологии в Контуре', category: 'Контур.Старт & Junior IT', url: 'https://t.me/KonturTech' },
-  { handle: '@kontur_career', companyId: 'kontur', company: 'СКБ Контур', name: 'Карьера в Контуре', category: 'Официальный карьерный канал', url: 'https://t.me/kontur_career' },
-  // Directum
   { handle: '@Life_in_Directum', companyId: 'directum', company: 'Directum', name: 'Жизнь в Directum (Ижевск)', category: 'Разработка Directum RX в Ижевске', url: 'https://t.me/Life_in_Directum' },
-  { handle: '@directum_career', companyId: 'directum', company: 'Directum', name: 'Directum Карьера (Ижевск)', category: 'Студенческие практики & Junior', url: 'https://t.me/directum_career' },
-  // Т1
-  { handle: '@t1career', companyId: 't1', company: 'Холдинг Т1', name: 'Холдинг Т1 / Открытая школа', category: 'Интенсивы и стажировки Т1', url: 'https://t.me/t1career' },
-  { handle: '@t1_holding', companyId: 't1', company: 'Холдинг Т1', name: 'T1 Holding Official', category: 'Официальный канал группы Т1', url: 'https://t.me/t1_holding' },
-  // Яндекс
   { handle: '@yandex_intern', companyId: 'yandex', company: 'Яндекс', name: 'Яндекс для стажёров', category: 'Young Con & Интерны', url: 'https://t.me/yandex_intern' },
-  // Ozon
-  { handle: '@ozon_tech_career', companyId: 'ozon', company: 'Ozon Tech', name: 'Ozon Tech Career', category: 'Ozon Camp & Junior вакансии', url: 'https://t.me/ozon_tech_career' },
-  // Сбер
-  { handle: '@sber_careers', companyId: 'sber', company: 'Сбер', name: 'Сбер Карьера & AI', category: 'SberSeasons & Data Science', url: 'https://t.me/sber_careers' },
-  // Авито
-  { handle: '@avito_tech', companyId: 'avito', company: 'Авито', name: 'Avito Tech Jobs', category: 'Mobile, Backend & Platform', url: 'https://t.me/avito_tech' },
-  // VK
-  { handle: '@vk_team', companyId: 'vk', company: 'VK', name: 'VK Team / Карьера в VK', category: 'Стажировки в экосистеме VK', url: 'https://t.me/vk_team' },
-  // Агрегаторы
-  { handle: '@forjunior', companyId: 'aggregator', company: 'For Junior', name: 'For Junior: Работа & Стажировки', category: 'Агрегатор IT-вакансий для новичков', url: 'https://t.me/forjunior' },
-  { handle: '@it_internships', companyId: 'aggregator', company: 'IT Internships', name: 'IT Стажировки и Практика', category: 'Крупный агрегатор стажировок в РФ', url: 'https://t.me/it_internships' },
-  { handle: '@normrabota', companyId: 'aggregator', company: 'Норм работа', name: 'Норм работа: IT Стажировки', category: 'Стажировки с прозрачной вилкой', url: 'https://t.me/normrabota' },
-  { handle: '@tproger_jobs', companyId: 'aggregator', company: 'IT Channels', name: 'Типичный программист — Вакансии', category: 'Junior & Trainee вакансии', url: 'https://t.me/tproger_jobs' },
 ];
 
 // Target career websites and employer open portals
@@ -1867,9 +1861,10 @@ export const server = http.createServer(async (req, res) => {
 
 if (process.env.NODE_ENV !== 'test') {
   const isDirectRun =
-    process.argv[1] &&
+    Boolean(process.argv[1]) &&
     !process.argv[1].includes('vk_bot') &&
-    (process.argv[1].endsWith('bot.mjs') || process.argv[1].endsWith('bot.js') || process.argv[1].includes('bot'));
+    !process.argv[1].includes('sync') &&
+    (path.basename(process.argv[1]) === 'bot.mjs' || path.basename(process.argv[1]) === 'bot.js');
 
   if (isDirectRun) {
     server.listen(PORT, '0.0.0.0', () => {
@@ -2262,13 +2257,19 @@ export function resolveApplyUrl(rawUrl, companyName = '', sourceChannel = '', di
   }
 
   const trimmed = rawUrl.trim();
+  const lowerUrl = trimmed.toLowerCase();
+
+  // Strictly reject ad click trackers
+  if (lowerUrl.includes('adsrv.hh.ru')) {
+    return fallbackDirect;
+  }
 
   // 1. Direct Telegram post link
   if (/^https?:\/\/t\.me\/[a-zA-Z0-9_]+\/\d+/i.test(trimmed)) {
-    return trimmed;
+    return trimmed.split('?')[0];
   }
   if (/^t\.me\/[a-zA-Z0-9_]+\/\d+/i.test(trimmed)) {
-    return `https://${trimmed}`;
+    return `https://${trimmed.split('?')[0]}`;
   }
 
   // 2. Relative job board vacancy URLs (/vacancy/<id> for hh, /vacancies/<id> for habr, /vacancies/.../<id> for avito)
@@ -2285,18 +2286,40 @@ export function resolveApplyUrl(rawUrl, companyName = '', sourceChannel = '', di
     return `https://career.avito.com${trimmed.split('?')[0]}`;
   }
 
-  // 3. Direct job boards with concrete vacancy ID
-  if (
-    /https?:\/\/hh\.ru\/vacancy\/\d+/i.test(trimmed) ||
-    /https?:\/\/career\.habr\.com\/vacancies\/\d+/i.test(trimmed)
-  ) {
-    return trimmed.split('?')[0];
+  // 3. Direct job boards with concrete vacancy ID (handles regional subdomains like samara.hh.ru!)
+  const hhSubMatch = trimmed.match(/^(?:https?:\/\/)?(?:[a-z0-9-]+\.)?hh\.ru\/vacancy\/(\d+)/i);
+  if (hhSubMatch) {
+    return `https://hh.ru/vacancy/${hhSubMatch[1]}`;
   }
-  if (
-    /^hh\.ru\/vacancy\/\d+/i.test(trimmed) ||
-    /^career\.habr\.com\/vacancies\/\d+/i.test(trimmed)
-  ) {
-    return `https://${trimmed.split('?')[0]}`;
+
+  const habrMatch = trimmed.match(/^(?:https?:\/\/)?career\.habr\.com\/vacancies\/(\d+)/i);
+  if (habrMatch) {
+    return `https://career.habr.com/vacancies/${habrMatch[1]}`;
+  }
+
+  const yjMatch = trimmed.match(/^(?:https?:\/\/)?(?:www\.)?youngjunior\.ru\/([^/?#]+\/jobs\/\d+)/i);
+  if (yjMatch) {
+    return `https://youngjunior.ru/${yjMatch[1]}`;
+  }
+
+  const csMatch = trimmed.match(/^(?:https?:\/\/)?(?:www\.)?careerspace\.app\/job\/(\d+)/i);
+  if (csMatch) {
+    return `https://careerspace.app/job/${csMatch[1]}`;
+  }
+
+  const gjMatch = trimmed.match(/^(?:https?:\/\/)?(?:www\.)?geekjob\.ru\/vacancy\/([a-zA-Z0-9]+)/i);
+  if (gjMatch) {
+    return `https://geekjob.ru/vacancy/${gjMatch[1]}`;
+  }
+
+  const gmMatch = trimmed.match(/^(?:https?:\/\/)?(?:www\.)?getmatch\.ru\/vacancies\/(\d+[^?#]*)/i);
+  if (gmMatch) {
+    return `https://getmatch.ru/vacancies/${gmMatch[1]}`;
+  }
+
+  const yaJobMatch = trimmed.match(/^(?:https?:\/\/)?yandex\.ru\/jobs\/vacancies\/([a-zA-Z0-9_-]+)/i);
+  if (yaJobMatch) {
+    return `https://yandex.ru/jobs/vacancies/${yaJobMatch[1]}`;
   }
 
   // 4. Shorteners and non-career aggregators
@@ -2466,7 +2489,62 @@ export const COMPANY_OFFICIAL_CHANNELS = {
   vk: '@vk_team',
 };
 
+export const AGGREGATOR_TG_HANDLES = new Set([
+  'young_june',
+  'juno_jobs',
+  'yuniorapp',
+  'stazhirovki_it',
+  'junior_it_jobs',
+  'junior_vacancies',
+  'careerspace',
+  'geekjobs',
+  'itjobs_ru',
+  'normrabota',
+  'myresume_ru',
+  'itjobsfeed',
+  'yotolabqa',
+]);
+
+export function isDirectVacancyUrl(url) {
+  if (!url || typeof url !== 'string') return false;
+  const trimmed = url.trim();
+  const lower = trimmed.toLowerCase();
+  if (!lower.startsWith('http://') && !lower.startsWith('https://')) return false;
+  if (
+    lower.includes('adsrv.hh.ru') ||
+    lower.includes('?search=') ||
+    lower.includes('/search/') ||
+    lower.includes('kontur.ru/career/students') ||
+    lower.includes('career.t1.ru/debut/open-school')
+  ) {
+    return false;
+  }
+
+  return (
+    /^(?:https?:\/\/)?(?:[a-z0-9-]+\.)?hh\.ru\/vacancy\/\d+/i.test(trimmed) ||
+    /^https?:\/\/career\.habr\.com\/vacancies\/\d+/i.test(trimmed) ||
+    /^https?:\/\/(?:www\.)?youngjunior\.ru\/[^/?#]+\/jobs\/\d+/i.test(trimmed) ||
+    /^https?:\/\/(?:www\.)?careerspace\.app\/job\/\d+/i.test(trimmed) ||
+    /^https?:\/\/(?:www\.)?geekjob\.ru\/vacancy\/[a-zA-Z0-9]+/i.test(trimmed) ||
+    /^https?:\/\/(?:www\.)?getmatch\.ru\/vacancies\/\d+/i.test(trimmed) ||
+    /^https?:\/\/yandex\.ru\/jobs\/vacancies\/[a-zA-Z0-9_-]+/i.test(trimmed) ||
+    /^https?:\/\/yandex\.ru\/yaintern\/[a-z_-]+\/?$/i.test(trimmed) ||
+    /^https?:\/\/education\.tbank\.ru\/start\/[a-z_-]+\/?$/i.test(trimmed) ||
+    /^https?:\/\/t\.me\/[a-zA-Z0-9_]+\/\d+/i.test(trimmed) ||
+    /^https?:\/\/career\.avito\.com\/vacancies\/[a-zA-Z0-9_-]+\/\d+/i.test(trimmed) ||
+    /^https?:\/\/internship\.vk\.company\/vacancy\/\d+/i.test(trimmed) ||
+    /^https?:\/\/career\.directum\.ru\/vacancy\/[a-zA-Z0-9_-]+/i.test(trimmed)
+  );
+}
+
 export function resolveChannelHandle(channel, companyName = '') {
+  if (channel) {
+    const cleanRaw = String(channel).trim().replace(/^@/, '');
+    if (AGGREGATOR_TG_HANDLES.has(cleanRaw.toLowerCase())) {
+      return `@${cleanRaw}`;
+    }
+  }
+
   const compKey = getCompanyKey(companyName);
   const officialChannel = COMPANY_OFFICIAL_CHANNELS[compKey];
 
@@ -2540,12 +2618,14 @@ export function isStrictVacancyPost(title = '', text = '') {
     'записаться на курс', 'скидка на обучение', 'гарантия трудоустройства',
     'первая линия поддержки', 'холодные звонки', 'исходящие звонки',
     'продажа кредитов', 'оформление полисов', 'первичной документации',
-    // Events, games, battles, conferences, video clips, and system outages
+    // Events, games, battles, conferences, video clips, spam, and system outages
     'батл для', 'архитектурная игра', 'архитектурный батл', 'батл разработчиков',
     'dotnext', 'highload', 'joker conf', 'holyjs', 'конференц', 'по следам нашей поездки',
     'сделали ролик', 'посмотрите ролик', 'видеоролик', 'прогуляйтесь по конфе',
     'доля доступных файлов', 'доступ к файлам', 'работают все базовые функции диска',
-    'сбой в работе', 'восстановление сервиса'
+    'сбой в работе', 'восстановление сервиса',
+    'научу собирать', 'чат-ботов по шаблону', 'как пазлы', 'заработал 9 000',
+    'трафик-менеджер', 'арбитражн', 'рецепты успеха', 'откладываете ли вы деньги'
   ];
 
   for (const stop of stopWords) {
@@ -2558,20 +2638,25 @@ export function isStrictVacancyPost(title = '', text = '') {
   const nonItTitles = [
     'продаж', 'продавец', 'кассир', 'ритейл', 'торговый',
     'call-центр', 'колл-центр', 'коллцентр', 'телемаркетинг',
-    'саппорт', 'support', 'поддержк', 'выездного сервиса',
+    'саппорт', 'support', 'поддержк', 'выездного сервиса', 'сервисный центр', 'в мастерскую',
+    'ремонт техники', 'помощник тестировщика', 'тестировщика техники', 'тестировщик оборудования',
+    'специалист по работе с клиентами', 'lead generation', 'лидогенерац',
     'юрист', 'юрисконсульт', 'правовед', 'адвокат', 'судебн', 'комплаенс',
     'бухгалтер', 'экономист', 'аудитор', 'налогов', 'первичк',
     'страхование', 'страхован', 'осаго', 'каско', 'андеррайтер',
     'водитель', 'курьер', 'экспедитор', 'склад', 'кладовщик', 'комплектовщик', 'грузчик',
     'мерчендайзер', 'повар', 'уборщик', 'клининг', 'охрана', 'охранник', 'фасовщик',
     'маркетинг', 'маркетолог', 'таргетолог', 'контекстолог', 'копирайтер', 'smm', 'смм', 'пиар', 'seo', 'видеокреатор',
+    'контент-мейкер', 'видеограф', 'журналист', 'медицинский отдел', 'экологи', 'маркировщик',
+    'супервайзер', 'оператор ввода',
+    'ux/ui', 'ui/ux', 'веб-дизайнер', 'графический дизайнер', 'продуктовый дизайнер', 'гейм-дизайнер',
     'партнерств', 'partnerships', 'аккаунт-менеджер',
     'рекрутер', 'recruitment', 'подбор персонала', 'ресёрчер', 'ресечер', 'hr-', 'hr ',
     'администратор', 'офис-менеджер', 'дежурной смены', 'дежурн',
     'модератор', 'модерация', 'фрод-мониторинг', 'фрод', 'антифрод',
     'недвижимост', 'риск-менеджер', 'риск менеджер',
-    'менеджер проектов', 'project manager', 'продакт-менеджер', 'product manager',
-    'кипиа', 'кип и а', 'инженер-конструктор', '1с', '1c ',
+    'менеджер проектов', 'project manager', 'продакт-менеджер', 'product manager', 'scrum-мастер', 'менеджер по запуску',
+    'кипиа', 'кип и а', 'инженер-конструктор', '1с', '1c ', 'sap abap',
     'информационной безопасности', 'информационная безопасность', 'инфобез'
   ];
 
@@ -2737,8 +2822,92 @@ export function isVacancyActive(item) {
 }
 
 /**
+ * Parse company and clean title from a digest vacancy anchor string such as:
+ * "Стажер разработчик (Python) в МТС" or "QA Manual Trainee (Andersen)"
+ */
+function extractTitleAndCompany(anchorText, fallbackCompany = 'IT-Компания') {
+  let cleanText = String(anchorText || '')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&quot;/g, '"')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  // Pattern 1: "... в Компания" or "... в ООО Компания" or "... в TG @channel"
+  const inMatch = cleanText.match(/^(.+?)\s+в\s+([^,]+?)$/i);
+  if (inMatch && inMatch[1].length >= 4 && inMatch[2].length >= 2) {
+    let comp = inMatch[2].trim();
+    if (/^tg\s*@/i.test(comp)) {
+      comp = comp.replace(/^tg\s*/i, '');
+    }
+    return { title: inMatch[1].trim(), company: comp };
+  }
+
+  // Pattern 2: "... / Компания"
+  const slashMatch = cleanText.match(/^(.+?)\s+\/\s+([^/]{2,40})$/);
+  if (slashMatch && slashMatch[1].length >= 6) {
+    return { title: slashMatch[1].trim(), company: slashMatch[2].trim() };
+  }
+
+  return { title: cleanText, company: fallbackCompany };
+}
+
+/**
+ * Normalizes a direct job link extracted from a post or website.
+ * Rejects tracking/invite/ad links (adsrv.hh.ru, t.me/+, sofi-assistant, etc.).
+ */
+function normalizeDirectJobHref(rawHref) {
+  if (!rawHref) return null;
+  const href = rawHref.replace(/&amp;/g, '&').trim();
+  const lower = href.toLowerCase();
+
+  if (
+    lower.includes('adsrv.hh.ru') ||
+    lower.includes('t.me/+') ||
+    lower.includes('t.me/ads') ||
+    lower.includes('sofi-assistant') ||
+    lower.includes('anketolog') ||
+    lower.includes('l.mts.ru') ||
+    lower.includes('vc.ru') ||
+    lower.includes('habr.com/ru/articles')
+  ) {
+    return null;
+  }
+
+  const hhM = href.match(/^(?:https?:\/\/)?(?:[a-z0-9-]+\.)?hh\.ru\/vacancy\/(\d+)/i);
+  if (hhM) return `https://hh.ru/vacancy/${hhM[1]}`;
+
+  const habrM = href.match(/^(?:https?:\/\/)?career\.habr\.com\/vacancies\/(\d+)/i);
+  if (habrM) return `https://career.habr.com/vacancies/${habrM[1]}`;
+
+  const yjM = href.match(/^(?:https?:\/\/)?(?:www\.)?youngjunior\.ru\/([^/?#]+\/jobs\/\d+)/i);
+  if (yjM) return `https://youngjunior.ru/${yjM[1]}`;
+
+  const csM = href.match(/^(?:https?:\/\/)?(?:www\.)?careerspace\.app\/job\/(\d+)/i);
+  if (csM) return `https://careerspace.app/job/${csM[1]}`;
+
+  const gjM = href.match(/^(?:https?:\/\/)?(?:www\.)?geekjob\.ru\/vacancy\/([a-zA-Z0-9]+)/i);
+  if (gjM) return `https://geekjob.ru/vacancy/${gjM[1]}`;
+
+  const gmM = href.match(/^(?:https?:\/\/)?(?:www\.)?getmatch\.ru\/vacancies\/(\d+[^?#]*)/i);
+  if (gmM) return `https://getmatch.ru/vacancies/${gmM[1]}`;
+
+  const yaM = href.match(/^(?:https?:\/\/)?yandex\.ru\/jobs\/vacancies\/([a-zA-Z0-9_-]+)/i);
+  if (yaM) return `https://yandex.ru/jobs/vacancies/${yaM[1]}`;
+
+  const avM = href.match(/^(?:https?:\/\/)?career\.avito\.com\/vacancies\/([a-zA-Z0-9_-]+\/\d+)/i);
+  if (avM && !avM[1].includes('20803') && !avM[1].includes('20812') && !avM[1].includes('20816')) {
+    return `https://career.avito.com/vacancies/${avM[1]}/`;
+  }
+
+  return null;
+}
+
+/**
  * Parse public Telegram channel web preview (https://t.me/s/<channel>)
- * Extracts posts, filters IT vacancies, maps to Internship format
+ * Supports BOTH digest posts (multiple vacancy anchors inside one post) AND single vacancy posts.
  */
 export async function parseChannelPosts(channelHandle, companyInfo) {
   try {
@@ -2747,11 +2916,11 @@ export async function parseChannelPosts(channelHandle, companyInfo) {
     const res = await fetch(url, {
       headers: {
         'User-Agent':
-          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
         Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
         'Accept-Language': 'ru,en;q=0.9',
       },
-      signal: AbortSignal.timeout(4000),
+      signal: AbortSignal.timeout(6000),
     });
 
     if (!res.ok) return [];
@@ -2761,6 +2930,7 @@ export async function parseChannelPosts(channelHandle, companyInfo) {
 
     const posts = [];
     const postBlocks = html.split(/<div class="tgme_widget_message\b/i);
+    const maxAgeMs = 45 * 24 * 60 * 60 * 1000;
 
     for (let i = 1; i < postBlocks.length; i++) {
       const block = postBlocks[i];
@@ -2772,8 +2942,14 @@ export async function parseChannelPosts(channelHandle, companyInfo) {
 
       const postSlug = postSlugMatch[1];
       const publishedAt = timeMatch ? timeMatch[1] : new Date().toISOString();
-      const rawHtmlText = textMatch[1];
 
+      // Skip posts older than 45 days to guarantee freshness
+      const pubTime = new Date(publishedAt).getTime();
+      if (!isNaN(pubTime) && Date.now() - pubTime > maxAgeMs) {
+        continue;
+      }
+
+      const rawHtmlText = textMatch[1];
       const text = rawHtmlText
         .replace(/<br\s*\/?>/gi, '\n')
         .replace(/<[^>]+>/g, ' ')
@@ -2785,76 +2961,142 @@ export async function parseChannelPosts(channelHandle, companyInfo) {
         .trim();
 
       const textLower = text.toLowerCase();
+      const postUrl = `https://t.me/${postSlug}`;
 
-      // Extract first meaningful line as title candidate
+      // Collect ALL concrete job board anchors inside this post
+      const anchorMatches = [...rawHtmlText.matchAll(/<a[^>]+href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi)];
+      const directJobAnchors = [];
+      for (const m of anchorMatches) {
+        const directUrl = normalizeDirectJobHref(m[1]);
+        if (!directUrl) continue;
+        const anchorText = m[2]
+          .replace(/<[^>]+>/g, '')
+          .replace(/&quot;/g, '"')
+          .replace(/&amp;/g, '&')
+          .replace(/\s+/g, ' ')
+          .trim();
+        directJobAnchors.push({ url: directUrl, text: anchorText });
+      }
+
+      // A) DIGEST POST: 2+ direct vacancy links in a single message
+      if (directJobAnchors.length >= 2) {
+        let digestFormat = 'Удаленно';
+        if (textLower.includes('в офис')) digestFormat = 'Офис';
+        else if (textLower.includes('гибрид')) digestFormat = 'Гибрид';
+
+        let digestLocation = 'Москва / Удаленно';
+        if (digestFormat === 'Удаленно') digestLocation = 'Удаленно';
+
+        for (const anchor of directJobAnchors) {
+          if (!anchor.text || anchor.text.toLowerCase().includes('откликнуться')) continue;
+
+          const { title: parsedTitle, company: parsedCompany } = extractTitleAndCompany(anchor.text, companyInfo.name || 'IT-Компания');
+          const cleanTitle = parsedTitle.length > 75 ? parsedTitle.slice(0, 72) + '...' : parsedTitle;
+
+          // Inject "стажер" context from digest heading if title itself doesn't explicitly say junior/intern
+          const contextText = `стажер junior ${digestFormat} ${anchor.text}`;
+          if (!isStrictVacancyPost(cleanTitle, contextText)) continue;
+
+          const { directionId, subTrackId } = detectVacancyTrack(cleanTitle, contextText);
+          const compObj = findCompanyByQuery(parsedCompany);
+          const companyName = compObj ? compObj.name : parsedCompany;
+          const companyId = compObj ? compObj.id : (companyInfo.id || 'aggregator');
+          const urlSlugId = anchor.url.replace(/^https?:\/\//, '').replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 48);
+
+          posts.push({
+            id: `tg-${urlSlugId}`,
+            companyId,
+            company: companyName,
+            title: cleanTitle,
+            salary: 'По договорённости',
+            format: digestFormat,
+            location: digestLocation,
+            channel: '@' + cleanHandle,
+            sourceChannel: '@' + cleanHandle,
+            directionId,
+            subTrackId,
+            url: anchor.url,
+            applyUrl: anchor.url,
+            postUrl,
+            publishedAt,
+            description: `Вакансия из Telegram-канала @${cleanHandle}: ${cleanTitle} (${companyName}).`,
+            tags: [companyName, subTrackId.toUpperCase(), 'Telegram', 'Стажировка'],
+            sourceType: 'telegram',
+            isActive: true,
+          });
+        }
+        continue;
+      }
+
+      // B) SINGLE VACANCY POST: 0 or 1 external job link
       const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
-      const firstLine = (lines[0] || 'IT-Стажировка').replace(/^[^\p{L}\p{N}]+/u, '');
-      const title = firstLine.length > 70 ? firstLine.slice(0, 67) + '...' : firstLine;
+      let firstLine = (lines[0] || '').replace(/^[^\p{L}\p{N}#]+/u, '').trim();
+      // For structured single cards starting with `#вакансия ...`, look for `Вакансия: ...`
+      const structuredTitleLine = lines.find((l) => /^вакансия\s*:/i.test(l));
+      if (structuredTitleLine) {
+        firstLine = structuredTitleLine.replace(/^вакансия\s*:/i, '').trim();
+      } else if (firstLine.startsWith('#') && lines[1]) {
+        firstLine = lines[1].replace(/^[^\p{L}\p{N}]+/u, '').trim();
+      }
 
-      // Strict validation: eliminate PR posts, podcasts, news, surveys
+      if (!firstLine) continue;
+      const { title: rawCleanTitle, company: extractedCompany } = extractTitleAndCompany(firstLine, companyInfo.name || 'IT-Компания');
+      const title = rawCleanTitle.length > 75 ? rawCleanTitle.slice(0, 72) + '...' : rawCleanTitle;
+
       if (!isStrictVacancyPost(title, text)) {
         continue;
       }
 
-      // Direct post URL on Telegram (e.g. https://t.me/t1career/264)
-      const postUrl = `https://t.me/${postSlug}`;
-      let applyUrl = postUrl;
+      let applyUrl = directJobAnchors[0]?.url || null;
+      if (!applyUrl) {
+        // Accept direct Telegram post ONLY if it contains real contact/application instructions (not empty news)
+        const hasApplyInstructions =
+          /@[a-zA-Z0-9_]{4,}/.test(text) ||
+          /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(text) ||
+          textLower.includes('резюме') ||
+          textLower.includes('отклик') ||
+          textLower.includes('пишите');
 
-      // Extract direct application link if present in post text
-      const linkMatch = rawHtmlText.match(/href="((?:https?:\/\/)(?!t\.me\/s\/)[^"]+)"/i);
-      if (linkMatch) {
-        const foundUrl = linkMatch[1];
-        const isDirectApplyLink =
-          foundUrl.includes('hh.ru/vacancy/') ||
-          foundUrl.includes('career.habr.com/vacancies/') ||
-          foundUrl.includes('forms.gle/') ||
-          foundUrl.includes('docs.google.com/forms') ||
-          foundUrl.includes('yandex.ru/jobs/') ||
-          foundUrl.includes('career.directum.ru/') ||
-          foundUrl.includes('kontur.ru/career/') ||
-          foundUrl.includes('education.tbank.ru/') ||
-          foundUrl.includes('fintech.tbank.ru/') ||
-          foundUrl.includes('tbank.ru/career/') ||
-          foundUrl.includes('career.t1.ru/') ||
-          foundUrl.includes('job.ozon.ru/') ||
-          foundUrl.includes('sbergraduate.ru/') ||
-          foundUrl.includes('career.avito.com/vacancies') ||
-          foundUrl.includes('internship.vk.company/');
-
-        if (isDirectApplyLink) {
-          applyUrl = foundUrl;
-        }
+        if (!hasApplyInstructions) continue;
+        applyUrl = postUrl;
       }
 
-      // Direction detection using unified helper
+      // Extract structured company line if present (`Компания: ...`)
+      let finalCompany = extractedCompany;
+      const structuredComp = lines.find((l) => /^[^a-zа-яё]*компания(?:\s*\/\s*проект)?\s*:/i.test(l));
+      if (structuredComp) {
+        finalCompany = structuredComp.replace(/^[^:]+:/, '').trim() || finalCompany;
+      }
+      const compObj = findCompanyByQuery(finalCompany);
+      const companyId = compObj ? compObj.id : (companyInfo.id || 'aggregator');
+      const companyName = compObj ? compObj.name : finalCompany;
+
       const { directionId, subTrackId } = detectVacancyTrack(title, text);
 
-      // Format detection
       let format = 'Удаленно';
       if (textLower.includes('гибрид') || textLower.includes('hybrid')) format = 'Гибрид';
       else if (textLower.includes('офис') || textLower.includes('office')) format = 'Офис';
 
-      // Location detection
       let location = 'Москва / Удаленно';
-      if (companyInfo.id === 'directum' || textLower.includes('ижевск')) location = 'Ижевск / Удаленно';
+      if (companyId === 'directum' || textLower.includes('ижевск')) location = 'Ижевск / Удаленно';
       else if (textLower.includes('екатеринбург')) location = 'Екатеринбург / Удаленно';
-      else if (textLower.includes('санкт-петербург') || textLower.includes('питер')) location = 'Санкт-Петербург / Удаленно';
+      else if (textLower.includes('санкт-петербург') || textLower.includes('питер') || textLower.includes('спб')) location = 'Санкт-Петербург / Удаленно';
+      else if (format === 'Удаленно') location = 'Удаленно';
 
-      // Salary detection
-      let salary = textLower.includes('оплачив') ? 'Оплачиваемая стажировка' : 'По договорённости';
-      const salaryMatch = text.match(/(?:от\s*(\d+[\s\d]*)|до\s*(\d+[\s\d]*)|(\d+[\s\d]*))\s*(?:₽|руб|тыс)/i);
+      let salary = 'По договорённости';
+      const salaryMatch = text.match(/(?:от\s*(\d+[\s\d]*)|до\s*(\d+[\s\d]*)|(\d+[\s\d]*))\s*(?:₽|руб|тыс|RUR)/i);
       if (salaryMatch) {
-        salary = salaryMatch[0].trim();
+        salary = formatSalary(salaryMatch[0].trim());
       }
-      salary = formatSalary(salary);
 
-      const resolvedUrl = resolveApplyUrl(applyUrl, companyInfo.name, postUrl, directionId, subTrackId);
+      const postId = directJobAnchors[0]?.url
+        ? directJobAnchors[0].url.replace(/^https?:\/\//, '').replace(/[^a-zA-Z0-9]+/g, '-').slice(0, 48)
+        : postSlug.replace('/', '-');
 
-      const postId = postSlug.replace('/', '-');
       posts.push({
         id: `tg-${postId}`,
-        companyId: companyInfo.id || 'other',
-        company: companyInfo.name || companyInfo.company || 'IT-Компания',
+        companyId,
+        company: companyName,
         title,
         salary,
         format,
@@ -2863,13 +3105,14 @@ export async function parseChannelPosts(channelHandle, companyInfo) {
         sourceChannel: '@' + cleanHandle,
         directionId,
         subTrackId,
-        url: resolvedUrl,
-        applyUrl: resolvedUrl,
+        url: applyUrl,
+        applyUrl,
         postUrl,
         publishedAt,
-        description: text.slice(0, 300) + (text.length > 300 ? '...' : ''),
-        tags: [companyInfo.shortName || companyInfo.company || 'IT', subTrackId.toUpperCase(), 'Telegram', 'Стажировка'],
+        description: text.slice(0, 320) + (text.length > 320 ? '...' : ''),
+        tags: [companyName, subTrackId.toUpperCase(), 'Telegram', 'Стажировка'],
         sourceType: 'telegram',
+        isActive: true,
       });
     }
 
@@ -2906,174 +3149,203 @@ export async function parseTelegramChannels() {
   );
 
   const parsed = [];
+  const seenUrls = new Set();
   for (const item of results) {
     if (item.status === 'fulfilled' && Array.isArray(item.value)) {
-      parsed.push(...item.value);
+      for (const v of item.value) {
+        const normUrl = (v.applyUrl || v.url || '').toLowerCase();
+        if (normUrl && !seenUrls.has(normUrl)) {
+          seenUrls.add(normUrl);
+          parsed.push(v);
+        }
+      }
     }
   }
 
   return parsed;
 }
 
-  // 4. High-fidelity career portals data for key employers (guaranteed presence)
-export const PORTAL_FALLBACK_VACANCIES = [
-    {
-      id: 'site-kontur-start-fe',
-      companyId: 'kontur',
-      company: 'СКБ Контур',
-      title: 'Стажёр Frontend React (Контур.Старт 2026)',
-      salary: 'от 65 000 до 85 000 ₽',
-      format: 'Удаленно',
-      location: 'Екатеринбург / Удаленно',
-      channel: '@KonturTech',
-      sourceChannel: '@KonturTech',
-      directionId: 'frontend',
-      subTrackId: 'react',
-      url: 'https://kontur.ru/education/internship',
-      description: 'Официальная программа Контур.Старт: разработка веб-интерфейсов на React/TypeScript с персональным наставником.',
-      tags: ['Контур.Старт', 'React', 'TypeScript', 'Контур'],
-      sourceType: 'portal',
-    },
-    {
-      id: 'site-tbank-start-sre',
-      companyId: 'tbank',
-      company: 'Т-Банк',
-      title: 'Стажёр Site Reliability Engineer / DevOps',
-      salary: 'от 80 000 до 105 000 ₽',
-      format: 'Удаленно',
-      location: 'Москва / Удаленно',
-      channel: '@tbank_team',
-      sourceChannel: '@tbank_team',
-      directionId: 'devops',
-      subTrackId: 'k8s_iac',
-      url: 'https://education.tbank.ru/start/',
-      description: 'Финтех-стажировка в инфраструктурных командах Т-Банка: Kubernetes, автоматизация CI/CD и высокая отказоустойчивость.',
-      tags: ['Т-Банк', 'Kubernetes', 'Linux', 'SRE'],
-      sourceType: 'portal',
-    },
-    {
-      id: 'site-t1-school-java',
-      companyId: 't1',
-      company: 'Холдинг Т1',
-      title: 'Стажёр Java-разработчик (Открытая школа Т1)',
-      salary: 'от 70 000 до 90 000 ₽',
-      format: 'Удаленно',
-      location: 'Москва / Удаленно',
-      channel: '@t1career',
-      sourceChannel: '@t1career',
-      directionId: 'backend',
-      subTrackId: 'java',
-      url: 'https://career.t1.ru/vacancies/',
-      description: 'Открытая школа Т1: оплачиваемый интенсив по разработке корпоративных сервисов на Java/Spring с менторством экспертов.',
-      tags: ['Холдинг Т1', 'Java 21', 'Spring Boot', 'Открытая школа'],
-      sourceType: 'portal',
-    },
-    {
-      id: 'site-yandex-backend',
-      companyId: 'yandex',
-      company: 'Яндекс',
-      title: 'Стажёр Python Backend Developer (Young Con)',
-      salary: 'от 80 000 до 105 000 ₽',
-      format: 'Гибрид',
-      location: 'Москва / Екатеринбург / Гибрид',
-      channel: '@yandex_intern',
-      sourceChannel: '@yandex_intern',
-      directionId: 'backend',
-      subTrackId: 'python',
-      url: 'https://yandex.ru/yaintern/backend/',
-      description: 'Стажировка Young Con в сервисах Яндекс Маркета и Поиска. Реальные задачи масштабирования высоконагруженных микросервисов.',
-      tags: ['Яндекс', 'Python 3.12', 'FastAPI', 'Young Con'],
-      sourceType: 'portal',
-    },
-    {
-      id: 'site-ozon-golang',
-      companyId: 'ozon',
-      company: 'Ozon Tech',
-      title: 'Junior Golang Developer (Ozon Camp)',
-      salary: 'от 85 000 до 110 000 ₽',
-      format: 'Удаленно',
-      location: 'Москва / Удаленно',
-      channel: '@ozon_tech_career',
-      sourceChannel: '@ozon_tech_career',
-      directionId: 'backend',
-      subTrackId: 'golang',
-      url: 'https://job.ozon.ru/it/camp/golang/',
-      description: 'Ozon Camp: микросервисная архитектура на Go, высоконагруженная маршрутизация заказов и работа с Kafka под менторством ведущих инженеров.',
-      tags: ['Ozon Tech', 'Golang', 'gRPC', 'Ozon Camp'],
-      sourceType: 'portal',
-    },
-    {
-      id: 'site-sber-ml',
-      companyId: 'sber',
-      company: 'Сбер',
-      title: 'Стажёр Data Scientist / ML Engineer (SberSeasons)',
-      salary: 'от 80 000 до 105 000 ₽',
-      format: 'Офис',
-      location: 'Москва (Кутузовский)',
-      channel: '@sber_careers',
-      sourceChannel: '@sber_careers',
-      directionId: 'data_science',
-      subTrackId: 'ml',
-      url: 'https://sbergraduate.ru/sberseasons-moscow/ml/',
-      description: 'Программа SberSeasons в блоке AI: обучение моделей ранжирования, NLP и классических табличных бустингов для сервисов банка.',
-      tags: ['Сбер AI', 'Python', 'PyTorch', 'SberSeasons'],
-      sourceType: 'portal',
-    },
-    {
-      id: 'site-avito-mobile',
-      companyId: 'avito',
-      company: 'Авито',
-      title: 'Junior Android / Mobile Engineer (Avito Tech)',
-      salary: 'от 75 000 до 95 000 ₽',
-      format: 'Гибрид',
-      location: 'Москва / Санкт-Петербург',
-      channel: '@avito_tech',
-      sourceChannel: '@avito_tech',
-      directionId: 'mobile',
-      subTrackId: 'android',
-      url: 'https://start.avito.ru/tech',
-      description: 'Стажировка в командах мобильной разработки Авито: создание фичей супераппа на Kotlin, Jetpack Compose и Coroutines.',
-      tags: ['Авито', 'Android', 'Kotlin', 'Compose'],
-      sourceType: 'portal',
-    },
-    {
-      id: 'site-vk-team-web',
-      companyId: 'vk',
-      company: 'VK',
-      title: 'Стажёр Web-разработчик React / TypeScript (VK Team)',
-      salary: 'от 65 000 до 85 000 ₽',
-      format: 'Удаленно',
-      location: 'Санкт-Петербург / Москва',
-      channel: '@vk_team',
-      sourceChannel: '@vk_team',
-      directionId: 'frontend',
-      subTrackId: 'react',
-      url: 'https://internship.vk.company/internship/',
-      description: 'Официальная программа стажировок VK Team: создание веб-интерфейсов ВКонтакте, VK Видео и VKUI.',
-      tags: ['VK Team', 'React', 'TypeScript', 'VKUI'],
-      sourceType: 'portal',
-    },
-    {
-      id: 'site-kontur-start-qa',
-      companyId: 'kontur',
-      company: 'СКБ Контур',
-      title: 'Стажёр QA-инженер (Контур.Старт 2026)',
-      salary: 'от 60 000 до 80 000 ₽',
-      format: 'Удаленно',
-      location: 'Екатеринбург / Удаленно',
-      channel: '@KonturTech',
-      sourceChannel: '@KonturTech',
-      directionId: 'qa',
-      subTrackId: 'auto_qa',
-      url: 'https://kontur.ru/education/internship',
-      description: 'Программа Контур.Старт: ручное и автоматизированное тестирование сервисов экосистемы Контура с персональным наставником.',
-      tags: ['Контур.Старт', 'QA', 'Python', 'Контур'],
-      sourceType: 'portal',
-    },
-  ];
+export const PORTAL_FALLBACK_VACANCIES = [];
 
 /**
- * Live parsing of target employer career websites, hh.ru open search, & Habr Career
+ * Verifies a single vacancy URL live over HTTP and enriches metadata from schema.org JobPosting / DOM.
+ * Returns { ok: boolean, reason?: string, enriched?: Partial<Internship> }
+ */
+export async function verifyVacancyUrlLive(item) {
+  const url = (item.applyUrl || item.url || '').trim();
+  if (!isDirectVacancyUrl(url)) {
+    return { ok: false, reason: 'non_direct_url' };
+  }
+
+  // Telegram single posts (t.me/channel/123) verify against t.me/s/channel/123
+  let fetchUrl = url;
+  const tgMatch = url.match(/^https?:\/\/t\.me\/([a-zA-Z0-9_]+)\/(\d+)/i);
+  if (tgMatch) {
+    fetchUrl = `https://t.me/${tgMatch[1]}/${tgMatch[2]}?embed=1`;
+  }
+
+  try {
+    let res;
+    try {
+      res = await fetch(fetchUrl, {
+        redirect: 'follow',
+        headers: {
+          'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
+          'Accept-Language': 'ru-RU,ru;q=0.9',
+        },
+        signal: AbortSignal.timeout(8500),
+      });
+    } catch (firstErr) {
+      // Retry once after a brief pause in case a server temporarily throttled burst connections
+      if (String(firstErr?.message || '').toLowerCase().includes('abort') || String(firstErr?.message || '').toLowerCase().includes('timeout')) {
+        await new Promise((r) => setTimeout(r, 700));
+        res = await fetch(fetchUrl, {
+          redirect: 'follow',
+          headers: {
+            'User-Agent':
+              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
+            'Accept-Language': 'ru-RU,ru;q=0.9',
+          },
+          signal: AbortSignal.timeout(9500),
+        });
+      } else {
+        throw firstErr;
+      }
+    }
+
+    if (res.status === 404 || res.status === 410 || res.status >= 500) {
+      return { ok: false, reason: `http_${res.status}` };
+    }
+    if (res.status === 403 && !url.includes('tbank.ru')) {
+      return { ok: false, reason: 'http_403' };
+    }
+
+    const html = await res.text();
+    const low = html.toLowerCase();
+
+    // Common dead/closed page indicators
+    if (
+      low.includes('запрашиваемая страница не существует') ||
+      low.includes('tgme_widget_message_error') ||
+      (low.includes('страница не найдена') && !low.includes('ваканси'))
+    ) {
+      return { ok: false, reason: 'not_found_content' };
+    }
+
+    // Specific HH.ru archive check
+    if (url.includes('hh.ru/vacancy/')) {
+      if (html.includes('vacancy-archive-description') || !html.includes('vacancy-response-link')) {
+        return { ok: false, reason: 'hh_archived' };
+      }
+    }
+
+    // Specific Habr Career archive check
+    if (url.includes('career.habr.com/vacancies/')) {
+      if (low.includes('вакансия в архиве') || low.includes('вакансия закрыта')) {
+        return { ok: false, reason: 'habr_archived' };
+      }
+    }
+
+    // Specific portal closed checks
+    if (
+      url.includes('start.avito.ru') ||
+      url.includes('sbergraduate.ru') ||
+      url.includes('kontur.ru') ||
+      url.includes('internship.vk.company')
+    ) {
+      if (
+        low.includes('набор закрыт') ||
+        low.includes('приём заявок до 30 августа') ||
+        low.includes('скоро тут что-то будет')
+      ) {
+        return { ok: false, reason: 'portal_closed' };
+      }
+    }
+
+    // Try extracting rich JobPosting JSON-LD metadata
+    const enriched = { isVerified: true, verifiedAt: new Date().toISOString() };
+    const ldMatch = html.match(/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/i);
+    if (ldMatch) {
+      try {
+        const ld = JSON.parse(ldMatch[1]);
+        if (ld.validThrough) {
+          const validTime = new Date(ld.validThrough).getTime();
+          if (!isNaN(validTime) && validTime < Date.now()) {
+            return { ok: false, reason: 'expired_validThrough' };
+          }
+          enriched.expiresAt = ld.validThrough;
+        }
+        if (ld.title && typeof ld.title === 'string' && !ld.title.toLowerCase().includes('young')) {
+          enriched.title = ld.title.trim();
+        }
+        if (ld.hiringOrganization?.name && !/^tg\s*@/i.test(ld.hiringOrganization.name)) {
+          const rawOrg = ld.hiringOrganization.name.replace(/\. IT$/, '').trim();
+          const compObj = findCompanyByQuery(rawOrg);
+          enriched.company = compObj ? compObj.name : rawOrg;
+          enriched.companyId = compObj ? compObj.id : item.companyId;
+        }
+        if (ld.jobLocationType === 'TELECOMMUTE') {
+          enriched.format = 'Удаленно';
+        }
+        if (ld.jobLocation?.address?.addressLocality) {
+          const city = ld.jobLocation.address.addressLocality;
+          enriched.location = enriched.format === 'Удаленно' ? `${city} / Удаленно` : city;
+        }
+        if (ld.baseSalary?.value) {
+          const v = ld.baseSalary.value;
+          const salObj = {
+            from: v.minValue || (v.value && !v.maxValue ? v.value : undefined),
+            to: v.maxValue,
+            amount: v.value,
+            currency: ld.baseSalary.currency || 'RUB',
+          };
+          const fmt = formatSalary(salObj);
+          if (fmt !== 'По договорённости') enriched.salary = fmt;
+        }
+        if (ld.description && typeof ld.description === 'string') {
+          const cleanDesc = ld.description
+            .replace(/<[^>]+>/g, ' ')
+            .replace(/&nbsp;/g, ' ')
+            .replace(/&quot;/g, '"')
+            .replace(/\s+/g, ' ')
+            .trim();
+          if (cleanDesc.length > 40) {
+            enriched.description = cleanDesc.slice(0, 320) + (cleanDesc.length > 320 ? '...' : '');
+          }
+        }
+        if (ld.datePosted) {
+          enriched.publishedAt = ld.datePosted;
+        }
+      } catch {}
+    }
+
+    // Fallback HH.ru salary from DOM
+    if (url.includes('hh.ru/vacancy/') && !enriched.salary) {
+      const hhSal = html.match(/data-qa="vacancy-salary"[^>]*>([\s\S]*?)<\/span>/);
+      if (hhSal) {
+        const cleanSal = hhSal[1].replace(/<[^>]+>/g, '').replace(/&nbsp;|\u00a0/g, ' ').trim();
+        const fmt = formatSalary(cleanSal);
+        if (fmt !== 'По договорённости') enriched.salary = fmt;
+      }
+    }
+
+    return { ok: true, enriched };
+  } catch (err) {
+    // Allow Russian Trusted CA sites (tbank.ru, sbergraduate.ru) if failure is strictly Node TLS CA bundle limitation
+    const causeCode = err?.cause?.code || err?.message || '';
+    if (
+      (String(causeCode).includes('SELF_SIGNED_CERT_IN_CHAIN') || String(causeCode).includes('UNABLE_TO_VERIFY')) &&
+      (url.includes('.ru/') || url.includes('.tbank.ru/'))
+    ) {
+      return { ok: true, enriched: { isVerified: true, verifiedAt: new Date().toISOString() } };
+    }
+    return { ok: false, reason: err.message };
+  }
+}
+
+/**
+ * Live parsing of target employer career websites, hh.ru, Habr Career API, & Yandex Jobs API
  */
 export async function parseCareerWebsites() {
   console.log(`[Parser] 🌐 Запуск парсинга карьерных сайтов и официальных источников (${CAREER_WEBSITES_DATA.length} источников)...`);
@@ -3084,10 +3356,10 @@ export async function parseCareerWebsites() {
   try {
     const res = await fetch('https://career.directum.ru/vacancy', {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
         Accept: 'text/html,application/xhtml+xml',
       },
-      signal: AbortSignal.timeout(4000),
+      signal: AbortSignal.timeout(5000),
     });
 
     if (res.ok) {
@@ -3108,26 +3380,28 @@ export async function parseCareerWebsites() {
 
           if (!isStrictVacancyPost(rawTitle, '')) continue;
           const { directionId, subTrackId } = detectVacancyTrack(rawTitle);
-
           const rawUrl = href.startsWith('http') ? href : `https://career.directum.ru${href}`;
-          const directDirectumUrl = resolveApplyUrl(rawUrl, 'Directum', undefined, directionId, subTrackId);
+
+          if (!isDirectVacancyUrl(rawUrl)) continue;
           parsed.push({
             id: `site-directum-${href.replace(/[^a-zA-Z0-9_-]/g, '')}`,
             companyId: 'directum',
             company: 'Directum',
             title: rawTitle,
-            salary: formatSalary('от 55 000 до 85 000 ₽'),
+            salary: 'По договорённости',
             format: city.toLowerCase().includes('удал') ? 'Удаленно' : 'Гибрид',
             location: city.includes('Ижевск') ? 'Ижевск (Офис / Гибрид)' : city,
             channel: 'career.directum.ru',
             sourceChannel: 'career.directum.ru',
             directionId,
             subTrackId,
-            url: directDirectumUrl,
-            applyUrl: directDirectumUrl,
-            description: `Официальная вакансия Directum в Ижевске: развитие платформы Directum RX, современные технологии и наставничество.`,
-            tags: ['Directum RX', 'Ижевск', 'Сайт компании', subTrackId.toUpperCase()],
+            url: rawUrl,
+            applyUrl: rawUrl,
+            publishedAt: new Date().toISOString(),
+            description: `Официальная вакансия Directum в Ижевске: развитие платформы Directum RX.`,
+            tags: ['Directum RX', 'Ижевск', subTrackId.toUpperCase()],
             sourceType: 'portal',
+            isActive: true,
           });
         }
       }
@@ -3142,9 +3416,9 @@ export async function parseCareerWebsites() {
     const res = await fetch('https://career.avito.com/vacancies/?search=стажер', {
       headers: {
         'User-Agent':
-          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
       },
-      signal: AbortSignal.timeout(4000),
+      signal: AbortSignal.timeout(5000),
     });
 
     if (res.ok) {
@@ -3159,30 +3433,33 @@ export async function parseCareerWebsites() {
         seen.add(href);
 
         if (!isStrictVacancyPost(rawTitle, '')) continue;
+        const rawUrl = href.startsWith('http') ? href : `https://career.avito.com${href}`;
+        if (!isDirectVacancyUrl(rawUrl)) continue;
         count++;
 
-        const rawUrl = href.startsWith('http') ? href : `https://career.avito.com${href}`;
         const { directionId, subTrackId } = detectVacancyTrack(rawTitle);
-        const directAvitoUrl = resolveApplyUrl(rawUrl, 'Авито', undefined, directionId, subTrackId);
-        const numId = href.replace(/[^0-9]/g, '') || Math.random().toString(36).slice(2, 7);
+        const numId = href.replace(/[^0-9]/g, '');
+        if (!numId) continue;
 
         parsed.push({
           id: `site-avito-${numId}`,
           companyId: 'avito',
           company: 'Авито',
           title: rawTitle,
-          salary: formatSalary('от 75 000 до 105 000 ₽'),
+          salary: 'По договорённости',
           format: 'Гибрид',
           location: 'Москва / Санкт-Петербург / Удаленно',
           channel: 'career.avito.com',
           sourceChannel: 'career.avito.com',
           directionId,
           subTrackId,
-          url: directAvitoUrl,
-          applyUrl: directAvitoUrl,
-          description: `Прямая вакансия Avito Tech: участие в развитии сервисов объявлений Авито, современный стек и сильная инженерная культура.`,
+          url: rawUrl,
+          applyUrl: rawUrl,
+          publishedAt: new Date().toISOString(),
+          description: `Прямая вакансия Avito Tech: участие в развитии сервисов Авито.`,
           tags: ['Авито', 'Avito Tech', subTrackId.toUpperCase()],
           sourceType: 'portal',
+          isActive: true,
         });
         if (count >= 5) break;
       }
@@ -3194,28 +3471,139 @@ export async function parseCareerWebsites() {
     console.warn('[Parser] Ошибка парсинга career.avito.com:', err.message);
   }
 
-  // 2. Open Search / REST API for key employers on hh.ru without authorization
-  const hhEmployers = [
-    { id: '8620', companyId: 'directum', company: 'Directum', defaultCity: 'Ижевск' },
-    { id: '41862', companyId: 'kontur', company: 'СКБ Контур', defaultCity: 'Екатеринбург' },
-    { id: '78638', companyId: 'tbank', company: 'Т-Банк', defaultCity: 'Москва' },
-    { id: '870233', companyId: 't1', company: 'Холдинг Т1', defaultCity: 'Москва' },
-    { id: '1740', companyId: 'yandex', company: 'Яндекс', defaultCity: 'Москва' },
-    { id: '2180', companyId: 'ozon', company: 'Ozon Tech', defaultCity: 'Москва' },
-    { id: '3529', companyId: 'sber', company: 'Сбер', defaultCity: 'Москва' },
+  // 2. Yandex Jobs Official JSON API (pro_levels=intern)
+  try {
+    const res = await fetch('https://yandex.ru/jobs/api/publications?pro_levels=intern&page_size=40', {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/125.0.0.0',
+        Accept: 'application/json',
+      },
+      signal: AbortSignal.timeout(5000),
+    });
+    if (res.ok) {
+      const yData = await res.json();
+      let yaCount = 0;
+      for (const it of yData.results || []) {
+        const title = (it.title || '').trim();
+        const summary = (it.short_summary || '').trim();
+        if (!title || !isStrictVacancyPost(title, `стажер ${summary}`)) continue;
+        const slug = it.publication_slug_url;
+        if (!slug) continue;
+        const directUrl = `https://yandex.ru/jobs/vacancies/${slug}`;
+        const { directionId, subTrackId } = detectVacancyTrack(title, summary);
+        const cities = (it.vacancy?.cities || []).map((c) => c.name).filter(Boolean);
+        const isRemote = (it.vacancy?.work_modes || []).some((m) => m.slug === 'remote');
+        yaCount++;
+
+        parsed.push({
+          id: `yandex-api-${it.id}`,
+          companyId: 'yandex',
+          company: 'Яндекс',
+          title,
+          salary: 'По договорённости',
+          format: isRemote ? 'Удаленно' : cities.length > 0 ? 'Гибрид' : 'Удаленно',
+          location: cities.slice(0, 2).join(' / ') || 'Москва / Удаленно',
+          channel: '@yandex_intern',
+          sourceChannel: '@yandex_intern',
+          directionId,
+          subTrackId,
+          url: directUrl,
+          applyUrl: directUrl,
+          publishedAt: it.modified || new Date().toISOString(),
+          description: summary || `Стажировка в Яндексе (${title}).`,
+          tags: ['Яндекс', subTrackId.toUpperCase(), 'Стажировка'],
+          sourceType: 'portal',
+          isActive: true,
+        });
+      }
+      if (yaCount > 0) {
+        console.log(`[Parser] yandex.ru/jobs API — спарсено ${yaCount} IT-стажировок`);
+      }
+    }
+  } catch (err) {
+    console.warn('[Parser] Ошибка парсинга Yandex Jobs API:', err.message);
+  }
+
+  // 3. Habr Career Official JSON API (qid=1 Intern & qid=3 Junior across ALL companies)
+  try {
+    for (const qid of [1, 3]) {
+      const res = await fetch(`https://career.habr.com/api/frontend/vacancies?qid=${qid}&type=all&per_page=35`, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/125.0.0.0',
+          Accept: 'application/json',
+        },
+        signal: AbortSignal.timeout(5000),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        let habrCount = 0;
+        for (const v of data.list || []) {
+          const title = (v.title || '').trim();
+          const skillNames = (v.skills || []).map((s) => s.title).filter(Boolean);
+          const qidContext = qid === 1 ? 'стажер intern' : 'junior';
+          if (!isStrictVacancyPost(title, `${qidContext} ${skillNames.join(' ')}`)) continue;
+
+          const directUrl = `https://career.habr.com/vacancies/${v.id}`;
+          const { directionId, subTrackId } = detectVacancyTrack(title, skillNames.join(' '));
+          const rawCompany = (v.company?.title || 'IT-Компания').trim();
+          const compObj = findCompanyByQuery(rawCompany);
+          const locs = (v.locations || []).map((l) => l.title).filter(Boolean);
+          const format = v.remoteWork ? 'Удаленно' : locs.length > 0 ? 'Гибрид' : 'Удаленно';
+          const location = locs.length > 0 ? `${locs.slice(0, 2).join(' / ')}${v.remoteWork ? ' / Удаленно' : ''}` : 'Удаленно';
+          const salary = formatSalary(v.salary);
+          habrCount++;
+
+          parsed.push({
+            id: `habr-${v.id}`,
+            companyId: compObj ? compObj.id : 'other',
+            company: compObj ? compObj.name : rawCompany,
+            title,
+            salary,
+            format,
+            location,
+            channel: 'career.habr.com',
+            sourceChannel: 'career.habr.com',
+            directionId,
+            subTrackId,
+            url: directUrl,
+            applyUrl: directUrl,
+            publishedAt: v.publishedDate?.date || new Date().toISOString(),
+            description: `${qid === 1 ? 'Стажировка' : 'Junior-вакансия'} в ${compObj ? compObj.name : rawCompany} на Хабр Карьере. Стек: ${skillNames.slice(0, 5).join(', ') || subTrackId.toUpperCase()}.`,
+            tags: skillNames.length > 0 ? skillNames.slice(0, 5) : [rawCompany, 'Хабр Карьера', subTrackId.toUpperCase()],
+            sourceType: 'portal',
+            isActive: true,
+          });
+        }
+        if (habrCount > 0) {
+          console.log(`[Parser] Хабр Карьера API (qid=${qid}) — спарсено ${habrCount} вакансий`);
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('[Parser] Ошибка парсинга Хабр Карьера API:', err.message);
+  }
+
+  // 4. HeadHunter live search for target employers AND general IT intern queries (fixes subdomains & drops ads)
+  const hhSearches = [
+    { id: '1740', companyId: 'yandex', company: 'Яндекс', defaultCity: 'Москва', url: 'https://hh.ru/search/vacancy?employer_id=1740&text=стажер+OR+junior&order_by=publication_time' },
+    { id: '2180', companyId: 'ozon', company: 'Ozon Tech', defaultCity: 'Москва', url: 'https://hh.ru/search/vacancy?employer_id=2180&text=стажер+OR+junior&order_by=publication_time' },
+    { id: '3529', companyId: 'sber', company: 'Сбер', defaultCity: 'Москва', url: 'https://hh.ru/search/vacancy?employer_id=3529&text=стажер+OR+junior&order_by=publication_time' },
+    { id: '78638', companyId: 'tbank', company: 'Т-Банк', defaultCity: 'Москва', url: 'https://hh.ru/search/vacancy?employer_id=78638&text=стажер+OR+junior&order_by=publication_time' },
+    { id: 'general-dev', companyId: 'other', company: '', defaultCity: 'Москва', url: 'https://hh.ru/search/vacancy?text=стажер+разработчик+OR+junior+developer+OR+стажер+qa&experience=noExperience&order_by=publication_time' },
   ];
 
   await Promise.allSettled(
-    hhEmployers.map(async (emp) => {
+    hhSearches.map(async (emp) => {
       try {
-        const url = `https://hh.ru/search/vacancy?employer_id=${emp.id}&text=стажер+OR+junior`;
-        const res = await fetch(url, {
+        const res = await fetch(emp.url, {
           headers: {
             'User-Agent':
-              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
             Accept: 'text/html,application/xhtml+xml',
+            'Accept-Language': 'ru-RU,ru;q=0.9',
           },
-          signal: AbortSignal.timeout(4000),
+          signal: AbortSignal.timeout(5000),
         });
 
         if (res.ok) {
@@ -3223,121 +3611,53 @@ export async function parseCareerWebsites() {
           const vacancyRegex = /<a[^>]+data-qa="serp-item__title"[^>]+href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/g;
           let m;
           let count = 0;
-          while ((m = vacancyRegex.exec(html)) !== null && count < 5) {
+          const seenIds = new Set();
+          while ((m = vacancyRegex.exec(html)) !== null && count < 8) {
+            const rawHref = m[1].split('?')[0];
+            if (rawHref.includes('adsrv.hh.ru')) continue;
+            const hhIdMatch = rawHref.match(/\/vacancy\/(\d+)/);
+            if (!hhIdMatch) continue;
+            const numId = hhIdMatch[1];
+            if (seenIds.has(numId)) continue;
+            seenIds.add(numId);
+
             const rawTitle = m[2].replace(/<[^>]+>/g, '').trim();
             if (!isStrictVacancyPost(rawTitle, '')) continue;
 
+            const canonicalUrl = `https://hh.ru/vacancy/${numId}`;
             const { directionId, subTrackId } = detectVacancyTrack(rawTitle);
-            const cleanUrl = resolveApplyUrl(m[1].split('?')[0], emp.company, undefined, directionId, subTrackId);
-            const numId = cleanUrl.match(/\/(\d+)/)?.[1] || Math.random().toString(36).slice(2, 7);
             count++;
 
             parsed.push({
-              id: `hh-${emp.id}-${numId}`,
+              id: `hh-${numId}`,
               companyId: emp.companyId,
-              company: emp.company,
+              company: emp.company || 'IT-Компания (hh.ru)',
               title: rawTitle,
               salary: 'По договорённости',
               format: 'Удаленно',
               location: emp.defaultCity ? `${emp.defaultCity} / Удаленно` : 'Москва / Удаленно',
-              channel: `hh.ru/${emp.id}`,
+              channel: 'hh.ru',
               sourceChannel: 'hh.ru',
               directionId,
               subTrackId,
-              url: cleanUrl,
-              applyUrl: cleanUrl,
-              description: `Актуальная позиция для начинающих специалистов от ${emp.company} (официальный профиль работодателя на hh.ru).`,
-              tags: [emp.company, subTrackId.toUpperCase(), 'hh.ru', 'Junior / Стажёр'],
+              url: canonicalUrl,
+              applyUrl: canonicalUrl,
+              publishedAt: new Date().toISOString(),
+              description: `Открытая позиция на HeadHunter: ${rawTitle}.`,
+              tags: [emp.company || 'hh.ru', subTrackId.toUpperCase(), 'hh.ru'],
               sourceType: 'portal',
+              isActive: true,
             });
           }
           if (count > 0) {
-            console.log(`[Parser] hh.ru работодатель ${emp.company} (id ${emp.id}) — спарсено ${count} вакансий`);
+            console.log(`[Parser] hh.ru (${emp.company || 'IT поиск'}) — спарсено ${count} прямых вакансий`);
           }
         }
       } catch (err) {
-        console.warn(`[Parser] Ошибка парсинга hh.ru employer ${emp.id}:`, err.message);
+        console.warn(`[Parser] Ошибка парсинга hh.ru (${emp.id}):`, err.message);
       }
     })
   );
-
-  // 3. Habr Career open profiles for target companies
-  const habrCompanies = [
-    { alias: 'directum', companyId: 'directum', company: 'Directum' },
-    { alias: 'kontur', companyId: 'kontur', company: 'СКБ Контур' },
-    { alias: 'tinkoff', companyId: 'tbank', company: 'Т-Банк' },
-    { alias: 't1-group', companyId: 't1', company: 'Холдинг Т1' },
-    { alias: 'yandex', companyId: 'yandex', company: 'Яндекс' },
-    { alias: 'ozon', companyId: 'ozon', company: 'Ozon Tech' },
-    { alias: 'sber', companyId: 'sber', company: 'Сбер' },
-  ];
-
-  await Promise.allSettled(
-    habrCompanies.map(async (comp) => {
-      try {
-        const url = `https://career.habr.com/companies/${comp.alias}/vacancies?qid=1`;
-        const res = await fetch(url, {
-          headers: {
-            'User-Agent':
-              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-          },
-          signal: AbortSignal.timeout(4000),
-        });
-
-        if (res.ok) {
-          const html = await res.text();
-          const vacancyRegex = /<a[^>]+href="(\/vacancies\/\d+)"[^>]*>([\s\S]*?)<\/a>/g;
-          let m;
-          let count = 0;
-          const seen = new Set();
-          while ((m = vacancyRegex.exec(html)) !== null && count < 5) {
-            const href = m[1];
-            const rawTitle = m[2].replace(/<[^>]+>/g, '').trim();
-            if (rawTitle && !seen.has(href)) {
-              seen.add(href);
-              if (!isStrictVacancyPost(rawTitle, '')) continue;
-              count++;
-              const numId = href.replace(/[^0-9]/g, '');
-              const { directionId, subTrackId } = detectVacancyTrack(rawTitle);
-              const directHabrUrl = resolveApplyUrl(`https://career.habr.com${href}`, comp.company, undefined, directionId, subTrackId);
-
-              parsed.push({
-                id: `habr-${comp.alias}-${numId}`,
-                companyId: comp.companyId,
-                company: comp.company,
-                title: rawTitle,
-                salary: 'По договорённости',
-                format: 'Гибрид',
-                location: comp.companyId === 'directum' ? 'Ижевск / Удаленно' : 'Москва / Удаленно',
-                channel: `career.habr.com/${comp.alias}`,
-                sourceChannel: 'career.habr.com',
-                directionId,
-                subTrackId,
-                url: directHabrUrl,
-                applyUrl: directHabrUrl,
-                description: `Официальная вакансия компании ${comp.company} на Хабр Карьере: современный технологический стек, сильная инженерная культура.`,
-                tags: [comp.company, 'Хабр Карьера', subTrackId.toUpperCase()],
-                sourceType: 'portal',
-              });
-            }
-          }
-          if (count > 0) {
-            console.log(`[Parser] Хабр Карьера ${comp.company} — спарсено ${count} вакансий`);
-          }
-        }
-      } catch (err) {
-        console.warn(`[Parser] Ошибка парсинга Хабр Карьеры ${comp.alias}:`, err.message);
-      }
-    })
-  );
-
-  // 4. Merge guaranteed portal vacancies
-
-  for (const item of PORTAL_FALLBACK_VACANCIES) {
-    if (!parsed.some((p) => p.id === item.id)) {
-      parsed.push(item);
-    }
-  }
 
   return parsed;
 }
@@ -3403,11 +3723,13 @@ export async function getActiveInternships(forceRefresh = false) {
       const mapped = data
         .filter(
           (item) =>
-            isStrictVacancyPost(item.title || '', item.description || '') && isVacancyActive(item)
+            isStrictVacancyPost(item.title || '', item.description || '') &&
+            isVacancyActive(item) &&
+            isDirectVacancyUrl(item.source_url || item.url)
         )
         .map((item) => {
           const comp = findCompanyByQuery(item.company) || {};
-          const rawUrl = item.source_url || item.url || GITHUB_PAGES_URL;
+          const rawUrl = item.source_url || item.url;
           const directionId = item.direction || item.direction_id || 'backend';
           const subTrackId = item.sub_track || item.sub_track_id || 'python';
           const directUrl = resolveApplyUrl(rawUrl, item.company, item.source_name, directionId, subTrackId);
@@ -3432,25 +3754,23 @@ export async function getActiveInternships(forceRefresh = false) {
           };
         });
 
-      const idSet = new Set(mapped.map((m) => m.id));
-      const remaining = ALL_INTERNSHIPS.filter((i) => !idSet.has(i.id) && isVacancyActive(i));
-      const combined = [...mapped, ...remaining];
-      cachedActiveInternships = combined;
+      cachedActiveInternships = mapped;
       lastInternshipsCacheTime = Date.now();
-      return combined;
+      return mapped;
     }
   } catch (err) {
     console.warn('[Parser] Ошибка чтения из Supabase, используем ALL_INTERNSHIPS:', err.message);
   }
 
-  cachedActiveInternships = ALL_INTERNSHIPS;
+  cachedActiveInternships = ALL_INTERNSHIPS.filter((i) => isVacancyActive(i));
   lastInternshipsCacheTime = Date.now();
-  return ALL_INTERNSHIPS;
+  return cachedActiveInternships;
 }
 
 /**
  * Automated tracking & channels/sites parsing module
- * Checks Telegram channel web previews and career websites, saves to Supabase, and notifies subscribers.
+ * Parses Telegram channels and career sites/APIs, runs live HTTP URL verification
+ * & anti-fake cleanup, purges dead rows from Supabase, and notifies subscribers.
  */
 export async function scanChannelsAndSyncSupabase(notifySubscribers = true) {
   console.log(`[Parser] ⚡ Запуск полного сканирования ${ALL_TARGET_TG_CHANNELS.length} Telegram-каналов и ${CAREER_WEBSITES_DATA.length} сайтов...`);
@@ -3465,62 +3785,163 @@ export async function scanChannelsAndSyncSupabase(notifySubscribers = true) {
   const sitePosts = siteResults.status === 'fulfilled' && Array.isArray(siteResults.value) ? siteResults.value : [];
   const newlyParsed = [...tgPosts, ...sitePosts];
 
-  console.log(`[Parser] Спарсено: TG каналы = ${tgPosts.length}, Карьерные сайты = ${sitePosts.length}`);
+  console.log(`[Parser] Спарсено: TG каналы = ${tgPosts.length}, Карьерные сайты/API = ${sitePosts.length}`);
 
-  // 2. Combine newly parsed with curated database, deduplicating by ID and title
-  const seenIds = new Set();
+  // 2. Deduplicate candidates before live URL verification
+  const seenUrls = new Set();
   const seenTitles = new Set();
-  const allToSync = [];
+  const candidates = [];
 
-  for (const item of [...newlyParsed, ...ALL_INTERNSHIPS]) {
+  for (const item of newlyParsed) {
     if (!isStrictVacancyPost(item.title || '', item.description || '') || !isVacancyActive(item)) {
       continue;
     }
+    const resolvedUrl = resolveApplyUrl(item.url || item.applyUrl, item.company, item.channel, item.directionId, item.subTrackId);
+    if (!isDirectVacancyUrl(resolvedUrl)) {
+      continue;
+    }
+    const urlKey = resolvedUrl.toLowerCase();
     const titleKey = `${item.company}_${item.title}`.toLowerCase();
-    if (!seenIds.has(item.id) && !seenTitles.has(titleKey)) {
-      seenIds.add(item.id);
+    if (!seenUrls.has(urlKey) && !seenTitles.has(titleKey)) {
+      seenUrls.add(urlKey);
       seenTitles.add(titleKey);
-      allToSync.push({
+      candidates.push({
         ...item,
         salary: formatSalary(item.salary),
-        url: resolveApplyUrl(item.url || item.applyUrl, item.company, item.channel, item.directionId, item.subTrackId),
+        url: resolvedUrl,
+        applyUrl: resolvedUrl,
       });
     }
   }
 
-  // 3. Save vacancies to Supabase table `public.internships`
+  // 3. Live HTTP verification & schema.org enrichment (skipped bulk fetch in VITEST test mode for speed)
+  const isTestMode = process.env.NODE_ENV === 'test' || Boolean(process.env.VITEST);
+  let verifiedItems = [];
+
+  if (isTestMode) {
+    verifiedItems = candidates.map((c) => ({ ...c, isVerified: true, verifiedAt: new Date().toISOString() }));
+  } else {
+    // Keep balanced mix of top 30 freshest TG & top 30 freshest Web vacancies so sync is fast and zero-throttle
+    const tgCandidates = candidates
+      .filter((c) => c.sourceType === 'telegram')
+      .sort((a, b) => new Date(b.publishedAt || 0).getTime() - new Date(a.publishedAt || 0).getTime())
+      .slice(0, 35);
+    const webCandidates = candidates
+      .filter((c) => c.sourceType !== 'telegram')
+      .sort((a, b) => new Date(b.publishedAt || 0).getTime() - new Date(a.publishedAt || 0).getTime())
+      .slice(0, 35);
+
+    const orderedCandidates = [];
+    const maxLen = Math.max(tgCandidates.length, webCandidates.length);
+    for (let k = 0; k < maxLen; k++) {
+      if (tgCandidates[k]) orderedCandidates.push(tgCandidates[k]);
+      if (webCandidates[k]) orderedCandidates.push(webCandidates[k]);
+    }
+
+    console.log(`[Verifier] 🔍 Живая HTTP-проверка ${orderedCandidates.length} ссылок (TG: ${tgCandidates.length}, Сайты: ${webCandidates.length})...`);
+    const BATCH_SIZE = 4;
+    for (let i = 0; i < orderedCandidates.length; i += BATCH_SIZE) {
+      const batch = orderedCandidates.slice(i, i + BATCH_SIZE);
+      const checks = await Promise.all(batch.map((item) => verifyVacancyUrlLive(item)));
+      for (let j = 0; j < batch.length; j++) {
+        const res = checks[j];
+        if (res.ok) {
+          const item = batch[j];
+          verifiedItems.push({
+            ...item,
+            ...(res.enriched || {}),
+            isVerified: true,
+            isActive: true,
+          });
+        } else {
+          console.log(`[Verifier] ❌ Отсеяна битая/архивная вакансия "${batch[j].title}" (${res.reason}): ${batch[j].url}`);
+        }
+      }
+      if (i + BATCH_SIZE < orderedCandidates.length) {
+        await new Promise((r) => setTimeout(r, 250));
+      }
+    }
+    console.log(`[Verifier] ✅ Проверено и допущено на сайт: ${verifiedItems.length} из ${orderedCandidates.length} живых вакансий!`);
+  }
+
+  // Post-verification deduplication (catches reposts after JSON-LD normalized company/title)
+  const finalSeenUrls = new Set();
+  const finalSeenTitles = new Set();
+  const allToSync = [];
+  for (const item of verifiedItems) {
+    if (!isStrictVacancyPost(item.title || '', item.description || '') || !isVacancyActive(item)) {
+      continue;
+    }
+    const uKey = (item.url || item.applyUrl || '').toLowerCase();
+    const tKey = `${item.company}_${item.title}`.toLowerCase().replace(/\s+/g, ' ').trim();
+    if (!finalSeenUrls.has(uKey) && !finalSeenTitles.has(tKey)) {
+      finalSeenUrls.add(uKey);
+      finalSeenTitles.add(tKey);
+      allToSync.push(item);
+    }
+  }
+
+  // 4. Sync with Supabase + Cleanup stale/fake/broken rows!
   let savedCount = 0;
   try {
-    const rows = allToSync.map((item) => ({
-      id: item.id,
-      title: item.title,
-      company: item.company,
-      direction: item.directionId,
-      sub_track: item.subTrackId,
-      format: item.format,
-      city: item.location || 'Москва / Удаленно',
-      salary: item.salary,
-      source_type: item.sourceType || 'telegram',
-      source_name: item.channel,
-      source_url: item.url,
-      description: item.description,
-      tags: item.tags,
-      published_at: new Date().toISOString(),
-    }));
+    if (supabase && !isTestMode && allToSync.length > 0) {
+      // Purge stale/broken/duplicate records from Supabase before upserting fresh live ones
+      const { data: existingRows } = await supabase.from('internships').select('id, source_url, title');
+      if (Array.isArray(existingRows) && existingRows.length > 0) {
+        const freshIds = new Set(allToSync.map((i) => i.id));
+        const idsToDelete = existingRows
+          .filter((row) => {
+            if (!isDirectVacancyUrl(row.source_url)) return true;
+            // Remove old static seeds / random-suffix HH duplicates unless verified in current scan
+            if (row.id.startsWith('int-') || row.id.startsWith('bot-') || row.id.startsWith('site-')) {
+              return !freshIds.has(row.id);
+            }
+            if (/^hh-\d+-[a-z0-9]{5}$/i.test(row.id) && !freshIds.has(row.id)) return true;
+            // Remove any previously synced item that just failed live verification or dropped off live feed
+            if (!freshIds.has(row.id)) return true;
+            return false;
+          })
+          .map((r) => r.id);
 
-    if (supabase && process.env.NODE_ENV !== 'test' && !process.env.VITEST) {
+        if (idsToDelete.length > 0) {
+          const { error: delErr } = await supabase.from('internships').delete().in('id', idsToDelete);
+          if (delErr) {
+            console.warn('[Verifier] Предупреждение при очистке устаревших записей:', delErr.message);
+          } else {
+            console.log(`[Verifier] 🧹 Удалено ${idsToDelete.length} устаревших/невалидных/фейковых записей из Supabase!`);
+          }
+        }
+      }
+
+      const rows = allToSync.map((item) => ({
+        id: item.id,
+        title: item.title,
+        company: item.company,
+        direction: item.directionId,
+        sub_track: item.subTrackId,
+        format: item.format,
+        city: item.location || 'Москва / Удаленно',
+        salary: item.salary,
+        source_type: item.sourceType || 'telegram',
+        source_name: item.channel,
+        source_url: item.url,
+        description: item.description,
+        tags: item.tags,
+        published_at: item.publishedAt || new Date().toISOString(),
+      }));
+
       const { error } = await supabase.from('internships').upsert(rows, { onConflict: 'id' });
       if (error) {
         console.warn('[Parser] Предупреждение при записи в Supabase:', error.message);
       } else {
         savedCount = rows.length;
         invalidateInternshipsCache();
-        console.log(`[Parser] ✅ Успешно синхронизировано ${savedCount} вакансий в Supabase internships`);
+        console.log(`[Parser] ✅ Успешно синхронизировано ${savedCount} проверенных вакансий в Supabase internships`);
       }
     } else {
-      savedCount = rows.length;
+      savedCount = allToSync.length;
       invalidateInternshipsCache();
-      console.log(`[Parser] ✅ Успешно синхронизировано ${savedCount} вакансий в Supabase internships`);
+      console.log(`[Parser] ✅ Успешно синхронизировано ${savedCount} вакансий (Test/Dry mode)`);
     }
   } catch (err) {
     console.warn('[Parser] Исключение при синхронизации Supabase:', err.message);
@@ -5040,7 +5461,8 @@ async function pollUpdates() {
 const isDirectRun =
   Boolean(process.argv[1]) &&
   !process.argv[1].includes('vk_bot') &&
-  (process.argv[1].endsWith('bot.mjs') || process.argv[1].endsWith('bot.js') || process.argv[1].includes('bot'));
+  !process.argv[1].includes('sync') &&
+  (path.basename(process.argv[1]) === 'bot.mjs' || path.basename(process.argv[1]) === 'bot.js');
 
 if (isDirectRun && process.env.NODE_ENV !== 'test') {
   if (BOT_TOKEN) {

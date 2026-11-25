@@ -450,7 +450,7 @@ export const InternshipCard: React.FC<InternshipCardProps> = ({
                   className="flex items-center gap-1.5 text-[11px] font-semibold truncate min-w-0 text-neutral-600 hover:text-black dark:text-neutral-400 dark:hover:text-white transition-colors"
                   title={src.badgeTooltip}
                 >
-                  {src.type === 'telegram_post' ? (
+                  {src.type === 'telegram_post' || internship.sourceType === 'telegram' ? (
                     <Bot className="w-3.5 h-3.5 shrink-0 text-neutral-500 dark:text-neutral-400" />
                   ) : (
                     <Globe className="w-3.5 h-3.5 shrink-0 text-neutral-500 dark:text-neutral-400" />

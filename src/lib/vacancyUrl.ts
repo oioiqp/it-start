@@ -158,13 +158,19 @@ export function resolveApplyUrl(
   }
 
   const trimmed = rawUrl.trim();
+  const lowerUrl = trimmed.toLowerCase();
+
+  // Strictly block ad click trackers (e.g. adsrv.hh.ru)
+  if (lowerUrl.includes('adsrv.hh.ru')) {
+    return fallbackDirect;
+  }
 
   // 1. Direct Telegram post link (e.g. https://t.me/channel/123 or t.me/channel/123)
   if (/^https?:\/\/t\.me\/[a-zA-Z0-9_]+\/\d+/i.test(trimmed)) {
-    return trimmed;
+    return trimmed.split('?')[0];
   }
   if (/^t\.me\/[a-zA-Z0-9_]+\/\d+/i.test(trimmed)) {
-    return `https://${trimmed}`;
+    return `https://${trimmed.split('?')[0]}`;
   }
 
   // 2. Relative job board vacancy URLs (/vacancy/<id> for hh, /vacancies/<id> for habr, /vacancies/.../<id> for avito)
@@ -182,18 +188,40 @@ export function resolveApplyUrl(
     return `https://career.avito.com${trimmed.split('?')[0]}`;
   }
 
-  // 3. Direct job boards with concrete vacancy ID (hh.ru/vacancy/<id>, career.habr.com/vacancies/<id>)
-  if (
-    /https?:\/\/hh\.ru\/vacancy\/\d+/i.test(trimmed) ||
-    /https?:\/\/career\.habr\.com\/vacancies\/\d+/i.test(trimmed)
-  ) {
-    return trimmed.split('?')[0];
+  // 3. Direct job boards & aggregators with concrete vacancy ID or slug
+  const hhSubMatch = trimmed.match(/^(?:https?:\/\/)?(?:[a-z0-9-]+\.)?hh\.ru\/vacancy\/(\d+)/i);
+  if (hhSubMatch) {
+    return `https://hh.ru/vacancy/${hhSubMatch[1]}`;
   }
-  if (
-    /^hh\.ru\/vacancy\/\d+/i.test(trimmed) ||
-    /^career\.habr\.com\/vacancies\/\d+/i.test(trimmed)
-  ) {
-    return `https://${trimmed.split('?')[0]}`;
+
+  const habrMatch = trimmed.match(/^(?:https?:\/\/)?career\.habr\.com\/vacancies\/(\d+)/i);
+  if (habrMatch) {
+    return `https://career.habr.com/vacancies/${habrMatch[1]}`;
+  }
+
+  const yjMatch = trimmed.match(/^(?:https?:\/\/)?(?:www\.)?youngjunior\.ru\/([^/?#]+\/jobs\/\d+)/i);
+  if (yjMatch) {
+    return `https://youngjunior.ru/${yjMatch[1]}`;
+  }
+
+  const csMatch = trimmed.match(/^(?:https?:\/\/)?(?:www\.)?careerspace\.app\/job\/(\d+)/i);
+  if (csMatch) {
+    return `https://careerspace.app/job/${csMatch[1]}`;
+  }
+
+  const gjMatch = trimmed.match(/^(?:https?:\/\/)?(?:www\.)?geekjob\.ru\/vacancy\/([a-zA-Z0-9]+)/i);
+  if (gjMatch) {
+    return `https://geekjob.ru/vacancy/${gjMatch[1]}`;
+  }
+
+  const gmMatch = trimmed.match(/^(?:https?:\/\/)?(?:www\.)?getmatch\.ru\/vacancies\/(\d+[^?#]*)/i);
+  if (gmMatch) {
+    return `https://getmatch.ru/vacancies/${gmMatch[1]}`;
+  }
+
+  const yaJobMatch = trimmed.match(/^(?:https?:\/\/)?yandex\.ru\/jobs\/vacancies\/([a-zA-Z0-9_-]+)/i);
+  if (yaJobMatch) {
+    return `https://yandex.ru/jobs/vacancies/${yaJobMatch[1]}`;
   }
 
   // 4. Shorteners and non-career aggregators
@@ -368,11 +396,74 @@ export const COMPANY_OFFICIAL_CHANNELS: Record<string, string> = {
 };
 
 /**
+ * Verified public Telegram aggregator channels that publish real IT internships & junior positions.
+ */
+export const AGGREGATOR_TG_HANDLES = new Set([
+  'young_june',
+  'juno_jobs',
+  'yuniorapp',
+  'stazhirovki_it',
+  'junior_it_jobs',
+  'junior_vacancies',
+  'careerspace',
+  'geekjobs',
+  'itjobs_ru',
+  'normrabota',
+  'myresume_ru',
+  'itjobsfeed',
+  'yotolabqa',
+]);
+
+/**
+ * Checks whether URL points directly to a concrete vacancy listing, post, or active track
+ * rather than a generic homepage, broken archive, or click-tracker ad.
+ */
+export function isDirectVacancyUrl(url: string | undefined): boolean {
+  if (!url || typeof url !== 'string') return false;
+  const trimmed = url.trim();
+  const lower = trimmed.toLowerCase();
+  if (!lower.startsWith('http://') && !lower.startsWith('https://')) return false;
+  if (
+    lower.includes('adsrv.hh.ru') ||
+    lower.includes('?search=') ||
+    lower.includes('/search/') ||
+    lower.includes('kontur.ru/career/students') ||
+    lower.includes('career.t1.ru/debut/open-school')
+  ) {
+    return false;
+  }
+
+  return (
+    /^(?:https?:\/\/)?(?:[a-z0-9-]+\.)?hh\.ru\/vacancy\/\d+/i.test(trimmed) ||
+    /^https?:\/\/career\.habr\.com\/vacancies\/\d+/i.test(trimmed) ||
+    /^https?:\/\/(?:www\.)?youngjunior\.ru\/[^/?#]+\/jobs\/\d+/i.test(trimmed) ||
+    /^https?:\/\/(?:www\.)?careerspace\.app\/job\/\d+/i.test(trimmed) ||
+    /^https?:\/\/(?:www\.)?geekjob\.ru\/vacancy\/[a-zA-Z0-9]+/i.test(trimmed) ||
+    /^https?:\/\/(?:www\.)?getmatch\.ru\/vacancies\/\d+/i.test(trimmed) ||
+    /^https?:\/\/yandex\.ru\/jobs\/vacancies\/[a-zA-Z0-9_-]+/i.test(trimmed) ||
+    /^https?:\/\/yandex\.ru\/yaintern\/[a-z_-]+\/?$/i.test(trimmed) ||
+    /^https?:\/\/education\.tbank\.ru\/start\/[a-z_-]+\/?$/i.test(trimmed) ||
+    /^https?:\/\/t\.me\/[a-zA-Z0-9_]+\/\d+/i.test(trimmed) ||
+    /^https?:\/\/career\.avito\.com\/vacancies\/[a-zA-Z0-9_-]+\/\d+/i.test(trimmed) ||
+    /^https?:\/\/internship\.vk\.company\/vacancy\/\d+/i.test(trimmed) ||
+    /^https?:\/\/career\.directum\.ru\/vacancy\/[a-zA-Z0-9_-]+/i.test(trimmed)
+  );
+}
+
+/**
  * Resolves Telegram channel handles to valid existing public channels.
- * Guarantees that every target company vacancy always points to its verified company channel,
- * and eliminates web domains/job board names being prepended with '@' (like @hh.ru or @career.avito.com).
+ * Guarantees that aggregator channels remain preserved, target employers map to canonical channels,
+ * and web domains never get prepended with '@' (like @hh.ru or @career.avito.com).
  */
 export function resolveChannelHandle(channel: string | undefined, companyName = ''): string {
+  // Preserve verified Telegram aggregator channel handle if explicitly specified
+  if (channel) {
+    const cleanRaw = channel.trim().replace(/^@/, '');
+    if (AGGREGATOR_TG_HANDLES.has(cleanRaw.toLowerCase())) {
+      return `@${cleanRaw}`;
+    }
+  }
+
   const compKey = getCompanyKey(companyName);
   const officialChannel = COMPANY_OFFICIAL_CHANNELS[compKey];
 
@@ -577,12 +668,14 @@ export function isStrictVacancyPost(title = '', text = ''): boolean {
     'записаться на курс', 'скидка на обучение', 'гарантия трудоустройства',
     'первая линия поддержки', 'холодные звонки', 'исходящие звонки',
     'продажа кредитов', 'оформление полисов', 'первичной документации',
-    // Events, games, battles, conferences, video clips, and system outages
+    // Events, games, battles, conferences, video clips, spam, and system outages
     'батл для', 'архитектурная игра', 'архитектурный батл', 'батл разработчиков',
     'dotnext', 'highload', 'joker conf', 'holyjs', 'конференц', 'по следам нашей поездки',
     'сделали ролик', 'посмотрите ролик', 'видеоролик', 'прогуляйтесь по конфе',
     'доля доступных файлов', 'доступ к файлам', 'работают все базовые функции диска',
-    'сбой в работе', 'восстановление сервиса'
+    'сбой в работе', 'восстановление сервиса',
+    'научу собирать', 'чат-ботов по шаблону', 'как пазлы', 'заработал 9 000',
+    'трафик-менеджер', 'арбитражн', 'рецепты успеха', 'откладываете ли вы деньги'
   ];
 
   for (const stop of stopWords) {
@@ -595,20 +688,25 @@ export function isStrictVacancyPost(title = '', text = ''): boolean {
   const nonItTitles = [
     'продаж', 'продавец', 'кассир', 'ритейл', 'торговый',
     'call-центр', 'колл-центр', 'коллцентр', 'телемаркетинг',
-    'саппорт', 'support', 'поддержк', 'выездного сервиса',
+    'саппорт', 'support', 'поддержк', 'выездного сервиса', 'сервисный центр', 'в мастерскую',
+    'ремонт техники', 'помощник тестировщика', 'тестировщика техники', 'тестировщик оборудования',
+    'специалист по работе с клиентами', 'lead generation', 'лидогенерац',
     'юрист', 'юрисконсульт', 'правовед', 'адвокат', 'судебн', 'комплаенс',
     'бухгалтер', 'экономист', 'аудитор', 'налогов', 'первичк',
     'страхование', 'страхован', 'осаго', 'каско', 'андеррайтер',
     'водитель', 'курьер', 'экспедитор', 'склад', 'кладовщик', 'комплектовщик', 'грузчик',
     'мерчендайзер', 'повар', 'уборщик', 'клининг', 'охрана', 'охранник', 'фасовщик',
     'маркетинг', 'маркетолог', 'таргетолог', 'контекстолог', 'копирайтер', 'smm', 'смм', 'пиар', 'seo', 'видеокреатор',
+    'контент-мейкер', 'видеограф', 'журналист', 'медицинский отдел', 'экологи', 'маркировщик',
+    'супервайзер', 'оператор ввода',
+    'ux/ui', 'ui/ux', 'веб-дизайнер', 'графический дизайнер', 'продуктовый дизайнер', 'гейм-дизайнер',
     'партнерств', 'partnerships', 'аккаунт-менеджер',
     'рекрутер', 'recruitment', 'подбор персонала', 'ресёрчер', 'ресечер', 'hr-', 'hr ',
     'администратор', 'офис-менеджер', 'дежурной смены', 'дежурн',
     'модератор', 'модерация', 'фрод-мониторинг', 'фрод', 'антифрод',
     'недвижимост', 'риск-менеджер', 'риск менеджер',
-    'менеджер проектов', 'project manager', 'продакт-менеджер', 'product manager',
-    'кипиа', 'кип и а', 'инженер-конструктор', '1с', '1c ',
+    'менеджер проектов', 'project manager', 'продакт-менеджер', 'product manager', 'scrum-мастер', 'менеджер по запуску',
+    'кипиа', 'кип и а', 'инженер-конструктор', '1с', '1c ', 'sap abap',
     'информационной безопасности', 'информационная безопасность', 'инфобез'
   ];
 
@@ -831,6 +929,80 @@ export function getVacancySourceDetails(
     };
   }
 
+  // 2.1 Habr Career direct vacancy
+  if (resolvedUrl.includes('career.habr.com/vacancies/')) {
+    return {
+      type: 'portal',
+      badgeLabel: 'Хабр Карьера',
+      badgeUrl: resolvedUrl,
+      badgeTooltip: `Открыть вакансию на Хабр Карьере: ${resolvedUrl}`,
+      actionLabel: 'Откликнуться на Хабр Карьере',
+      actionMobileLabel: 'На Хабре',
+      applyUrl: resolvedUrl,
+      officialChannelHandle,
+      officialChannelUrl,
+    };
+  }
+
+  // 2.2 Young&Junior direct vacancy (from Telegram channels)
+  if (resolvedUrl.includes('youngjunior.ru/')) {
+    const cleanSourceCh = sourceChannel && sourceChannel.startsWith('@') ? sourceChannel : '';
+    return {
+      type: 'portal',
+      badgeLabel: cleanSourceCh ? `TG ${cleanSourceCh}` : 'Young&Junior',
+      badgeUrl: cleanSourceCh ? `https://t.me/${cleanSourceCh.replace(/^@/, '')}` : resolvedUrl,
+      badgeTooltip: `Прямая страница вакансии ${companyName}: ${resolvedUrl}`,
+      actionLabel: `Открыть вакансию ${companyName || ''}`.trim(),
+      actionMobileLabel: 'Вакансия',
+      applyUrl: resolvedUrl,
+      officialChannelHandle: cleanSourceCh || officialChannelHandle,
+      officialChannelUrl: cleanSourceCh ? `https://t.me/${cleanSourceCh.replace(/^@/, '')}` : officialChannelUrl,
+    };
+  }
+
+  // 2.3 Careerspace / GeekJob / Getmatch / Yandex Jobs direct vacancies
+  if (resolvedUrl.includes('careerspace.app/job/')) {
+    return {
+      type: 'portal',
+      badgeLabel: 'Careerspace',
+      badgeUrl: resolvedUrl,
+      badgeTooltip: `Открыть вакансию на Careerspace: ${resolvedUrl}`,
+      actionLabel: 'Откликнуться на Careerspace',
+      actionMobileLabel: 'Отклик',
+      applyUrl: resolvedUrl,
+      officialChannelHandle,
+      officialChannelUrl,
+    };
+  }
+
+  if (resolvedUrl.includes('geekjob.ru/vacancy/')) {
+    return {
+      type: 'portal',
+      badgeLabel: 'GeekJob',
+      badgeUrl: resolvedUrl,
+      badgeTooltip: `Открыть вакансию на GeekJob: ${resolvedUrl}`,
+      actionLabel: 'Откликнуться на GeekJob',
+      actionMobileLabel: 'Отклик',
+      applyUrl: resolvedUrl,
+      officialChannelHandle,
+      officialChannelUrl,
+    };
+  }
+
+  if (resolvedUrl.includes('yandex.ru/jobs/vacancies/')) {
+    return {
+      type: 'portal',
+      badgeLabel: 'Яндекс Команда',
+      badgeUrl: resolvedUrl,
+      badgeTooltip: `Прямая страница вакансии Яндекса: ${resolvedUrl}`,
+      actionLabel: 'Откликнуться в Яндекс',
+      actionMobileLabel: 'На Яндекс',
+      applyUrl: resolvedUrl,
+      officialChannelHandle,
+      officialChannelUrl,
+    };
+  }
+
   // 3. Official employer career portal
   return {
     type: 'portal',
@@ -910,13 +1082,16 @@ export function isVacancyActive(item: VacancyFreshnessInput | null | undefined):
     return false;
   }
 
-  // 4. Stale senior / closed Avito links
+  // 4. Stale senior / closed Avito & broken obsolete links
   if (
     url.includes('/vacancies/razrabotka/20803') ||
     url.includes('/vacancies/razrabotka/20812') ||
     url.includes('/vacancies/analitika-dannykh/20816') ||
     url.includes('/vacancies/razrabotka/20805') ||
-    url.includes('/vacancies/razrabotka/20808')
+    url.includes('/vacancies/razrabotka/20808') ||
+    url.includes('adsrv.hh.ru') ||
+    url.includes('kontur.ru/career/students') ||
+    url.includes('career.t1.ru/debut/open-school')
   ) {
     return false;
   }

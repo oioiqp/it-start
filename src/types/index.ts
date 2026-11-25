@@ -85,6 +85,8 @@ export interface Internship {
   publishedAt: string;
   isHot?: boolean;
   isActive?: boolean;
+  isVerified?: boolean;
+  verifiedAt?: string;
   status?: 'active' | 'closed' | 'archived' | 'expired';
   expiresAt?: string;
   batchYear?: number | string;

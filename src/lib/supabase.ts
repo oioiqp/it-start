@@ -1,6 +1,13 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Internship, TelegramSubscription, UserProgress } from '../types';
-import { resolveApplyUrl, resolveChannelHandle, formatSalary, isStrictVacancyPost, isVacancyActive } from './vacancyUrl';
+import {
+  resolveApplyUrl,
+  resolveChannelHandle,
+  formatSalary,
+  isStrictVacancyPost,
+  isVacancyActive,
+  isDirectVacancyUrl,
+} from './vacancyUrl';
 
 export const SUPABASE_URL = 'https://pmgsymacvhzsixbpndsn.supabase.co';
 export const SUPABASE_ANON_KEY =
@@ -57,11 +64,20 @@ export async function fetchInternshipsFromSupabase(): Promise<Internship[] | nul
     }
 
     if (data && data.length > 0) {
-      const validRows = data.filter((item: any) =>
-        isStrictVacancyPost(item.title || '', item.description || '') &&
-        isVacancyActive(item)
-      );
-      const items = validRows.map((item: any) => {
+      const validRows = data.filter((item: any) => {
+        const url = item.source_url || item.apply_url || '';
+        return (
+          isStrictVacancyPost(item.title || '', item.description || '') &&
+          isVacancyActive(item) &&
+          isDirectVacancyUrl(url)
+        );
+      });
+
+      const seenUrls = new Set<string>();
+      const seenTitles = new Set<string>();
+      const items: Internship[] = [];
+
+      for (const item of validRows) {
         const parseArray = (val: any, fallback: string[]): string[] => {
           if (Array.isArray(val)) return val;
           if (typeof val === 'string') {
@@ -96,13 +112,25 @@ export async function fetchInternshipsFromSupabase(): Promise<Internship[] | nul
           directionId,
           subTrackId
         );
-        const isTgPost = directApplyUrl.includes('t.me/');
-        const derivedSourceType: 'telegram' | 'portal' = isTgPost ? 'telegram' : 'portal';
-        const sourceChannel = isTgPost
-          ? resolveChannelHandle(item.source_name || item.source_channel, item.company)
-          : (item.source_name || item.company || 'portal');
+        if (!isDirectVacancyUrl(directApplyUrl)) continue;
 
-        return {
+        const urlKey = directApplyUrl.toLowerCase();
+        const titleKey = `${item.company}_${item.title}`.toLowerCase().replace(/\s+/g, ' ').trim();
+        if (seenUrls.has(urlKey) || seenTitles.has(titleKey)) continue;
+        seenUrls.add(urlKey);
+        seenTitles.add(titleKey);
+
+        const rawSourceName = String(item.source_name || item.source_channel || '').trim();
+        const isTgSource =
+          item.source_type === 'telegram' ||
+          directApplyUrl.includes('t.me/') ||
+          rawSourceName.startsWith('@');
+        const derivedSourceType: 'telegram' | 'portal' = isTgSource ? 'telegram' : 'portal';
+        const sourceChannel = isTgSource
+          ? resolveChannelHandle(rawSourceName, item.company)
+          : (rawSourceName || item.company || 'portal');
+
+        items.push({
           id: String(item.id),
           title: item.title,
           company: item.company,
@@ -120,11 +148,12 @@ export async function fetchInternshipsFromSupabase(): Promise<Internship[] | nul
           sourceType: derivedSourceType,
           applyUrl: directApplyUrl,
           publishedAt: item.published_at || new Date().toISOString(),
-          isHot: Boolean(item.is_hot),
+          isHot: false,
           isActive: item.is_active !== false && item.status !== 'closed' && item.status !== 'archived',
+          isVerified: true,
           status: item.status || 'active',
-        };
-      });
+        });
+      }
 
       items.forEach((item: Internship) => inMemoryInternships.set(item.id, item));
       return items;

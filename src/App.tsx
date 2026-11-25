@@ -41,7 +41,7 @@ import {
   TELEGRAM_BOT_URL,
   GITHUB_PAGES_URL,
 } from './lib/supabase';
-import { isVacancyActive } from './lib/vacancyUrl';
+import { isVacancyActive, isDirectVacancyUrl } from './lib/vacancyUrl';
 import {
   getCachedInternships,
   getLocalProgress,
@@ -104,10 +104,11 @@ export function App() {
   // User Progress
   const [userProgress, setUserProgress] = useState<UserProgress>(() => getLocalProgress());
 
-  // Internships state
+  // Internships state (strictly verified active & direct links)
   const [internships, setInternships] = useState<Internship[]>(() => {
-    const cached = getCachedInternships();
-    return cached.length > 0 ? cached : SEED_INTERNSHIPS;
+    const cached = getCachedInternships().filter((i) => isVacancyActive(i) && isDirectVacancyUrl(i.applyUrl));
+    if (cached.length > 0) return cached;
+    return SEED_INTERNSHIPS.filter((i) => isVacancyActive(i) && isDirectVacancyUrl(i.applyUrl));
   });
   const [isLoadingInternships, setIsLoadingInternships] = useState<boolean>(false);
   const [selectedInternshipForPlan, setSelectedInternshipForPlan] = useState<Internship | null>(null);
@@ -246,7 +247,7 @@ export function App() {
       setCurrentSubscription(localSub);
     }
 
-    // 3. Fetch internships from Supabase & Seed if empty
+    // 3. Fetch verified live internships from Supabase (or clean fallback)
     const syncInternships = async () => {
       setIsLoadingInternships(true);
       const data = await fetchInternshipsFromSupabase();
@@ -255,20 +256,29 @@ export function App() {
         setInternships(data);
         saveCachedInternships(data);
       } else if (data && data.length === 0) {
-        // Table is empty, seed initial data
-        console.log('Seeding initial internships to Supabase...');
-        await seedInternshipsToSupabase(SEED_INTERNSHIPS);
-        setInternships(SEED_INTERNSHIPS);
-        saveCachedInternships(SEED_INTERNSHIPS);
+        const cleanSeed = SEED_INTERNSHIPS.filter((i) => isVacancyActive(i) && isDirectVacancyUrl(i.applyUrl));
+        await seedInternshipsToSupabase(cleanSeed);
+        setInternships(cleanSeed);
+        saveCachedInternships(cleanSeed);
       } else {
-        // Fallback to seed data
-        setInternships(SEED_INTERNSHIPS);
+        setInternships(SEED_INTERNSHIPS.filter((i) => isVacancyActive(i) && isDirectVacancyUrl(i.applyUrl)));
       }
       setIsLoadingInternships(false);
     };
 
     syncInternships();
   }, []);
+
+  const handleManualRefresh = async () => {
+    triggerHaptic('selection');
+    setIsLoadingInternships(true);
+    const data = await fetchInternshipsFromSupabase();
+    if (data && data.length > 0) {
+      setInternships(data);
+      saveCachedInternships(data);
+    }
+    setIsLoadingInternships(false);
+  };
 
   // Handle URL params for navigation
   useEffect(() => {
@@ -695,7 +705,7 @@ export function App() {
                 Агрегатор IT-стажировок
               </h1>
               <p className="text-xs sm:text-sm font-normal leading-relaxed max-w-xl mx-auto text-neutral-600 dark:text-neutral-300">
-                100% реальные вакансии • Роадмапы • 55+ вопросов к собеседованиям
+                Проверенные стажировки из Telegram-каналов и карьерных сайтов • Роадмапы • Вопросы
               </p>
             </div>
 
@@ -1024,13 +1034,13 @@ export function App() {
                       <button
                         key={src}
                         onClick={() => setSelectedSource(src)}
-                        className={`px-2.5 py-1 rounded-full transition-all duration-150 active:scale-95 text-xs font-medium ${
+                        className={`px-2.5 py-1 rounded-full transition-all duration-150 active:scale-95 text-xs font-medium cursor-pointer ${
                           selectedSource === src
                             ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-xs'
                             : 'liquid-glass-pill hover:bg-white/50 text-neutral-700 dark:text-neutral-300'
                         }`}
                       >
-                        {src === 'all' ? 'Все' : src === 'telegram' ? 'Telegram' : 'Порталы'}
+                        {src === 'all' ? 'Все' : src === 'telegram' ? 'Telegram-каналы' : 'Сайты и API'}
                       </button>
                     ))}
                   </div>
@@ -1053,13 +1063,20 @@ export function App() {
               <div className="flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-400 px-1">
                 <span>
                   Найдено стажировок: <strong className="text-neutral-900 dark:text-white">{filteredAndSortedInternships.length}</strong>
-                </span>
-                {isLoadingInternships && (
-                  <span className="flex items-center gap-1.5 text-neutral-700 dark:text-neutral-300">
-                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                    Синхронизация с Supabase...
+                  <span className="hidden sm:inline text-neutral-400 dark:text-neutral-500 ml-2">
+                    (TG-каналы: {filteredAndSortedInternships.filter((i) => i.sourceType === 'telegram').length} • Сайты: {filteredAndSortedInternships.filter((i) => i.sourceType !== 'telegram').length})
                   </span>
-                )}
+                </span>
+                <button
+                  type="button"
+                  onClick={handleManualRefresh}
+                  disabled={isLoadingInternships}
+                  className="inline-flex items-center gap-1.5 text-neutral-700 hover:text-black dark:text-neutral-300 dark:hover:text-white transition-colors cursor-pointer disabled:opacity-60"
+                  title="Обновить список проверенных вакансий из базы"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${isLoadingInternships ? 'animate-spin' : ''}`} />
+                  <span>{isLoadingInternships ? 'Проверка и загрузка...' : 'Обновить'}</span>
+                </button>
               </div>
 
               {filteredAndSortedInternships.length === 0 ? (
