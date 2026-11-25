@@ -13,8 +13,10 @@ import {
   MapPin,
   PlusCircle,
   Briefcase,
+  History,
+  LogIn,
 } from 'lucide-react';
-import type { Internship, JobApplication } from '../types';
+import type { Internship, JobApplication, ViewedVacancyEntry } from '../types';
 import { triggerHaptic } from '../lib/telegram';
 import { formatSalary } from '../lib/vacancyUrl';
 import { cleanLocation } from './InternshipCard';
@@ -22,6 +24,9 @@ import { cleanLocation } from './InternshipCard';
 interface ApplicationsViewProps {
   applications: JobApplication[];
   allInternships: Internship[];
+  viewedHistory?: ViewedVacancyEntry[];
+  isAuthorized?: boolean;
+  onOpenAuthModal?: () => void;
   onUpdateApplication: (app: JobApplication) => void;
   onRemoveApplication: (vacancyId: string) => void;
   onOpenPlan: (internship: Internship) => void;
@@ -32,6 +37,9 @@ interface ApplicationsViewProps {
 export const ApplicationsView: React.FC<ApplicationsViewProps> = ({
   applications,
   allInternships,
+  viewedHistory = [],
+  isAuthorized = false,
+  onOpenAuthModal,
   onUpdateApplication,
   onRemoveApplication,
   onOpenPlan,
@@ -546,10 +554,84 @@ export const ApplicationsView: React.FC<ApplicationsViewProps> = ({
                   </div>
                 </div>
               </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
       )}
+
+      {/* Viewed Internships History */}
+      {(() => {
+        const viewedItems = viewedHistory
+          .map((entry) => {
+            const item = allInternships.find((i) => i.id === entry.id);
+            return item ? { entry, item } : null;
+          })
+          .filter((x): x is { entry: ViewedVacancyEntry; item: Internship } => x !== null);
+
+        if (viewedItems.length === 0) return null;
+
+        return (
+          <div className="rounded-2xl sm:rounded-3xl p-5 sm:p-6 liquid-glass space-y-4">
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+              <div className="flex items-center gap-2">
+                <History className="w-4 h-4 text-neutral-700 dark:text-neutral-300" />
+                <h3 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white font-sans">
+                  История просмотров ({viewedItems.length})
+                </h3>
+              </div>
+              {!isAuthorized && onOpenAuthModal && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    triggerHaptic('medium');
+                    onOpenAuthModal();
+                  }}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-neutral-900 hover:bg-black text-white dark:bg-white dark:text-neutral-900 shadow-xs cursor-pointer"
+                >
+                  <LogIn className="w-3.5 h-3.5" />
+                  <span>Войти (TG / VK), чтобы сохранить историю</span>
+                </button>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {viewedItems.slice(0, 12).map(({ entry, item }) => (
+                <div
+                  key={entry.id}
+                  className="p-3.5 rounded-2xl liquid-glass-subtle flex items-center justify-between gap-3"
+                >
+                  <div className="min-w-0">
+                    <div className="text-[11px] font-semibold text-neutral-500 dark:text-neutral-400 truncate">
+                      {item.company} • {formatSalary(item.salary)}
+                    </div>
+                    <div className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-white truncate">
+                      {item.title}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => onOpenPlan(item)}
+                      className="px-3 py-1.5 rounded-full text-[11px] font-semibold liquid-glass-pill hover:bg-white/60 text-neutral-800 dark:text-neutral-200 cursor-pointer"
+                    >
+                      План
+                    </button>
+                    <a
+                      href={item.applyUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3 py-1.5 rounded-full text-[11px] font-semibold bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 inline-flex items-center gap-1 cursor-pointer"
+                    >
+                      <span>Открыть</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 };

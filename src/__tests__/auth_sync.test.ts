@@ -40,8 +40,8 @@ describe('Authorization, Opt-Out Notifications, and Cloud State Sync', () => {
       })
     );
 
-    expect(html).toContain('Войти');
-    expect(html).toContain('Авторизация через Telegram или ВКонтакте для сохранения прогресса');
+    expect(html).toContain('Войти (TG / VK)');
+    expect(html).toContain('Авторизация через Telegram или ВКонтакте для сохранения истории и прогресса');
   });
 
   it('Navbar shows signed-in profile badge with muted bell when notifications are disabled', () => {
@@ -85,7 +85,7 @@ describe('Authorization, Opt-Out Notifications, and Cloud State Sync', () => {
     );
 
     expect(html).toContain('Авторизация через Telegram');
-    expect(html).toContain('Авторизация для сохранения вашего состояния');
+    expect(html).toContain('Авторизация для сохранения вашего состояния и истории');
     expect(html).toContain('Получать уведомления о новых стажировках');
     expect(html).toContain('Войти через Telegram');
     expect(html).toContain('Telegram-бот');
@@ -184,7 +184,9 @@ describe('Authorization, Opt-Out Notifications, and Cloud State Sync', () => {
       },
     ];
 
-    const encoded = encodeCloudSavedState(progress, favorites, applications);
+    const encoded = encodeCloudSavedState(progress, favorites, applications, [
+      { id: 'tbank-ml-2026', viewedAt: '2026-11-25T10:30:00.000Z' },
+    ]);
     const decoded = decodeCloudSavedState(
       progress.completedTopics,
       progress.completedQuestions,
@@ -193,8 +195,15 @@ describe('Authorization, Opt-Out Notifications, and Cloud State Sync', () => {
     expect(decoded.progress).toEqual(progress);
     expect(decoded.favorites).toEqual(favorites);
     expect(decoded.applications).toEqual(applications);
+    expect(decoded.viewedHistory).toEqual([
+      { id: 'tbank-ml-2026', viewedAt: '2026-11-25T10:30:00.000Z' },
+    ]);
 
-    const saved = await saveUserProgressToSupabase(userKey, progress, { favorites, applications });
+    const saved = await saveUserProgressToSupabase(userKey, progress, {
+      favorites,
+      applications,
+      viewedHistory: [{ id: 'tbank-ml-2026', viewedAt: '2026-11-25T10:30:00.000Z' }],
+    });
     expect(saved).toBe(true);
 
     // Updating progress with 2-arg signature must preserve previously synced favorites & applications
@@ -212,6 +221,9 @@ describe('Authorization, Opt-Out Notifications, and Cloud State Sync', () => {
     expect(restored!.favorites).toEqual(favorites);
     expect(restored!.applications).toHaveLength(1);
     expect(restored!.applications[0].company).toBe('Т-Банк');
+    expect(restored!.viewedHistory).toEqual([
+      { id: 'tbank-ml-2026', viewedAt: '2026-11-25T10:30:00.000Z' },
+    ]);
   });
 
   it('persists and clears local AuthProfile cleanly when browser storage is present', () => {
@@ -262,5 +274,16 @@ describe('Authorization, Opt-Out Notifications, and Cloud State Sync', () => {
     expect(vkSub.is_active).toBe(false);
     const activeVkIds = (await getVkSubscribers()).map((s: any) => String(s.peer_id));
     expect(activeVkIds).not.toContain('888999001');
+  });
+
+  it('bot WEBAPP_URL and PUBLIC_WEB_URL resolve to live GitHub Pages instead of 404 Koyeb', async () => {
+    // @ts-expect-error untyped ESM bot module
+    const bot = await import('../../bot/bot.mjs');
+    // @ts-expect-error untyped ESM VK bot module
+    const vkBot = await import('../../bot/vk_bot.mjs');
+
+    expect(bot.WEBAPP_URL).toBe('https://oioiqp.github.io/it-start/');
+    expect(bot.PUBLIC_WEB_URL).toBe('https://oioiqp.github.io/it-start/');
+    expect(vkBot.PUBLIC_WEB_URL).toBe('https://oioiqp.github.io/it-start/');
   });
 });

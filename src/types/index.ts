@@ -169,10 +169,16 @@ export interface AuthProfile {
   authorizedAt: string;
 }
 
+export interface ViewedVacancyEntry {
+  id: string;
+  viewedAt: string;
+}
+
 export interface CloudUserState {
   progress: UserProgress;
   favorites: string[];
   applications: JobApplication[];
+  viewedHistory?: ViewedVacancyEntry[];
   updatedAt?: string;
 }
 

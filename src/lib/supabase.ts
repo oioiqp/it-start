@@ -6,6 +6,7 @@ import type {
   JobApplication,
   TelegramSubscription,
   UserProgress,
+  ViewedVacancyEntry,
 } from '../types';
 import {
   resolveApplyUrl,
@@ -413,11 +414,13 @@ const FAV_PREFIX = 'fav:';
 const SUBTOPIC_PREFIX = '__sub__:';
 const REPEAT_PREFIX = '__rep__:';
 const APP_PREFIX = '__app__:';
+const VIEW_PREFIX = '__view__:';
 
 export function encodeCloudSavedState(
   progress: UserProgress,
   favorites: string[] = [],
-  applications: JobApplication[] = []
+  applications: JobApplication[] = [],
+  viewedHistory: ViewedVacancyEntry[] = []
 ): string[] {
   const entries: string[] = [];
   const seenFavs = new Set<string>();
@@ -453,6 +456,13 @@ export function encodeCloudSavedState(
       entries.push(`${APP_PREFIX}${JSON.stringify(app)}`);
     }
   }
+  const seenViews = new Set<string>();
+  for (const view of viewedHistory.slice(0, 40)) {
+    const cleanId = String(view?.id || '').trim();
+    if (!cleanId || seenViews.has(cleanId)) continue;
+    seenViews.add(cleanId);
+    entries.push(`${VIEW_PREFIX}${cleanId}|${view.viewedAt || new Date().toISOString()}`);
+  }
   return entries;
 }
 
@@ -468,6 +478,7 @@ export function decodeCloudSavedState(
   const repeatQuestions: string[] = [];
   const favorites: string[] = [];
   const applications: JobApplication[] = [];
+  const viewedHistory: ViewedVacancyEntry[] = [];
 
   if (Array.isArray(savedInternships)) {
     for (const rawItem of savedInternships) {
@@ -481,6 +492,12 @@ export function decodeCloudSavedState(
       } else if (rawItem.startsWith(REPEAT_PREFIX)) {
         const id = rawItem.slice(REPEAT_PREFIX.length);
         if (id) repeatQuestions.push(id);
+      } else if (rawItem.startsWith(VIEW_PREFIX)) {
+        const rest = rawItem.slice(VIEW_PREFIX.length);
+        const sepIdx = rest.indexOf('|');
+        const id = sepIdx >= 0 ? rest.slice(0, sepIdx) : rest;
+        const viewedAt = sepIdx >= 0 ? rest.slice(sepIdx + 1) : updatedAt || new Date().toISOString();
+        if (id) viewedHistory.push({ id, viewedAt });
       } else if (rawItem.startsWith(APP_PREFIX)) {
         try {
           const parsed = JSON.parse(rawItem.slice(APP_PREFIX.length));
@@ -506,12 +523,13 @@ export function decodeCloudSavedState(
     },
     favorites: Array.from(new Set(favorites)),
     applications,
+    viewedHistory,
     updatedAt,
   };
 }
 
 /**
- * Fetch complete cloud user state (progress, favorites, applications) from Supabase
+ * Fetch complete cloud user state (progress, favorites, applications, viewed history) from Supabase
  */
 export async function fetchUserProgressFromSupabase(
   userId: string | number
@@ -523,7 +541,7 @@ export async function fetchUserProgressFromSupabase(
     const cached = inMemoryCloudState.get(key);
     if (cached) return cached;
     const prog = inMemoryUserProgress.get(key);
-    return prog ? { progress: prog, favorites: [], applications: [] } : null;
+    return prog ? { progress: prog, favorites: [], applications: [], viewedHistory: [] } : null;
   }
 
   try {
@@ -559,26 +577,28 @@ export async function fetchUserProgressFromSupabase(
 }
 
 /**
- * Save user progress (and optionally favorites & applications) to Supabase
+ * Save user progress (and optionally favorites, applications, viewedHistory) to Supabase
  */
 export async function saveUserProgressToSupabase(
   userId: string | number,
   progress: UserProgress,
-  extras?: { favorites?: string[]; applications?: JobApplication[] }
+  extras?: { favorites?: string[]; applications?: JobApplication[]; viewedHistory?: ViewedVacancyEntry[] }
 ): Promise<boolean> {
   const key = String(userId || 'anonymous').trim() || 'anonymous';
   const prevCloud = inMemoryCloudState.get(key);
   const favorites = extras?.favorites !== undefined ? extras.favorites : prevCloud?.favorites || [];
   const applications = extras?.applications !== undefined ? extras.applications : prevCloud?.applications || [];
+  const viewedHistory =
+    extras?.viewedHistory !== undefined ? extras.viewedHistory : prevCloud?.viewedHistory || [];
   const updatedAt = new Date().toISOString();
 
   inMemoryUserProgress.set(key, progress);
-  inMemoryCloudState.set(key, { progress, favorites, applications, updatedAt });
+  inMemoryCloudState.set(key, { progress, favorites, applications, viewedHistory, updatedAt });
 
   if (isSupabaseOffline) return true;
 
   try {
-    const encodedExtras = encodeCloudSavedState(progress, favorites, applications);
+    const encodedExtras = encodeCloudSavedState(progress, favorites, applications, viewedHistory);
     const { error } = await supabase.from('user_progress').upsert(
       {
         user_key: key,

@@ -121,6 +121,12 @@ export const BACKEND_URL =
   process.env.RENDER_URL ||
   'https://it-start-bot.koyeb.app/';
 export const RENDER_URL = BACKEND_URL;
+export const PUBLIC_WEB_URL =
+  process.env.WEBAPP_URL ||
+  process.env.PUBLIC_URL ||
+  process.env.KOYEB_PUBLIC_URL ||
+  (process.env.KOYEB_PUBLIC_DOMAIN ? `https://${process.env.KOYEB_PUBLIC_DOMAIN.replace(/\/+$/, '')}/` : '') ||
+  GITHUB_PAGES_URL;
 export const VK_COMMUNITY_URL = process.env.VK_COMMUNITY_URL || 'https://vk.com/club242573933';
 
 export const VK_BOT_CONFIG = {
@@ -281,7 +287,7 @@ export const MAIN_VK_INLINE_KEYBOARD = createVkKeyboard({
     ],
     [
       { label: '🔔 Подписка', payload: { cmd: 'subscribe' }, color: 'positive' },
-      { label: '🌐 Веб-сайт', link: RENDER_URL },
+      { label: '🌐 Веб-сайт', link: PUBLIC_WEB_URL },
     ],
   ],
 });
@@ -332,7 +338,7 @@ export const VACANCIES_VK_KEYBOARD = createVkKeyboard({
     ],
     [
       { label: '🏢 Компании', payload: { cmd: 'companies' }, color: 'primary' },
-      { label: '🌐 Веб-сайт', link: RENDER_URL },
+      { label: '🌐 Веб-сайт', link: PUBLIC_WEB_URL },
     ],
   ],
 });
@@ -397,7 +403,7 @@ export function formatVkVacanciesList(items = [], title = 'Актуальные 
   text += '━━━━━━━━━━━━━━━━━━━━\n\n';
 
   slice.forEach((item, idx) => {
-    const verifiedApplyUrl = item.applyUrl || item.url || RENDER_URL;
+    const verifiedApplyUrl = item.applyUrl || item.url || PUBLIC_WEB_URL;
     const channel = resolveChannelHandle(item.sourceChannel || item.channel, item.company);
     const loc = formatLocation(item);
     const isTgPost = verifiedApplyUrl.includes('t.me/');
@@ -420,7 +426,7 @@ export function formatVkVacanciesList(items = [], title = 'Актуальные 
 
   text += `\n💡 Все вакансии с фильтрами, роадмапами и тренажёром доступны в приложении:\n`;
   text += `🚀 VK Mini App: https://vk.com/app${VK_APP_ID}\n`;
-  text += `🌐 Веб-версия без VPN: ${RENDER_URL}`;
+  text += `🌐 Веб-сайт: ${PUBLIC_WEB_URL}`;
   return text;
 }
 
@@ -991,7 +997,7 @@ export async function notifyVkSubscribers(vacancies = [], token = VK_BOT_TOKEN) 
       const isWeb = vac.sourceType === 'portal' || vac.sourceType === 'website';
       const sourceLabel = isWeb ? 'Карьерный сайт' : 'Telegram-канал';
       const sourceChannel = resolveChannelHandle(vac.sourceChannel || vac.channel, vac.company);
-      const applyUrl = vac.applyUrl || vac.url || RENDER_URL;
+      const applyUrl = vac.applyUrl || vac.url || PUBLIC_WEB_URL;
       const msg =
         `🔥 Новая стажировка!\n` +
         `━━━━━━━━━━━━━━━━━━━━\n` +
@@ -1081,7 +1087,7 @@ export async function sendVkCompanyDetails(peerId, targetCompany, token = VK_BOT
       if (tagsStr) {
         text += `🏷 Стек: ${tagsStr}\n`;
       }
-      text += `🔗 ${v.applyUrl || v.url || RENDER_URL}\n`;
+      text += `🔗 ${v.applyUrl || v.url || PUBLIC_WEB_URL}\n`;
       text += `─────────────────────\n`;
     });
   } else {
@@ -1089,7 +1095,7 @@ export async function sendVkCompanyDetails(peerId, targetCompany, token = VK_BOT
   }
 
   text += `\n━━━━━━━━━━━━━━━━━━━━\n`;
-  text += `🚀 VK Mini App: https://vk.com/app${VK_APP_ID}\n🌐 Веб-версия без VPN: ${RENDER_URL}`;
+  text += `🚀 VK Mini App: https://vk.com/app${VK_APP_ID}\n🌐 Веб-сайт: ${PUBLIC_WEB_URL}`;
 
   const keyboard = createVkKeyboard({
     inline: true,
@@ -1101,7 +1107,7 @@ export async function sendVkCompanyDetails(peerId, targetCompany, token = VK_BOT
       ],
       [
         { label: '🔔 Подписка', payload: { cmd: 'subscribe' }, color: 'positive' },
-        { label: '🌐 Веб-сайт', link: RENDER_URL },
+        { label: '🌐 Веб-сайт', link: PUBLIC_WEB_URL },
       ],
     ],
   });
@@ -1482,7 +1488,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
       `━━━━━━━━━━━━━━━━━━━━\n` +
       `🚀 Открыть древо роадмапов с сохранением личного прогресса:\n` +
       `📱 VK Mini App: https://vk.com/app${VK_APP_ID}\n` +
-      `🌐 Без VPN в браузере: ${RENDER_URL}`;
+      `🌐 Веб-сайт: ${PUBLIC_WEB_URL}`;
 
     const keyboard = createVkKeyboard({
       inline: true,
@@ -1494,7 +1500,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
         ],
         [
           { label: '🔔 Подписка', payload: { cmd: 'subscribe' }, color: 'positive' },
-          { label: '🌐 Веб-сайт', link: RENDER_URL },
+          { label: '🌐 Веб-сайт', link: PUBLIC_WEB_URL },
         ],
       ],
     });
@@ -1527,7 +1533,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
       `🎯 Доступен режим флеш-карточек и симуляция собеседования со скрытием ответа!\n\n` +
       `━━━━━━━━━━━━━━━━━━━━\n` +
       `🚀 Запустить тренажёр: https://vk.com/app${VK_APP_ID}\n` +
-      `🌐 Без VPN в браузере: ${RENDER_URL}`;
+      `🌐 Веб-сайт: ${PUBLIC_WEB_URL}`;
 
     const keyboard = createVkKeyboard({
       inline: true,
@@ -1539,7 +1545,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
         ],
         [
           { label: '🔔 Подписка', payload: { cmd: 'subscribe' }, color: 'positive' },
-          { label: '🌐 Веб-сайт', link: RENDER_URL },
+          { label: '🌐 Веб-сайт', link: PUBLIC_WEB_URL },
         ],
       ],
     });
@@ -1581,7 +1587,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
           { label: '🏢 Компании', payload: { cmd: 'companies' }, color: 'secondary' },
         ],
         [
-          { label: '🌐 Веб-сайт', link: RENDER_URL },
+          { label: '🌐 Веб-сайт', link: PUBLIC_WEB_URL },
           { label: '🔕 Отписаться', payload: { cmd: 'unsubscribe' }, color: 'negative' },
         ],
       ],
@@ -1656,7 +1662,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
       `Этот ID используется ботом IT-Старт для отправки персональных пуш-уведомлений о новых стажировках по вашему стеку.\n\n` +
       `🔔 Статус подписки: ${isSubscribed ? '✅ Активна (уведомления включены)' : '❌ Не активна (отправьте /subscribe для включения)'}\n` +
       `🚀 VK Mini App: https://vk.com/app${VK_APP_ID}\n` +
-      `🌐 Веб-версия без VPN: ${RENDER_URL}`;
+      `🌐 Веб-сайт: ${PUBLIC_WEB_URL}`;
 
     const keyboard = createVkKeyboard({
       inline: true,
@@ -1668,7 +1674,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
         ],
         [
           { label: '🏢 Компании', payload: { cmd: 'companies' }, color: 'secondary' },
-          { label: '🌐 Веб-сайт', link: RENDER_URL },
+          { label: '🌐 Веб-сайт', link: PUBLIC_WEB_URL },
         ],
       ],
     });
@@ -1734,7 +1740,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
         ],
         [
           { label: '🏢 Компании', payload: { cmd: 'companies' }, color: 'secondary' },
-          { label: '🌐 Веб-сайт', link: RENDER_URL },
+          { label: '🌐 Веб-сайт', link: PUBLIC_WEB_URL },
         ],
       ],
     });
@@ -1775,7 +1781,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
       `💾 База: Supabase PostgreSQL\n\n` +
       `━━━━━━━━━━━━━━━━━━━━\n` +
       `🚀 VK Mini App: vk.com/app${VK_APP_ID}\n` +
-      `🌐 Сайт без VPN: ${RENDER_URL}`;
+      `🌐 Веб-сайт: ${PUBLIC_WEB_URL}`;
 
     const reply = {
       peer_id: peerId,
@@ -1809,7 +1815,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
       `━━━━━━━━━━━━━━━━━━━━\n` +
       `Сервис доступен на любых устройствах без VPN:\n\n` +
       `📱 VK Mini App: запускается прямо в клиенте ВКонтакте\n` +
-      `🌐 Веб-сайт: ${RENDER_URL}\n` +
+      `🌐 Веб-сайт: ${PUBLIC_WEB_URL}\n` +
       `🌐 Зеркало: ${GITHUB_PAGES_URL}\n` +
       `✈️ Telegram-бот: @IT_start_izh_bot\n\n` +
       `В интерактивном приложении вас ждут:\n` +
@@ -1822,7 +1828,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
       buttons: [
         [
           { label: '📱 VK Mini App', app_id: Number(VK_APP_ID) },
-          { label: '🌐 Веб-сайт', link: RENDER_URL },
+          { label: '🌐 Веб-сайт', link: PUBLIC_WEB_URL },
         ],
         [
           { label: '💼 Вакансии', payload: { cmd: 'vacancies' }, color: 'primary' },
@@ -1856,7 +1862,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
       `Вы уже находитесь в официальном боте IT-Старт!\n\n` +
       `• 📱 VK Mini App: vk.com/app${VK_APP_ID}\n` +
       `• 👥 Сообщество: ${VK_COMMUNITY_URL}\n` +
-      `• 🌐 Веб-сайт: ${RENDER_URL}\n\n` +
+      `• 🌐 Веб-сайт: ${PUBLIC_WEB_URL}\n\n` +
       `💡 Посмотреть вакансии VK: отправьте /company_vk`;
 
     const keyboard = createVkKeyboard({
@@ -1865,7 +1871,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
         [{ label: '🚀 Открыть VK Mini App', app_id: VK_APP_ID }],
         [
           { label: '🏢 Вакансии VK', payload: { cmd: 'company', id: 'vk' }, color: 'primary' },
-          { label: '🌐 Веб-сайт', link: RENDER_URL },
+          { label: '🌐 Веб-сайт', link: PUBLIC_WEB_URL },
         ],
       ],
     });
@@ -1900,7 +1906,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
       `• 📱 WebApp: встроен прямо в мессенджер\n` +
       `• 🔔 Мгновенные уведомления о стажировках\n\n` +
       `🔗 Бот TG: t.me/IT_start_izh_bot\n` +
-      `🌐 Сайт без VPN: ${RENDER_URL}\n` +
+      `🌐 Веб-сайт: ${PUBLIC_WEB_URL}\n` +
       `🚀 VK Mini App: vk.com/app${VK_APP_ID}`;
 
     const keyboard = createVkKeyboard({
@@ -1910,7 +1916,7 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
         [{ label: '🚀 Открыть VK Mini App', app_id: VK_APP_ID }],
         [
           { label: '💼 Стажировки', payload: { cmd: 'vacancies' }, color: 'primary' },
-          { label: '🌐 Веб-сайт', link: RENDER_URL },
+          { label: '🌐 Веб-сайт', link: PUBLIC_WEB_URL },
         ],
       ],
     });

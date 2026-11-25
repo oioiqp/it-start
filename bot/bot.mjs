@@ -91,7 +91,13 @@ export const BACKEND_URL =
   process.env.RENDER_URL ||
   'https://it-start-bot.koyeb.app/';
 export const RENDER_URL = BACKEND_URL;
-export const WEBAPP_URL = process.env.WEBAPP_URL || BACKEND_URL;
+export const PUBLIC_WEB_URL =
+  process.env.WEBAPP_URL ||
+  process.env.PUBLIC_URL ||
+  process.env.KOYEB_PUBLIC_URL ||
+  (process.env.KOYEB_PUBLIC_DOMAIN ? `https://${process.env.KOYEB_PUBLIC_DOMAIN.replace(/\/+$/, '')}/` : '') ||
+  GITHUB_PAGES_URL;
+export const WEBAPP_URL = process.env.WEBAPP_URL || PUBLIC_WEB_URL;
 const BOT_USERNAME = 'IT_start_izh_bot';
 export const PORT = process.env.PORT ? (Number(process.env.PORT) || 8000) : 8000;
 export let isRunning = true;
@@ -1615,7 +1621,7 @@ export const server = http.createServer(async (req, res) => {
               [{ label: '🚀 Открыть в Mini App', app_id: VK_APP_ID }],
               ...(directUrl
                 ? [[{ label: actionLabel || '🔗 Откликнуться на вакансию', link: directUrl }]]
-                : [[{ label: '🌐 Веб-сайт', link: RENDER_URL }]]),
+                : [[{ label: '🌐 Веб-сайт', link: PUBLIC_WEB_URL }]]),
             ],
           });
           const vkRes = await sendVkNotification(cleanPeerId, text, { keyboard, checkPermission: false, applyUrl: directUrl });
@@ -4810,7 +4816,7 @@ export async function handleMessage(msg) {
         `👤 Профиль: <b>${firstName}</b>${username ? ` (@${username})` : ''}\n` +
         `🆔 Ваш Telegram ID: <code>${chatId}</code>\n` +
         `🔕 Уведомления о вакансиях <b>отключены</b> (можно включить на сайте по желанию).\n\n` +
-        `Вернитесь на сайт и нажмите <b>«Определить Chat ID автоматически»</b> или вставьте ID <code>${chatId}</code> — ваш прогресс роадмапов, тренажёра, избранное и отклики будут синхронизироваться в облаке.`;
+        `Нажмите кнопку ниже, чтобы сразу войти на сайт или в WebApp под своим профилем — история просмотров, отклики, избранное и прогресс роадмапов будут сохраняться в облаке.`;
 
       await callTelegram('sendMessage', {
         chat_id: chatId,
@@ -4819,6 +4825,7 @@ export async function handleMessage(msg) {
         reply_markup: {
           inline_keyboard: [
             [{ text: '🚀 Открыть IT-Старт с этим профилем', web_app: { url: webAppUrlWithParams } }],
+            [{ text: '🌐 Войти в браузере (с историей)', url: webAppUrlWithParams }],
           ],
         },
       });
@@ -4859,7 +4866,7 @@ export async function handleMessage(msg) {
           { text: '⚡ Скан', callback_data: 'scan' },
         ],
         [
-          { text: '🌐 Веб-сайт', url: RENDER_URL },
+          { text: '🌐 Веб-сайт', url: PUBLIC_WEB_URL },
           { text: 'ℹ️ Помощь', callback_data: 'help' },
         ],
       ],
@@ -5061,7 +5068,7 @@ export async function handleMessage(msg) {
       `💬 <b>Диалог с ботом VK:</b> https://vk.com/im?sel=-242573933\n` +
       `👥 <b>Группа ВКонтакте:</b> https://vk.com/club242573933\n` +
       `🚀 <b>VK Mini App:</b> https://vk.com/app54857681\n` +
-      `🌐 <b>Сайт платформы без VPN:</b> ${RENDER_URL}`;
+      `🌐 <b>Веб-сайт:</b> ${PUBLIC_WEB_URL}`;
 
     await callTelegram('sendMessage', {
       chat_id: chatId,
@@ -5075,7 +5082,7 @@ export async function handleMessage(msg) {
           ],
           [
             { text: '💼 Стажировки', callback_data: 'vacancies:all' },
-            { text: '🌐 Веб-сайт', url: RENDER_URL },
+            { text: '🌐 Веб-сайт', url: PUBLIC_WEB_URL },
           ],
         ],
       },
@@ -5099,7 +5106,7 @@ export async function handleMessage(msg) {
       `• 🚀 Telegram WebApp: запускается в 1 клик прямо в чате\n` +
       `• 🔔 Персональные пуш-уведомления о новых вакансиях\n` +
       `• 🗺 Роадмапы и тренажёр собеседований\n\n` +
-      `🌐 <b>Сайт платформы без VPN:</b> ${RENDER_URL}\n` +
+      `🌐 <b>Веб-сайт:</b> ${PUBLIC_WEB_URL}\n` +
       `📱 <b>ВКонтакте Mini App:</b> https://vk.com/app54857681`;
     await callTelegram('sendMessage', {
       chat_id: chatId,
@@ -5110,7 +5117,7 @@ export async function handleMessage(msg) {
           [{ text: '🚀 Запустить WebApp', web_app: { url: webAppUrlWithParams } }],
           [
             { text: '💼 Стажировки', callback_data: 'vacancies:all' },
-            { text: '🌐 Веб-сайт', url: RENDER_URL },
+            { text: '🌐 Веб-сайт', url: PUBLIC_WEB_URL },
           ],
         ],
       },
@@ -5159,7 +5166,7 @@ export async function handleMessage(msg) {
           { text: '❓ Тренажёр', callback_data: 'questions' },
         ],
         [
-          { text: '🌐 Веб-сайт', url: RENDER_URL },
+          { text: '🌐 Веб-сайт', url: PUBLIC_WEB_URL },
           { text: 'ℹ️ Помощь', callback_data: 'help' },
         ],
       ],
@@ -5201,7 +5208,7 @@ export async function sendSubscribe(chatId, firstName = 'Разработчик'
           { text: '🏢 Компании', callback_data: 'companies' },
         ],
         [
-          { text: '🌐 Веб-сайт', url: RENDER_URL },
+          { text: '🌐 Веб-сайт', url: PUBLIC_WEB_URL },
           { text: '🔕 Отписаться', callback_data: 'unsubscribe' },
         ],
       ],
@@ -5240,7 +5247,7 @@ export async function sendId(chatId, firstName = 'Разработчик', usern
         ],
         [
           { text: '🏢 Компании', callback_data: 'companies' },
-          { text: '🌐 Веб-сайт', url: RENDER_URL },
+          { text: '🌐 Веб-сайт', url: PUBLIC_WEB_URL },
         ],
       ],
     },
@@ -5280,7 +5287,7 @@ export async function sendVacancies(chatId, filter = 'all') {
     text += `🔍 По вашему запросу стажировок не найдено.\nПопробуйте выбрать другое направление или компанию ниже!`;
   } else {
     list.slice(0, 5).forEach((item, idx) => {
-      const applyUrl = item.applyUrl || item.url || RENDER_URL;
+      const applyUrl = item.applyUrl || item.url || PUBLIC_WEB_URL;
       const webAppVacancyUrl = `${WEBAPP_URL}${WEBAPP_URL.includes('?') ? '&' : '?'}vacancyId=${item.id}`;
       const channel = resolveChannelHandle(item.sourceChannel || item.channel, item.company);
       const stack = Array.isArray(item.tags) && item.tags.length > 0 ? item.tags.slice(0, 4).join(' • ') : '';
@@ -5304,7 +5311,7 @@ export async function sendVacancies(chatId, filter = 'all') {
       text += `<i>... и ещё ${list.length - 5} стажировок доступно в WebApp!</i>\n\n`;
     }
     text += `💡 <i>Все фильтры, роадмапы и тренажёр доступны в приложении:</i>\n`;
-    text += `🌐 <a href="${RENDER_URL}">Сайт без VPN</a> • 📱 <a href="https://vk.com/app54857681">VK Mini App</a>`;
+    text += `🌐 <a href="${PUBLIC_WEB_URL}">Веб-сайт</a> • 📱 <a href="https://vk.com/app54857681">VK Mini App</a>`;
   }
 
   if (text.length > 3900) {
@@ -5353,7 +5360,7 @@ export async function sendVacancies(chatId, filter = 'all') {
         { text: '🚀 Открыть в WebApp', web_app: { url: webAppUrlWithParams } },
       ],
       [
-        { text: '🌐 Открыть сайт без VPN', url: RENDER_URL },
+        { text: '🌐 Открыть сайт', url: PUBLIC_WEB_URL },
       ],
     ],
   };
@@ -5411,7 +5418,7 @@ export async function sendCompanies(chatId) {
         { text: '🚀 Смотреть в WebApp', web_app: { url: webAppUrlWithParams } },
       ],
       [
-        { text: '🌐 Веб-сайт без VPN', url: RENDER_URL },
+        { text: '🌐 Веб-сайт', url: PUBLIC_WEB_URL },
       ],
     ],
   };
@@ -5453,7 +5460,7 @@ export async function sendCompanyVacancies(chatId, companyId) {
     text += `🔍 Сейчас прямых позиций в базе нет, но парсер отслеживает <code>${company.channel}</code> 24/7!\nПроверьте WebApp или сайт компании:\n`;
   } else {
     list.slice(0, 5).forEach((item, idx) => {
-      const applyUrl = item.applyUrl || item.url || RENDER_URL;
+      const applyUrl = item.applyUrl || item.url || PUBLIC_WEB_URL;
       const salaryFormatted = formatSalary(item.salary);
       const loc = formatLocation(item);
       const stack = Array.isArray(item.tags) && item.tags.length > 0 ? item.tags.slice(0, 4).join(' • ') : '';
@@ -5483,7 +5490,7 @@ export async function sendCompanyVacancies(chatId, companyId) {
         { text: '💼 Вакансии', callback_data: 'vacancies:all' },
       ],
       [
-        { text: '🌐 Веб-сайт без VPN', url: RENDER_URL },
+        { text: '🌐 Веб-сайт', url: PUBLIC_WEB_URL },
       ],
     ],
   };
@@ -5534,7 +5541,7 @@ export async function runManualScan(chatId) {
         { text: '🚀 Открыть WebApp', web_app: { url: webAppUrlWithParams } },
       ],
       [
-        { text: '🌐 Веб-сайт без VPN', url: RENDER_URL },
+        { text: '🌐 Веб-сайт', url: PUBLIC_WEB_URL },
       ],
     ],
   };
@@ -5585,7 +5592,7 @@ export async function sendStatus(chatId) {
         { text: '🚀 Открыть WebApp', web_app: { url: webAppUrlWithParams } },
       ],
       [
-        { text: '🌐 Веб-сайт без VPN', url: RENDER_URL },
+        { text: '🌐 Веб-сайт', url: PUBLIC_WEB_URL },
       ],
     ],
   };
@@ -5631,7 +5638,7 @@ export async function sendRoadmaps(chatId) {
         { text: '❓ Тренажёр', callback_data: 'questions' },
       ],
       [
-        { text: '🌐 Веб-сайт', url: RENDER_URL },
+        { text: '🌐 Веб-сайт', url: PUBLIC_WEB_URL },
         { text: '🏠 Меню', callback_data: 'help' },
       ],
     ],
@@ -5676,7 +5683,7 @@ export async function sendQuestions(chatId) {
         { text: '🗺 Роадмапы', callback_data: 'roadmaps' },
       ],
       [
-        { text: '🌐 Веб-сайт', url: RENDER_URL },
+        { text: '🌐 Веб-сайт', url: PUBLIC_WEB_URL },
         { text: '🔔 Подписка', callback_data: 'subscribe' },
       ],
     ],
@@ -5701,7 +5708,7 @@ export async function sendSite(chatId) {
   const text =
     `🚀 <b>Платформа IT-Старт доступна на всех устройствах:</b>\n` +
     `━━━━━━━━━━━━━━━━━━━━\n` +
-    `🌐 <b>Веб-версия без VPN:</b> ${RENDER_URL}\n` +
+    `🌐 <b>Веб-сайт:</b> ${PUBLIC_WEB_URL}\n` +
     `✈️ <b>Telegram Mini App:</b> запускается прямо внутри этого чата\n` +
     `📱 <b>ВКонтакте Mini App:</b> https://vk.com/app54857681\n` +
     `🐙 <b>Зеркало на GitHub Pages:</b> ${GITHUB_PAGES_URL}\n\n` +
@@ -5716,7 +5723,7 @@ export async function sendSite(chatId) {
         { text: '🚀 Запустить Telegram WebApp', web_app: { url: webAppUrlWithParams } },
       ],
       [
-        { text: '🌐 Открыть сайт без VPN', url: RENDER_URL },
+        { text: '🌐 Открыть сайт', url: PUBLIC_WEB_URL },
       ],
       [
         { text: '💼 Стажировки', callback_data: 'vacancies:all' },
@@ -5766,7 +5773,7 @@ export async function sendHelp(chatId) {
     `• /frontend • /backend • /mobile\n` +
     `• /data_science • /qa • /devops\n\n` +
     `💡 <i>Вы также можете отправить название («яндекс», «т1», «контур», «директум») или стека («фронтенд», «бэкенд»)!</i>\n\n` +
-    `🌐 <b>Сайт платформы без VPN:</b> ${RENDER_URL}`;
+    `🌐 <b>Веб-сайт:</b> ${PUBLIC_WEB_URL}`;
 
   const keyboard = {
     inline_keyboard: [
@@ -5783,7 +5790,7 @@ export async function sendHelp(chatId) {
       ],
       [
         { text: '🔔 Подписка', callback_data: 'subscribe' },
-        { text: '🌐 Веб-сайт', url: RENDER_URL },
+        { text: '🌐 Веб-сайт', url: PUBLIC_WEB_URL },
       ],
     ],
   };
@@ -5891,7 +5898,7 @@ export async function handleCallbackQuery(query) {
                 { text: '🚀 Открыть в WebApp', web_app: { url: webAppUrlWithParams } },
               ],
               [
-                { text: '🌐 Открыть сайт без VPN', url: RENDER_URL },
+                { text: '🌐 Открыть сайт', url: PUBLIC_WEB_URL },
               ],
             ],
           };
@@ -5954,7 +5961,7 @@ export async function handleCallbackQuery(query) {
                 { text: '🚀 Открыть в WebApp', web_app: { url: webAppUrlWithParams } },
               ],
               [
-                { text: '🌐 Открыть сайт без VPN', url: RENDER_URL },
+                { text: '🌐 Открыть сайт', url: PUBLIC_WEB_URL },
               ],
             ],
           };
@@ -5982,6 +5989,17 @@ let offset = 0;
 async function pollUpdates() {
   console.log(`🚀 Бот @${BOT_USERNAME} успешно запущен в режиме Long Polling!`);
   console.log(`Нажмите Ctrl+C для остановки.\n`);
+
+  // Ensure Telegram persistent menu button points to live GitHub Pages WebApp (never dead Koyeb 404)
+  if (BOT_TOKEN) {
+    callTelegram('setChatMenuButton', {
+      menu_button: {
+        type: 'web_app',
+        text: 'IT-Старт',
+        web_app: { url: WEBAPP_URL },
+      },
+    }).catch(() => {});
+  }
 
   // Initial channel sync on startup (delayed by 4s to let HTTP server start)
   setTimeout(() => {

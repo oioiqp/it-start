@@ -148,6 +148,11 @@ export function setCachedTelegramUser(user: TelegramUser | null): void {
   }
 }
 
+export function isTelegramAuthOnlyUrl(): boolean {
+  if (typeof window === 'undefined') return false;
+  return (window.location.search || '').includes('auth_only=1');
+}
+
 export function isTelegramWebApp(): boolean {
   if (typeof window === 'undefined') return false;
   if (window.Telegram?.WebApp?.initDataUnsafe?.user) return true;
@@ -411,7 +416,8 @@ export async function autoDetectChatIdFromUpdates(
   if (!token) {
     return {
       success: false,
-      error: 'Укажите Bot Token для автоматического поиска Chat ID через getUpdates',
+      error:
+        'Откройте диалог с @IT_start_izh_bot кнопкой выше и нажмите кнопку входа в ответном сообщении — авторизация пройдёт автоматически, либо вставьте ваш Chat ID вручную.',
     };
   }
 

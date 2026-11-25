@@ -533,10 +533,10 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
             </h2>
             <p className="text-xs text-neutral-600 dark:text-neutral-300 truncate leading-relaxed">
               {isStandaloneWeb
-                ? 'Сохранение роадмапов, тренажёра, избранного и откликов в облаке • Уведомления по желанию'
+                ? 'Сохранение истории просмотров, откликов, избранного и прогресса • Уведомления по желанию'
                 : platform === 'vk'
-                ? 'Синхронизация прогресса и уведомления от VK-бота IT-Старт'
-                : `Синхронизация прогресса и уведомления от бота @${TELEGRAM_BOT_USERNAME}`}
+                ? 'Синхронизация истории и уведомления от VK-бота IT-Старт'
+                : `Синхронизация истории и уведомления от бота @${TELEGRAM_BOT_USERNAME}`}
             </p>
           </div>
         </div>
@@ -595,10 +595,10 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
               <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
               <div className="space-y-0.5 text-[11px] text-neutral-700 dark:text-neutral-200 leading-relaxed">
                 <div className="font-bold text-neutral-900 dark:text-white">
-                  Авторизация для сохранения вашего состояния
+                  Авторизация для сохранения вашего состояния и истории
                 </div>
                 <p>
-                  Вход через Telegram или ВКонтакте привязывает к вашему ID прогресс роадмапов, вопросы тренажёра, избранные стажировки и отклики. Можно войти без уведомлений.
+                  Вход через Telegram или ВКонтакте привязывает к вашему ID историю просмотров и откликов, прогресс роадмапов, вопросы тренажёра и избранное. Можно войти без уведомлений.
                 </p>
               </div>
             </div>

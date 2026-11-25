@@ -23,6 +23,7 @@ import type {
   TelegramSubscription,
   TelegramUser,
   UserProgress,
+  ViewedVacancyEntry,
   WorkFormat,
 } from './types';
 import { DIRECTIONS } from './data/directions';
@@ -69,8 +70,11 @@ import {
   addLocalApplication,
   removeLocalApplication,
   saveLocalApplications,
+  getLocalViewedHistory,
+  saveLocalViewedHistory,
+  addLocalViewedVacancy,
 } from './lib/storage';
-import { initTelegramWebApp, triggerHaptic } from './lib/telegram';
+import { initTelegramWebApp, isTelegramAuthOnlyUrl, triggerHaptic } from './lib/telegram';
 import {
   initVkBridge,
   isVkMiniApp,
@@ -90,8 +94,9 @@ export function App() {
   const [favorites, setFavorites] = useState<string[]>(() => getLocalFavorites());
   const [onlyFavorites, setOnlyFavorites] = useState<boolean>(false);
 
-  // Applications state
+  // Applications & Viewing History state
   const [applications, setApplications] = useState<JobApplication[]>(() => getLocalApplications());
+  const [viewedHistory, setViewedHistory] = useState<ViewedVacancyEntry[]>(() => getLocalViewedHistory());
 
   // Company info modal state
   const [selectedCompanyForInfo, setSelectedCompanyForInfo] = useState<string | null>(null);
@@ -112,7 +117,11 @@ export function App() {
     if (cached) return cached;
     const lp = getVkLaunchParams();
     if (lp.vk_user_id) {
-      return { id: lp.vk_user_id, first_name: 'Пользователь VK' };
+      return {
+        id: lp.vk_user_id,
+        first_name: typeof lp.vk_first_name === 'string' && lp.vk_first_name ? lp.vk_first_name : 'Пользователь VK',
+        last_name: typeof lp.vk_last_name === 'string' && lp.vk_last_name ? lp.vk_last_name : undefined,
+      };
     }
     return null;
   });
@@ -189,6 +198,7 @@ export function App() {
         setCurrentSubscription(remoteExisting);
         return;
       }
+      const isAuthOnlyUrl = isTelegramAuthOnlyUrl();
       const autoSub: TelegramSubscription = {
         chat_id: String(u.id),
         username: u.username || existing?.username || '',
@@ -199,7 +209,7 @@ export function App() {
         sub_tracks: existing?.sub_tracks?.length
           ? existing.sub_tracks
           : ['react', 'python', 'nodejs', 'golang', 'auto_qa', 'cicd_docker'],
-        is_active: true,
+        is_active: !isAuthOnlyUrl,
         created_at: existing?.created_at || new Date().toISOString(),
       };
       saveLocalSubscription(autoSub);
@@ -364,11 +374,15 @@ export function App() {
         saveLocalFavorites(cloud.favorites);
         setApplications(cloud.applications);
         saveLocalApplications(cloud.applications);
+        const restoredViews = cloud.viewedHistory || [];
+        setViewedHistory(restoredViews);
+        saveLocalViewedHistory(restoredViews);
       } else {
         // First time seeing this user in cloud: push any existing local state
         saveUserProgressToSupabase(activeCloudKey, getLocalProgress(), {
           favorites: getLocalFavorites(),
           applications: getLocalApplications(),
+          viewedHistory: getLocalViewedHistory(),
         });
       }
 
@@ -414,6 +428,7 @@ export function App() {
       const localProg = getLocalProgress();
       const localFavs = getLocalFavorites();
       const localApps = getLocalApplications();
+      const localViews = getLocalViewedHistory();
 
       if (cloud) {
         const mergedCompletedTopics = Array.from(
@@ -444,21 +459,37 @@ export function App() {
         });
         const mergedApps = Array.from(appMap.values());
 
+        const viewMap = new Map<string, ViewedVacancyEntry>();
+        [...(cloud.viewedHistory || []), ...localViews].forEach((v) => {
+          if (!v || !v.id) return;
+          const prev = viewMap.get(v.id);
+          if (!prev || v.viewedAt > prev.viewedAt) {
+            viewMap.set(v.id, v);
+          }
+        });
+        const mergedViews = Array.from(viewMap.values())
+          .sort((a, b) => b.viewedAt.localeCompare(a.viewedAt))
+          .slice(0, 40);
+
         setUserProgress(mergedProgress);
         saveLocalProgress(mergedProgress);
         setFavorites(mergedFavorites);
         saveLocalFavorites(mergedFavorites);
         setApplications(mergedApps);
         saveLocalApplications(mergedApps);
+        setViewedHistory(mergedViews);
+        saveLocalViewedHistory(mergedViews);
 
         saveUserProgressToSupabase(nextKey, mergedProgress, {
           favorites: mergedFavorites,
           applications: mergedApps,
+          viewedHistory: mergedViews,
         });
       } else {
         saveUserProgressToSupabase(nextKey, localProg, {
           favorites: localFavs,
           applications: localApps,
+          viewedHistory: localViews,
         });
       }
 
@@ -494,7 +525,23 @@ export function App() {
     saveLocalFavorites([]);
     setApplications([]);
     saveLocalApplications([]);
+    setViewedHistory([]);
+    saveLocalViewedHistory([]);
   }, []);
+
+  const handleOpenInternship = useCallback(
+    (internship: Internship) => {
+      setSelectedInternshipForPlan(internship);
+      const nextViews = addLocalViewedVacancy(internship.id);
+      setViewedHistory(nextViews);
+      saveUserProgressToSupabase(activeCloudKey, userProgress, {
+        favorites,
+        applications,
+        viewedHistory: nextViews,
+      });
+    },
+    [activeCloudKey, userProgress, favorites, applications]
+  );
 
   // Save progress helper (syncs local & complete cloud state)
   const updateProgress = (updater: (prev: UserProgress) => UserProgress) => {
@@ -505,6 +552,7 @@ export function App() {
       saveUserProgressToSupabase(activeCloudKey, next, {
         favorites,
         applications,
+        viewedHistory,
       });
 
       return next;
@@ -613,6 +661,7 @@ export function App() {
     saveUserProgressToSupabase(activeCloudKey, userProgress, {
       favorites: next,
       applications,
+      viewedHistory,
     });
   };
 
@@ -659,9 +708,12 @@ export function App() {
     };
     const next = addLocalApplication(newApp);
     setApplications(next);
+    const nextViews = addLocalViewedVacancy(internship.id);
+    setViewedHistory(nextViews);
     saveUserProgressToSupabase(activeCloudKey, userProgress, {
       favorites,
       applications: next,
+      viewedHistory: nextViews,
     });
   };
 
@@ -672,6 +724,7 @@ export function App() {
     saveUserProgressToSupabase(activeCloudKey, userProgress, {
       favorites,
       applications: next,
+      viewedHistory,
     });
   };
 
@@ -681,6 +734,7 @@ export function App() {
     saveUserProgressToSupabase(activeCloudKey, userProgress, {
       favorites,
       applications: next,
+      viewedHistory,
     });
   };
 
@@ -808,189 +862,190 @@ export function App() {
 
       {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-7">
+        {/* Global Auth & History Sync Banner (Visible on EVERY tab so guests always see how to save history) */}
+        <div className="mb-5">
+          {vkUser && (
+            <div className="flex items-center justify-between gap-2.5 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl sm:rounded-full liquid-glass border border-blue-500/20 shadow-xs transition-all duration-300">
+              <div className="flex items-center gap-2.5 min-w-0">
+                {vkUser.photo_100 || vkUser.photo_200 ? (
+                  <img
+                    src={vkUser.photo_100 || vkUser.photo_200}
+                    alt={vkUser.first_name || 'VK'}
+                    className="w-8 h-8 rounded-full object-cover border border-blue-500/30 shrink-0 shadow-xs"
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
+                    VK
+                  </div>
+                )}
+                <div className="min-w-0">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="text-xs sm:text-sm font-bold text-neutral-900 truncate">
+                      {vkUser.first_name} {vkUser.last_name || ''}
+                    </span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
+                    <span className="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-blue-500/10 text-blue-600 border border-blue-500/20 shrink-0">
+                      VK Mini App • Авторизован
+                    </span>
+                  </div>
+                  <div className="text-[10px] sm:text-[11px] text-neutral-500 font-medium truncate">
+                    История и прогресс сохраняются • {userProgress.completedTopics.length} тем • {applications.length} откл. • {viewedHistory.length} просм.
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={() => {
+                  triggerHaptic('medium');
+                  setIsSubscribeModalOpen(true);
+                }}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-all active:scale-95 shrink-0 cursor-pointer"
+                title="Настроить профиль и уведомления ВКонтакте"
+              >
+                <Bot className="w-3.5 h-3.5" />
+                <span className="sm:hidden text-xs font-semibold">Пуши</span>
+                <span className="hidden sm:inline text-xs font-semibold">Уведомления</span>
+              </button>
+            </div>
+          )}
+
+          {telegramUser && !vkUser && (
+            <div className="flex items-center justify-between gap-2.5 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl sm:rounded-full liquid-glass border border-sky-500/25 shadow-xs transition-all duration-300">
+              <div className="flex items-center gap-2.5 min-w-0">
+                {telegramUser.photo_url ? (
+                  <img
+                    src={telegramUser.photo_url}
+                    alt={telegramUser.first_name || 'TG'}
+                    className="w-8 h-8 rounded-full object-cover border border-sky-500/30 shrink-0 shadow-xs"
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-sky-600 to-blue-500 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
+                    {telegramUser.first_name ? telegramUser.first_name.slice(0, 2).toUpperCase() : 'TG'}
+                  </div>
+                )}
+                <div className="min-w-0">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="text-xs sm:text-sm font-bold text-neutral-900 truncate">
+                      {telegramUser.first_name} {telegramUser.last_name || ''}
+                    </span>
+                    {telegramUser.username && (
+                      <span className="text-[11px] text-neutral-500 font-medium truncate">
+                        @{telegramUser.username}
+                      </span>
+                    )}
+                    <span className="w-1.5 h-1.5 rounded-full bg-sky-500 shrink-0" />
+                    <span className="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-sky-500/10 text-sky-700 border border-sky-500/20 shrink-0">
+                      Telegram • Авторизован
+                    </span>
+                  </div>
+                  <div className="text-[10px] sm:text-[11px] text-neutral-500 font-medium truncate">
+                    История и прогресс сохраняются • {userProgress.completedTopics.length} тем • {applications.length} откл. • {viewedHistory.length} просм.
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={() => {
+                  triggerHaptic('medium');
+                  setIsSubscribeModalOpen(true);
+                }}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neutral-900 hover:bg-black text-white text-xs font-semibold shadow-xs transition-all active:scale-95 shrink-0 cursor-pointer"
+                title="Настроить профиль и уведомления в Telegram"
+              >
+                <Send className="w-3.5 h-3.5 text-sky-400" />
+                <span className="sm:hidden text-xs font-semibold">Пуши TG</span>
+                <span className="hidden sm:inline text-xs font-semibold">Уведомления TG</span>
+              </button>
+            </div>
+          )}
+
+          {!vkUser && !telegramUser && (
+            authProfile ? (
+              <div className="flex items-center justify-between gap-2.5 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl sm:rounded-full liquid-glass border border-emerald-500/20 shadow-xs transition-all duration-300">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div
+                    className={`w-8 h-8 rounded-full text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs ${
+                      authProfile.platform === 'vk' ? 'bg-blue-600' : 'bg-sky-600'
+                    }`}
+                  >
+                    {authProfile.platform === 'vk' ? 'VK' : 'TG'}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-white truncate">
+                        {authProfile.firstName ||
+                          (authProfile.username ? `@${authProfile.username}` : `ID ${authProfile.id}`)}
+                      </span>
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 shrink-0">
+                        <ShieldCheck className="w-3 h-3" />
+                        <span>Авторизован</span>
+                      </span>
+                      <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium liquid-glass-pill text-neutral-600 dark:text-neutral-300 shrink-0">
+                        {authProfile.notificationsEnabled ? (
+                          <>
+                            <Bell className="w-3 h-3 text-emerald-600" />
+                            <span>Уведомления вкл</span>
+                          </>
+                        ) : (
+                          <>
+                            <BellOff className="w-3 h-3 text-neutral-400" />
+                            <span>Без уведомлений</span>
+                          </>
+                        )}
+                      </span>
+                    </div>
+                    <div className="text-[10px] sm:text-[11px] text-neutral-500 dark:text-neutral-400 font-medium truncate">
+                      История сохраняется в облаке • {userProgress.completedTopics.length} тем • {applications.length} откл. • {viewedHistory.length} просм.
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    triggerHaptic('medium');
+                    setIsSubscribeModalOpen(true);
+                  }}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neutral-900 hover:bg-black text-white dark:bg-white dark:text-neutral-900 text-xs font-semibold shadow-xs transition-all active:scale-95 shrink-0 cursor-pointer"
+                >
+                  <span>Профиль</span>
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center justify-between gap-2.5 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl sm:rounded-full liquid-glass border border-black/15 dark:border-white/15 shadow-xs transition-all duration-300">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-8 h-8 rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 flex items-center justify-center shrink-0 shadow-xs">
+                    <LogIn className="w-4 h-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-white truncate">
+                      Войдите через Telegram или ВКонтакте, чтобы сохранять историю
+                    </div>
+                    <div className="text-[10px] sm:text-[11px] text-neutral-600 dark:text-neutral-300 truncate">
+                      История просмотров, откликов, избранное и прогресс роадмапов • Можно войти без уведомлений
+                    </div>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    triggerHaptic('medium');
+                    setIsSubscribeModalOpen(true);
+                  }}
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-neutral-900 hover:bg-black text-white dark:bg-white dark:text-neutral-950 text-xs font-semibold shadow-xs transition-all active:scale-95 shrink-0 cursor-pointer"
+                >
+                  <LogIn className="w-3.5 h-3.5" />
+                  <span className="sm:hidden">Войти</span>
+                  <span className="hidden sm:inline">Войти (TG / VK)</span>
+                </button>
+              </div>
+            )
+          )}
+        </div>
+
         {/* TAB 1: INTERNSHIPS FEED */}
         {activeTab === 'internships' && (
           <div className="relative space-y-6">
-            {/* VK Mini App Profile Card (When opened inside VK) */}
-            {/* Ultra-Compact Sleek Apple Liquid Glass Profile Capsule */}
-            {vkUser && (
-              <div className="flex items-center justify-between gap-2.5 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl sm:rounded-full liquid-glass border border-blue-500/20 shadow-xs transition-all duration-300">
-                <div className="flex items-center gap-2.5 min-w-0">
-                  {vkUser.photo_100 || vkUser.photo_200 ? (
-                    <img
-                      src={vkUser.photo_100 || vkUser.photo_200}
-                      alt={vkUser.first_name || 'VK'}
-                      className="w-8 h-8 rounded-full object-cover border border-blue-500/30 shrink-0 shadow-xs"
-                    />
-                  ) : (
-                    <div className="w-8 h-8 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
-                      VK
-                    </div>
-                  )}
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className="text-xs sm:text-sm font-bold text-neutral-900 truncate">
-                        {vkUser.first_name} {vkUser.last_name || ''}
-                      </span>
-                      <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
-                      <span className="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-blue-500/10 text-blue-600 border border-blue-500/20 shrink-0">
-                        VK Mini App
-                      </span>
-                    </div>
-                    <div className="text-[10px] sm:text-[11px] text-neutral-500 font-medium truncate">
-                      {userProgress.completedTopics.length} тем • {userProgress.completedQuestions.length} вопросов
-                    </div>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => {
-                    triggerHaptic('medium');
-                    setIsSubscribeModalOpen(true);
-                  }}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-all active:scale-95 shrink-0 cursor-pointer"
-                  title="Настроить уведомления ВКонтакте"
-                >
-                  <Bot className="w-3.5 h-3.5" />
-                  <span className="sm:hidden text-xs font-semibold">Пуши</span>
-                  <span className="hidden sm:inline text-xs font-semibold">Уведомления</span>
-                </button>
-              </div>
-            )}
-
-            {/* Telegram Mini App Profile Card (When opened inside Telegram) */}
-            {telegramUser && !vkUser && (
-              <div className="flex items-center justify-between gap-2.5 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl sm:rounded-full liquid-glass border border-sky-500/25 shadow-xs transition-all duration-300">
-                <div className="flex items-center gap-2.5 min-w-0">
-                  {telegramUser.photo_url ? (
-                    <img
-                      src={telegramUser.photo_url}
-                      alt={telegramUser.first_name || 'TG'}
-                      className="w-8 h-8 rounded-full object-cover border border-sky-500/30 shrink-0 shadow-xs"
-                    />
-                  ) : (
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-sky-600 to-blue-500 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
-                      {telegramUser.first_name ? telegramUser.first_name.slice(0, 2).toUpperCase() : 'TG'}
-                    </div>
-                  )}
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className="text-xs sm:text-sm font-bold text-neutral-900 truncate">
-                        {telegramUser.first_name} {telegramUser.last_name || ''}
-                      </span>
-                      {telegramUser.username && (
-                        <span className="text-[11px] text-neutral-500 font-medium truncate">
-                          @{telegramUser.username}
-                        </span>
-                      )}
-                      <span className="w-1.5 h-1.5 rounded-full bg-sky-500 shrink-0" />
-                      <span className="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-sky-500/10 text-sky-700 border border-sky-500/20 shrink-0">
-                        Telegram Mini App
-                      </span>
-                    </div>
-                    <div className="text-[10px] sm:text-[11px] text-neutral-500 font-medium truncate">
-                      {userProgress.completedTopics.length} тем • {userProgress.completedQuestions.length} вопросов
-                    </div>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => {
-                    triggerHaptic('medium');
-                    setIsSubscribeModalOpen(true);
-                  }}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neutral-900 hover:bg-black text-white text-xs font-semibold shadow-xs transition-all active:scale-95 shrink-0 cursor-pointer"
-                  title="Настроить уведомления в Telegram"
-                >
-                  <Send className="w-3.5 h-3.5 text-sky-400" />
-                  <span className="sm:hidden text-xs font-semibold">Пуши TG</span>
-                  <span className="hidden sm:inline text-xs font-semibold">Уведомления TG</span>
-                </button>
-              </div>
-            )}
-
-            {/* Standalone Web Auth / Cloud Sync Strip */}
-            {!vkUser && !telegramUser && (
-              authProfile ? (
-                <div className="flex items-center justify-between gap-2.5 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl sm:rounded-full liquid-glass border border-emerald-500/20 shadow-xs transition-all duration-300">
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <div
-                      className={`w-8 h-8 rounded-full text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs ${
-                        authProfile.platform === 'vk' ? 'bg-blue-600' : 'bg-sky-600'
-                      }`}
-                    >
-                      {authProfile.platform === 'vk' ? 'VK' : 'TG'}
-                    </div>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-white truncate">
-                          {authProfile.firstName ||
-                            (authProfile.username ? `@${authProfile.username}` : `ID ${authProfile.id}`)}
-                        </span>
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 shrink-0">
-                          <ShieldCheck className="w-3 h-3" />
-                          <span>Авторизован</span>
-                        </span>
-                        <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium liquid-glass-pill text-neutral-600 dark:text-neutral-300 shrink-0">
-                          {authProfile.notificationsEnabled ? (
-                            <>
-                              <Bell className="w-3 h-3 text-emerald-600" />
-                              <span>Уведомления вкл</span>
-                            </>
-                          ) : (
-                            <>
-                              <BellOff className="w-3 h-3 text-neutral-400" />
-                              <span>Без уведомлений</span>
-                            </>
-                          )}
-                        </span>
-                      </div>
-                      <div className="text-[10px] sm:text-[11px] text-neutral-500 dark:text-neutral-400 font-medium truncate">
-                        Состояние сохраняется в облаке • {userProgress.completedTopics.length} тем • {favorites.length} в избр. • {applications.length} откл.
-                      </div>
-                    </div>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      triggerHaptic('medium');
-                      setIsSubscribeModalOpen(true);
-                    }}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neutral-900 hover:bg-black text-white dark:bg-white dark:text-neutral-900 text-xs font-semibold shadow-xs transition-all active:scale-95 shrink-0 cursor-pointer"
-                  >
-                    <span>Профиль</span>
-                  </button>
-                </div>
-              ) : (
-                <div className="flex items-center justify-between gap-2.5 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl sm:rounded-full liquid-glass border border-black/10 dark:border-white/10 shadow-xs transition-all duration-300">
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="w-8 h-8 rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 flex items-center justify-center shrink-0 shadow-xs">
-                      <LogIn className="w-4 h-4" />
-                    </div>
-                    <div className="min-w-0">
-                      <div className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-white truncate">
-                        Авторизация через Telegram или ВКонтакте
-                      </div>
-                      <div className="text-[10px] sm:text-[11px] text-neutral-600 dark:text-neutral-300 truncate">
-                        Войдите, чтобы сохранять роадмапы, тренажёр, избранное и отклики • Уведомления можно отключить
-                      </div>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      triggerHaptic('medium');
-                      setIsSubscribeModalOpen(true);
-                    }}
-                    className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-neutral-900 hover:bg-black text-white dark:bg-white dark:text-neutral-950 text-xs font-semibold shadow-xs transition-all active:scale-95 shrink-0 cursor-pointer"
-                  >
-                    <LogIn className="w-3.5 h-3.5" />
-                    <span>Войти</span>
-                  </button>
-                </div>
-              )
-            )}
 
             {/* Ambient typography watermark behind cards - guaranteed single line */}
             <div className="absolute inset-x-0 -top-4 sm:-top-6 h-48 sm:h-96 flex items-center justify-center -z-10 pointer-events-none overflow-hidden select-none opacity-[0.035] blur-[0.5px]">
@@ -1494,7 +1549,7 @@ export function App() {
                         userProgress={userProgress}
                         roadmapTopics={ROADMAP_TOPICS}
                         questions={QUESTIONS}
-                        onOpenPlan={(item) => setSelectedInternshipForPlan(item)}
+                        onOpenPlan={handleOpenInternship}
                         isFavorite={favorites.includes(internship.id)}
                         onToggleFavorite={handleToggleFavorite}
                         onOpenCompanyInfo={(comp) => setSelectedCompanyForInfo(comp)}
@@ -1520,9 +1575,12 @@ export function App() {
           <ApplicationsView
             applications={applications}
             allInternships={internships}
+            viewedHistory={viewedHistory}
+            isAuthorized={Boolean(vkUser || telegramUser || authProfile)}
+            onOpenAuthModal={() => setIsSubscribeModalOpen(true)}
             onUpdateApplication={handleUpdateApplication}
             onRemoveApplication={handleRemoveApplication}
-            onOpenPlan={(item) => setSelectedInternshipForPlan(item)}
+            onOpenPlan={handleOpenInternship}
             onOpenCompanyInfo={(comp) => setSelectedCompanyForInfo(comp)}
             onNavigateToCatalog={() => setActiveTab('internships')}
           />

@@ -237,10 +237,11 @@ export const Navbar: React.FC<NavbarProps> = ({
                 onOpenSubscribeModal();
               }}
               className="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-full font-semibold text-xs transition-transform duration-150 active:scale-95 shadow-xs shrink-0 bg-neutral-900 hover:bg-black text-white dark:bg-white dark:text-neutral-950 cursor-pointer"
-              title="Авторизация через Telegram или ВКонтакте для сохранения прогресса"
+              title="Авторизация через Telegram или ВКонтакте для сохранения истории и прогресса"
             >
               <LogIn className="w-3.5 h-3.5" />
-              <span>Войти</span>
+              <span className="sm:hidden">Войти</span>
+              <span className="hidden sm:inline">Войти (TG / VK)</span>
             </button>
           )}
         </div>

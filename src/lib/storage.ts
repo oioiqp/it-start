@@ -1,4 +1,4 @@
-import type { AuthProfile, Internship, JobApplication, TelegramSubscription, UserProgress } from '../types';
+import type { AuthProfile, Internship, JobApplication, TelegramSubscription, UserProgress, ViewedVacancyEntry } from '../types';
 
 const PROGRESS_STORAGE_KEY = 'it_start_user_progress';
 const SUBSCRIPTION_STORAGE_KEY = 'it_start_local_subscription';
@@ -7,6 +7,7 @@ const INTERNSHIPS_STORAGE_KEY = 'it_start_cached_internships_v3';
 const THEME_STORAGE_KEY = 'it_start_theme';
 const FAVORITES_STORAGE_KEY = 'it_start_favorites';
 const APPLICATIONS_STORAGE_KEY = 'it_start_applications';
+const VIEWED_HISTORY_STORAGE_KEY = 'it_start_viewed_history';
 
 export function getLocalTheme(): 'dark' | 'light' {
   if (typeof window === 'undefined') return 'dark';
@@ -216,6 +217,38 @@ export function removeLocalApplication(vacancyId: string): JobApplication[] {
   const current = getLocalApplications();
   const next = current.filter((a) => a.vacancyId !== vacancyId && a.id !== vacancyId);
   saveLocalApplications(next);
+  return next;
+}
+
+export function getLocalViewedHistory(): ViewedVacancyEntry[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem(VIEWED_HISTORY_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed)
+      ? parsed.filter((x) => x && typeof x.id === 'string' && typeof x.viewedAt === 'string')
+      : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveLocalViewedHistory(history: ViewedVacancyEntry[]): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(VIEWED_HISTORY_STORAGE_KEY, JSON.stringify(history.slice(0, 40)));
+  } catch (e) {
+    console.warn('Failed to save viewed history to localStorage:', e);
+  }
+}
+
+export function addLocalViewedVacancy(vacancyId: string): ViewedVacancyEntry[] {
+  const cleanId = String(vacancyId || '').trim();
+  if (!cleanId) return getLocalViewedHistory();
+  const current = getLocalViewedHistory().filter((item) => item.id !== cleanId);
+  const next: ViewedVacancyEntry[] = [{ id: cleanId, viewedAt: new Date().toISOString() }, ...current].slice(0, 40);
+  saveLocalViewedHistory(next);
   return next;
 }
 
