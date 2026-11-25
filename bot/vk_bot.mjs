@@ -134,6 +134,7 @@ export const VK_BOT_CONFIG = {
 
 // In-memory subscribers store for VK push notifications
 export const vkSubscribers = new Map();
+export const mutedVkSubscribers = new Set();
 
 // In-memory user menu tracking for contextual numbered commands (main, vacancies, companies)
 export const userMenuState = new Map();
@@ -594,8 +595,10 @@ export async function registerVkSubscriber(peerId, meta = {}) {
   };
   if (isActive) {
     vkSubscribers.set(id, sub);
+    mutedVkSubscribers.delete(id);
   } else {
     vkSubscribers.delete(id);
+    mutedVkSubscribers.add(id);
   }
 
   try {
@@ -624,6 +627,7 @@ export async function registerVkSubscriber(peerId, meta = {}) {
 export async function unregisterVkSubscriber(peerId) {
   const id = String(cleanVkPeerId(peerId));
   const deleted = vkSubscribers.delete(id);
+  mutedVkSubscribers.add(id);
 
   try {
     if (supabase && process.env.NODE_ENV !== 'test' && !process.env.VITEST) {
@@ -760,6 +764,28 @@ export async function syncSubscribersFromVkConversations(token = VK_BOT_TOKEN) {
       return 0;
     }
 
+    // Load existing VK rows from Supabase first so we NEVER override is_active: false opt-outs
+    const knownVkRows = new Map();
+    try {
+      if (supabase && process.env.NODE_ENV !== 'test' && !process.env.VITEST) {
+        const { data: existingRows } = await supabase
+          .from('tg_subscriptions')
+          .select('chat_id, is_active')
+          .like('chat_id', 'vk_%');
+        if (Array.isArray(existingRows)) {
+          for (const row of existingRows) {
+            const chatKey = String(row.chat_id || '');
+            const isActiveRow = Boolean(row.is_active);
+            knownVkRows.set(chatKey, isActiveRow);
+            const numericId = chatKey.replace(/^vk_/, '');
+            if (!isActiveRow && numericId) {
+              mutedVkSubscribers.add(numericId);
+            }
+          }
+        }
+      }
+    } catch {}
+
     let syncedCount = 0;
     for (const item of res.result.items) {
       const conv = item.conversation;
@@ -770,6 +796,9 @@ export async function syncSubscribersFromVkConversations(token = VK_BOT_TOKEN) {
       if (peer && peer.type === 'user' && peer.id > 0 && canWrite) {
         const idStr = String(peer.id);
         const existing = vkSubscribers.get(idStr);
+        if (knownVkRows.has(`vk_${idStr}`) || mutedVkSubscribers.has(idStr)) {
+          continue;
+        }
         if (!existing || !existing.is_active) {
           console.log(`[VK Bot] 🔍 Обнаружен активный диалог с пользователем VK ${idStr}, регистрируем подписку...`);
           await registerVkSubscriber(peer.id, {
@@ -1119,10 +1148,10 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
 
   if (!peerId) return { ok: false, error: 'Missing peer_id' };
 
-  // Auto-register user as active subscriber on ANY incoming message or event if not yet active
+  // Auto-register user as active subscriber on ANY incoming message or event ONLY if they haven't muted pushes
   const cleanPeerIdStr = String(peerId).replace(/^vk_/, '');
   const existingSub = vkSubscribers.get(cleanPeerIdStr);
-  if (!existingSub || !existingSub.is_active) {
+  if ((!existingSub || !existingSub.is_active) && !mutedVkSubscribers.has(cleanPeerIdStr)) {
     const firstName =
       message.from?.first_name ||
       rawInput.from?.first_name ||
