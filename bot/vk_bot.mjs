@@ -184,7 +184,7 @@ async function sendVkOrEdit(peerId, message, keyboard, token, conversationMessag
       'messages.edit',
       {
         ...basePayload,
-        conversation_message_id: conversationMessageId,
+        cmid: conversationMessageId,
       },
       token
     );
@@ -1488,12 +1488,17 @@ export async function handleVkMessage(rawInput, token = VK_BOT_TOKEN) {
   // State helpers for auto-subscription (evaluated after parsing command below)
   const cleanPeerIdStr = String(cleanVkPeerId(peerId));
   const existingSub = vkUserPrefsStore.get(cleanPeerIdStr) || vkSubscribers.get(cleanPeerIdStr);
-  const conversationMessageId =
-    message.conversation_message_id || rawInput.conversation_message_id || rawInput.object?.conversation_message_id || null;
-
-  // Acknowledge inline callback button event to dismiss loading spinner in VK app
   const eventId = message.event_id || rawInput.event_id || rawInput.object?.event_id;
-  if (eventId) {
+  const isCallbackEvent = Boolean(
+    rawInput._isMessageEvent || message._isMessageEvent || rawInput.type === 'message_event' || eventId
+  );
+  const rawCmid =
+    message.conversation_message_id || rawInput.conversation_message_id || rawInput.object?.conversation_message_id || null;
+  // Only edit in-place when handling an inline callback event (never try to edit a user's incoming text message)
+  const conversationMessageId = isCallbackEvent ? rawCmid : null;
+
+  // Acknowledge inline callback button event once to dismiss loading spinner in VK app
+  if (eventId && token) {
     const userId = message.user_id || rawInput.user_id || rawInput.object?.user_id || peerId;
     callVk('messages.sendMessageEventAnswer', { event_id: eventId, user_id: userId, peer_id: peerId }, token).catch(() => {});
   }
@@ -2598,15 +2603,17 @@ export async function startVkBot(token = VK_BOT_TOKEN, options = {}) {
               if (upd.type === 'message_new' || upd.type === 'message_event') {
                 const rawObj = upd.object?.message || upd.object || upd;
                 const msg =
-                  upd.type === 'message_event' && upd.object?.conversation_message_id
-                    ? { ...rawObj, conversation_message_id: upd.object.conversation_message_id }
+                  upd.type === 'message_event'
+                    ? {
+                        ...rawObj,
+                        _isMessageEvent: true,
+                        conversation_message_id:
+                          upd.object?.conversation_message_id || rawObj?.conversation_message_id || null,
+                        event_id: upd.object?.event_id || rawObj?.event_id,
+                        user_id: upd.object?.user_id || rawObj?.user_id,
+                        peer_id: upd.object?.peer_id || rawObj?.peer_id || upd.object?.user_id,
+                      }
                     : rawObj;
-                if (upd.type === 'message_event' && (upd.object?.event_id || msg.event_id)) {
-                  const eventId = upd.object?.event_id || msg.event_id;
-                  const userId = upd.object?.user_id || msg.user_id;
-                  const peerId = upd.object?.peer_id || msg.peer_id || userId;
-                  callVk('messages.sendMessageEventAnswer', { event_id: eventId, user_id: userId, peer_id: peerId }, tokenToUse).catch(() => {});
-                }
                 if (msg) {
                   await handleVkMessage(msg, tokenToUse);
                 }
