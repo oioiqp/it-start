@@ -51,9 +51,6 @@ import {
   isVacancyActive,
   isDirectVacancyUrl,
   resolveApplicationDeadlineIso,
-  getCompanySegment,
-  getVacancySourceCategory,
-  type VacancySourceCategory,
 } from './lib/vacancyUrl';
 import {
   getCachedInternships,
@@ -90,17 +87,18 @@ import {
 import { VK_COMMUNITY_URL, saveVkPeerId } from './lib/vk';
 import { RENDER_URL } from './services/subscriptionService';
 
-const CORE_FINTECH_COMPANIES = ['Т-Банк', 'Сбер'];
-const EXTRA_FINTECH_COMPANIES = ['Альфа-Банк', 'Модульбанк', 'ВТБ'];
-const IT_COMPANIES = [
-  'Яндекс',
+const CORE_TARGET_COMPANIES = [
+  'Т-Банк',
   'Холдинг Т1',
   'Контур',
-  'Ozon Tech',
   'Directum',
+  'Яндекс',
+  'Ozon Tech',
+  'Сбер',
   'Авито',
   'VK',
 ];
+const EXTRA_KNOWN_COMPANIES = ['Альфа-Банк', 'Модульбанк', 'МТС'];
 
 export function App() {
   // Navigation
@@ -169,12 +167,10 @@ export function App() {
 
   // Internships Filters
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [selectedCompanySegment, setSelectedCompanySegment] = useState<'all' | 'fintech' | 'it'>('all');
   const [selectedCompany, setSelectedCompany] = useState<string>('all');
   const [selectedDirection, setSelectedDirection] = useState<DirectionId | 'all'>('all');
   const [selectedSubTrack, setSelectedSubTrack] = useState<SubTrackId | 'all'>('all');
   const [selectedFormat, setSelectedFormat] = useState<WorkFormat | 'all'>('all');
-  const [selectedSource, setSelectedSource] = useState<'all' | VacancySourceCategory>('all');
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState<boolean>(false);
   const [sortConfig, setSortConfig] = useState<{ field: 'publishedAt' | 'salary', direction: 'asc' | 'desc' }>({ field: 'publishedAt', direction: 'desc' });
 
@@ -773,18 +769,12 @@ export function App() {
       // 0.1 Favorites filter
       if (onlyFavorites && !favorites.includes(item.id)) return false;
 
-      // 0.2 Company segment (Fintech vs regular IT companies)
-      if (selectedCompanySegment !== 'all' && getCompanySegment(item.company) !== selectedCompanySegment) {
-        return false;
-      }
-
       if (selectedCompany !== 'all' && !matchesCompanyFilter(item.company, selectedCompany)) {
         return false;
       }
       if (selectedDirection !== 'all' && item.directionId !== selectedDirection) return false;
       if (selectedSubTrack !== 'all' && item.subTrackId !== selectedSubTrack) return false;
       if (selectedFormat !== 'all' && item.format !== selectedFormat) return false;
-      if (selectedSource !== 'all' && getVacancySourceCategory(item) !== selectedSource) return false;
 
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase().trim();
@@ -836,55 +826,33 @@ export function App() {
     });
 
     return result;
-  }, [internships, selectedCompanySegment, selectedCompany, selectedDirection, selectedSubTrack, selectedFormat, selectedSource, searchQuery, sortConfig, onlyFavorites, favorites]);
+  }, [internships, selectedCompany, selectedDirection, selectedSubTrack, selectedFormat, searchQuery, sortConfig, onlyFavorites, favorites]);
 
   const resetAllFilters = useCallback(() => {
     triggerHaptic('light');
     setSearchQuery('');
     setOnlyFavorites(false);
-    setSelectedCompanySegment('all');
     setSelectedCompany('all');
     setSelectedDirection('all');
     setSelectedSubTrack('all');
     setSelectedFormat('all');
-    setSelectedSource('all');
   }, []);
 
   const hasActiveFilters = Boolean(
     searchQuery ||
       onlyFavorites ||
-      selectedCompanySegment !== 'all' ||
       selectedCompany !== 'all' ||
       selectedDirection !== 'all' ||
       selectedSubTrack !== 'all' ||
-      selectedFormat !== 'all' ||
-      selectedSource !== 'all'
+      selectedFormat !== 'all'
   );
 
-  const visibleFintechCompanies = useMemo(() => {
-    const dynamicExtras = EXTRA_FINTECH_COMPANIES.filter((comp) =>
+  const visibleCompanies = useMemo(() => {
+    const dynamicExtras = EXTRA_KNOWN_COMPANIES.filter((comp) =>
       internships.some((item) => matchesCompanyFilter(item.company, comp))
     );
-    return [...CORE_FINTECH_COMPANIES, ...dynamicExtras];
+    return [...CORE_TARGET_COMPANIES, ...dynamicExtras];
   }, [internships]);
-
-  const fintechCount = useMemo(
-    () => internships.filter((i) => getCompanySegment(i.company) === 'fintech').length,
-    [internships]
-  );
-
-  const itCompaniesCount = useMemo(
-    () => internships.filter((i) => getCompanySegment(i.company) === 'it').length,
-    [internships]
-  );
-
-  const SOURCE_FILTER_LABELS: Record<'all' | VacancySourceCategory, string> = {
-    all: 'Все',
-    official: 'Официальные сайты',
-    hh: 'hh.ru',
-    habr: 'Хабр Карьера',
-    telegram: 'Telegram-каналы',
-  };
 
   return (
     <div className="min-h-screen flex flex-col relative light bg-[#dbe0ea] text-neutral-900 liquid-ambient selection:bg-neutral-950 selection:text-white">
@@ -1004,17 +972,17 @@ export function App() {
                     setIsMobileFiltersOpen(!isMobileFiltersOpen);
                   }}
                   className={`flex items-center gap-1.5 px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 shrink-0 ${
-                    (selectedCompanySegment !== 'all' || selectedCompany !== 'all' || selectedFormat !== 'all' || selectedSource !== 'all' || isMobileFiltersOpen)
+                    (selectedCompany !== 'all' || selectedFormat !== 'all' || isMobileFiltersOpen)
                       ? 'bg-neutral-900 text-white shadow-xs dark:bg-white dark:text-neutral-950'
                       : 'liquid-glass-pill hover:bg-white/50 text-neutral-700 dark:text-neutral-300'
                   }`}
-                  title="Все фильтры (Работодатели, Формат, Источник)"
+                  title="Все фильтры (Работодатели, Формат)"
                 >
                   <SlidersHorizontal className="w-3.5 h-3.5" />
                   <span>Фильтры</span>
-                  {(selectedCompanySegment !== 'all' || selectedCompany !== 'all' || selectedFormat !== 'all' || selectedSource !== 'all') && (
+                  {(selectedCompany !== 'all' || selectedFormat !== 'all') && (
                     <span className="w-4 h-4 rounded-full bg-white text-neutral-950 text-[10px] font-bold flex items-center justify-center">
-                      {(selectedCompanySegment !== 'all' ? 1 : 0) + (selectedCompany !== 'all' ? 1 : 0) + (selectedFormat !== 'all' ? 1 : 0) + (selectedSource !== 'all' ? 1 : 0)}
+                      {(selectedCompany !== 'all' ? 1 : 0) + (selectedFormat !== 'all' ? 1 : 0)}
                     </span>
                   )}
                 </button>
@@ -1110,16 +1078,6 @@ export function App() {
                       <X className="w-3 h-3 opacity-70" />
                     </button>
                   )}
-                  {selectedCompanySegment !== 'all' && (
-                    <button
-                      type="button"
-                      onClick={() => setSelectedCompanySegment('all')}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-neutral-900 text-white dark:bg-white dark:text-black shrink-0 transition-transform active:scale-95 cursor-pointer"
-                    >
-                      <span>{selectedCompanySegment === 'fintech' ? 'Финтех-компании' : 'IT-компании'}</span>
-                      <X className="w-3 h-3 opacity-70" />
-                    </button>
-                  )}
                   {selectedCompany !== 'all' && (
                     <button
                       type="button"
@@ -1163,16 +1121,6 @@ export function App() {
                       <X className="w-3 h-3 opacity-70" />
                     </button>
                   )}
-                  {selectedSource !== 'all' && (
-                    <button
-                      type="button"
-                      onClick={() => setSelectedSource('all')}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-neutral-900 text-white dark:bg-white dark:text-black shrink-0 transition-transform active:scale-95 cursor-pointer"
-                    >
-                      <span>{SOURCE_FILTER_LABELS[selectedSource]}</span>
-                      <X className="w-3 h-3 opacity-70" />
-                    </button>
-                  )}
                   <button
                     type="button"
                     onClick={resetAllFilters}
@@ -1187,151 +1135,61 @@ export function App() {
 
               {/* Secondary Filters Container (Always visible on desktop, collapsible on mobile) */}
               <div className={`space-y-3.5 pt-3 border-t border-black/5 dark:border-white/5 ${isMobileFiltersOpen ? 'block' : 'hidden sm:block'}`}>
-                {/* Company Filter: Separated into Fintech & General IT companies */}
-                <div className="space-y-2.5">
-                  <div className="flex items-center justify-between gap-2 flex-wrap">
-                    <span className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-neutral-600 dark:text-neutral-400">
+                {/* Unified Company Filter */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-neutral-600 dark:text-neutral-400">
+                    <span className="flex items-center gap-1.5">
                       <Building2 className="w-3.5 h-3.5 text-neutral-600 dark:text-neutral-400" />
-                      Работодатель:
+                      Работодатель (Топ IT-компании):
                     </span>
-
-                    {/* Fintech vs Regular IT segment switcher */}
-                    <div className="flex items-center gap-1 p-0.5 rounded-full liquid-glass-subtle">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          triggerHaptic('selection');
-                          setSelectedCompanySegment('all');
-                          setSelectedCompany('all');
-                        }}
-                        className={`px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all cursor-pointer ${
-                          selectedCompanySegment === 'all' && selectedCompany === 'all'
-                            ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-xs'
-                            : 'text-neutral-600 hover:text-neutral-950 dark:text-neutral-300'
-                        }`}
-                      >
-                        Все ({internships.length})
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          triggerHaptic('selection');
-                          const nextSeg = selectedCompanySegment === 'fintech' ? 'all' : 'fintech';
-                          setSelectedCompanySegment(nextSeg);
-                          if (selectedCompany !== 'all' && getCompanySegment(selectedCompany) !== 'fintech') {
-                            setSelectedCompany('all');
-                          }
-                        }}
-                        className={`px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all cursor-pointer ${
-                          selectedCompanySegment === 'fintech'
-                            ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-xs'
-                            : 'text-neutral-600 hover:text-neutral-950 dark:text-neutral-300'
-                        }`}
-                      >
-                        🏦 Финтех ({fintechCount})
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          triggerHaptic('selection');
-                          const nextSeg = selectedCompanySegment === 'it' ? 'all' : 'it';
-                          setSelectedCompanySegment(nextSeg);
-                          if (selectedCompany !== 'all' && getCompanySegment(selectedCompany) !== 'it') {
-                            setSelectedCompany('all');
-                          }
-                        }}
-                        className={`px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all cursor-pointer ${
-                          selectedCompanySegment === 'it'
-                            ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-xs'
-                            : 'text-neutral-600 hover:text-neutral-950 dark:text-neutral-300'
-                        }`}
-                      >
-                        💻 IT-компании ({itCompaniesCount})
-                      </button>
-                    </div>
                   </div>
-
-                  {/* Visual split into two clear rows/groups: Fintech vs Regular IT */}
-                  <div className="space-y-2">
-                    {selectedCompanySegment !== 'it' && (
-                      <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5 touch-pan-x overscroll-x-contain">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-500 shrink-0 mr-1">
-                          Финтех:
-                        </span>
-                        {visibleFintechCompanies.map((company) => {
-                          const isSelected = selectedCompany === company;
-                          const count = internships.filter((item) => matchesCompanyFilter(item.company, company)).length;
-                          return (
-                            <button
-                              key={company}
-                              type="button"
-                              onClick={() => {
-                                triggerHaptic('selection');
-                                setSelectedCompany(isSelected ? 'all' : company);
-                              }}
-                              className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 shrink-0 flex items-center gap-1.5 cursor-pointer ${
-                                isSelected
-                                  ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-xs'
-                                  : count === 0
-                                  ? 'liquid-glass-pill opacity-55 hover:opacity-90 text-neutral-600 dark:text-neutral-400'
-                                  : 'liquid-glass-pill hover:bg-white/60 text-neutral-800 dark:text-neutral-200'
-                              }`}
-                            >
-                              <span>{company}</span>
-                              <span
-                                className={`text-[10px] px-1.5 py-0.2 rounded-full font-medium ${
-                                  isSelected
-                                    ? 'bg-white/20 text-white dark:bg-black/10 dark:text-neutral-950'
-                                    : 'bg-black/5 text-neutral-700 dark:bg-white/10 dark:text-neutral-300'
-                                }`}
-                              >
-                                {count}
-                              </span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    )}
-
-                    {selectedCompanySegment !== 'fintech' && (
-                      <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5 touch-pan-x overscroll-x-contain">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-500 shrink-0 mr-1">
-                          IT-компании:
-                        </span>
-                        {IT_COMPANIES.map((company) => {
-                          const isSelected = selectedCompany === company;
-                          const count = internships.filter((item) => matchesCompanyFilter(item.company, company)).length;
-                          return (
-                            <button
-                              key={company}
-                              type="button"
-                              onClick={() => {
-                                triggerHaptic('selection');
-                                setSelectedCompany(isSelected ? 'all' : company);
-                              }}
-                              className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 shrink-0 flex items-center gap-1.5 cursor-pointer ${
-                                isSelected
-                                  ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-xs'
-                                  : count === 0
-                                  ? 'liquid-glass-pill opacity-55 hover:opacity-90 text-neutral-600 dark:text-neutral-400'
-                                  : 'liquid-glass-pill hover:bg-white/60 text-neutral-800 dark:text-neutral-200'
-                              }`}
-                            >
-                              <span>{company}</span>
-                              <span
-                                className={`text-[10px] px-1.5 py-0.2 rounded-full font-medium ${
-                                  isSelected
-                                    ? 'bg-white/20 text-white dark:bg-black/10 dark:text-neutral-950'
-                                    : 'bg-black/5 text-neutral-700 dark:bg-white/10 dark:text-neutral-300'
-                                }`}
-                              >
-                                {count}
-                              </span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    )}
+                  <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 touch-pan-x overscroll-x-contain">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        triggerHaptic('selection');
+                        setSelectedCompany('all');
+                      }}
+                      className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 shrink-0 cursor-pointer ${
+                        selectedCompany === 'all'
+                          ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-xs'
+                          : 'liquid-glass-pill hover:bg-white/50 text-neutral-700 dark:text-neutral-300'
+                      }`}
+                    >
+                      Все ({internships.length})
+                    </button>
+                    {visibleCompanies.map((company) => {
+                      const isSelected = selectedCompany === company;
+                      const count = internships.filter((item) => matchesCompanyFilter(item.company, company)).length;
+                      return (
+                        <button
+                          key={company}
+                          type="button"
+                          onClick={() => {
+                            triggerHaptic('selection');
+                            setSelectedCompany(isSelected ? 'all' : company);
+                          }}
+                          className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 shrink-0 flex items-center gap-1.5 cursor-pointer ${
+                            isSelected
+                              ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-xs'
+                              : count === 0
+                              ? 'liquid-glass-pill opacity-60 hover:opacity-95 text-neutral-600 dark:text-neutral-400'
+                              : 'liquid-glass-pill hover:bg-white/60 text-neutral-800 dark:text-neutral-200'
+                          }`}
+                        >
+                          <span>{company}</span>
+                          <span
+                            className={`text-[10px] px-1.5 py-0.2 rounded-full font-medium ${
+                              isSelected
+                                ? 'bg-white/20 text-white dark:bg-black/10 dark:text-neutral-950'
+                                : 'bg-black/5 text-neutral-700 dark:bg-white/10 dark:text-neutral-300'
+                            }`}
+                          >
+                            {count}
+                          </span>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -1369,7 +1227,7 @@ export function App() {
                   </div>
                 )}
 
-                {/* Format & Source selectors */}
+                {/* Format selector */}
                 <div className="flex flex-wrap items-center justify-between gap-2.5 pt-2 border-t border-black/5 dark:border-white/5 text-xs">
                   {/* Format Filter with Visual Badges */}
                   <div className="flex items-center gap-1.5 flex-wrap">
@@ -1393,28 +1251,6 @@ export function App() {
                       </button>
                     ))}
                   </div>
-
-                  {/* Clear & understandable Source Filter */}
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="text-neutral-600 dark:text-neutral-400 font-semibold text-[11px]">Источник:</span>
-                    {(['all', 'official', 'hh', 'habr', 'telegram'] as const).map((src) => (
-                      <button
-                        key={src}
-                        type="button"
-                        onClick={() => {
-                          triggerHaptic('selection');
-                          setSelectedSource(src);
-                        }}
-                        className={`px-2.5 py-1 rounded-full transition-all duration-150 active:scale-95 text-xs font-medium cursor-pointer ${
-                          selectedSource === src
-                            ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-xs'
-                            : 'liquid-glass-pill hover:bg-white/50 text-neutral-700 dark:text-neutral-300'
-                        }`}
-                      >
-                        {SOURCE_FILTER_LABELS[src]}
-                      </button>
-                    ))}
-                  </div>
                 </div>
 
                 {/* Mobile close button */}
@@ -1434,9 +1270,6 @@ export function App() {
               <div className="flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-400 px-1">
                 <span>
                   Найдено стажировок: <strong className="text-neutral-900 dark:text-white">{filteredAndSortedInternships.length}</strong>
-                  <span className="hidden sm:inline text-neutral-400 dark:text-neutral-500 ml-2">
-                    (Оф. сайты: {filteredAndSortedInternships.filter((i) => getVacancySourceCategory(i) === 'official').length} • hh.ru: {filteredAndSortedInternships.filter((i) => getVacancySourceCategory(i) === 'hh').length} • Хабр: {filteredAndSortedInternships.filter((i) => getVacancySourceCategory(i) === 'habr').length} • TG: {filteredAndSortedInternships.filter((i) => getVacancySourceCategory(i) === 'telegram').length})
-                  </span>
                 </span>
                 <button
                   type="button"

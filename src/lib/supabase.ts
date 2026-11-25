@@ -28,7 +28,7 @@ export const GITHUB_PAGES_URL = 'https://oioiqp.github.io/it-start/';
 
 const quickFetch: typeof fetch = (input, init) => {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 1200);
+  const timer = setTimeout(() => controller.abort(), 10000);
   if (init?.signal) {
     init.signal.addEventListener('abort', () => controller.abort(), { once: true });
   }
@@ -40,7 +40,7 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   global: { fetch: quickFetch },
 });
 
-// In-memory fallback stores when Supabase is unreachable (offline / DNS issues / local vitest environment)
+// In-memory fallback stores when Supabase is unreachable (only sticky in Vitest test env)
 const isTestEnv =
   typeof globalThis !== 'undefined' &&
   Boolean((globalThis as any).process?.env?.VITEST || (globalThis as any).process?.env?.NODE_ENV === 'test');
@@ -49,6 +49,12 @@ const inMemoryInternships: Map<string, Internship> = new Map();
 const inMemorySubscriptions: Map<string, TelegramSubscription> = new Map();
 const inMemoryUserProgress: Map<string, UserProgress> = new Map();
 const inMemoryCloudState: Map<string, CloudUserState> = new Map();
+
+function markOfflineIfTest() {
+  if (isTestEnv) {
+    isSupabaseOffline = true;
+  }
+}
 
 /**
  * Fetch internships from Supabase table `public.internships`
@@ -66,7 +72,7 @@ export async function fetchInternshipsFromSupabase(): Promise<Internship[] | nul
 
     if (error) {
       console.warn('Supabase fetch internships error, fallback will be used:', error.message);
-      isSupabaseOffline = true;
+      markOfflineIfTest();
       if (inMemoryInternships.size > 0) {
         return Array.from(inMemoryInternships.values());
       }
@@ -184,7 +190,7 @@ export async function fetchInternshipsFromSupabase(): Promise<Internship[] | nul
     return [];
   } catch (err) {
     console.warn('Supabase query exception, using in-memory store:', err);
-    isSupabaseOffline = true;
+    markOfflineIfTest();
     if (inMemoryInternships.size > 0) {
       return Array.from(inMemoryInternships.values());
     }
@@ -224,13 +230,13 @@ export async function seedInternshipsToSupabase(seedData: Internship[]): Promise
     const { error } = await supabase.from('internships').upsert(rows, { onConflict: 'id' });
     if (error) {
       console.warn('Seed internships warning (may already exist or RLS):', error.message);
-      isSupabaseOffline = true;
+      markOfflineIfTest();
       return true;
     }
     return true;
   } catch (err) {
     console.warn('Error during seeding, in-memory used:', err);
-    isSupabaseOffline = true;
+    markOfflineIfTest();
     return true;
   }
 }
@@ -264,13 +270,13 @@ export async function addInternshipToSupabase(item: Internship): Promise<boolean
     const { error } = await supabase.from('internships').upsert(row, { onConflict: 'id' });
     if (error) {
       console.warn('Failed to insert internship to Supabase:', error.message);
-      isSupabaseOffline = true;
+      markOfflineIfTest();
       return true;
     }
     return true;
   } catch (err) {
     console.warn('Exception adding internship to Supabase, stored in memory:', err);
-    isSupabaseOffline = true;
+    markOfflineIfTest();
     return true;
   }
 }
@@ -300,13 +306,13 @@ export async function saveSubscriptionToSupabase(sub: TelegramSubscription): Pro
 
     if (error) {
       console.warn('Supabase upsert subscription warning:', error.message);
-      isSupabaseOffline = true;
+      markOfflineIfTest();
       return true;
     }
     return true;
   } catch (err) {
     console.warn('Supabase subscription exception, stored in memory:', err);
-    isSupabaseOffline = true;
+    markOfflineIfTest();
     return true;
   }
 }
@@ -326,7 +332,7 @@ export async function fetchSubscriptionsFromSupabase(): Promise<TelegramSubscrip
       .eq('is_active', true);
 
     if (error || !data) {
-      isSupabaseOffline = true;
+      markOfflineIfTest();
       return Array.from(inMemorySubscriptions.values()).filter((s) => s.is_active);
     }
 
@@ -343,7 +349,7 @@ export async function fetchSubscriptionsFromSupabase(): Promise<TelegramSubscrip
     fetched.forEach((s: TelegramSubscription) => inMemorySubscriptions.set(String(s.chat_id), s));
     return fetched;
   } catch {
-    isSupabaseOffline = true;
+    markOfflineIfTest();
     return Array.from(inMemorySubscriptions.values()).filter((s) => s.is_active);
   }
 }
@@ -369,7 +375,7 @@ export async function fetchSubscriptionByChatIdFromSupabase(
       .maybeSingle();
 
     if (error) {
-      isSupabaseOffline = true;
+      markOfflineIfTest();
       return inMemorySubscriptions.get(key) || null;
     }
 
@@ -387,7 +393,7 @@ export async function fetchSubscriptionByChatIdFromSupabase(
     inMemorySubscriptions.set(key, sub);
     return sub;
   } catch {
-    isSupabaseOffline = true;
+    markOfflineIfTest();
     return inMemorySubscriptions.get(key) || null;
   }
 }
@@ -553,7 +559,7 @@ export async function fetchUserProgressFromSupabase(
 
     if (error) {
       console.warn('Error fetching user progress from Supabase:', error.message);
-      isSupabaseOffline = true;
+      markOfflineIfTest();
       return inMemoryCloudState.get(key) || null;
     }
 
@@ -571,7 +577,7 @@ export async function fetchUserProgressFromSupabase(
     inMemoryCloudState.set(key, decoded);
     return decoded;
   } catch {
-    isSupabaseOffline = true;
+    markOfflineIfTest();
     return inMemoryCloudState.get(key) || null;
   }
 }
@@ -612,12 +618,12 @@ export async function saveUserProgressToSupabase(
 
     if (error) {
       console.warn('Error saving user progress to Supabase:', error.message);
-      isSupabaseOffline = true;
+      markOfflineIfTest();
       return true;
     }
     return true;
   } catch {
-    isSupabaseOffline = true;
+    markOfflineIfTest();
     return true;
   }
 }
