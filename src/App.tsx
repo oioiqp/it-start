@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import {
   Search,
   Building2,
@@ -9,8 +9,13 @@ import {
   X,
   SlidersHorizontal,
   Star,
+  LogIn,
+  ShieldCheck,
+  Bell,
+  BellOff,
 } from 'lucide-react';
 import type {
+  AuthProfile,
   DirectionId,
   Internship,
   JobApplication,
@@ -36,6 +41,9 @@ import {
   fetchInternshipsFromSupabase,
   seedInternshipsToSupabase,
   saveUserProgressToSupabase,
+  fetchUserProgressFromSupabase,
+  fetchSubscriptionByChatIdFromSupabase,
+  normalizeCloudUserKey,
   saveSubscriptionToSupabase,
   TELEGRAM_BOT_USERNAME,
   TELEGRAM_BOT_URL,
@@ -47,10 +55,15 @@ import {
   getLocalProgress,
   getLocalSubscription,
   saveLocalSubscription,
+  clearLocalSubscription,
+  getLocalAuthProfile,
+  saveLocalAuthProfile,
+  clearLocalAuthProfile,
   saveCachedInternships,
   saveLocalProgress,
   saveLocalTheme,
   getLocalFavorites,
+  saveLocalFavorites,
   toggleLocalFavorite,
   getLocalApplications,
   addLocalApplication,
@@ -83,6 +96,11 @@ export function App() {
   // Company info modal state
   const [selectedCompanyForInfo, setSelectedCompanyForInfo] = useState<string | null>(null);
 
+  // Auth Profile & Cloud Key (unified across Mini Apps & standalone web)
+  const [authProfile, setAuthProfile] = useState<AuthProfile | null>(() => getLocalAuthProfile());
+  const hydratedCloudKeyRef = useRef<string | null>(null);
+  const skipNextHydrationKeyRef = useRef<string | null>(null);
+
   // Telegram User & Subscription
   const [telegramUser, setTelegramUser] = useState<TelegramUser | null>(() => initTelegramWebApp());
   const [currentSubscription, setCurrentSubscription] = useState<TelegramSubscription | null>(() => getLocalSubscription());
@@ -103,6 +121,17 @@ export function App() {
 
   // User Progress
   const [userProgress, setUserProgress] = useState<UserProgress>(() => getLocalProgress());
+
+  const activeCloudKey = useMemo(() => {
+    if (vkUser?.id) return normalizeCloudUserKey('vk', vkUser.id);
+    if (telegramUser?.id) return normalizeCloudUserKey('telegram', telegramUser.id);
+    if (authProfile?.id) return normalizeCloudUserKey(authProfile.platform, authProfile.id);
+    if (currentSubscription?.chat_id) {
+      const cid = String(currentSubscription.chat_id);
+      return normalizeCloudUserKey(cid.startsWith('vk_') ? 'vk' : 'telegram', cid);
+    }
+    return 'anonymous';
+  }, [vkUser, telegramUser, authProfile, currentSubscription]);
 
   // Internships state (strictly verified active & direct links)
   const [internships, setInternships] = useState<Internship[]>(() => {
@@ -149,26 +178,33 @@ export function App() {
 
   // Initialize Telegram WebApp, VK Mini App & Supabase
   useEffect(() => {
-    const syncTelegramAutoSubscription = (u: TelegramUser) => {
+    const syncTelegramAutoSubscription = async (u: TelegramUser) => {
       const existing = getLocalSubscription();
-      if (!existing || String(existing.chat_id) !== String(u.id) || !existing.is_active) {
-        const autoSub: TelegramSubscription = {
-          chat_id: String(u.id),
-          username: u.username || existing?.username || '',
-          first_name: u.first_name || existing?.first_name || 'Пользователь Telegram',
-          directions: existing?.directions?.length
-            ? existing.directions
-            : ['frontend', 'backend', 'mobile', 'qa', 'devops', 'data_science'],
-          sub_tracks: existing?.sub_tracks?.length
-            ? existing.sub_tracks
-            : ['react', 'python', 'nodejs', 'golang', 'auto_qa', 'cicd_docker'],
-          is_active: true,
-          created_at: existing?.created_at || new Date().toISOString(),
-        };
-        saveLocalSubscription(autoSub);
-        setCurrentSubscription(autoSub);
-        saveSubscriptionToSupabase(autoSub);
+      if (existing && String(existing.chat_id) === String(u.id)) {
+        return;
       }
+      const remoteExisting = await fetchSubscriptionByChatIdFromSupabase(String(u.id));
+      if (remoteExisting) {
+        saveLocalSubscription(remoteExisting);
+        setCurrentSubscription(remoteExisting);
+        return;
+      }
+      const autoSub: TelegramSubscription = {
+        chat_id: String(u.id),
+        username: u.username || existing?.username || '',
+        first_name: u.first_name || existing?.first_name || 'Пользователь Telegram',
+        directions: existing?.directions?.length
+          ? existing.directions
+          : ['frontend', 'backend', 'mobile', 'qa', 'devops', 'data_science'],
+        sub_tracks: existing?.sub_tracks?.length
+          ? existing.sub_tracks
+          : ['react', 'python', 'nodejs', 'golang', 'auto_qa', 'cicd_docker'],
+        is_active: true,
+        created_at: existing?.created_at || new Date().toISOString(),
+      };
+      saveLocalSubscription(autoSub);
+      setCurrentSubscription(autoSub);
+      saveSubscriptionToSupabase(autoSub);
     };
 
     // 1. Detect Telegram WebApp
@@ -191,42 +227,51 @@ export function App() {
       }, 150);
     }
 
-    const syncVkAutoSubscription = (u: VkUser) => {
+    const syncVkAutoSubscription = async (u: VkUser) => {
       const vkKey = `vk_${u.id}`;
       const existing = getLocalSubscription();
-      if (!existing || String(existing.chat_id) !== vkKey || !existing.is_active) {
-        const autoSub: TelegramSubscription = {
-          chat_id: vkKey,
-          username: `${u.first_name || ''} ${u.last_name || ''}`.trim(),
-          first_name: u.first_name || 'Пользователь VK',
-          directions: existing?.directions?.length
-            ? existing.directions
-            : ['frontend', 'backend', 'mobile', 'qa', 'devops', 'data_science'],
-          sub_tracks: existing?.sub_tracks?.length
-            ? existing.sub_tracks
-            : ['react', 'python', 'nodejs', 'golang', 'auto_qa', 'cicd_docker'],
-          is_active: true,
-          created_at: existing?.created_at || new Date().toISOString(),
-        };
-        saveVkPeerId(String(u.id));
-        saveLocalSubscription(autoSub);
-        setCurrentSubscription(autoSub);
-        saveSubscriptionToSupabase(autoSub);
-
-        const serverUrl = RENDER_URL.endsWith('/') ? RENDER_URL.slice(0, -1) : RENDER_URL;
-        fetch(`${serverUrl}/subscribe`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chatId: vkKey,
-            username: autoSub.username,
-            firstName: autoSub.first_name,
-            directions: autoSub.directions,
-            sub_tracks: autoSub.sub_tracks,
-            platform: 'vk',
-          }),
-        }).catch(() => {});
+      if (existing && String(existing.chat_id) === vkKey) {
+        return;
       }
+      const remoteExisting = await fetchSubscriptionByChatIdFromSupabase(vkKey);
+      if (remoteExisting) {
+        saveVkPeerId(String(u.id));
+        saveLocalSubscription(remoteExisting);
+        setCurrentSubscription(remoteExisting);
+        return;
+      }
+      const autoSub: TelegramSubscription = {
+        chat_id: vkKey,
+        username: `${u.first_name || ''} ${u.last_name || ''}`.trim(),
+        first_name: u.first_name || 'Пользователь VK',
+        directions: existing?.directions?.length
+          ? existing.directions
+          : ['frontend', 'backend', 'mobile', 'qa', 'devops', 'data_science'],
+        sub_tracks: existing?.sub_tracks?.length
+          ? existing.sub_tracks
+          : ['react', 'python', 'nodejs', 'golang', 'auto_qa', 'cicd_docker'],
+        is_active: true,
+        created_at: existing?.created_at || new Date().toISOString(),
+      };
+      saveVkPeerId(String(u.id));
+      saveLocalSubscription(autoSub);
+      setCurrentSubscription(autoSub);
+      saveSubscriptionToSupabase(autoSub);
+
+      const serverUrl = RENDER_URL.endsWith('/') ? RENDER_URL.slice(0, -1) : RENDER_URL;
+      fetch(`${serverUrl}/subscribe`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chatId: vkKey,
+          username: autoSub.username,
+          firstName: autoSub.first_name,
+          directions: autoSub.directions,
+          sub_tracks: autoSub.sub_tracks,
+          platform: 'vk',
+          isActive: true,
+        }),
+      }).catch(() => {});
     };
 
     // 2. Detect and initialize VK Mini App
@@ -293,14 +338,174 @@ export function App() {
     }
   }, [internships, isLoadingInternships]);
 
-  // Save progress helper
+  // Hydrate cloud state (progress, favorites, applications) whenever authenticated user changes
+  useEffect(() => {
+    if (!activeCloudKey || activeCloudKey === 'anonymous') return;
+    if (skipNextHydrationKeyRef.current === activeCloudKey) {
+      skipNextHydrationKeyRef.current = null;
+      return;
+    }
+    if (hydratedCloudKeyRef.current === activeCloudKey) return;
+
+    let cancelled = false;
+    hydratedCloudKeyRef.current = activeCloudKey;
+
+    const hydrateFromCloud = async () => {
+      const [cloud, remoteSub] = await Promise.all([
+        fetchUserProgressFromSupabase(activeCloudKey),
+        fetchSubscriptionByChatIdFromSupabase(activeCloudKey),
+      ]);
+      if (cancelled) return;
+
+      if (cloud) {
+        setUserProgress(cloud.progress);
+        saveLocalProgress(cloud.progress);
+        setFavorites(cloud.favorites);
+        saveLocalFavorites(cloud.favorites);
+        setApplications(cloud.applications);
+        saveLocalApplications(cloud.applications);
+      } else {
+        // First time seeing this user in cloud: push any existing local state
+        saveUserProgressToSupabase(activeCloudKey, getLocalProgress(), {
+          favorites: getLocalFavorites(),
+          applications: getLocalApplications(),
+        });
+      }
+
+      if (remoteSub) {
+        setCurrentSubscription(remoteSub);
+        saveLocalSubscription(remoteSub);
+        setAuthProfile((prev) => {
+          if (!prev) return prev;
+          const updated: AuthProfile = {
+            ...prev,
+            firstName: prev.firstName || remoteSub.first_name || undefined,
+            username: prev.username || remoteSub.username || undefined,
+            notificationsEnabled: Boolean(remoteSub.is_active),
+          };
+          saveLocalAuthProfile(updated);
+          return updated;
+        });
+      }
+    };
+
+    hydrateFromCloud();
+    return () => {
+      cancelled = true;
+    };
+  }, [activeCloudKey]);
+
+  const handleAuthSuccess = useCallback(
+    async (profile: AuthProfile, sub: TelegramSubscription) => {
+      const nextKey = normalizeCloudUserKey(profile.platform, profile.id);
+      skipNextHydrationKeyRef.current = nextKey;
+      hydratedCloudKeyRef.current = nextKey;
+
+      setAuthProfile(profile);
+      saveLocalAuthProfile(profile);
+      setCurrentSubscription(sub);
+      saveLocalSubscription(sub);
+
+      const [cloud, remoteSub] = await Promise.all([
+        fetchUserProgressFromSupabase(nextKey),
+        fetchSubscriptionByChatIdFromSupabase(nextKey),
+      ]);
+
+      const localProg = getLocalProgress();
+      const localFavs = getLocalFavorites();
+      const localApps = getLocalApplications();
+
+      if (cloud) {
+        const mergedCompletedTopics = Array.from(
+          new Set([...cloud.progress.completedTopics, ...localProg.completedTopics])
+        );
+        const mergedCompletedSubtopics = Array.from(
+          new Set([...(cloud.progress.completedSubtopics || []), ...(localProg.completedSubtopics || [])])
+        );
+        const mergedCompletedQuestions = Array.from(
+          new Set([...cloud.progress.completedQuestions, ...localProg.completedQuestions])
+        );
+        const mergedRepeatQuestions = Array.from(
+          new Set([...cloud.progress.repeatQuestions, ...localProg.repeatQuestions])
+        ).filter((id) => !mergedCompletedQuestions.includes(id));
+
+        const mergedProgress: UserProgress = {
+          completedTopics: mergedCompletedTopics,
+          completedSubtopics: mergedCompletedSubtopics,
+          completedQuestions: mergedCompletedQuestions,
+          repeatQuestions: mergedRepeatQuestions,
+        };
+        const mergedFavorites = Array.from(new Set([...cloud.favorites, ...localFavs]));
+        const appMap = new Map<string, JobApplication>();
+        [...cloud.applications, ...localApps].forEach((a) => {
+          if (a && (a.vacancyId || a.id)) {
+            appMap.set(String(a.vacancyId || a.id), a);
+          }
+        });
+        const mergedApps = Array.from(appMap.values());
+
+        setUserProgress(mergedProgress);
+        saveLocalProgress(mergedProgress);
+        setFavorites(mergedFavorites);
+        saveLocalFavorites(mergedFavorites);
+        setApplications(mergedApps);
+        saveLocalApplications(mergedApps);
+
+        saveUserProgressToSupabase(nextKey, mergedProgress, {
+          favorites: mergedFavorites,
+          applications: mergedApps,
+        });
+      } else {
+        saveUserProgressToSupabase(nextKey, localProg, {
+          favorites: localFavs,
+          applications: localApps,
+        });
+      }
+
+      if (remoteSub && (!profile.firstName || !profile.username)) {
+        const enriched: AuthProfile = {
+          ...profile,
+          firstName: profile.firstName || remoteSub.first_name || undefined,
+          username: profile.username || remoteSub.username || undefined,
+        };
+        setAuthProfile(enriched);
+        saveLocalAuthProfile(enriched);
+      }
+    },
+    []
+  );
+
+  const handleLogout = useCallback(() => {
+    hydratedCloudKeyRef.current = null;
+    skipNextHydrationKeyRef.current = null;
+    clearLocalAuthProfile();
+    clearLocalSubscription();
+    setAuthProfile(null);
+    setCurrentSubscription(null);
+    const emptyProgress: UserProgress = {
+      completedTopics: [],
+      completedSubtopics: [],
+      completedQuestions: [],
+      repeatQuestions: [],
+    };
+    setUserProgress(emptyProgress);
+    saveLocalProgress(emptyProgress);
+    setFavorites([]);
+    saveLocalFavorites([]);
+    setApplications([]);
+    saveLocalApplications([]);
+  }, []);
+
+  // Save progress helper (syncs local & complete cloud state)
   const updateProgress = (updater: (prev: UserProgress) => UserProgress) => {
     setUserProgress((prev) => {
       const next = updater(prev);
       saveLocalProgress(next);
 
-      const userId = telegramUser?.id || vkUser?.id || currentSubscription?.chat_id || 'anonymous';
-      saveUserProgressToSupabase(userId, next);
+      saveUserProgressToSupabase(activeCloudKey, next, {
+        favorites,
+        applications,
+      });
 
       return next;
     });
@@ -405,6 +610,10 @@ export function App() {
   const handleToggleFavorite = (id: string) => {
     const next = toggleLocalFavorite(id);
     setFavorites(next);
+    saveUserProgressToSupabase(activeCloudKey, userProgress, {
+      favorites: next,
+      applications,
+    });
   };
 
   // Applications Handlers
@@ -450,17 +659,29 @@ export function App() {
     };
     const next = addLocalApplication(newApp);
     setApplications(next);
+    saveUserProgressToSupabase(activeCloudKey, userProgress, {
+      favorites,
+      applications: next,
+    });
   };
 
   const handleUpdateApplication = (app: JobApplication) => {
     const next = applications.map((a) => (a.vacancyId === app.vacancyId ? app : a));
     setApplications(next);
     saveLocalApplications(next);
+    saveUserProgressToSupabase(activeCloudKey, userProgress, {
+      favorites,
+      applications: next,
+    });
   };
 
   const handleRemoveApplication = (vacancyId: string) => {
     const next = removeLocalApplication(vacancyId);
     setApplications(next);
+    saveUserProgressToSupabase(activeCloudKey, userProgress, {
+      favorites,
+      applications: next,
+    });
   };
 
   // Helper for matching companies with synonyms
@@ -573,6 +794,7 @@ export function App() {
           setActiveTab={setActiveTab}
           telegramUser={telegramUser}
           vkUser={vkUser}
+          authProfile={authProfile}
           isVk={isVk}
           userProgress={userProgress}
           totalTopicsCount={ROADMAP_TOPICS.length}
@@ -685,6 +907,89 @@ export function App() {
                   <span className="hidden sm:inline text-xs font-semibold">Уведомления TG</span>
                 </button>
               </div>
+            )}
+
+            {/* Standalone Web Auth / Cloud Sync Strip */}
+            {!vkUser && !telegramUser && (
+              authProfile ? (
+                <div className="flex items-center justify-between gap-2.5 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl sm:rounded-full liquid-glass border border-emerald-500/20 shadow-xs transition-all duration-300">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div
+                      className={`w-8 h-8 rounded-full text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs ${
+                        authProfile.platform === 'vk' ? 'bg-blue-600' : 'bg-sky-600'
+                      }`}
+                    >
+                      {authProfile.platform === 'vk' ? 'VK' : 'TG'}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-white truncate">
+                          {authProfile.firstName ||
+                            (authProfile.username ? `@${authProfile.username}` : `ID ${authProfile.id}`)}
+                        </span>
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 shrink-0">
+                          <ShieldCheck className="w-3 h-3" />
+                          <span>Авторизован</span>
+                        </span>
+                        <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium liquid-glass-pill text-neutral-600 dark:text-neutral-300 shrink-0">
+                          {authProfile.notificationsEnabled ? (
+                            <>
+                              <Bell className="w-3 h-3 text-emerald-600" />
+                              <span>Уведомления вкл</span>
+                            </>
+                          ) : (
+                            <>
+                              <BellOff className="w-3 h-3 text-neutral-400" />
+                              <span>Без уведомлений</span>
+                            </>
+                          )}
+                        </span>
+                      </div>
+                      <div className="text-[10px] sm:text-[11px] text-neutral-500 dark:text-neutral-400 font-medium truncate">
+                        Состояние сохраняется в облаке • {userProgress.completedTopics.length} тем • {favorites.length} в избр. • {applications.length} откл.
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      triggerHaptic('medium');
+                      setIsSubscribeModalOpen(true);
+                    }}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neutral-900 hover:bg-black text-white dark:bg-white dark:text-neutral-900 text-xs font-semibold shadow-xs transition-all active:scale-95 shrink-0 cursor-pointer"
+                  >
+                    <span>Профиль</span>
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between gap-2.5 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl sm:rounded-full liquid-glass border border-black/10 dark:border-white/10 shadow-xs transition-all duration-300">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="w-8 h-8 rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 flex items-center justify-center shrink-0 shadow-xs">
+                      <LogIn className="w-4 h-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-white truncate">
+                        Авторизация через Telegram или ВКонтакте
+                      </div>
+                      <div className="text-[10px] sm:text-[11px] text-neutral-600 dark:text-neutral-300 truncate">
+                        Войдите, чтобы сохранять роадмапы, тренажёр, избранное и отклики • Уведомления можно отключить
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      triggerHaptic('medium');
+                      setIsSubscribeModalOpen(true);
+                    }}
+                    className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-neutral-900 hover:bg-black text-white dark:bg-white dark:text-neutral-950 text-xs font-semibold shadow-xs transition-all active:scale-95 shrink-0 cursor-pointer"
+                  >
+                    <LogIn className="w-3.5 h-3.5" />
+                    <span>Войти</span>
+                  </button>
+                </div>
+              )
             )}
 
             {/* Ambient typography watermark behind cards - guaranteed single line */}
@@ -1272,15 +1577,18 @@ export function App() {
         onClose={() => setSelectedCompanyForInfo(null)}
       />
 
-      {/* Subscribe to Telegram & VK Modal */}
+      {/* Subscribe & Auth Modal */}
       <SubscribeModal
         isOpen={isSubscribeModalOpen}
         onClose={() => setIsSubscribeModalOpen(false)}
         telegramUser={telegramUser}
         vkUser={vkUser}
+        authProfile={authProfile}
         isVk={isVk}
         currentSubscription={currentSubscription}
         onSubscriptionSaved={(sub) => setCurrentSubscription(sub)}
+        onAuthSuccess={handleAuthSuccess}
+        onLogout={handleLogout}
       />
 
       {/* Footer */}

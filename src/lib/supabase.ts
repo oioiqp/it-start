@@ -1,5 +1,12 @@
 import { createClient } from '@supabase/supabase-js';
-import type { Internship, TelegramSubscription, UserProgress } from '../types';
+import type {
+  AuthPlatform,
+  CloudUserState,
+  Internship,
+  JobApplication,
+  TelegramSubscription,
+  UserProgress,
+} from '../types';
 import {
   resolveApplyUrl,
   parseTelegramSource,
@@ -40,6 +47,7 @@ let isSupabaseOffline = isTestEnv;
 const inMemoryInternships: Map<string, Internship> = new Map();
 const inMemorySubscriptions: Map<string, TelegramSubscription> = new Map();
 const inMemoryUserProgress: Map<string, UserProgress> = new Map();
+const inMemoryCloudState: Map<string, CloudUserState> = new Map();
 
 /**
  * Fetch internships from Supabase table `public.internships`
@@ -340,24 +348,244 @@ export async function fetchSubscriptionsFromSupabase(): Promise<TelegramSubscrip
 }
 
 /**
- * Save user progress to Supabase
+ * Fetch exact subscription/preferences row by chat_id (including is_active: false)
+ */
+export async function fetchSubscriptionByChatIdFromSupabase(
+  chatId: string | number
+): Promise<TelegramSubscription | null> {
+  const key = String(chatId).trim();
+  if (!key) return null;
+
+  if (isSupabaseOffline) {
+    return inMemorySubscriptions.get(key) || null;
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('tg_subscriptions')
+      .select('*')
+      .eq('chat_id', key)
+      .maybeSingle();
+
+    if (error) {
+      isSupabaseOffline = true;
+      return inMemorySubscriptions.get(key) || null;
+    }
+
+    if (!data) return null;
+
+    const sub: TelegramSubscription = {
+      chat_id: data.chat_id,
+      username: data.username || '',
+      first_name: data.first_name || '',
+      directions: Array.isArray(data.directions) ? data.directions : [],
+      sub_tracks: Array.isArray(data.sub_tracks) ? data.sub_tracks : [],
+      is_active: Boolean(data.is_active),
+      created_at: data.updated_at || data.created_at,
+    };
+    inMemorySubscriptions.set(key, sub);
+    return sub;
+  } catch {
+    isSupabaseOffline = true;
+    return inMemorySubscriptions.get(key) || null;
+  }
+}
+
+/**
+ * Normalize user key consistently across Mini Apps and Web Auth.
+ * VK users always map to `vk_<id>`, Telegram users always map to raw numeric/string `<id>`.
+ */
+export function normalizeCloudUserKey(
+  platform: AuthPlatform | null | undefined,
+  rawId: string | number | null | undefined
+): string {
+  const raw = String(rawId ?? '').trim();
+  if (!raw || raw === 'anonymous') return 'anonymous';
+  if (platform === 'vk' || /^vk_/i.test(raw)) {
+    const clean = raw.replace(/^vk_/i, '').trim();
+    return clean ? `vk_${clean}` : 'anonymous';
+  }
+  const clean = raw.replace(/^tg_/i, '').trim();
+  return clean || 'anonymous';
+}
+
+const FAV_PREFIX = 'fav:';
+const SUBTOPIC_PREFIX = '__sub__:';
+const REPEAT_PREFIX = '__rep__:';
+const APP_PREFIX = '__app__:';
+
+export function encodeCloudSavedState(
+  progress: UserProgress,
+  favorites: string[] = [],
+  applications: JobApplication[] = []
+): string[] {
+  const entries: string[] = [];
+  const seenFavs = new Set<string>();
+  for (const favId of favorites) {
+    const clean = String(favId || '').trim();
+    if (clean && !seenFavs.has(clean)) {
+      seenFavs.add(clean);
+      entries.push(`${FAV_PREFIX}${clean}`);
+    }
+  }
+  const seenSub = new Set<string>();
+  for (const subId of progress.completedSubtopics || []) {
+    const clean = String(subId || '').trim();
+    if (clean && !seenSub.has(clean)) {
+      seenSub.add(clean);
+      entries.push(`${SUBTOPIC_PREFIX}${clean}`);
+    }
+  }
+  const seenRep = new Set<string>();
+  for (const repId of progress.repeatQuestions || []) {
+    const clean = String(repId || '').trim();
+    if (clean && !seenRep.has(clean)) {
+      seenRep.add(clean);
+      entries.push(`${REPEAT_PREFIX}${clean}`);
+    }
+  }
+  const seenApps = new Set<string>();
+  for (const app of applications) {
+    if (!app || (!app.vacancyId && !app.id)) continue;
+    const appKey = String(app.vacancyId || app.id);
+    if (!seenApps.has(appKey)) {
+      seenApps.add(appKey);
+      entries.push(`${APP_PREFIX}${JSON.stringify(app)}`);
+    }
+  }
+  return entries;
+}
+
+export function decodeCloudSavedState(
+  completedNodes: unknown,
+  completedQuestions: unknown,
+  savedInternships: unknown,
+  updatedAt?: string
+): CloudUserState {
+  const completedTopics = Array.isArray(completedNodes) ? completedNodes.map(String) : [];
+  const completedQs = Array.isArray(completedQuestions) ? completedQuestions.map(String) : [];
+  const completedSubtopics: string[] = [];
+  const repeatQuestions: string[] = [];
+  const favorites: string[] = [];
+  const applications: JobApplication[] = [];
+
+  if (Array.isArray(savedInternships)) {
+    for (const rawItem of savedInternships) {
+      if (typeof rawItem !== 'string') continue;
+      if (rawItem.startsWith(FAV_PREFIX)) {
+        const id = rawItem.slice(FAV_PREFIX.length);
+        if (id) favorites.push(id);
+      } else if (rawItem.startsWith(SUBTOPIC_PREFIX)) {
+        const id = rawItem.slice(SUBTOPIC_PREFIX.length);
+        if (id) completedSubtopics.push(id);
+      } else if (rawItem.startsWith(REPEAT_PREFIX)) {
+        const id = rawItem.slice(REPEAT_PREFIX.length);
+        if (id) repeatQuestions.push(id);
+      } else if (rawItem.startsWith(APP_PREFIX)) {
+        try {
+          const parsed = JSON.parse(rawItem.slice(APP_PREFIX.length));
+          if (parsed && typeof parsed === 'object' && (parsed.vacancyId || parsed.id)) {
+            applications.push(parsed as JobApplication);
+          }
+        } catch {
+          // Ignore malformed serialized application entry
+        }
+      } else if (rawItem.trim()) {
+        // Backward compatibility with plain unprefixed favorite IDs
+        favorites.push(rawItem.trim());
+      }
+    }
+  }
+
+  return {
+    progress: {
+      completedTopics,
+      completedSubtopics,
+      completedQuestions: completedQs,
+      repeatQuestions,
+    },
+    favorites: Array.from(new Set(favorites)),
+    applications,
+    updatedAt,
+  };
+}
+
+/**
+ * Fetch complete cloud user state (progress, favorites, applications) from Supabase
+ */
+export async function fetchUserProgressFromSupabase(
+  userId: string | number
+): Promise<CloudUserState | null> {
+  const key = String(userId || '').trim();
+  if (!key) return null;
+
+  if (isSupabaseOffline) {
+    const cached = inMemoryCloudState.get(key);
+    if (cached) return cached;
+    const prog = inMemoryUserProgress.get(key);
+    return prog ? { progress: prog, favorites: [], applications: [] } : null;
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('user_progress')
+      .select('*')
+      .eq('user_key', key)
+      .maybeSingle();
+
+    if (error) {
+      console.warn('Error fetching user progress from Supabase:', error.message);
+      isSupabaseOffline = true;
+      return inMemoryCloudState.get(key) || null;
+    }
+
+    if (!data) {
+      return null;
+    }
+
+    const decoded = decodeCloudSavedState(
+      data.completed_nodes,
+      data.completed_questions,
+      data.saved_internships,
+      data.updated_at
+    );
+    inMemoryUserProgress.set(key, decoded.progress);
+    inMemoryCloudState.set(key, decoded);
+    return decoded;
+  } catch {
+    isSupabaseOffline = true;
+    return inMemoryCloudState.get(key) || null;
+  }
+}
+
+/**
+ * Save user progress (and optionally favorites & applications) to Supabase
  */
 export async function saveUserProgressToSupabase(
   userId: string | number,
-  progress: UserProgress
+  progress: UserProgress,
+  extras?: { favorites?: string[]; applications?: JobApplication[] }
 ): Promise<boolean> {
-  inMemoryUserProgress.set(String(userId), progress);
+  const key = String(userId || 'anonymous').trim() || 'anonymous';
+  const prevCloud = inMemoryCloudState.get(key);
+  const favorites = extras?.favorites !== undefined ? extras.favorites : prevCloud?.favorites || [];
+  const applications = extras?.applications !== undefined ? extras.applications : prevCloud?.applications || [];
+  const updatedAt = new Date().toISOString();
+
+  inMemoryUserProgress.set(key, progress);
+  inMemoryCloudState.set(key, { progress, favorites, applications, updatedAt });
 
   if (isSupabaseOffline) return true;
 
   try {
+    const encodedExtras = encodeCloudSavedState(progress, favorites, applications);
     const { error } = await supabase.from('user_progress').upsert(
       {
-        user_key: String(userId),
+        user_key: key,
         completed_nodes: progress.completedTopics,
         completed_questions: progress.completedQuestions,
-        saved_internships: [],
-        updated_at: new Date().toISOString(),
+        saved_internships: encodedExtras,
+        updated_at: updatedAt,
       },
       { onConflict: 'user_key' }
     );

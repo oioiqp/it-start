@@ -30,6 +30,7 @@ export interface SaveSubscriptionParams {
   firstName?: string;
   directions: DirectionId[];
   subTracks: SubTrackId[];
+  notificationsEnabled?: boolean;
 }
 
 export interface TestNotificationParams {
@@ -97,6 +98,7 @@ export async function saveUnifiedSubscription(
   const isVk = params.platform === 'vk';
   const cleanId = isVk ? stripVkPrefix(rawId) : rawId;
   const storageChatId = isVk ? normalizeVkChatId(cleanId) : cleanId;
+  const notificationsEnabled = params.notificationsEnabled !== false;
 
   const subData: TelegramSubscription = {
     chat_id: storageChatId,
@@ -104,7 +106,7 @@ export async function saveUnifiedSubscription(
     first_name: (params.firstName || (isVk ? 'Пользователь VK' : 'Пользователь Telegram')).trim(),
     directions: params.directions,
     sub_tracks: params.subTracks,
-    is_active: true,
+    is_active: notificationsEnabled,
     created_at: new Date().toISOString(),
   };
 
@@ -131,6 +133,7 @@ export async function saveUnifiedSubscription(
           directions: subData.directions,
           sub_tracks: subData.sub_tracks,
           platform: params.platform,
+          isActive: notificationsEnabled,
         }),
       }).catch(() => {});
     } catch {}

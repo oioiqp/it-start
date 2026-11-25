@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   X,
   Bell,
+  BellOff,
   Send,
   Check,
   AlertCircle,
@@ -9,9 +10,12 @@ import {
   Bot,
   RefreshCw,
   Repeat,
+  LogIn,
+  LogOut,
+  ShieldCheck,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import type { DirectionId, SubTrackId, TelegramSubscription, TelegramUser } from '../types';
+import type { AuthProfile, DirectionId, SubTrackId, TelegramSubscription, TelegramUser } from '../types';
 import { isVkMiniApp, requestVkNotificationsPermission, type VkUser } from '../lib/vkBridge';
 import { DIRECTIONS } from '../data/directions';
 import { saveSubscriptionToSupabase, TELEGRAM_BOT_USERNAME, TELEGRAM_BOT_URL } from '../lib/supabase';
@@ -23,6 +27,7 @@ import {
   isTelegramWebApp,
 } from '../lib/telegram';
 import {
+  saveLocalAuthProfile,
   saveLocalSubscription,
 } from '../lib/storage';
 import { getVkBotDialogUrl, getSavedVkPeerId, autoDetectVkPeerId } from '../lib/vk';
@@ -41,8 +46,11 @@ interface SubscribeModalProps {
   telegramUser: TelegramUser | null;
   vkUser?: VkUser | null;
   isVk?: boolean;
+  authProfile?: AuthProfile | null;
   currentSubscription: TelegramSubscription | null;
   onSubscriptionSaved: (sub: TelegramSubscription) => void;
+  onAuthSuccess?: (profile: AuthProfile, sub: TelegramSubscription) => void;
+  onLogout?: () => void;
 }
 
 export const SubscribeModal: React.FC<SubscribeModalProps> = ({
@@ -51,17 +59,30 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
   telegramUser,
   vkUser,
   isVk,
+  authProfile,
   currentSubscription,
   onSubscriptionSaved,
+  onAuthSuccess,
+  onLogout,
 }) => {
   // Determine initial platform based on client environment:
-  // Inside VK -> VK notifications by default
-  // Inside TG -> Telegram notifications by default
-  // Regular Web -> Telegram by default (with prominent dual-choice switch)
+  // Inside VK -> VK by default
+  // Inside TG -> Telegram by default
+  // Regular Web -> existing authProfile platform or Telegram by default
   const isInsideVk = Boolean(vkUser || isVk || isVkMiniApp());
-  const initialPlatform: NotificationPlatform = isInsideVk ? 'vk' : 'telegram';
+  const initialPlatform: NotificationPlatform = isInsideVk
+    ? 'vk'
+    : !telegramUser && authProfile?.platform
+    ? authProfile.platform
+    : 'telegram';
 
   const [platform, setPlatform] = useState<NotificationPlatform>(initialPlatform);
+  const [notificationsEnabled, setNotificationsEnabled] = useState<boolean>(() => {
+    if (authProfile) return authProfile.notificationsEnabled;
+    if (currentSubscription) return Boolean(currentSubscription.is_active);
+    // In Mini Apps default to true for notifications; in standalone web let user opt-in explicitly
+    return Boolean(isInsideVk || telegramUser);
+  });
 
   // Dedicated separate states for Telegram and VK to eliminate cross-contamination
   const [tgChatId, setTgChatId] = useState<string>(() => {
@@ -147,6 +168,9 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
           setVkFullName(currentSubscription.username || currentSubscription.first_name || '');
         }
       }
+      setNotificationsEnabled(
+        currentSubscription ? Boolean(currentSubscription.is_active) : authProfile?.notificationsEnabled ?? true
+      );
     } else if (inTg) {
       setPlatform('telegram');
       if (telegramUser) {
@@ -158,21 +182,39 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
         if (currentSubscription.username) setTgUsername(currentSubscription.username);
         if (currentSubscription.first_name) setTgFirstName(currentSubscription.first_name);
       }
+      setNotificationsEnabled(
+        currentSubscription ? Boolean(currentSubscription.is_active) : authProfile?.notificationsEnabled ?? true
+      );
     } else {
       // Standalone web mode
+      if (authProfile) {
+        setPlatform(authProfile.platform);
+        setNotificationsEnabled(authProfile.notificationsEnabled);
+        if (authProfile.platform === 'telegram') {
+          setTgChatId(authProfile.id);
+          if (authProfile.username) setTgUsername(authProfile.username);
+          if (authProfile.firstName) setTgFirstName(authProfile.firstName);
+        } else {
+          setVkPeerId(authProfile.id);
+          const name = [authProfile.firstName, authProfile.lastName].filter(Boolean).join(' ').trim();
+          if (name) setVkFullName(name);
+        }
+      } else {
+        setNotificationsEnabled(currentSubscription ? Boolean(currentSubscription.is_active) : false);
+      }
       if (currentSubscription && !String(currentSubscription.chat_id).startsWith('vk_')) {
-        setTgChatId(String(currentSubscription.chat_id));
-        if (currentSubscription.username) setTgUsername(currentSubscription.username);
-        if (currentSubscription.first_name) setTgFirstName(currentSubscription.first_name);
+        setTgChatId((prev) => prev || String(currentSubscription.chat_id));
+        if (currentSubscription.username) setTgUsername((prev) => prev || currentSubscription.username || '');
+        if (currentSubscription.first_name) setTgFirstName((prev) => prev || currentSubscription.first_name || '');
       } else if (currentSubscription && String(currentSubscription.chat_id).startsWith('vk_')) {
-        setVkPeerId(String(currentSubscription.chat_id).replace(/^vk_/, ''));
-        setVkFullName(currentSubscription.username || currentSubscription.first_name || '');
+        setVkPeerId((prev) => prev || String(currentSubscription.chat_id).replace(/^vk_/, ''));
+        setVkFullName((prev) => prev || currentSubscription.username || currentSubscription.first_name || '');
       }
       const savedVk = getSavedVkPeerId();
-      if (savedVk) setVkPeerId(savedVk);
+      if (savedVk) setVkPeerId((prev) => prev || savedVk);
     }
     setStatusMessage(null);
-  }, [isOpen, vkUser, isVk, telegramUser, currentSubscription]);
+  }, [isOpen, vkUser, isVk, telegramUser, currentSubscription, authProfile]);
 
   // Switch between Telegram and VK notification channels without losing input or cross-contaminating
   const handleSwitchPlatform = (targetPlatform: NotificationPlatform) => {
@@ -220,25 +262,40 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
     setIsDetecting(false);
 
     if (result.success && result.chatId) {
-      setTgChatId(String(result.chatId));
+      const detectedId = String(result.chatId);
+      const detectedUsername = (result.username || tgUsername).trim();
+      const detectedFirstName = (result.firstName || tgFirstName).trim();
+      setTgChatId(detectedId);
       if (result.username) setTgUsername(result.username);
       if (result.firstName) setTgFirstName(result.firstName);
       setStatusMessage({
         type: 'success',
-        text: `Chat ID успешно определен: ${result.chatId} (${result.username ? '@' + result.username : result.firstName || 'Пользователь'})! Подписка синхронизирована.`,
+        text: notificationsEnabled
+          ? `Chat ID определен: ${detectedId} (${detectedUsername ? '@' + detectedUsername : detectedFirstName || 'Пользователь'})! Авторизация и уведомления включены.`
+          : `Chat ID определен: ${detectedId}! Профиль авторизован без уведомлений — ваш прогресс сохраняется в облаке.`,
       });
       triggerHaptic('success');
 
       const subData: TelegramSubscription = {
-        chat_id: String(result.chatId),
-        username: (result.username || tgUsername).trim(),
-        first_name: (result.firstName || tgFirstName).trim(),
+        chat_id: detectedId,
+        username: detectedUsername,
+        first_name: detectedFirstName,
         directions: selectedDirections,
         sub_tracks: selectedSubTracks,
-        is_active: true,
+        is_active: notificationsEnabled,
         created_at: new Date().toISOString(),
       };
+      const profile: AuthProfile = {
+        platform: 'telegram',
+        id: detectedId,
+        username: detectedUsername || undefined,
+        firstName: detectedFirstName || undefined,
+        notificationsEnabled,
+        authorizedAt: authProfile?.authorizedAt || new Date().toISOString(),
+      };
+      saveLocalAuthProfile(profile);
       saveLocalSubscription(subData);
+      onAuthSuccess?.(profile, subData);
       onSubscriptionSaved(subData);
       saveSubscriptionToSupabase(subData);
     } else {
@@ -349,16 +406,19 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
       return;
     }
 
-    if (selectedDirections.length === 0) {
-      setStatusMessage({ type: 'error', text: 'Выберите хотя бы одно направление стажировок' });
+    if (selectedDirections.length === 0 && notificationsEnabled) {
+      setStatusMessage({ type: 'error', text: 'Выберите хотя бы одно направление для уведомлений' });
       return;
     }
+
+    const effectiveDirections: DirectionId[] =
+      selectedDirections.length > 0 ? selectedDirections : ['frontend', 'backend'];
 
     setIsLoading(true);
     setStatusMessage(null);
 
-    // If inside VK Mini App, request native community messages permission
-    if (platform === 'vk' && (isVk || vkUser)) {
+    // If inside VK Mini App AND notifications are enabled, request native community messages permission
+    if (platform === 'vk' && (isVk || vkUser) && notificationsEnabled) {
       try {
         await requestVkNotificationsPermission(242573933);
       } catch {}
@@ -369,25 +429,39 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
       id: currentId,
       username: currentUsername,
       firstName: currentFirstName,
-      directions: selectedDirections,
+      directions: effectiveDirections,
       subTracks: selectedSubTracks,
+      notificationsEnabled,
     });
 
     setIsLoading(false);
 
     if (saveRes.success) {
       triggerHaptic('success');
-      confetti({ particleCount: 90, spread: 70 });
+      confetti({ particleCount: notificationsEnabled ? 90 : 45, spread: 70 });
 
+      const profile: AuthProfile = {
+        platform,
+        id: currentId,
+        username: currentUsername || undefined,
+        firstName: currentFirstName || undefined,
+        notificationsEnabled,
+        authorizedAt: authProfile?.authorizedAt || new Date().toISOString(),
+      };
+      saveLocalAuthProfile(profile);
+      onAuthSuccess?.(profile, saveRes.subscription);
       onSubscriptionSaved(saveRes.subscription);
+
       setStatusMessage({
         type: 'success',
-        text: `Подписка успешно сохранена! Уведомления ${platform === 'vk' ? 'ВКонтакте' : 'в Telegram'} активированы.`,
+        text: notificationsEnabled
+          ? `Авторизация и уведомления ${platform === 'vk' ? 'ВКонтакте' : 'в Telegram'} сохранены! Прогресс синхронизирован в облаке.`
+          : `Вы авторизованы через ${platform === 'vk' ? 'ВКонтакте' : 'Telegram'}! Состояние сохраняется в облаке, уведомления отключены.`,
       });
 
       setTimeout(() => {
         onClose();
-      }, 1800);
+      }, 1500);
     } else {
       setStatusMessage({
         type: 'error',
@@ -439,16 +513,30 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
               platform === 'vk' ? 'bg-blue-600' : 'bg-neutral-900'
             }`}
           >
-            {platform === 'vk' ? <Bot className="w-5 h-5" /> : <Bell className="w-5 h-5" />}
+            {isStandaloneWeb ? (
+              <LogIn className="w-5 h-5" />
+            ) : platform === 'vk' ? (
+              <Bot className="w-5 h-5" />
+            ) : (
+              <Bell className="w-5 h-5" />
+            )}
           </div>
           <div className="min-w-0">
             <h2 className="text-lg font-bold font-sans text-neutral-950 dark:text-white truncate leading-snug">
-              {platform === 'vk' ? 'Уведомления ВКонтакте' : 'Уведомления в Telegram'}
+              {isStandaloneWeb
+                ? platform === 'vk'
+                  ? 'Авторизация через ВКонтакте'
+                  : 'Авторизация через Telegram'
+                : platform === 'vk'
+                ? 'Авторизация • Уведомления ВКонтакте'
+                : 'Авторизация • Уведомления в Telegram'}
             </h2>
             <p className="text-xs text-neutral-600 dark:text-neutral-300 truncate leading-relaxed">
-              {platform === 'vk'
-                ? 'Мгновенные пуши о новых стажировках от официального VK-бота IT-Старт'
-                : `Мгновенные пуши о новых стажировках от бота @${TELEGRAM_BOT_USERNAME}`}
+              {isStandaloneWeb
+                ? 'Сохранение роадмапов, тренажёра, избранного и откликов в облаке • Уведомления по желанию'
+                : platform === 'vk'
+                ? 'Синхронизация прогресса и уведомления от VK-бота IT-Старт'
+                : `Синхронизация прогресса и уведомления от бота @${TELEGRAM_BOT_USERNAME}`}
             </p>
           </div>
         </div>
@@ -502,6 +590,19 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
         {/* Scrollable Content Body with Fixed Footer */}
         <form onSubmit={handleSaveSubscription} className="flex-1 flex flex-col min-h-0 justify-between overflow-hidden">
           <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar space-y-3.5 pr-0.5">
+            {/* Explicit Cloud Sync / Authorization Info Banner */}
+            <div className="p-3 rounded-2xl border border-emerald-500/20 bg-emerald-500/5 dark:bg-emerald-500/10 text-xs flex items-start gap-2.5">
+              <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+              <div className="space-y-0.5 text-[11px] text-neutral-700 dark:text-neutral-200 leading-relaxed">
+                <div className="font-bold text-neutral-900 dark:text-white">
+                  Авторизация для сохранения вашего состояния
+                </div>
+                <p>
+                  Вход через Telegram или ВКонтакте привязывает к вашему ID прогресс роадмапов, вопросы тренажёра, избранные стажировки и отклики. Можно войти без уведомлений.
+                </p>
+              </div>
+            </div>
+
             {/* Top Official Bot Card & Profile Status */}
             {platform === 'vk' ? (
               <div className="p-3.5 rounded-2xl border text-xs space-y-2.5 bg-blue-500/5 border-blue-500/20 liquid-glass-subtle">
@@ -526,7 +627,9 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
                 </div>
 
                 <p className="text-[11px] text-neutral-600 leading-relaxed">
-                  Откройте диалог с официальным ботом IT-Старт и отправьте команду /start или /subscribe для активации сообщений.
+                  {notificationsEnabled
+                    ? 'Откройте диалог с официальным ботом IT-Старт и отправьте любое сообщение или /start для активации.'
+                    : 'Введите ваш числовой VK ID ниже или напишите боту, чтобы определить ID автоматически — уведомления останутся отключенными.'}
                 </p>
 
                 {/* Profile badge / Identification status */}
@@ -644,7 +747,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
                     </div>
                   </div>
                   <a
-                    href={`${TELEGRAM_BOT_URL}?start=subscribe`}
+                    href={`${TELEGRAM_BOT_URL}?start=${notificationsEnabled ? 'subscribe' : 'auth'}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neutral-900 hover:bg-black text-white font-medium text-[11px] shadow-xs transition-colors shrink-0 cursor-pointer"
@@ -655,7 +758,9 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
                 </div>
 
                 <p className="text-[11px] text-neutral-600 leading-relaxed">
-                  Откройте диалог с официальным ботом IT-Старт и отправьте команду /start или /subscribe для активации сообщений.
+                  {notificationsEnabled
+                    ? 'Откройте диалог с официальным ботом IT-Старт и отправьте команду /start или /subscribe для активации сообщений.'
+                    : 'Введите ваш Telegram Chat ID ниже или откройте бота (/start), чтобы определить ID автоматически — рассылка останется выключенной.'}
                 </p>
 
                 {/* Profile badge / Identification status */}
@@ -715,10 +820,10 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
                   </div>
                 ) : null}
 
-                {/* Subtle manual entry for desktop web (folded by default, no ugly prompts) */}
+                {/* Subtle manual entry for desktop web (open by default when ID is not yet entered) */}
                 {!telegramUser && (
-                  <details className="text-xs pt-0.5">
-                    <summary className="text-[11px] text-neutral-400 hover:text-neutral-600 dark:text-neutral-500 cursor-pointer select-none inline-flex items-center gap-1">
+                  <details className="text-xs pt-0.5" open={!tgChatId ? true : undefined}>
+                    <summary className="text-[11px] text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 cursor-pointer select-none inline-flex items-center gap-1">
                       <span>Настроить ID вручную</span>
                     </summary>
                     <div className="space-y-2 pt-2">
@@ -787,6 +892,56 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
                 )}
               </div>
             )}
+
+            {/* Notifications Opt-In Toggle: Authorize without notifications vs enable pushes */}
+            <div className="p-3 rounded-2xl border border-black/10 dark:border-white/10 liquid-glass-subtle flex items-center justify-between gap-3">
+              <div className="flex items-start gap-2.5 min-w-0">
+                <div
+                  className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
+                    notificationsEnabled
+                      ? platform === 'vk'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900'
+                      : 'bg-black/5 dark:bg-white/10 text-neutral-500 dark:text-neutral-400'
+                  }`}
+                >
+                  {notificationsEnabled ? <Bell className="w-4 h-4" /> : <BellOff className="w-4 h-4" />}
+                </div>
+                <div className="min-w-0">
+                  <div className="text-xs font-bold text-neutral-900 dark:text-white">
+                    Получать уведомления о новых стажировках
+                  </div>
+                  <div className="text-[11px] text-neutral-500 dark:text-neutral-400 leading-snug">
+                    {notificationsEnabled
+                      ? `Включены — бот ${platform === 'vk' ? 'ВКонтакте' : 'Telegram'} будет присылать подходящие вакансии`
+                      : 'Отключены — авторизация сработает только для сохранения прогресса без сообщений от бота'}
+                  </div>
+                </div>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={notificationsEnabled}
+                aria-label="Получать уведомления о новых стажировках"
+                onClick={() => {
+                  triggerHaptic('selection');
+                  setNotificationsEnabled((prev) => !prev);
+                }}
+                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none ${
+                  notificationsEnabled
+                    ? platform === 'vk'
+                      ? 'bg-blue-600'
+                      : 'bg-emerald-600'
+                    : 'bg-neutral-300 dark:bg-neutral-700'
+                }`}
+              >
+                <span
+                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ${
+                    notificationsEnabled ? 'translate-x-5' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </div>
 
             {/* Directions selector */}
             <div>
@@ -870,27 +1025,84 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
             )}
 
             <div className="flex flex-col sm:flex-row items-center gap-2">
-              <button
-                type="button"
-                onClick={handleTestNotification}
-                disabled={isLoading || !(platform === 'vk' ? vkPeerId.trim() : tgChatId.trim())}
-                className="w-full sm:w-1/2 min-h-[44px] flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-transform duration-150 active:scale-95 disabled:opacity-50 liquid-glass-pill hover:bg-white/50 text-neutral-800 cursor-pointer"
-              >
-                <Send className="w-3.5 h-3.5 text-neutral-600" />
-                <span>{platform === 'vk' ? 'Проверить в VK' : 'Проверить в TG'}</span>
-              </button>
+              {notificationsEnabled ? (
+                <button
+                  type="button"
+                  onClick={handleTestNotification}
+                  disabled={isLoading || !(platform === 'vk' ? vkPeerId.trim() : tgChatId.trim())}
+                  className="w-full sm:w-1/2 min-h-[44px] flex items-center justify-center gap-2 px-4 py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-transform duration-150 active:scale-95 disabled:opacity-50 liquid-glass-pill hover:bg-white/50 text-neutral-800 cursor-pointer"
+                >
+                  <Send className="w-3.5 h-3.5 text-neutral-600" />
+                  <span>{platform === 'vk' ? 'Проверить в VK' : 'Проверить в TG'}</span>
+                </button>
+              ) : isStandaloneWeb && authProfile && onLogout ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    triggerHaptic('medium');
+                    onLogout();
+                    onClose();
+                  }}
+                  className="w-full sm:w-1/2 min-h-[44px] flex items-center justify-center gap-2 px-4 py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-transform duration-150 active:scale-95 liquid-glass-pill hover:bg-rose-500/10 text-rose-700 dark:text-rose-300 cursor-pointer"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span>Выйти из аккаунта</span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="w-full sm:w-1/2 min-h-[44px] flex items-center justify-center gap-2 px-4 py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-transform duration-150 active:scale-95 liquid-glass-pill hover:bg-white/50 text-neutral-700 cursor-pointer"
+                >
+                  <span>Отмена</span>
+                </button>
+              )}
 
               <button
                 type="submit"
                 disabled={isLoading}
-                className={`w-full sm:w-1/2 min-h-[44px] flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-white text-xs sm:text-sm font-semibold shadow-xs transition-transform duration-150 active:scale-95 disabled:opacity-50 cursor-pointer ${
+                className={`w-full sm:w-1/2 min-h-[44px] flex items-center justify-center gap-2 px-4 py-2.5 rounded-full text-white text-xs sm:text-sm font-semibold shadow-xs transition-transform duration-150 active:scale-95 disabled:opacity-50 cursor-pointer ${
                   platform === 'vk' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-neutral-900 hover:bg-black'
                 }`}
               >
-                <Check className="w-4 h-4" />
-                <span>{isLoading ? 'Сохранение...' : platform === 'vk' ? 'Подключить в VK' : 'Подключить в TG'}</span>
+                {isStandaloneWeb && !authProfile ? <LogIn className="w-4 h-4" /> : <Check className="w-4 h-4" />}
+                <span>
+                  {isLoading
+                    ? 'Сохранение...'
+                    : !isStandaloneWeb
+                    ? notificationsEnabled
+                      ? platform === 'vk'
+                        ? 'Подключить в VK'
+                        : 'Подключить в TG'
+                      : 'Сохранить (без пушей)'
+                    : authProfile
+                    ? 'Сохранить профиль'
+                    : platform === 'vk'
+                    ? notificationsEnabled
+                      ? 'Войти и включить VK'
+                      : 'Войти через VK'
+                    : notificationsEnabled
+                    ? 'Войти и включить TG'
+                    : 'Войти через Telegram'}
+                </span>
               </button>
             </div>
+            {isStandaloneWeb && authProfile && onLogout && notificationsEnabled && (
+              <div className="flex justify-center pt-0.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    triggerHaptic('medium');
+                    onLogout();
+                    onClose();
+                  }}
+                  className="inline-flex items-center gap-1 text-[11px] font-medium text-neutral-500 hover:text-rose-600 transition-colors cursor-pointer"
+                >
+                  <LogOut className="w-3 h-3" />
+                  <span>Выйти из аккаунта ({authProfile.platform === 'vk' ? 'VK' : 'TG'})</span>
+                </button>
+              </div>
+            )}
           </div>
         </form>
       </div>

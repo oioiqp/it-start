@@ -1,7 +1,8 @@
-import type { Internship, JobApplication, TelegramSubscription, UserProgress } from '../types';
+import type { AuthProfile, Internship, JobApplication, TelegramSubscription, UserProgress } from '../types';
 
 const PROGRESS_STORAGE_KEY = 'it_start_user_progress';
 const SUBSCRIPTION_STORAGE_KEY = 'it_start_local_subscription';
+const AUTH_PROFILE_STORAGE_KEY = 'it_start_auth_profile';
 const INTERNSHIPS_STORAGE_KEY = 'it_start_cached_internships_v3';
 const THEME_STORAGE_KEY = 'it_start_theme';
 const FAVORITES_STORAGE_KEY = 'it_start_favorites';
@@ -72,6 +73,58 @@ export function saveLocalSubscription(sub: TelegramSubscription): void {
     localStorage.setItem(SUBSCRIPTION_STORAGE_KEY, JSON.stringify(sub));
   } catch (e) {
     console.warn('Failed to save subscription to localStorage:', e);
+  }
+}
+
+export function clearLocalSubscription(): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.removeItem(SUBSCRIPTION_STORAGE_KEY);
+    localStorage.removeItem('it_start_vk_peer_id');
+  } catch (e) {
+    console.warn('Failed to clear subscription from localStorage:', e);
+  }
+}
+
+export function getLocalAuthProfile(): AuthProfile | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem(AUTH_PROFILE_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || !parsed.id || (parsed.platform !== 'telegram' && parsed.platform !== 'vk')) {
+      return null;
+    }
+    return {
+      platform: parsed.platform,
+      id: String(parsed.id),
+      username: parsed.username || undefined,
+      firstName: parsed.firstName || undefined,
+      lastName: parsed.lastName || undefined,
+      photoUrl: parsed.photoUrl || undefined,
+      notificationsEnabled: parsed.notificationsEnabled !== false,
+      authorizedAt: parsed.authorizedAt || new Date().toISOString(),
+    };
+  } catch {
+    return null;
+  }
+}
+
+export function saveLocalAuthProfile(profile: AuthProfile): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(AUTH_PROFILE_STORAGE_KEY, JSON.stringify(profile));
+  } catch (e) {
+    console.warn('Failed to save auth profile to localStorage:', e);
+  }
+}
+
+export function clearLocalAuthProfile(): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.removeItem(AUTH_PROFILE_STORAGE_KEY);
+  } catch (e) {
+    console.warn('Failed to clear auth profile from localStorage:', e);
   }
 }
 

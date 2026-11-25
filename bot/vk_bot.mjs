@@ -582,6 +582,7 @@ export async function callVk(method, params = {}, token = VK_BOT_TOKEN) {
 export async function registerVkSubscriber(peerId, meta = {}) {
   const cleanId = cleanVkPeerId(peerId);
   const id = String(cleanId);
+  const isActive = meta.is_active !== false;
   const sub = {
     peer_id: id,
     first_name: meta.first_name || 'Пользователь VK',
@@ -589,9 +590,13 @@ export async function registerVkSubscriber(peerId, meta = {}) {
     directions: meta.directions || ['frontend', 'backend', 'mobile', 'qa', 'devops', 'data_science'],
     sub_tracks: meta.sub_tracks || ['react', 'python', 'nodejs', 'golang', 'auto_qa', 'cicd_docker'],
     subscribed_at: new Date().toISOString(),
-    is_active: true,
+    is_active: isActive,
   };
-  vkSubscribers.set(id, sub);
+  if (isActive) {
+    vkSubscribers.set(id, sub);
+  } else {
+    vkSubscribers.delete(id);
+  }
 
   try {
     if (supabase && process.env.NODE_ENV !== 'test' && !process.env.VITEST) {
@@ -601,7 +606,7 @@ export async function registerVkSubscriber(peerId, meta = {}) {
         first_name: sub.first_name,
         directions: sub.directions,
         sub_tracks: sub.sub_tracks,
-        is_active: true,
+        is_active: isActive,
         updated_at: new Date().toISOString(),
       };
       await supabase.from('tg_subscriptions').upsert(row, { onConflict: 'chat_id' });

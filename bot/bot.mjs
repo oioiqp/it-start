@@ -1665,6 +1665,7 @@ export const server = http.createServer(async (req, res) => {
       try {
         const parsed = JSON.parse(body || '{}');
         const { chatId, username, firstName, directions, sub_tracks, platform } = parsed;
+        const isActive = parsed.isActive !== false && parsed.is_active !== false;
         if (!chatId) {
           res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
           res.end(JSON.stringify({ success: false, error: 'chatId is required' }));
@@ -1681,15 +1682,18 @@ export const server = http.createServer(async (req, res) => {
             first_name: firstName,
             directions,
             sub_tracks,
+            is_active: isActive,
           });
 
-          // Deliver immediate confirmation push in VK if user has permitted messages
-          sendVkNotification(
-            cleanPeerId,
-            `🎉 Уведомления IT-Старт ВКонтакте успешно активированы!\n` +
-            `━━━━━━━━━━━━━━━━━━━━\n` +
-            `Вы первыми узнаете о новых оплачиваемых стажировках от ведущих работодателей под ваш стек.`
-          ).catch(() => {});
+          // Deliver immediate confirmation push in VK only when notifications are enabled
+          if (isActive) {
+            sendVkNotification(
+              cleanPeerId,
+              `🎉 Уведомления IT-Старт ВКонтакте успешно активированы!\n` +
+              `━━━━━━━━━━━━━━━━━━━━\n` +
+              `Вы первыми узнаете о новых оплачиваемых стажировках от ведущих работодателей под ваш стек.`
+            ).catch(() => {});
+          }
 
           res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
           res.end(JSON.stringify({ success: true, subscriber: sub }));
@@ -1701,6 +1705,7 @@ export const server = http.createServer(async (req, res) => {
           first_name: firstName,
           directions,
           sub_tracks,
+          is_active: isActive,
         });
         res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
         res.end(JSON.stringify({ success: true, subscriber: sub }));
@@ -4651,17 +4656,22 @@ export async function getTgSubscribers() {
  */
 export async function registerTgSubscriber(chatId, meta = {}) {
   const id = String(chatId);
+  const isActive = meta.is_active !== false;
   const sub = {
     chat_id: id,
     username: meta.username || '',
     first_name: meta.first_name || 'Пользователь Telegram',
     directions: meta.directions || ['frontend', 'backend', 'mobile', 'qa', 'devops', 'data_science'],
     sub_tracks: meta.sub_tracks || ['react', 'python', 'nodejs', 'golang', 'auto_qa', 'cicd_docker'],
-    is_active: true,
+    is_active: isActive,
     updated_at: new Date().toISOString(),
   };
 
-  tgSubscribers.set(id, sub);
+  if (isActive) {
+    tgSubscribers.set(id, sub);
+  } else {
+    tgSubscribers.delete(id);
+  }
 
   try {
     if (supabase && process.env.NODE_ENV !== 'test' && !process.env.VITEST) {
@@ -4784,13 +4794,36 @@ export async function handleMessage(msg) {
     textClean === 'hello' ||
     isGreeting
   ) {
-    // Auto-register subscriber in Supabase
+    const isAuthOnlyStart = textClean === '/start auth' || textClean.startsWith('/start auth_');
+    // Auto-register subscriber in Supabase (without enabling push notifications when opened via ?start=auth)
     await registerTgSubscriber(chatId, {
       username,
       first_name: firstName,
+      is_active: !isAuthOnlyStart,
     });
 
-    const webAppUrlWithParams = `${WEBAPP_URL}${WEBAPP_URL.includes('?') ? '&' : '?'}tg_chat_id=${chatId}&tg_username=${encodeURIComponent(username || '')}&tg_first_name=${encodeURIComponent(firstName || '')}&subscribed=1#tg_chat_id=${chatId}`;
+    const webAppUrlWithParams = `${WEBAPP_URL}${WEBAPP_URL.includes('?') ? '&' : '?'}tg_chat_id=${chatId}&tg_username=${encodeURIComponent(username || '')}&tg_first_name=${encodeURIComponent(firstName || '')}${isAuthOnlyStart ? '&auth_only=1' : '&subscribed=1'}#tg_chat_id=${chatId}`;
+
+    if (isAuthOnlyStart) {
+      const authText =
+        `🔑 <b>Авторизация в IT-Старт</b>\n\n` +
+        `👤 Профиль: <b>${firstName}</b>${username ? ` (@${username})` : ''}\n` +
+        `🆔 Ваш Telegram ID: <code>${chatId}</code>\n` +
+        `🔕 Уведомления о вакансиях <b>отключены</b> (можно включить на сайте по желанию).\n\n` +
+        `Вернитесь на сайт и нажмите <b>«Определить Chat ID автоматически»</b> или вставьте ID <code>${chatId}</code> — ваш прогресс роадмапов, тренажёра, избранное и отклики будут синхронизироваться в облаке.`;
+
+      await callTelegram('sendMessage', {
+        chat_id: chatId,
+        text: authText,
+        parse_mode: 'HTML',
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: '🚀 Открыть IT-Старт с этим профилем', web_app: { url: webAppUrlWithParams } }],
+          ],
+        },
+      });
+      return;
+    }
 
     const welcomeText =
       `👋 <b>Привет, ${firstName}!</b>\n\n` +

@@ -156,6 +156,26 @@ export interface UserProgress {
   repeatQuestions: string[];
 }
 
+export type AuthPlatform = 'telegram' | 'vk';
+
+export interface AuthProfile {
+  platform: AuthPlatform;
+  id: string;
+  username?: string;
+  firstName?: string;
+  lastName?: string;
+  photoUrl?: string;
+  notificationsEnabled: boolean;
+  authorizedAt: string;
+}
+
+export interface CloudUserState {
+  progress: UserProgress;
+  favorites: string[];
+  applications: JobApplication[];
+  updatedAt?: string;
+}
+
 export interface TeamMember {
   name: string;
   role: string;

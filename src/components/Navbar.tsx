@@ -6,8 +6,11 @@ import {
   Send,
   Bot,
   CheckCheck,
+  LogIn,
+  Bell,
+  BellOff,
 } from 'lucide-react';
-import type { TelegramUser, UserProgress } from '../types';
+import type { AuthProfile, TelegramUser, UserProgress } from '../types';
 import type { VkUser } from '../lib/vkBridge';
 import { triggerHaptic } from '../lib/telegram';
 
@@ -18,6 +21,7 @@ interface NavbarProps {
   setActiveTab: (tab: NavTabId) => void;
   telegramUser?: TelegramUser | null;
   vkUser?: VkUser | null;
+  authProfile?: AuthProfile | null;
   isVk?: boolean;
   userProgress?: UserProgress;
   totalTopicsCount?: number;
@@ -33,6 +37,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   setActiveTab,
   telegramUser,
   vkUser,
+  authProfile,
   isVk,
   onOpenSubscribeModal,
   applicationsCount = 0,
@@ -189,23 +194,53 @@ export const Navbar: React.FC<NavbarProps> = ({
                   onOpenSubscribeModal();
                 }}
                 className="flex items-center gap-1 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full font-semibold text-xs transition-transform duration-150 active:scale-95 shadow-xs shrink-0 bg-neutral-900 hover:bg-black text-white dark:bg-white dark:text-neutral-900 cursor-pointer"
-                title={`Telegram: ${telegramUser.first_name || ''} • Уведомления`}
+                title={`Telegram: ${telegramUser.first_name || ''} • Профиль и уведомления`}
               >
                 <Send className="w-3.5 h-3.5 text-sky-400" />
                 <span className="hidden sm:inline">TG Бот</span>
               </button>
             </div>
+          ) : authProfile ? (
+            <button
+              onClick={() => {
+                triggerHaptic('medium');
+                onOpenSubscribeModal();
+              }}
+              className={`flex items-center gap-1.5 pl-1.5 pr-2.5 sm:pr-3 py-1 rounded-full text-xs font-semibold transition-transform duration-150 active:scale-95 shadow-xs shrink-0 border cursor-pointer ${
+                authProfile.platform === 'vk'
+                  ? 'bg-blue-50/90 dark:bg-blue-950/40 border-blue-500/25 text-neutral-900 dark:text-white'
+                  : 'bg-sky-500/10 dark:bg-sky-950/40 border-sky-500/25 text-neutral-900 dark:text-white'
+              }`}
+              title={`Аккаунт (${authProfile.platform === 'vk' ? 'ВКонтакте' : 'Telegram'} ID: ${authProfile.id}) • Состояние сохраняется в облаке${authProfile.notificationsEnabled ? '' : ' • Уведомления откл.'}`}
+            >
+              <span
+                className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full text-white font-bold text-[10px] flex items-center justify-center shrink-0 ${
+                  authProfile.platform === 'vk' ? 'bg-blue-600' : 'bg-sky-600'
+                }`}
+              >
+                {authProfile.platform === 'vk' ? 'VK' : 'TG'}
+              </span>
+              <span className="truncate max-w-[90px] sm:max-w-[100px]">
+                {authProfile.firstName ||
+                  (authProfile.username ? `@${authProfile.username}` : `ID ${authProfile.id}`)}
+              </span>
+              {authProfile.notificationsEnabled ? (
+                <Bell className="w-3 h-3 text-emerald-600 dark:text-emerald-400 shrink-0" />
+              ) : (
+                <BellOff className="w-3 h-3 text-neutral-400 shrink-0" />
+              )}
+            </button>
           ) : (
             <button
               onClick={() => {
                 triggerHaptic('medium');
                 onOpenSubscribeModal();
               }}
-              className="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-full font-semibold text-xs transition-transform duration-150 active:scale-95 shadow-xs shrink-0 bg-neutral-900 hover:bg-black text-white cursor-pointer"
-              title="Боты и уведомления"
+              className="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-full font-semibold text-xs transition-transform duration-150 active:scale-95 shadow-xs shrink-0 bg-neutral-900 hover:bg-black text-white dark:bg-white dark:text-neutral-950 cursor-pointer"
+              title="Авторизация через Telegram или ВКонтакте для сохранения прогресса"
             >
-              <Bot className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Боты</span>
+              <LogIn className="w-3.5 h-3.5" />
+              <span>Войти</span>
             </button>
           )}
         </div>
